@@ -10,7 +10,7 @@
 
 **Goal:** Initialize monorepo, Docker environment, and CI/CD so all developers can build, run, and test locally with one command.
 
-**Status:** Complete (2026-02-10)
+**Status:** Gap Closure (2026-02-10)
 
 **Segments:** ALL (DATABASE, BACKEND, FRONTEND, DEVOPS)
 
@@ -18,7 +18,7 @@
 
 **Depends on:** None
 
-**Plans:** 7/7 complete
+**Plans:** 10 plans (7 complete, 3 gap closure pending)
 
 Plans:
 - [x] 01-a-PLAN.md — Root monorepo scaffold (pnpm workspace, tsconfig, env vars, ignore files)
@@ -28,13 +28,19 @@ Plans:
 - [x] 01-e-PLAN.md — Developer tooling (ESLint 9, Prettier, husky, commitlint)
 - [x] 01-f-PLAN.md — CI/CD pipeline (GitHub Actions, Trivy scanning)
 - [x] 01-g-PLAN.md — Health endpoints and monorepo validation
+- [ ] 01-h-PLAN.md — Gap closure: Fix Prettier formatting violations (39 files)
+- [ ] 01-i-PLAN.md — Gap closure: Fix TypeScript errors (372) and ESLint errors (93)
+- [ ] 01-j-PLAN.md — Gap closure: Fix homepage 404 (restructure app/ with [locale] segment)
 
 **Success Criteria:**
 1. ~~`pnpm install` succeeds and workspace packages resolve~~ ✓
 2. ~~`docker compose up` starts PostgreSQL, Redis, and RabbitMQ with passing health checks~~ ✓
-3. ~~`pnpm dev` starts Next.js dev server connecting to all services~~ ✓
-4. ~~CI pipeline runs lint and type-check on every push~~ ✓
-5. ~~Health/readiness endpoints respond with 200~~ ✓
+3. `pnpm dev` starts Next.js dev server and homepage loads without 404 (pending 01-j)
+4. `pnpm type-check` passes with zero errors across all packages (pending 01-i)
+5. `pnpm lint` passes with zero errors across all packages (pending 01-i)
+6. `pnpm format:check` passes with zero formatting issues (pending 01-h)
+7. ~~CI pipeline runs lint and type-check on every push~~ ✓
+8. ~~Health/readiness endpoints respond with 200~~ ✓
 
 ---
 
@@ -115,17 +121,17 @@ Plans:
 
 **Depends on:** Phase 3
 
-**Plans:** 8 plans
+**Plans:** 8 plans in 5 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Design system foundation (shadcn/ui components, Tailwind theme, cn utility)
-- [ ] 04-02-PLAN.md — State management & API client (Zustand stores, TanStack Query, providers)
-- [ ] 04-03-PLAN.md — Internationalization setup (next-intl, cs/sk/en translations)
-- [ ] 04-04-PLAN.md — Auth pages (login, register, forgot-password, reset-password)
-- [ ] 04-05-PLAN.md — App shell layout (sidebar, header, breadcrumbs, mobile nav, auth guard)
-- [ ] 04-06-PLAN.md — Dashboard & shared components (KPI cards, data table, empty states, skeletons)
-- [ ] 04-07-PLAN.md — Calendar & toast (FullCalendar resource timeline, sonner, placeholder pages)
-- [ ] 04-08-PLAN.md — Visual verification checkpoint
+- [ ] 04-01-PLAN.md — Design system foundation (shadcn/ui 16 components, Tailwind theme, cn utility) [Wave 1]
+- [ ] 04-02-PLAN.md — State management & API client (Zustand stores, TanStack Query, providers) [Wave 1]
+- [ ] 04-03-PLAN.md — Internationalization setup (next-intl, cs/sk/en translations) [Wave 1]
+- [ ] 04-04-PLAN.md — Auth pages (login, register, forgot-password, reset-password) [Wave 2]
+- [ ] 04-05-PLAN.md — App shell layout (sidebar, header, breadcrumbs, mobile nav, auth guard) [Wave 2]
+- [ ] 04-06-PLAN.md — Dashboard & shared components (KPI cards, data table, empty states, skeletons) [Wave 3]
+- [ ] 04-07-PLAN.md — Calendar & toast (FullCalendar resource timeline, sonner, placeholder pages) [Wave 4]
+- [ ] 04-08-PLAN.md — Visual verification checkpoint [Wave 5]
 
 **Success Criteria:**
 1. User can log in and see role-appropriate sidebar navigation
@@ -370,4 +376,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-10 after GSD upgrade*
+*Last updated: 2026-02-10 after gap closure planning*
