@@ -6,9 +6,11 @@
 
 ## Milestone 1: Foundation & MVP
 
-### Phase 1: Project Setup & Infrastructure
+### Phase 1: Project Setup & Infrastructure ✓
 
 **Goal:** Initialize monorepo, Docker environment, and CI/CD so all developers can build, run, and test locally with one command.
+
+**Status:** Complete (2026-02-10)
 
 **Segments:** ALL (DATABASE, BACKEND, FRONTEND, DEVOPS)
 
@@ -16,23 +18,23 @@
 
 **Depends on:** None
 
-**Plans:** 7 plans
+**Plans:** 7/7 complete
 
 Plans:
-- [ ] 01-a-PLAN.md — Root monorepo scaffold (pnpm workspace, tsconfig, env vars, ignore files)
-- [ ] 01-b-PLAN.md — Shared packages stubs (database, shared, events, ui)
-- [ ] 01-c-PLAN.md — Next.js 14 app setup (apps/web with App Router, Tailwind)
-- [ ] 01-d-PLAN.md — Docker Compose environment (PostgreSQL, Redis, RabbitMQ, Dockerfile)
-- [ ] 01-e-PLAN.md — Developer tooling (ESLint 9, Prettier, husky, commitlint)
-- [ ] 01-f-PLAN.md — CI/CD pipeline (GitHub Actions, Trivy scanning)
-- [ ] 01-g-PLAN.md — Health endpoints and monorepo validation
+- [x] 01-a-PLAN.md — Root monorepo scaffold (pnpm workspace, tsconfig, env vars, ignore files)
+- [x] 01-b-PLAN.md — Shared packages stubs (database, shared, events, ui)
+- [x] 01-c-PLAN.md — Next.js 14 app setup (apps/web with App Router, Tailwind)
+- [x] 01-d-PLAN.md — Docker Compose environment (PostgreSQL, Redis, RabbitMQ, Dockerfile)
+- [x] 01-e-PLAN.md — Developer tooling (ESLint 9, Prettier, husky, commitlint)
+- [x] 01-f-PLAN.md — CI/CD pipeline (GitHub Actions, Trivy scanning)
+- [x] 01-g-PLAN.md — Health endpoints and monorepo validation
 
 **Success Criteria:**
-1. `pnpm install` succeeds and workspace packages resolve
-2. `docker compose up` starts PostgreSQL, Redis, and RabbitMQ with passing health checks
-3. `pnpm dev` starts Next.js dev server connecting to all services
-4. CI pipeline runs lint and type-check on every push
-5. Health/readiness endpoints respond with 200
+1. ~~`pnpm install` succeeds and workspace packages resolve~~ ✓
+2. ~~`docker compose up` starts PostgreSQL, Redis, and RabbitMQ with passing health checks~~ ✓
+3. ~~`pnpm dev` starts Next.js dev server connecting to all services~~ ✓
+4. ~~CI pipeline runs lint and type-check on every push~~ ✓
+5. ~~Health/readiness endpoints respond with 200~~ ✓
 
 ---
 
