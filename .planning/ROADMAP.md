@@ -82,6 +82,18 @@ Plans:
 
 **Depends on:** Phase 2
 
+**Plans:** 8 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Shared error classes, error codes, API response utilities
+- [ ] 03-02-PLAN.md — JWT management, Argon2id password hashing, Redis client, Zod validation middleware
+- [ ] 03-03-PLAN.md — Route handler factory, auth/RBAC middleware, auth Zod schemas
+- [ ] 03-04-PLAN.md — Auth endpoints: register, login, refresh, logout, password reset, email verify, profile
+- [ ] 03-05-PLAN.md — MFA setup/verify, OAuth2 scaffolds, API key management
+- [ ] 03-06-PLAN.md — Customer CRUD with pagination, search, tags, GDPR export
+- [ ] 03-07-PLAN.md — Service CRUD with categories, Employee CRUD with working hours and overrides
+- [ ] 03-08-PLAN.md — Resource CRUD with types, company settings, company working hours
+
 **Success Criteria:**
 1. User can register, verify email, log in, and receive JWT tokens
 2. Refresh token rotation works (old token rejected after rotation)
