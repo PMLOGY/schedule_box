@@ -1,0 +1,335 @@
+# Requirements: ScheduleBox
+
+**Defined:** 2026-02-10
+**Core Value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
+
+## v1 Requirements
+
+Requirements for full platform release. Each maps to roadmap phases.
+
+### Infrastructure
+
+- [ ] **INFRA-01**: Monorepo initialized with Next.js 14, TypeScript, pnpm workspaces
+- [ ] **INFRA-02**: Docker Compose runs PostgreSQL 16, Redis 7, RabbitMQ 3.13 with health checks
+- [ ] **INFRA-03**: CI/CD pipeline skeleton with GitHub Actions (lint, test, build)
+- [ ] **INFRA-04**: Linting (ESLint), formatting (Prettier), pre-commit hooks configured
+- [ ] **INFRA-05**: Health check and readiness endpoints for all services
+
+### Database
+
+- [ ] **DB-01**: All 47 Drizzle ORM table schemas matching documentation spec
+- [ ] **DB-02**: Migration system with up/down support and CI integration
+- [ ] **DB-03**: Row Level Security policies on every tenant table (company_id scoped)
+- [ ] **DB-04**: Development seed data for all core entities
+- [ ] **DB-05**: Double-booking prevention via UNIQUE constraint + SELECT FOR UPDATE
+- [ ] **DB-06**: Soft delete on key tables (bookings, customers, employees, services)
+- [ ] **DB-07**: Audit logging triggers on critical tables
+
+### Authentication
+
+- [ ] **AUTH-01**: User can register with email and password
+- [ ] **AUTH-02**: User can log in and receive JWT access + refresh tokens
+- [ ] **AUTH-03**: JWT refresh token rotation with secure storage
+- [ ] **AUTH-04**: User can reset password via email link
+- [ ] **AUTH-05**: User receives email verification after registration
+- [ ] **AUTH-06**: Multi-factor authentication support (TOTP)
+- [ ] **AUTH-07**: OAuth2 login (Google, Facebook, Apple)
+- [ ] **AUTH-08**: RBAC middleware enforcing 23 permissions across 4 roles (admin, owner, employee, customer)
+- [ ] **AUTH-09**: API key management for external integrations
+
+### Core Entities
+
+- [ ] **CORE-01**: Customer CRUD with name, email, phone, notes, visit history
+- [ ] **CORE-02**: Service CRUD with name, price, duration, description, image
+- [ ] **CORE-03**: Service category management (grouping services)
+- [ ] **CORE-04**: Employee CRUD with profile, assigned services, statistics
+- [ ] **CORE-05**: Working hours management per employee (Mon-Sun, time ranges)
+- [ ] **CORE-06**: Working hours overrides (vacation, sick days, exceptions)
+- [ ] **CORE-07**: Resource CRUD (rooms, chairs, equipment)
+- [ ] **CORE-08**: Resource type management
+- [ ] **CORE-09**: Company settings management (name, address, timezone, logo)
+- [ ] **CORE-10**: Zod validation on every API input
+- [ ] **CORE-11**: Shared error handling middleware with standard error format
+
+### Frontend Shell
+
+- [ ] **UI-01**: App shell with sidebar navigation, header, and routing per role
+- [ ] **UI-02**: Design system primitives (Button, Input, Select, Modal, Table, etc.)
+- [ ] **UI-03**: Login page with email/password form
+- [ ] **UI-04**: Registration page with onboarding wizard
+- [ ] **UI-05**: Forgot password / reset password pages
+- [ ] **UI-06**: Dashboard with KPI cards (bookings, revenue, no-shows, occupancy)
+- [ ] **UI-07**: Calendar component with day/week/month views and employee columns
+- [ ] **UI-08**: Toast notification system (success, warning, error, info)
+- [ ] **UI-09**: Empty states, loading states, and error boundaries
+
+### Booking
+
+- [ ] **BOOK-01**: Availability engine calculating free slots from working hours, existing bookings, and buffer times
+- [ ] **BOOK-02**: Booking CRUD with double-booking prevention (SELECT FOR UPDATE)
+- [ ] **BOOK-03**: 4-step booking form (select service -> pick date/time -> customer info -> confirmation)
+- [ ] **BOOK-04**: Calendar with drag & drop for rescheduling bookings
+- [ ] **BOOK-05**: Buffer time configuration before/after services (cleanup, prep)
+- [ ] **BOOK-06**: Customer can cancel or reschedule booking per cancellation policy
+- [ ] **BOOK-07**: Admin can block time slots (vacation, maintenance)
+- [ ] **BOOK-08**: RabbitMQ domain events (booking.created, booking.confirmed, booking.cancelled, booking.completed, booking.no_show)
+- [ ] **BOOK-09**: Multi-resource booking (service requiring room + equipment)
+- [ ] **BOOK-10**: Booking expiration mechanism for unpaid pending bookings
+
+### Payments
+
+- [ ] **PAY-01**: Comgate online payment gateway integration (card payments)
+- [ ] **PAY-02**: QRcomat on-site QR code payment generation
+- [ ] **PAY-03**: Payment webhook processing with idempotency keys
+- [ ] **PAY-04**: Invoice PDF generation and download
+- [ ] **PAY-05**: Refund processing from admin interface
+- [ ] **PAY-06**: SAGA choreography pattern: booking -> payment -> confirmation flow with compensation
+- [ ] **PAY-07**: Payment status tracking and history per booking
+
+### Notifications & Automation
+
+- [ ] **NOTIF-01**: Email notification sending via SMTP
+- [ ] **NOTIF-02**: SMS notification sending via provider API
+- [ ] **NOTIF-03**: Push notification support
+- [ ] **NOTIF-04**: Notification template system with Handlebars variables
+- [ ] **NOTIF-05**: Automatic confirmation email on booking creation
+- [ ] **NOTIF-06**: Automatic reminder notifications (24h and 2h before appointment)
+- [ ] **NOTIF-07**: RabbitMQ event consumers triggering notifications automatically
+- [ ] **NOTIF-08**: Visual rule builder for automation (trigger -> delay -> action)
+- [ ] **NOTIF-09**: Review request automation after completed visit
+- [ ] **NOTIF-10**: Review routing (4-5 stars -> Google/Facebook, 1-3 stars -> internal feedback)
+
+### CRM & Marketing
+
+- [ ] **CRM-01**: Customer tagging system (VIP, new, problem, etc.)
+- [ ] **CRM-02**: Coupon CRUD (percentage and fixed discounts, expiration, limits)
+- [ ] **CRM-03**: Coupon validation and application during booking
+- [ ] **CRM-04**: Gift card system with balance tracking and redemption
+- [ ] **CRM-05**: Customer bulk import from CSV
+- [ ] **CRM-06**: Customer export to CSV/JSON
+- [ ] **CRM-07**: GDPR compliance tools (data export, anonymization, deletion)
+
+### Loyalty
+
+- [ ] **LOYAL-01**: Loyalty program CRUD (points-based and stamp-based)
+- [ ] **LOYAL-02**: Tier system with automatic upgrades (Bronze -> Silver -> Gold)
+- [ ] **LOYAL-03**: Automatic points earning on booking completion
+- [ ] **LOYAL-04**: Points redemption for rewards/discounts
+- [ ] **LOYAL-05**: Apple Wallet digital loyalty card
+- [ ] **LOYAL-06**: Google Wallet digital loyalty card
+- [ ] **LOYAL-07**: Rewards catalog management
+
+### AI Phase 1
+
+- [ ] **AI1-01**: No-show predictor using XGBoost (display risk % in booking detail)
+- [ ] **AI1-02**: Customer Lifetime Value prediction using Random Forest
+- [ ] **AI1-03**: Customer health score (RFM + ML, 0-100 scale)
+- [ ] **AI1-04**: AI fallback system with circuit breaker and default values when AI unavailable
+- [ ] **AI1-05**: AI prediction display in customer detail and booking views
+
+### AI Phase 2
+
+- [ ] **AI2-01**: Smart upselling recommendations (collaborative filtering)
+- [ ] **AI2-02**: Dynamic pricing optimizer adjusting prices by demand (reinforcement learning)
+- [ ] **AI2-03**: Capacity optimizer maximizing utilization (LSTM)
+- [ ] **AI2-04**: Smart reminder timing optimizing send times (Bayesian optimization)
+
+### Advanced Features
+
+- [ ] **ADV-01**: Marketplace listing with geo-search for discovering businesses
+- [ ] **ADV-02**: Review system with owner responses
+- [ ] **ADV-03**: Embeddable JavaScript booking widget for external websites
+- [ ] **ADV-04**: Public booking page per company with branding
+- [ ] **ADV-05**: Video conferencing integration (Zoom)
+- [ ] **ADV-06**: Video conferencing integration (Google Meet)
+- [ ] **ADV-07**: Video conferencing integration (MS Teams)
+- [ ] **ADV-08**: White-label mobile app framework
+
+### Polish
+
+- [ ] **POL-01**: Analytics dashboard with revenue graphs and KPI trends
+- [ ] **POL-02**: Revenue and booking reports by period with export
+- [ ] **POL-03**: Internationalization support (cs, sk, en)
+- [ ] **POL-04**: WCAG 2.1 AA accessibility compliance
+- [ ] **POL-05**: Performance optimization (Lighthouse score >90)
+
+### AI Phase 3
+
+- [ ] **AI3-01**: Voice booking via phone (Whisper STT + GPT-4 NLU)
+- [ ] **AI3-02**: AI follow-up generator for personalized re-engagement emails
+- [ ] **AI3-03**: Competitor intelligence with automated monitoring
+
+### DevOps & Launch
+
+- [ ] **OPS-01**: Kubernetes production deployment with auto-scaling
+- [ ] **OPS-02**: Monitoring stack (Prometheus + Grafana + Sentry)
+- [ ] **OPS-03**: Distributed tracing (OpenTelemetry + Jaeger)
+- [ ] **OPS-04**: Load testing with k6 (target: 1000 concurrent users)
+- [ ] **OPS-05**: Security audit (OWASP ZAP, dependency scanning)
+- [ ] **OPS-06**: Beta testing program with real businesses
+
+## v2 Requirements
+
+Deferred to future releases. Tracked but not in current roadmap.
+
+### Mobile
+
+- **MOB-01**: Native React Native mobile app
+- **MOB-02**: Push notifications on mobile
+- **MOB-03**: Offline booking capability
+
+### Expansion
+
+- **EXP-01**: Multi-language admin interface (PL, DE)
+- **EXP-02**: Multi-currency support
+- **EXP-03**: Country-specific payment gateways
+
+### Advanced AI
+
+- **AI4-01**: AI demand forecasting per service
+- **AI4-02**: AI-powered customer segmentation
+- **AI4-03**: Natural language report queries
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| Native mobile app | Web-first approach, React Native deferred to v2 |
+| Kafka message queue | RabbitMQ sufficient for target scale (5000 businesses) |
+| Elasticsearch | PostgreSQL full-text search (pg_trgm) sufficient for v1 |
+| Prisma ORM | Drizzle chosen for better SQL control and migration flexibility |
+| Real-time chat between owner and customer | High complexity, not core to scheduling value |
+| Multi-tenant database sharding | Single PostgreSQL with RLS sufficient for v1 scale |
+| Self-hosted AI models | OpenAI API + scikit-learn sufficient, avoid infrastructure complexity |
+| Accounting/invoicing module | Invoice generation yes, full accounting out of scope |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Pending |
+| DB-01 | Phase 2 | Pending |
+| DB-02 | Phase 2 | Pending |
+| DB-03 | Phase 2 | Pending |
+| DB-04 | Phase 2 | Pending |
+| DB-05 | Phase 2 | Pending |
+| DB-06 | Phase 2 | Pending |
+| DB-07 | Phase 2 | Pending |
+| AUTH-01 | Phase 3 | Pending |
+| AUTH-02 | Phase 3 | Pending |
+| AUTH-03 | Phase 3 | Pending |
+| AUTH-04 | Phase 3 | Pending |
+| AUTH-05 | Phase 3 | Pending |
+| AUTH-06 | Phase 3 | Pending |
+| AUTH-07 | Phase 3 | Pending |
+| AUTH-08 | Phase 3 | Pending |
+| AUTH-09 | Phase 3 | Pending |
+| CORE-01 | Phase 3 | Pending |
+| CORE-02 | Phase 3 | Pending |
+| CORE-03 | Phase 3 | Pending |
+| CORE-04 | Phase 3 | Pending |
+| CORE-05 | Phase 3 | Pending |
+| CORE-06 | Phase 3 | Pending |
+| CORE-07 | Phase 3 | Pending |
+| CORE-08 | Phase 3 | Pending |
+| CORE-09 | Phase 3 | Pending |
+| CORE-10 | Phase 3 | Pending |
+| CORE-11 | Phase 3 | Pending |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Pending |
+| UI-03 | Phase 4 | Pending |
+| UI-04 | Phase 4 | Pending |
+| UI-05 | Phase 4 | Pending |
+| UI-06 | Phase 4 | Pending |
+| UI-07 | Phase 4 | Pending |
+| UI-08 | Phase 4 | Pending |
+| UI-09 | Phase 4 | Pending |
+| BOOK-01 | Phase 5 | Pending |
+| BOOK-02 | Phase 5 | Pending |
+| BOOK-03 | Phase 5 | Pending |
+| BOOK-04 | Phase 5 | Pending |
+| BOOK-05 | Phase 5 | Pending |
+| BOOK-06 | Phase 5 | Pending |
+| BOOK-07 | Phase 5 | Pending |
+| BOOK-08 | Phase 5 | Pending |
+| BOOK-09 | Phase 5 | Pending |
+| BOOK-10 | Phase 5 | Pending |
+| PAY-01 | Phase 6 | Pending |
+| PAY-02 | Phase 6 | Pending |
+| PAY-03 | Phase 6 | Pending |
+| PAY-04 | Phase 6 | Pending |
+| PAY-05 | Phase 6 | Pending |
+| PAY-06 | Phase 6 | Pending |
+| PAY-07 | Phase 6 | Pending |
+| NOTIF-01 | Phase 7 | Pending |
+| NOTIF-02 | Phase 7 | Pending |
+| NOTIF-03 | Phase 7 | Pending |
+| NOTIF-04 | Phase 7 | Pending |
+| NOTIF-05 | Phase 7 | Pending |
+| NOTIF-06 | Phase 7 | Pending |
+| NOTIF-07 | Phase 7 | Pending |
+| NOTIF-08 | Phase 7 | Pending |
+| NOTIF-09 | Phase 7 | Pending |
+| NOTIF-10 | Phase 7 | Pending |
+| CRM-01 | Phase 8 | Pending |
+| CRM-02 | Phase 8 | Pending |
+| CRM-03 | Phase 8 | Pending |
+| CRM-04 | Phase 8 | Pending |
+| CRM-05 | Phase 8 | Pending |
+| CRM-06 | Phase 8 | Pending |
+| CRM-07 | Phase 8 | Pending |
+| LOYAL-01 | Phase 9 | Pending |
+| LOYAL-02 | Phase 9 | Pending |
+| LOYAL-03 | Phase 9 | Pending |
+| LOYAL-04 | Phase 9 | Pending |
+| LOYAL-05 | Phase 9 | Pending |
+| LOYAL-06 | Phase 9 | Pending |
+| LOYAL-07 | Phase 9 | Pending |
+| AI1-01 | Phase 10 | Pending |
+| AI1-02 | Phase 10 | Pending |
+| AI1-03 | Phase 10 | Pending |
+| AI1-04 | Phase 10 | Pending |
+| AI1-05 | Phase 10 | Pending |
+| AI2-01 | Phase 11 | Pending |
+| AI2-02 | Phase 11 | Pending |
+| AI2-03 | Phase 11 | Pending |
+| AI2-04 | Phase 11 | Pending |
+| ADV-01 | Phase 12 | Pending |
+| ADV-02 | Phase 12 | Pending |
+| ADV-03 | Phase 12 | Pending |
+| ADV-04 | Phase 12 | Pending |
+| ADV-05 | Phase 12 | Pending |
+| ADV-06 | Phase 12 | Pending |
+| ADV-07 | Phase 12 | Pending |
+| ADV-08 | Phase 12 | Pending |
+| POL-01 | Phase 13 | Pending |
+| POL-02 | Phase 13 | Pending |
+| POL-03 | Phase 13 | Pending |
+| POL-04 | Phase 13 | Pending |
+| POL-05 | Phase 13 | Pending |
+| AI3-01 | Phase 14 | Pending |
+| AI3-02 | Phase 14 | Pending |
+| AI3-03 | Phase 14 | Pending |
+| OPS-01 | Phase 15 | Pending |
+| OPS-02 | Phase 15 | Pending |
+| OPS-03 | Phase 15 | Pending |
+| OPS-04 | Phase 15 | Pending |
+| OPS-05 | Phase 15 | Pending |
+| OPS-06 | Phase 15 | Pending |
+
+**Coverage:**
+- v1 requirements: 103 total
+- Mapped to phases: 103
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-02-10*
+*Last updated: 2026-02-10 after GSD upgrade (derived from schedulebox_complete_documentation.md v13.0)*
