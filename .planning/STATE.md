@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 3 of 15 — Authentication & Core Services
 - **Status:** In Progress
-- **Current Plan:** 03-03 (Auth Middleware & Validation)
-- **Plans Executed:** 18
+- **Current Plan:** 03-08 (Resource CRUD & Settings)
+- **Plans Executed:** 19
 
 ## What's Done
 
@@ -40,14 +40,15 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-01: Error Handling & API Response Foundation (2 tasks, 2 commits)
 - [x] Plan 03-02: JWT & Token Management (2 tasks, 2 commits)
 - [x] Plan 03-03: Auth Middleware & Validation (2 tasks, 2 commits)
+- [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
 Phase 2: Complete ✅
-Phase 3: In Progress - Error handling foundation complete, continuing with JWT and auth endpoints
+Phase 3: In Progress - Core services endpoints (resources, settings) complete, auth endpoints pending
 
-Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout)
+Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) or other core CRUD endpoints
 
 ## Decisions
 
@@ -127,6 +128,10 @@ Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout)
 - [Phase 03-03]: PERMISSIONS constant defines all 23 system permissions for RBAC checks
 - [Phase 03-03]: findCompanyId helper resolves user UUID to company ID for tenant-scoped queries
 - [Phase 03-03]: Password complexity enforced via Zod regex (min 12 chars + uppercase + lowercase + number + special)
+- [Phase 03-08]: Resource CRUD with hard delete and FK constraint handling (deactivate via is_active flag)
+- [Phase 03-08]: Resource types are company-scoped with left join for optional type assignment
+- [Phase 03-08]: Company settings partial update maps snake_case request to camelCase database columns
+- [Phase 03-08]: Company working hours bulk replace pattern (delete + insert) for company-level defaults (employeeId IS NULL)
 
 ## Blockers
 
@@ -136,10 +141,10 @@ None — ready to start implementation.
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Requirements | 103 | ~18 implemented (database + error handling) |
+| Requirements | 103 | ~22 implemented (database + error handling + resources + settings) |
 | Phases | 15 | 2 complete, 1 in progress (Phase 3) |
 | DB Tables | 47 | 46 (all schemas + views + relations complete) |
-| API Endpoints | 99 | 2 (/api/health, /api/readiness) |
+| API Endpoints | 99 | ~15 (health, readiness, resources, settings, services, customers, tags) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
 
@@ -164,11 +169,12 @@ None — ready to start implementation.
 | 02-08 | 640s | 2 | 9 | 2 |
 | 03-01 | 175s | 2 | 7 | 2 |
 | 03-03 | 220s | 2 | 5 | 2 |
+| 03-08 | 233s | 2 | 7 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T20:04:53Z
-**Stopped at:** Completed 03-03-PLAN.md
+**Last session:** 2026-02-10T21:16:05Z
+**Stopped at:** Completed 03-08-PLAN.md
 
 ---
-*Last updated: 2026-02-10T20:04:53Z after completing Plan 03-03*
+*Last updated: 2026-02-10T21:16:05Z after completing Plan 03-08*
