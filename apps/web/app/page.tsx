@@ -1,11 +1,25 @@
-export default function HomePage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold">ScheduleBox</h1>
-      <p className="mt-4 text-lg text-gray-600">AI-powered reservation and scheduling platform</p>
-      <p className="mt-2 text-sm text-gray-400">
-        v{process.env.APP_VERSION || '1.0.0'} &mdash; Phase 1: Infrastructure
-      </p>
-    </main>
-  );
+import { redirect } from 'next/navigation';
+
+/**
+ * Root Page Redirect
+ *
+ * This page exists to handle the root path (/) and redirect to the default locale.
+ *
+ * Why this is needed:
+ * - next-intl middleware requires a page.tsx to exist at the root
+ * - Without this file, Next.js returns 404 before middleware can process the request
+ * - The middleware is configured with `localePrefix: 'as-needed'` which means:
+ *   - Default locale (cs) paths don't include /cs prefix in the URL
+ *   - Non-default locales (sk, en) include the locale prefix
+ *
+ * Flow:
+ * 1. User visits /
+ * 2. This page redirects to /cs
+ * 3. Middleware processes /cs and rewrites to appropriate content from app/[locale]/*
+ * 4. If unauthenticated, user sees /login (not /cs/login due to localePrefix: 'as-needed')
+ *
+ * This is a documented pattern when using next-intl with App Router and localePrefix: 'as-needed'.
+ */
+export default function RootPage() {
+  redirect('/cs');
 }
