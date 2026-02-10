@@ -3,7 +3,7 @@ status: diagnosed
 phase: 04-frontend-shell
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-07-SUMMARY.md
 started: 2026-02-10T22:10:00Z
-updated: 2026-02-10T22:20:00Z
+updated: 2026-02-10T22:30:00Z
 ---
 
 ## Current Test
@@ -51,84 +51,73 @@ result: pass
 
 expected: Navigating to the root URL (/) or /dashboard redirects to the login page since you are not authenticated. The auth guard prevents access to dashboard without valid JWT.
 result: issue
-reported: "Missing required html tags. The following tags are missing in the Root Layout: <html>, <body>. Error prevents page from rendering."
-severity: blocker
+reported: "Original blocker (missing html/body tags) fixed. But / shows 404 instead of redirecting to login. /cs/ correctly redirects to login — next-intl middleware not rewriting root URL."
+severity: major
 
 ### 9. Sidebar Navigation (if dashboard accessible)
 
 expected: If you can access the dashboard (e.g., by temporarily disabling auth guard or after login), the left sidebar shows navigation items with icons: Dashboard, Calendar, Bookings, Customers, Services, Employees, Settings. Sidebar is collapsible.
-result: issue
-reported: "same error — root layout missing <html> and <body> tags blocks all dashboard routes"
-severity: blocker
+result: skipped
+reason: Cannot log in without backend server (Docker not available)
 
 ### 10. Dashboard KPI Cards
 
 expected: The dashboard page shows 4 stat cards in a grid: today's bookings (12), monthly revenue (47,850 Kč), new customers (23), average rating (4.7/5). Each card shows a trend indicator (up/down arrow with percentage).
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ### 11. Quick Actions
 
 expected: Below the KPI cards, a "Quick Actions" section shows 3 buttons: New Booking, Add Customer, View Calendar (in Czech).
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ### 12. Calendar Page
 
 expected: Navigating to /calendar shows a FullCalendar resource timeline with employee columns (4 mock employees). A toolbar above with prev/next/today buttons and day/week/month view toggles. Mock booking events shown in colored blocks.
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ### 13. Placeholder Pages
 
 expected: Navigating to /customers, /services, /employees, /settings, /bookings each shows a placeholder empty state with an icon and "coming soon" style message.
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ### 14. Header & Breadcrumbs
 
 expected: When viewing dashboard pages, a sticky header bar appears at the top with breadcrumbs showing the current location (e.g., "Dashboard > Calendar"). On mobile, a hamburger menu icon appears.
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ### 15. Responsive Layout
 
 expected: Resizing the browser to mobile width (~375px) hides the sidebar and shows a hamburger menu in the header. Tapping the hamburger opens a slide-over sheet with the same navigation items.
 result: skipped
-reason: Blocked by root layout error (Test 8)
+reason: Cannot log in without backend server (Docker not available)
 
 ## Summary
 
 total: 15
 passed: 7
-issues: 2
+issues: 1
 pending: 0
-skipped: 6
+skipped: 7
 
 ## Gaps
 
-- truth: 'Navigating to / or /dashboard redirects to login page via auth guard'
-  status: fixed
-  reason: 'User reported: Missing required html tags. The following tags are missing in the Root Layout: <html>, <body>. Error prevents page from rendering.'
-  severity: blocker
+- truth: 'Navigating to / redirects to login page via next-intl middleware and auth guard'
+  status: failed
+  reason: 'User reported: / shows 404. /cs/ correctly redirects to login. next-intl middleware not rewriting root URL to /cs/.'
+  severity: major
   test: 8
-  root_cause: 'app/layout.tsx was a bare passthrough returning just children without <html> or <body> tags. During i18n restructuring, these tags were moved to app/[locale]/layout.tsx, but Next.js requires them in the root layout.'
+  root_cause: 'Root page.tsx was deleted during i18n restructuring (moved to app/[locale]/). next-intl middleware configured with localePrefix: as-needed should rewrite / to /cs/ but either middleware is not matching root path or there is no page at app/[locale]/(dashboard)/page.tsx being served for /.'
   artifacts:
-    - path: 'apps/web/app/layout.tsx'
-      issue: 'Missing <html> and <body> tags — was bare passthrough'
-    - path: 'apps/web/app/[locale]/layout.tsx'
-      issue: 'Contained <html>/<body> that belong in root layout'
+    - path: 'apps/web/middleware.ts'
+      issue: 'May not be rewriting root / path to /cs/'
+    - path: 'apps/web/app/page.tsx'
+      issue: 'Deleted — no root page exists outside [locale] segment'
   missing:
-    - 'Move <html>, <body>, font, providers, Toaster, globals.css back to app/layout.tsx'
-    - 'Strip app/[locale]/layout.tsx to just NextIntlClientProvider wrapper'
-  debug_session: '.planning/debug/missing-html-tags-root-layout.md'
-
-- truth: 'Dashboard renders with sidebar navigation showing menu items'
-  status: fixed
-  reason: 'User reported: same error — root layout missing <html> and <body> tags blocks all dashboard routes'
-  severity: blocker
-  test: 9
-  root_cause: 'Same root cause as Test 8 — single fix resolves both issues'
-  artifacts: []
-  missing: []
-  debug_session: '.planning/debug/missing-html-tags-root-layout.md'
+    - 'Ensure next-intl middleware rewrites / to /cs/ (check matcher config)'
+    - 'Or add a root app/page.tsx that redirects to /cs/'
+  debug_session: ''
