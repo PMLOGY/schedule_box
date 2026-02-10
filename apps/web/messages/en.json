@@ -1,0 +1,123 @@
+{
+  "common": {
+    "appName": "ScheduleBox",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "noResults": "No results",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "register": "Register",
+      "invalidCredentials": "Invalid credentials",
+      "mfaRequired": "Two-factor authentication required"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create a new account",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "companyName": "Company name",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in",
+      "termsAgree": "I agree to the",
+      "termsLink": "terms of service",
+      "privacyLink": "privacy policy"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email to reset password",
+      "email": "Email",
+      "submit": "Send reset link",
+      "backToLogin": "Back to login",
+      "emailSent": "Reset link has been sent"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter your new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "success": "Password successfully reset"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "bookings": "Bookings",
+    "customers": "Customers",
+    "services": "Services",
+    "employees": "Employees",
+    "analytics": "Analytics",
+    "marketing": "Marketing",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome",
+    "todayBookings": "Today's bookings",
+    "monthlyRevenue": "Monthly revenue",
+    "newCustomers": "New customers",
+    "averageRating": "Average rating",
+    "noShowRate": "No-show rate",
+    "occupancyRate": "Occupancy rate",
+    "vsLastMonth": "vs last month",
+    "quickActions": "Quick actions",
+    "newBooking": "New booking",
+    "addCustomer": "Add customer",
+    "viewCalendar": "View calendar"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "noEvents": "No events",
+    "allEmployees": "All employees"
+  },
+  "table": {
+    "noData": "No data",
+    "rowsPerPage": "Rows per page",
+    "page": "Page",
+    "of": "of",
+    "showing": "Showing",
+    "to": "to",
+    "entries": "entries"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access forbidden",
+    "networkError": "Network error",
+    "serverError": "Server error"
+  }
+}

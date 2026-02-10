@@ -1,0 +1,123 @@
+{
+  "common": {
+    "appName": "ScheduleBox",
+    "loading": "Načítání...",
+    "save": "Uložit",
+    "cancel": "Zrušit",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "create": "Vytvořit",
+    "search": "Hledat",
+    "filter": "Filtrovat",
+    "back": "Zpět",
+    "next": "Další",
+    "previous": "Předchozí",
+    "close": "Zavřít",
+    "confirm": "Potvrdit",
+    "yes": "Ano",
+    "no": "Ne",
+    "noResults": "Žádné výsledky",
+    "error": "Chyba",
+    "success": "Úspěch"
+  },
+  "auth": {
+    "login": {
+      "title": "Přihlášení",
+      "subtitle": "Přihlaste se ke svému účtu",
+      "email": "E-mail",
+      "password": "Heslo",
+      "submit": "Přihlásit se",
+      "forgotPassword": "Zapomenuté heslo?",
+      "noAccount": "Nemáte účet?",
+      "register": "Registrovat se",
+      "invalidCredentials": "Neplatné přihlašovací údaje",
+      "mfaRequired": "Vyžadováno dvoufázové ověření"
+    },
+    "register": {
+      "title": "Registrace",
+      "subtitle": "Vytvořte si nový účet",
+      "firstName": "Jméno",
+      "lastName": "Příjmení",
+      "email": "E-mail",
+      "password": "Heslo",
+      "confirmPassword": "Potvrdit heslo",
+      "companyName": "Název společnosti",
+      "submit": "Zaregistrovat se",
+      "hasAccount": "Již máte účet?",
+      "login": "Přihlásit se",
+      "termsAgree": "Souhlasím s",
+      "termsLink": "podmínkami použití",
+      "privacyLink": "zásadami ochrany osobních údajů"
+    },
+    "forgotPassword": {
+      "title": "Zapomenuté heslo",
+      "subtitle": "Zadejte svůj e-mail pro obnovení hesla",
+      "email": "E-mail",
+      "submit": "Odeslat odkaz",
+      "backToLogin": "Zpět na přihlášení",
+      "emailSent": "E-mail s odkazem byl odeslán"
+    },
+    "resetPassword": {
+      "title": "Obnovit heslo",
+      "subtitle": "Zadejte nové heslo",
+      "newPassword": "Nové heslo",
+      "confirmPassword": "Potvrdit heslo",
+      "submit": "Obnovit heslo",
+      "success": "Heslo bylo úspěšně obnoveno"
+    }
+  },
+  "nav": {
+    "dashboard": "Přehled",
+    "calendar": "Kalendář",
+    "bookings": "Rezervace",
+    "customers": "Zákazníci",
+    "services": "Služby",
+    "employees": "Zaměstnanci",
+    "analytics": "Analytika",
+    "marketing": "Marketing",
+    "settings": "Nastavení",
+    "help": "Nápověda",
+    "logout": "Odhlásit se"
+  },
+  "dashboard": {
+    "title": "Přehled",
+    "welcome": "Vítejte",
+    "todayBookings": "Dnešní rezervace",
+    "monthlyRevenue": "Měsíční tržby",
+    "newCustomers": "Noví zákazníci",
+    "averageRating": "Průměrné hodnocení",
+    "noShowRate": "Míra nedostavení",
+    "occupancyRate": "Míra obsazenosti",
+    "vsLastMonth": "oproti minulému měsíci",
+    "quickActions": "Rychlé akce",
+    "newBooking": "Nová rezervace",
+    "addCustomer": "Přidat zákazníka",
+    "viewCalendar": "Zobrazit kalendář"
+  },
+  "calendar": {
+    "title": "Kalendář",
+    "today": "Dnes",
+    "day": "Den",
+    "week": "Týden",
+    "month": "Měsíc",
+    "noEvents": "Žádné události",
+    "allEmployees": "Všichni zaměstnanci"
+  },
+  "table": {
+    "noData": "Žádná data",
+    "rowsPerPage": "Řádků na stránku",
+    "page": "Stránka",
+    "of": "z",
+    "showing": "Zobrazeno",
+    "to": "až",
+    "entries": "záznamů"
+  },
+  "errors": {
+    "generic": "Něco se pokazilo",
+    "notFound": "Stránka nenalezena",
+    "unauthorized": "Neautorizováno",
+    "forbidden": "Přístup zakázán",
+    "networkError": "Chyba sítě",
+    "serverError": "Chyba serveru"
+  }
+}
