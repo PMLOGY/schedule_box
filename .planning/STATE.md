@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
 - **Status:** In Progress
-- **Current Plan:** 7 of TBD in Phase 02
-- **Plans Executed:** 13
+- **Current Plan:** 8 of TBD in Phase 02
+- **Plans Executed:** 14
 
 ## What's Done
 
@@ -34,13 +34,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-04: Bookings & Payments schema (2 tasks, 2 commits)
 - [x] Plan 02-05: Business Features schema (2 tasks, 2 commits)
 - [x] Plan 02-06: Platform Tables schema (2 tasks, 1 commit - merged with parallel plans)
+- [x] Plan 02-09: Database Functions & Constraints (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - All schemas complete (46 tables: 8 auth + 12 entities + 5 bookings/payments + 9 business features + 12 platform tables)
+Phase 2: In Progress - All schemas complete (46 tables + 8 SQL function files)
 
-Next: Generate Drizzle migrations and apply to PostgreSQL
+Next: Generate Drizzle migrations and apply SQL functions to PostgreSQL
 
 ## Decisions
 
@@ -93,6 +94,10 @@ Next: Generate Drizzle migrations and apply to PostgreSQL
 - [Phase 02-06]: audit_logs.company_id nullable to preserve audit trail after company deletion
 - [Phase 02-06]: Partial index on notifications.scheduled_at WHERE status='pending' for queue efficiency
 - [Phase 02-06]: DESC index on marketplace.average_rating for featured listing optimization
+- [Phase 02-09]: btree_gist exclusion constraint for double-booking prevention (defense in depth)
+- [Phase 02-09]: Partial indexes on deleted_at IS NULL optimize soft-delete queries (deleted_at columns in Drizzle)
+- [Phase 02-09]: Dynamic trigger application via DO $$ loop for updated_at columns
+- [Phase 02-09]: Audit trail triggers on 5 critical tables (bookings, customers, services, employees, payments)
 
 ## Blockers
 
@@ -125,11 +130,12 @@ None — ready to start implementation.
 | 02-04 | 328s | 2 | 3 | 2 |
 | 02-05 | 444s | 2 | 4 | 2 |
 | 02-06 | 485s | 2 | 9 | 1 |
+| 02-09 | 113s | 2 | 8 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T18:44:12Z
-**Stopped at:** Completed 02-06-PLAN.md (Platform Tables Schema)
+**Last session:** 2026-02-10T19:48:47Z
+**Stopped at:** Completed 02-09-PLAN.md (Database Functions & Constraints)
 
 ---
-*Last updated: 2026-02-10T18:44:12Z after completing Plan 02-06*
+*Last updated: 2026-02-10T19:48:47Z after completing Plan 02-09*
