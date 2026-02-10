@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await apiClient.post<RefreshResponse>('/auth/refresh');
           set({ accessToken: response.accessToken });
-        } catch (_error) {
+        } catch {
           // Refresh failed - clear state
           get().logout();
         }

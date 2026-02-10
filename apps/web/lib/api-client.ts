@@ -66,7 +66,7 @@ class ApiClient {
 
             return this.handleResponse<T>(retryResponse);
           }
-        } catch (_refreshError) {
+        } catch {
           // Refresh failed - logout
           useAuthStore.getState().logout();
           throw this.buildError(response, await response.json());
