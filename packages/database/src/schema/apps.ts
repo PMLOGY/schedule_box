@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Apps Schema
  *
  * White-label mobile app management:
@@ -18,7 +18,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
+import { companies } from './auth';
 
 // ============================================================================
 // WHITELABEL_APPS TABLE

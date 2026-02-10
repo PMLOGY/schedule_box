@@ -11,11 +11,11 @@
 
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, services, serviceCategories } from '@schedulebox/database';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse, noContentResponse } from '@/lib/utils/response.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { serviceUpdateSchema, serviceIdParamSchema } from '@/validations/service.js';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse, noContentResponse } from '@/lib/utils/response';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { serviceUpdateSchema, serviceIdParamSchema } from '@/validations/service';
 import { NotFoundError } from '@schedulebox/shared';
 
 /**

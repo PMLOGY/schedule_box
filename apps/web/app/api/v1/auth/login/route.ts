@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/login
  * User authentication with optional MFA verification
  *
@@ -13,14 +13,14 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { verify as verifyTOTP } from 'otplib';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users, roles, companies } from '@schedulebox/database';
-import { verifyPassword } from '@/lib/auth/password.js';
-import { generateTokenPair } from '@/lib/auth/jwt.js';
-import { redis } from '@/lib/redis/client.js';
-import { loginSchema } from '@/validations/auth.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { verifyPassword } from '@/lib/auth/password';
+import { generateTokenPair } from '@/lib/auth/jwt';
+import { redis } from '@/lib/redis/client';
+import { loginSchema } from '@/validations/auth';
+import { handleRouteError } from '@/lib/utils/errors';
+import { successResponse } from '@/lib/utils/response';
 import { UnauthorizedError } from '@schedulebox/shared';
 
 export async function POST(req: NextRequest) {
@@ -114,10 +114,7 @@ export async function POST(req: NextRequest) {
     );
 
     // 7. Update last login timestamp
-    await db
-      .update(users)
-      .set({ lastLoginAt: new Date() })
-      .where(eq(users.id, userRecord.id));
+    await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, userRecord.id));
 
     // 8. Return success with tokens and set httpOnly cookie
     const response = NextResponse.json({

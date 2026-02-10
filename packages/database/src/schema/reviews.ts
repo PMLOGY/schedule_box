@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Reviews Schema
  *
  * Customer review and rating system with redirect routing:
@@ -19,10 +19,10 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { customers } from './customers.js';
-import { services } from './services.js';
-import { employees } from './employees.js';
+import { companies } from './auth';
+import { customers } from './customers';
+import { services } from './services';
+import { employees } from './employees';
 
 // Note: bookings table reference uses deferred FK pattern
 // (parallel plan 02-04/02-05 may not be complete yet)

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AI Schema
  *
  * AI prediction and model metrics tracking:
@@ -18,7 +18,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
+import { companies } from './auth';
 
 // ============================================================================
 // AI_PREDICTIONS TABLE

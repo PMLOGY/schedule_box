@@ -11,7 +11,20 @@
       "Bash(grep:*)",
       "Bash(node:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Skill(gsd:plan-phase)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(npx tsc:*)",
+      "Bash(powershell:*)",
+      "Bash(ls:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(pnpm:*)",
+      "Bash(pnpm --filter web add:*)",
+      "Bash(cat:*)",
+      "Bash(git stash:*)",
+      "Bash(npx next build:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

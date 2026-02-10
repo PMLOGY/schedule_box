@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/verify-email
  * Verify user email address using token
  *
@@ -11,12 +11,12 @@
 import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { createHash } from 'crypto';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users } from '@schedulebox/database';
-import { redis } from '@/lib/redis/client.js';
-import { verifyEmailSchema } from '@/validations/auth.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { redis } from '@/lib/redis/client';
+import { verifyEmailSchema } from '@/validations/auth';
+import { handleRouteError } from '@/lib/utils/errors';
+import { successResponse } from '@/lib/utils/response';
 import { BadRequestError } from '@schedulebox/shared';
 
 export async function POST(req: NextRequest) {
@@ -36,10 +36,7 @@ export async function POST(req: NextRequest) {
     const userId = parseInt(userIdStr, 10);
 
     // 3. Update user: emailVerified=true
-    await db
-      .update(users)
-      .set({ emailVerified: true })
-      .where(eq(users.id, userId));
+    await db.update(users).set({ emailVerified: true }).where(eq(users.id, userId));
 
     // 4. Delete Redis key (one-time use)
     await redis.del(`email_verify:${tokenHash}`);

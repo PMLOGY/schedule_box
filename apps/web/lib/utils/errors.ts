@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Error handling utilities for Next.js API routes
  */
 
 import { type NextResponse } from 'next/server';
 import { AppError, InternalError } from '@schedulebox/shared';
-import { errorResponse } from './response.js';
+import { errorResponse } from './response';
 
 /**
  * Centralized error handler for API route handlers

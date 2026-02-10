@@ -41,6 +41,14 @@ export default tseslint.config(
     },
   },
 
+  // API routes: allow non-null assertions (user! is guaranteed by requiresAuth)
+  {
+    files: ['apps/web/app/api/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
+    },
+  },
+
   // Prettier must be last to override conflicting rules
   prettierConfig,
 

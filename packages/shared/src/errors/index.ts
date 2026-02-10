@@ -1,9 +1,9 @@
-/**
+﻿/**
  * Error handling exports for ScheduleBox
  */
 
 // Re-export all error classes
-export * from './app-error.js';
+export * from './app-error';
 
 /**
  * Standard error codes used throughout the ScheduleBox API

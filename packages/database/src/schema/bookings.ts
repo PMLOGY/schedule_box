@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Booking Schema
  *
  * Core booking and scheduling tables:
@@ -25,11 +25,11 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { customers } from './customers.js';
-import { services } from './services.js';
-import { employees } from './employees.js';
-import { resources } from './resources.js';
+import { companies } from './auth';
+import { customers } from './customers';
+import { services } from './services';
+import { employees } from './employees';
+import { resources } from './resources';
 
 // ============================================================================
 // BOOKINGS TABLE

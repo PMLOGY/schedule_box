@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Notifications Schema
  *
  * Notification system with smart templating and delivery tracking:
@@ -20,8 +20,8 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { customers } from './customers.js';
+import { companies } from './auth';
+import { customers } from './customers';
 
 // Note: bookings table reference uses deferred FK pattern
 // (parallel plan 02-04/02-05 may not be complete yet)

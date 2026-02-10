@@ -1,14 +1,14 @@
-/**
+﻿/**
  * Resource type list and create endpoints
  * GET /api/v1/resource-types - List resource types
  * POST /api/v1/resource-types - Create resource type
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { successResponse, createdResponse } from '@/lib/utils/response.js';
-import { resourceTypeCreateSchema } from '@/validations/resource.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { successResponse, createdResponse } from '@/lib/utils/response';
+import { resourceTypeCreateSchema } from '@/validations/resource';
 import { db, resourceTypes } from '@schedulebox/database';
 import { eq } from 'drizzle-orm';
 

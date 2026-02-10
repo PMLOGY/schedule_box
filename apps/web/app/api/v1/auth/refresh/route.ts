@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/refresh
  * Rotate refresh token and generate new access token
  *
@@ -8,9 +8,8 @@
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { rotateRefreshToken } from '@/lib/auth/jwt.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { rotateRefreshToken } from '@/lib/auth/jwt';
+import { handleRouteError } from '@/lib/utils/errors';
 import { BadRequestError } from '@schedulebox/shared';
 
 export async function POST(req: NextRequest) {
@@ -36,9 +35,11 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Rotate token (revokes old, generates new pair)
-    const { accessToken, refreshToken: newRefreshToken, expiresIn } = await rotateRefreshToken(
-      refreshToken,
-    );
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+      expiresIn,
+    } = await rotateRefreshToken(refreshToken);
 
     // 3. Return new tokens and update cookie
     const response = NextResponse.json({

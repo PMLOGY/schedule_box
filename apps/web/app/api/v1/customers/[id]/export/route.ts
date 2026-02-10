@@ -6,11 +6,11 @@
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, customers, customerTags, tags, bookings, payments } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { successResponse } from '@/lib/utils/response.js';
-import { customerIdParamSchema, type CustomerIdParam } from '@/validations/customer.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { successResponse } from '@/lib/utils/response';
+import { customerIdParamSchema, type CustomerIdParam } from '@/validations/customer';
 
 /**
  * GET /api/v1/customers/[id]/export

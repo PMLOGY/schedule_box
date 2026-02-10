@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/change-password
  * Change password for authenticated user
  *
@@ -11,13 +11,13 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users, refreshTokens } from '@schedulebox/database';
-import { verifyPassword, checkPasswordHistory, updatePassword } from '@/lib/auth/password.js';
-import { blacklistToken } from '@/lib/auth/jwt.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { changePasswordSchema } from '@/validations/auth.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { verifyPassword, checkPasswordHistory, updatePassword } from '@/lib/auth/password';
+import { blacklistToken } from '@/lib/auth/jwt';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { changePasswordSchema } from '@/validations/auth';
+import { successResponse } from '@/lib/utils/response';
 import { UnauthorizedError, ValidationError } from '@schedulebox/shared';
 
 export const POST = createRouteHandler({

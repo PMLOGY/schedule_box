@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Resource Schema
  *
  * Resource management for bookings:
@@ -22,8 +22,8 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { services } from './services.js';
+import { companies } from './auth';
+import { services } from './services';
 
 // ============================================================================
 // RESOURCE_TYPES TABLE

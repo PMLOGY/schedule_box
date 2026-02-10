@@ -1,14 +1,14 @@
-/**
+﻿/**
  * Company settings endpoints
  * GET /api/v1/settings/company - Get company profile
  * PUT /api/v1/settings/company - Update company settings
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { successResponse } from '@/lib/utils/response.js';
-import { companyUpdateSchema } from '@/validations/settings.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { successResponse } from '@/lib/utils/response';
+import { companyUpdateSchema } from '@/validations/settings';
 import { db, companies } from '@schedulebox/database';
 import { eq } from 'drizzle-orm';
 import { NotFoundError } from '@schedulebox/shared';

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * API Key Management
  * GET /api/v1/settings/api-keys - List API keys
  * POST /api/v1/settings/api-keys - Create API key
@@ -7,10 +7,10 @@
  * Keys are SHA-256 hashed in DB, only returned once on creation.
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { successResponse, createdResponse } from '@/lib/utils/response.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { successResponse, createdResponse } from '@/lib/utils/response';
 import { db, apiKeys } from '@schedulebox/database';
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';

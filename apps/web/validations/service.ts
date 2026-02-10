@@ -25,7 +25,10 @@ export const serviceCreateSchema = z.object({
   requires_payment: z.boolean().optional().default(false),
   is_online: z.boolean().optional().default(false),
   video_provider: z.enum(['zoom', 'google_meet', 'ms_teams']).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   resource_ids: z.array(z.number().int()).optional(),
 });
 
@@ -51,7 +54,10 @@ export const serviceUpdateSchema = z.object({
   requires_payment: z.boolean().optional(),
   is_online: z.boolean().optional(),
   video_provider: z.enum(['zoom', 'google_meet', 'ms_teams']).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   is_active: z.boolean().optional(),
 });
 

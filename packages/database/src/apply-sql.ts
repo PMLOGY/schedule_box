@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Apply SQL Files Script
  *
  * Executes raw SQL files (RLS policies, triggers, constraints, functions)
@@ -13,7 +13,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { migrationClient } from './db.js';
+import { migrationClient } from './db';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Payment Schema
  *
  * Payment processing and invoicing tables:
@@ -22,9 +22,9 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { bookings } from './bookings.js';
-import { customers } from './customers.js';
+import { companies } from './auth';
+import { bookings } from './bookings';
+import { customers } from './customers';
 
 // ============================================================================
 // PAYMENTS TABLE

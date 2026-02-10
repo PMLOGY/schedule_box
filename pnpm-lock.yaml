@@ -66,8 +66,8 @@ importers:
         specifier: ^6.1.20
         version: 6.1.20(@fullcalendar/core@6.1.20)
       '@hookform/resolvers':
-        specifier: ^5.2.2
-        version: 5.2.2(react-hook-form@7.71.1(react@18.3.1))
+        specifier: 3.9.1
+        version: 3.9.1(react-hook-form@7.71.1(react@18.3.1))
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -895,10 +895,10 @@ packages:
     peerDependencies:
       '@fullcalendar/core': ~6.1.20
 
-  '@hookform/resolvers@5.2.2':
-    resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
+  '@hookform/resolvers@3.9.1':
+    resolution: {integrity: sha512-ud2HqmGBM0P0IABqoskKWI6PEf6ZDDBZkFqe2Vnl+mTHCEHzr3ISjjZyCwTjC/qpL25JC9aIDkloQejvMeq0ug==}
     peerDependencies:
-      react-hook-form: ^7.55.0
+      react-hook-form: ^7.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1539,9 +1539,6 @@ packages:
 
   '@scure/base@2.0.0':
     resolution: {integrity: sha512-3E1kpuZginKkek01ovG8krQ0Z44E3DHPjc5S2rjJw9lZn3KSQOs8S7wqikF/AH7iRanHypj85uGyxk0XAyC37w==}
-
-  '@standard-schema/utils@0.3.0':
-    resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
   '@swc/core-darwin-arm64@1.15.11':
     resolution: {integrity: sha512-QoIupRWVH8AF1TgxYyeA5nS18dtqMuxNwchjBIwJo3RdwLEFiJq6onOx9JAxHtuPwUkIVuU2Xbp+jCJ7Vzmgtg==}
@@ -3858,9 +3855,8 @@ snapshots:
       '@fullcalendar/premium-common': 6.1.20(@fullcalendar/core@6.1.20)
       '@fullcalendar/scrollgrid': 6.1.20(@fullcalendar/core@6.1.20)
 
-  '@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@18.3.1))':
+  '@hookform/resolvers@3.9.1(react-hook-form@7.71.1(react@18.3.1))':
     dependencies:
-      '@standard-schema/utils': 0.3.0
       react-hook-form: 7.71.1(react@18.3.1)
 
   '@humanfs/core@0.19.1': {}
@@ -4432,8 +4428,6 @@ snapshots:
   '@schummar/icu-type-parser@1.21.5': {}
 
   '@scure/base@2.0.0': {}
-
-  '@standard-schema/utils@0.3.0': {}
 
   '@swc/core-darwin-arm64@1.15.11':
     optional: true

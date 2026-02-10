@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Development Seed Script
  *
  * Seeds the database with realistic Czech/Slovak development data:
@@ -14,8 +14,8 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { db, migrationClient } from '../db.js';
-import * as schema from '../schema/index.js';
+import { db, migrationClient } from '../db';
+import * as schema from '../schema/index';
 import {
   DEV_PASSWORD_HASH,
   czechName,
@@ -27,7 +27,7 @@ import {
   calculateEndTime,
   SERVICE_NAMES,
   SERVICE_CATEGORIES,
-} from './helpers.js';
+} from './helpers';
 
 /**
  * Main seed function

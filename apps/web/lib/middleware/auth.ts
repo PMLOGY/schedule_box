@@ -1,10 +1,10 @@
-/**
+﻿/**
  * JWT authentication middleware
  * Extracts and verifies JWT from Authorization Bearer header
  */
 
 import { type NextRequest } from 'next/server';
-import { verifyJWT, type JWTPayload } from '@/lib/auth/jwt.js';
+import { verifyJWT, type JWTPayload } from '@/lib/auth/jwt';
 import { UnauthorizedError } from '@schedulebox/shared';
 
 /**

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/reset-password
  * Reset password using token from forgot-password flow
  *
@@ -13,13 +13,13 @@
 import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { createHash } from 'crypto';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users, refreshTokens } from '@schedulebox/database';
-import { checkPasswordHistory, updatePassword } from '@/lib/auth/password.js';
-import { redis } from '@/lib/redis/client.js';
-import { resetPasswordSchema } from '@/validations/auth.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { checkPasswordHistory, updatePassword } from '@/lib/auth/password';
+import { redis } from '@/lib/redis/client';
+import { resetPasswordSchema } from '@/validations/auth';
+import { handleRouteError } from '@/lib/utils/errors';
+import { successResponse } from '@/lib/utils/response';
 import { BadRequestError, ValidationError } from '@schedulebox/shared';
 
 export async function POST(req: NextRequest) {
@@ -60,10 +60,7 @@ export async function POST(req: NextRequest) {
       .where(eq(users.id, userId));
 
     // 7. Revoke all refresh tokens (force re-login)
-    await db
-      .update(refreshTokens)
-      .set({ revoked: true })
-      .where(eq(refreshTokens.userId, userId));
+    await db.update(refreshTokens).set({ revoked: true }).where(eq(refreshTokens.userId, userId));
 
     // 8. Return success
     return successResponse({

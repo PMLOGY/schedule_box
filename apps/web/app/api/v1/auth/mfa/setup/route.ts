@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MFA Setup Endpoint
  * POST /api/v1/auth/mfa/setup
  *
@@ -6,9 +6,9 @@
  * Requires authenticated user. MFA is NOT enabled until verified.
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse } from '@/lib/utils/response.js';
-import { setupMFA } from '@/lib/auth/mfa.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse } from '@/lib/utils/response';
+import { setupMFA } from '@/lib/auth/mfa';
 import { db, users } from '@schedulebox/database';
 import { eq } from 'drizzle-orm';
 import { UnauthorizedError } from '@schedulebox/shared';

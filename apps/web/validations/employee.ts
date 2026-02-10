@@ -15,7 +15,10 @@ export const employeeCreateSchema = z.object({
   phone: z.string().optional(),
   title: z.string().optional(),
   bio: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   service_ids: z.array(z.number().int()).optional(),
 });
 
@@ -31,7 +34,10 @@ export const employeeUpdateSchema = z.object({
   phone: z.string().optional(),
   title: z.string().optional(),
   bio: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   is_active: z.boolean().optional(),
 });
 
@@ -68,8 +74,14 @@ export type WorkingHoursCreateInput = z.infer<typeof workingHoursCreateSchema>;
  */
 export const scheduleOverrideSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), // YYYY-MM-DD
-  start_time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
-  end_time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  start_time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
+  end_time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
   is_day_off: z.boolean().optional().default(false),
   reason: z.string().optional(),
 });

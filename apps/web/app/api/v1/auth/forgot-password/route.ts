@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/forgot-password
  * Request password reset link
  *
@@ -12,12 +12,12 @@ import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { createHash } from 'crypto';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users } from '@schedulebox/database';
-import { redis } from '@/lib/redis/client.js';
-import { forgotPasswordSchema } from '@/validations/auth.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { redis } from '@/lib/redis/client';
+import { forgotPasswordSchema } from '@/validations/auth';
+import { handleRouteError } from '@/lib/utils/errors';
+import { successResponse } from '@/lib/utils/response';
 
 export async function POST(req: NextRequest) {
   try {

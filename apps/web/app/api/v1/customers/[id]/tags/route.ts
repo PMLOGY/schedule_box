@@ -6,16 +6,16 @@
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, customers, customerTags, tags } from '@schedulebox/database';
 import { NotFoundError, ConflictError } from '@schedulebox/shared';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { successResponse } from '@/lib/utils/response';
 import {
   customerTagsSchema,
   customerIdParamSchema,
   type CustomerTags,
   type CustomerIdParam,
-} from '@/validations/customer.js';
+} from '@/validations/customer';
 
 /**
  * PUT /api/v1/customers/[id]/tags

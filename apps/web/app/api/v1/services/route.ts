@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GET /api/v1/services
  * List services with optional filtering by category_id and is_active
  *
@@ -8,11 +8,11 @@
 
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, services, serviceCategories, serviceResources } from '@schedulebox/database';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse, createdResponse } from '@/lib/utils/response.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { serviceCreateSchema, serviceQuerySchema } from '@/validations/service.js';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse, createdResponse } from '@/lib/utils/response';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { serviceCreateSchema, serviceQuerySchema } from '@/validations/service';
 
 /**
  * List services

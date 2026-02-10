@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Route handler factory for Next.js API routes
  * Composable pattern combining auth, RBAC, validation, and error handling
  *
@@ -7,11 +7,11 @@
 
 import { type NextRequest, type NextResponse } from 'next/server';
 import { type z } from 'zod';
-import { authenticateRequest } from './auth.js';
-import { checkPermissions } from './rbac.js';
-import { validateBody, validateParams } from './validate.js';
-import { handleRouteError } from '../utils/errors.js';
-import { type JWTPayload } from '../auth/jwt.js';
+import { authenticateRequest } from './auth';
+import { checkPermissions } from './rbac';
+import { validateBody, validateParams } from './validate';
+import { handleRouteError } from '../utils/errors';
+import { type JWTPayload } from '../auth/jwt';
 
 /**
  * Context passed to route handler

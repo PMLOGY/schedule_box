@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MFA Verify Endpoint
  * POST /api/v1/auth/mfa/verify
  *
@@ -6,10 +6,10 @@
  * Requires authenticated user with MFA secret from setup.
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse } from '@/lib/utils/response.js';
-import { mfaSetupVerifySchema } from '@/validations/auth.js';
-import { enableMFA } from '@/lib/auth/mfa.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse } from '@/lib/utils/response';
+import { mfaSetupVerifySchema } from '@/validations/auth';
+import { enableMFA } from '@/lib/auth/mfa';
 import { db, users } from '@schedulebox/database';
 import { eq } from 'drizzle-orm';
 import { UnauthorizedError, ValidationError } from '@schedulebox/shared';

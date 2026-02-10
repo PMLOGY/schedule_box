@@ -1,14 +1,14 @@
-/**
+﻿/**
  * Company working hours endpoints
  * GET /api/v1/settings/working-hours - Get company-level default working hours
  * PUT /api/v1/settings/working-hours - Update company-level default working hours
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { successResponse } from '@/lib/utils/response.js';
-import { companyWorkingHoursSchema } from '@/validations/settings.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { successResponse } from '@/lib/utils/response';
+import { companyWorkingHoursSchema } from '@/validations/settings';
 import { db, workingHours } from '@schedulebox/database';
 import { eq, and, isNull } from 'drizzle-orm';
 

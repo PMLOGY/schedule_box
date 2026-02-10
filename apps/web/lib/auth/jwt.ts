@@ -1,4 +1,4 @@
-/**
+﻿/**
  * JWT token generation, verification, rotation, and blacklisting
  *
  * Security:
@@ -11,8 +11,8 @@ import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { createHash } from 'crypto';
 import { eq } from 'drizzle-orm';
-import { redis } from '../redis/client.js';
-import { db } from '../db/client.js';
+import { redis } from '../redis/client';
+import { db } from '../db/client';
 import { refreshTokens, rolePermissions, permissions, users, roles } from '@schedulebox/database';
 import { UnauthorizedError } from '@schedulebox/shared';
 

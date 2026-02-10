@@ -1,2 +1,2 @@
-// Re-export all API types
-export * from './api.js';
+﻿// Re-export all API types
+export * from './api';

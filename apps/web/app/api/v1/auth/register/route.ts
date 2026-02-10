@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/register
  * User registration with company creation
  *
@@ -9,13 +9,13 @@
 import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { companies, users, roles, passwordHistory } from '@schedulebox/database';
-import { hashPassword } from '@/lib/auth/password.js';
-import { generateTokenPair } from '@/lib/auth/jwt.js';
-import { registerSchema } from '@/validations/auth.js';
-import { handleRouteError } from '@/lib/utils/errors.js';
-import { createdResponse } from '@/lib/utils/response.js';
+import { hashPassword } from '@/lib/auth/password';
+import { generateTokenPair } from '@/lib/auth/jwt';
+import { registerSchema } from '@/validations/auth';
+import { handleRouteError } from '@/lib/utils/errors';
+import { createdResponse } from '@/lib/utils/response';
 import { ConflictError } from '@schedulebox/shared';
 
 /**

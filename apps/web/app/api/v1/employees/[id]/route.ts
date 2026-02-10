@@ -11,11 +11,11 @@
 
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, employees, employeeServices, services } from '@schedulebox/database';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse, noContentResponse } from '@/lib/utils/response.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { employeeUpdateSchema, employeeIdParamSchema } from '@/validations/employee.js';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse, noContentResponse } from '@/lib/utils/response';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { employeeUpdateSchema, employeeIdParamSchema } from '@/validations/employee';
 import { NotFoundError } from '@schedulebox/shared';
 
 /**
@@ -51,7 +51,11 @@ export const GET = createRouteHandler({
       })
       .from(employees)
       .where(
-        and(eq(employees.uuid, params.id), eq(employees.companyId, companyId), isNull(employees.deletedAt)),
+        and(
+          eq(employees.uuid, params.id),
+          eq(employees.companyId, companyId),
+          isNull(employees.deletedAt),
+        ),
       )
       .limit(1);
 
@@ -120,7 +124,11 @@ export const PUT = createRouteHandler({
       .update(employees)
       .set(updateData)
       .where(
-        and(eq(employees.uuid, params.id), eq(employees.companyId, companyId), isNull(employees.deletedAt)),
+        and(
+          eq(employees.uuid, params.id),
+          eq(employees.companyId, companyId),
+          isNull(employees.deletedAt),
+        ),
       )
       .returning({
         uuid: employees.uuid,
@@ -159,7 +167,11 @@ export const DELETE = createRouteHandler({
         updatedAt: new Date(),
       })
       .where(
-        and(eq(employees.uuid, params.id), eq(employees.companyId, companyId), isNull(employees.deletedAt)),
+        and(
+          eq(employees.uuid, params.id),
+          eq(employees.companyId, companyId),
+          isNull(employees.deletedAt),
+        ),
       )
       .returning({ uuid: employees.uuid });
 

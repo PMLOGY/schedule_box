@@ -14,10 +14,7 @@ class ApiClient {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     // Get access token from auth store

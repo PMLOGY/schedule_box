@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Loyalty Schema
  *
  * Loyalty program management with points, stamps, and tiers:
@@ -25,9 +25,9 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { customers } from './customers.js';
-import { services } from './services.js';
+import { companies } from './auth';
+import { customers } from './customers';
+import { services } from './services';
 
 // ============================================================================
 // LOYALTY_PROGRAMS TABLE

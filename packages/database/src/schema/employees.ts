@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Employee Schema
  *
  * Employee/staff management with working hours:
@@ -25,8 +25,8 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies, users } from './auth.js';
-import { services } from './services.js';
+import { companies, users } from './auth';
+import { services } from './services';
 
 // ============================================================================
 // EMPLOYEES TABLE

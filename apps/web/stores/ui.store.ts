@@ -52,6 +52,6 @@ export const useUIStore = create<UIState>()(
         // Only persist sidebar collapsed state
         sidebarCollapsed: state.sidebarCollapsed,
       }),
-    }
-  )
+    },
+  ),
 );

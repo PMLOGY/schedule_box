@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Marketplace Schema
  *
  * Public marketplace for business discovery:
@@ -20,7 +20,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
+import { companies } from './auth';
 
 // ============================================================================
 // MARKETPLACE_LISTINGS TABLE

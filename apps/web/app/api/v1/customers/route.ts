@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Customer List and Create Endpoints
  * GET  /api/v1/customers - List customers with pagination, search, tag filter, and sorting
  * POST /api/v1/customers - Create new customer
@@ -7,17 +7,16 @@
 import { eq, and, isNull, or, ilike, sql } from 'drizzle-orm';
 import { db, customers, customerTags, tags } from '@schedulebox/database';
 import { ConflictError } from '@schedulebox/shared';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { validateQuery } from '@/lib/middleware/validate.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { successResponse, createdResponse, paginatedResponse } from '@/lib/utils/response.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { validateQuery } from '@/lib/middleware/validate';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { createdResponse, paginatedResponse } from '@/lib/utils/response';
 import {
   customerCreateSchema,
   customerQuerySchema,
-  type CustomerCreate,
   type CustomerQuery,
-} from '@/validations/customer.js';
+} from '@/validations/customer';
 
 /**
  * GET /api/v1/customers
@@ -28,7 +27,8 @@ export const GET = createRouteHandler({
   requiredPermissions: [PERMISSIONS.CUSTOMERS_READ],
   handler: async ({ req, user }) => {
     // Find user's company ID for tenant isolation
-    const { companyId } = await findCompanyId(user!.sub);
+    const userSub = user?.sub ?? '';
+    const { companyId } = await findCompanyId(userSub);
 
     // Parse and validate query parameters
     const query = validateQuery(customerQuerySchema, req) as CustomerQuery;
@@ -43,13 +43,14 @@ export const GET = createRouteHandler({
     // Add search condition (search in name, email, or phone)
     if (search) {
       const searchTerm = `%${search}%`;
-      baseConditions.push(
-        or(
-          ilike(customers.name, searchTerm),
-          ilike(customers.email, searchTerm),
-          ilike(customers.phone, searchTerm),
-        )!,
+      const searchCondition = or(
+        ilike(customers.name, searchTerm),
+        ilike(customers.email, searchTerm),
+        ilike(customers.phone, searchTerm),
       );
+      if (searchCondition) {
+        baseConditions.push(searchCondition);
+      }
     }
 
     // Build query based on tag filter
@@ -102,7 +103,10 @@ export const GET = createRouteHandler({
       }
     } else {
       // Query without tag filter
-      const queryWithoutTags = db.select().from(customers).where(and(...baseConditions));
+      const queryWithoutTags = db
+        .select()
+        .from(customers)
+        .where(and(...baseConditions));
 
       // Add sorting based on sort_by parameter
       if (sort_by === 'name') {
@@ -184,7 +188,8 @@ export const POST = createRouteHandler({
   requiredPermissions: [PERMISSIONS.CUSTOMERS_CREATE],
   handler: async ({ body, user }) => {
     // Find user's company ID for tenant isolation
-    const { companyId } = await findCompanyId(user!.sub);
+    const userSub = user?.sub ?? '';
+    const { companyId } = await findCompanyId(userSub);
 
     // Check for duplicate email within company (if email provided)
     if (body.email) {

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * Role-Based Access Control (RBAC) middleware
  * Checks user permissions against required permissions
  */
 
-import { type JWTPayload } from '@/lib/auth/jwt.js';
+import { type JWTPayload } from '@/lib/auth/jwt';
 import { ForbiddenError } from '@schedulebox/shared';
 
 /**

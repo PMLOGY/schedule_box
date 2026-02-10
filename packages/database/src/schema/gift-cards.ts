@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Gift Card Schema
  *
  * Gift card management with balance tracking:
@@ -20,8 +20,8 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
-import { customers } from './customers.js';
+import { companies } from './auth';
+import { customers } from './customers';
 
 // ============================================================================
 // GIFT_CARDS TABLE

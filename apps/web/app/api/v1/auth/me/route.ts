@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GET /api/v1/auth/me - Get authenticated user profile
  * PUT /api/v1/auth/me - Update user profile
  *
@@ -6,11 +6,11 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users, roles, companies } from '@schedulebox/database';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { userUpdateSchema } from '@/validations/auth.js';
-import { successResponse } from '@/lib/utils/response.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { userUpdateSchema } from '@/validations/auth';
+import { successResponse } from '@/lib/utils/response';
 import { NotFoundError } from '@schedulebox/shared';
 
 /**

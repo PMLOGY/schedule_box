@@ -6,12 +6,12 @@
 import { eq, and, isNull, sql } from 'drizzle-orm';
 import { db, customers, bookings } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { validateQuery } from '@/lib/middleware/validate.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { paginatedResponse } from '@/lib/utils/response.js';
-import { customerIdParamSchema, type CustomerIdParam } from '@/validations/customer.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { validateQuery } from '@/lib/middleware/validate';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { paginatedResponse } from '@/lib/utils/response';
+import { customerIdParamSchema, type CustomerIdParam } from '@/validations/customer';
 import { z } from 'zod';
 
 /**

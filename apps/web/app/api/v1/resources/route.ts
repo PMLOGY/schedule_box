@@ -1,16 +1,16 @@
-/**
+﻿/**
  * Resource list and create endpoints
  * GET /api/v1/resources - List resources with type join
  * POST /api/v1/resources - Create resource
  */
 
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { successResponse, createdResponse } from '@/lib/utils/response.js';
-import { resourceCreateSchema } from '@/validations/resource.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { successResponse, createdResponse } from '@/lib/utils/response';
+import { resourceCreateSchema } from '@/validations/resource';
 import { db, resources, resourceTypes } from '@schedulebox/database';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 /**
  * GET /api/v1/resources

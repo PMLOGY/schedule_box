@@ -8,16 +8,16 @@
 import { eq, and } from 'drizzle-orm';
 import { db, tags } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { successResponse, noContentResponse } from '@/lib/utils/response.js';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { successResponse, noContentResponse } from '@/lib/utils/response';
 import {
   tagUpdateSchema,
   tagIdParamSchema,
   type TagUpdate,
   type TagIdParam,
-} from '@/validations/customer.js';
+} from '@/validations/customer';
 
 /**
  * GET /api/v1/tags/[id]

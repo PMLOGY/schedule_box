@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Service Schema
  *
  * Service catalog with dynamic pricing:
@@ -21,7 +21,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
+import { companies } from './auth';
 
 // ============================================================================
 // SERVICE_CATEGORIES TABLE

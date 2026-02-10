@@ -1,4 +1,4 @@
-/**
+﻿/**
  * POST /api/v1/auth/logout
  * Logout user and revoke all tokens
  *
@@ -9,11 +9,11 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db } from '@/lib/db/client.js';
+import { db } from '@/lib/db/client';
 import { users, refreshTokens } from '@schedulebox/database';
-import { blacklistToken } from '@/lib/auth/jwt.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { noContentResponse } from '@/lib/utils/response.js';
+import { blacklistToken } from '@/lib/auth/jwt';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { noContentResponse } from '@/lib/utils/response';
 
 export const POST = createRouteHandler({
   requiresAuth: true,

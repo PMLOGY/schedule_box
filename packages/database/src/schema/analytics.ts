@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Analytics Schema
  *
  * Analytics, audit logging, and competitor intelligence:
@@ -19,7 +19,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies, users } from './auth.js';
+import { companies, users } from './auth';
 
 // ============================================================================
 // ANALYTICS_EVENTS TABLE

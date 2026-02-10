@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Drizzle Relations
  *
  * Defines relationships between tables for query builder and nested queries.
@@ -14,24 +14,24 @@ import {
   rolePermissions,
   refreshTokens,
   apiKeys,
-} from './auth.js';
-import { customers, customerTags, tags } from './customers.js';
-import { services, serviceCategories } from './services.js';
-import { employees, employeeServices, workingHours, workingHoursOverrides } from './employees.js';
-import { resources, resourceTypes, serviceResources } from './resources.js';
-import { bookings, bookingResources, availabilitySlots } from './bookings.js';
-import { payments, invoices } from './payments.js';
-import { coupons, couponUsage } from './coupons.js';
-import { giftCards, giftCardTransactions } from './gift-cards.js';
-import { loyaltyPrograms, loyaltyTiers, loyaltyCards, loyaltyTransactions } from './loyalty.js';
-import { notifications, notificationTemplates } from './notifications.js';
-import { reviews } from './reviews.js';
-import { aiPredictions } from './ai.js';
-import { marketplaceListings } from './marketplace.js';
-import { videoMeetings } from './video.js';
-import { whitelabelApps } from './apps.js';
-import { automationRules, automationLogs } from './automation.js';
-import { auditLogs, analyticsEvents } from './analytics.js';
+} from './auth';
+import { customers, customerTags, tags } from './customers';
+import { services, serviceCategories } from './services';
+import { employees, employeeServices, workingHours, workingHoursOverrides } from './employees';
+import { resources, resourceTypes, serviceResources } from './resources';
+import { bookings, bookingResources, availabilitySlots } from './bookings';
+import { payments, invoices } from './payments';
+import { coupons, couponUsage } from './coupons';
+import { giftCards, giftCardTransactions } from './gift-cards';
+import { loyaltyPrograms, loyaltyTiers, loyaltyCards, loyaltyTransactions } from './loyalty';
+import { notifications, notificationTemplates } from './notifications';
+import { reviews } from './reviews';
+import { aiPredictions } from './ai';
+import { marketplaceListings } from './marketplace';
+import { videoMeetings } from './video';
+import { whitelabelApps } from './apps';
+import { automationRules, automationLogs } from './automation';
+import { auditLogs, analyticsEvents } from './analytics';
 
 // ============================================================================
 // COMPANIES RELATIONS

@@ -88,6 +88,6 @@ export const useAuthStore = create<AuthState>()(
         // Only persist user - NOT tokens (accessToken in memory only)
         user: state.user,
       }),
-    }
-  )
+    },
+  ),
 );

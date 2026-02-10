@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GET /api/v1/employees
  * List employees with assigned services
  *
@@ -8,11 +8,11 @@
 
 import { eq, and, isNull } from 'drizzle-orm';
 import { db, employees, employeeServices, services } from '@schedulebox/database';
-import { findCompanyId } from '@/lib/db/tenant-scope.js';
-import { createRouteHandler } from '@/lib/middleware/route-handler.js';
-import { successResponse, createdResponse } from '@/lib/utils/response.js';
-import { PERMISSIONS } from '@/lib/middleware/rbac.js';
-import { employeeCreateSchema } from '@/validations/employee.js';
+import { findCompanyId } from '@/lib/db/tenant-scope';
+import { createRouteHandler } from '@/lib/middleware/route-handler';
+import { successResponse, createdResponse } from '@/lib/utils/response';
+import { PERMISSIONS } from '@/lib/middleware/rbac';
+import { employeeCreateSchema } from '@/validations/employee';
 
 /**
  * List employees

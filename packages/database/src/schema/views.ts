@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Database Views
  *
  * Drizzle pgView definitions for reporting and analytics:
@@ -8,8 +8,8 @@
 
 import { pgView } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { bookings } from './bookings.js';
-import { customers } from './customers.js';
+import { bookings } from './bookings';
+import { customers } from './customers';
 
 // ============================================================================
 // DAILY BOOKING SUMMARY VIEW

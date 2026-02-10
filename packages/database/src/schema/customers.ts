@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Customer Schema
  *
  * Customer management with AI-computed fields:
@@ -25,7 +25,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies, users } from './auth.js';
+import { companies, users } from './auth';
 
 // ============================================================================
 // CUSTOMERS TABLE

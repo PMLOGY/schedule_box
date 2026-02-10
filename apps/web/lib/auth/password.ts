@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Password hashing and history management using Argon2id
  *
  * Security parameters (OWASP recommendations, Doc section 24.1):
@@ -10,7 +10,7 @@
  */
 import argon2 from 'argon2';
 import { eq, desc, inArray } from 'drizzle-orm';
-import { db } from '../db/client.js';
+import { db } from '../db/client';
 import { users, passwordHistory } from '@schedulebox/database';
 
 // Argon2id parameters matching OWASP recommendations (Doc sec 24.1)

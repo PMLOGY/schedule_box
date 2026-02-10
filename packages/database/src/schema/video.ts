@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Video Schema
  *
  * Video conferencing integration for virtual bookings:
@@ -17,7 +17,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { companies } from './auth.js';
+import { companies } from './auth';
 
 // Note: bookings table reference uses deferred FK pattern
 // (parallel plan 02-04/02-05 may not be complete yet)
