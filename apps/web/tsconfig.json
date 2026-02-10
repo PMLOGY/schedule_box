@@ -5,11 +5,12 @@
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./app/*", "./components/*", "./lib/*", "./validations/*"],
+      "@/*": ["./app/*", "./components/*", "./lib/*", "./validations/*", "./stores/*"],
       "@/app/*": ["./app/*"],
       "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"],
-      "@/validations/*": ["./validations/*"]
+      "@/validations/*": ["./validations/*"],
+      "@/stores/*": ["./stores/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
