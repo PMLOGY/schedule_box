@@ -115,6 +115,18 @@ Plans:
 
 **Depends on:** Phase 3
 
+**Plans:** 8 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Design system foundation (shadcn/ui components, Tailwind theme, cn utility)
+- [ ] 04-02-PLAN.md — State management & API client (Zustand stores, TanStack Query, providers)
+- [ ] 04-03-PLAN.md — Internationalization setup (next-intl, cs/sk/en translations)
+- [ ] 04-04-PLAN.md — Auth pages (login, register, forgot-password, reset-password)
+- [ ] 04-05-PLAN.md — App shell layout (sidebar, header, breadcrumbs, mobile nav, auth guard)
+- [ ] 04-06-PLAN.md — Dashboard & shared components (KPI cards, data table, empty states, skeletons)
+- [ ] 04-07-PLAN.md — Calendar & toast (FullCalendar resource timeline, sonner, placeholder pages)
+- [ ] 04-08-PLAN.md — Visual verification checkpoint
+
 **Success Criteria:**
 1. User can log in and see role-appropriate sidebar navigation
 2. Dashboard shows KPI cards (bookings, revenue, no-shows, occupancy)
