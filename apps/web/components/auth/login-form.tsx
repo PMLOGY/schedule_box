@@ -32,7 +32,7 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 export function LoginForm() {
   const t = useTranslations('auth.login');
-  const _tCommon = useTranslations('common');
+  const tCommon = useTranslations('common');
   const _tErrors = useTranslations('errors');
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
