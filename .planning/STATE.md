@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 1 of 15 — Project Setup & Infrastructure
 - **Status:** In Progress
-- **Current Plan:** 2 of 7 in Phase 01
-- **Plans Executed:** 2
+- **Current Plan:** 3 of 7 in Phase 01
+- **Plans Executed:** 3
 
 ## What's Done
 
@@ -22,14 +22,13 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] 103 requirements defined across 17 categories
 - [x] 15 phases mapped across 4 milestones
 - [x] Plan 01-a: Root monorepo scaffold (3 tasks, 3 commits)
+- [x] Plan 01-b: Workspace packages stub (2 tasks, 2 commits)
 - [x] Plan 01-d: Docker environment (2 tasks, 2 commits)
 
 ## What's Next
 
-Phase 1: Project Setup & Infrastructure (6 plans remaining)
-- Create apps/web Next.js 14 application (Plan 01-b)
-- Create packages/database with Drizzle ORM (Plan 01-c)
-- Create packages/shared utilities (Plan 01-d)
+Phase 1: Project Setup & Infrastructure (5 plans remaining)
+- Create apps/web Next.js 14 application (Plan 01-c)
 - Add ESLint, Prettier, Husky tooling (Plan 01-e)
 - Create Docker Compose configuration (Plan 01-f)
 - Run pnpm install to validate workspace (Plan 01-g)
@@ -74,12 +73,13 @@ None — ready to start implementation.
 | Phase-Plan | Duration | Tasks | Files | Commits |
 |------------|----------|-------|-------|---------|
 | 01-a | 89s | 3 | 9 | 3 |
+| 01-b | 115s | 2 | 18 | 2 |
 | 01-d | 81s | 2 | 2 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T17:24:12Z
-**Stopped at:** Completed 01-d-PLAN.md
+**Last session:** 2026-02-10T17:26:10Z
+**Stopped at:** Completed 01-b-PLAN.md
 
 ---
-*Last updated: 2026-02-10T17:24:12Z after completing Plan 01-d*
+*Last updated: 2026-02-10T17:26:10Z after completing Plan 01-b*
