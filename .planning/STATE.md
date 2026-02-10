@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 1 of 15 — Project Setup & Infrastructure
 - **Status:** In Progress
-- **Current Plan:** 5 of 7 in Phase 01
-- **Plans Executed:** 5
+- **Current Plan:** 6 of 7 in Phase 01
+- **Plans Executed:** 6
 
 ## What's Done
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 01-c: Next.js 14 app setup (2 tasks, 1 commit)
 - [x] Plan 01-d: Docker environment (2 tasks, 2 commits)
 - [x] Plan 01-e: Developer tooling configuration (3 tasks, 3 commits)
+- [x] Plan 01-f: GitHub Actions CI/CD pipeline (2 tasks, 2 commits)
 
 ## What's Next
 
-Phase 1: Project Setup & Infrastructure (2 plans remaining)
-- Create Docker Compose configuration (Plan 01-f)
+Phase 1: Project Setup & Infrastructure (1 plan remaining)
 - Run pnpm install to validate workspace (Plan 01-g)
 
 ## Decisions
@@ -55,6 +55,9 @@ Phase 1: Project Setup & Infrastructure (2 plans remaining)
 - [Phase 01-e]: ESLint 9 flat config with TypeScript strict rules established as code quality baseline
 - [Phase 01-e]: Conventional Commits with segment-based scopes enforced via commitlint
 - [Phase 01-e]: Pre-commit hooks run lint-staged for automatic code quality enforcement
+- [Phase 01-f]: GitHub Actions CI/CD pipeline validates every push/PR with lint and type-check
+- [Phase 01-f]: Docker images built on main branch only and pushed to ghcr.io with Trivy security scanning
+- [Phase 01-f]: Dependency review workflow denies copyleft licenses (AGPL, GPL) for SaaS compatibility
 
 ## Blockers
 
@@ -80,11 +83,12 @@ None — ready to start implementation.
 | 01-c | 114s | 2 | 8 | 1 |
 | 01-d | 81s | 2 | 2 | 2 |
 | 01-e | 116s | 3 | 7 | 3 |
+| 01-f | 46s | 2 | 2 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T17:27:01.181Z
-**Stopped at:** Completed 01-e-PLAN.md
+**Last session:** 2026-02-10T17:29:28Z
+**Stopped at:** Completed 01-f-PLAN.md
 
 ---
-*Last updated: 2026-02-10T17:27:01Z after completing Plan 01-e*
+*Last updated: 2026-02-10T17:29:28Z after completing Plan 01-f*
