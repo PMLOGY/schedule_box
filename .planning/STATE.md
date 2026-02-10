@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 3 — Authentication & Core Services
+**Current focus:** Phase 3 Complete — Ready for Phase 4
 
 ## Position
 
 - **Milestone:** v1.0
 - **Phase:** 3 of 15 — Authentication & Core Services
-- **Status:** In Progress
-- **Current Plan:** 03-05 (MFA, OAuth2 Scaffolds, API Key Management)
-- **Plans Executed:** 21
+- **Status:** Complete
+- **Current Plan:** Phase 3 Complete
+- **Plans Executed:** 24
 
 ## What's Done
 
@@ -40,17 +40,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-01: Error Handling & API Response Foundation (2 tasks, 2 commits)
 - [x] Plan 03-02: JWT & Token Management (2 tasks, 2 commits)
 - [x] Plan 03-03: Auth Middleware & Validation (2 tasks, 2 commits)
-- [x] Plan 03-05: MFA, OAuth2 Scaffolds, API Key Management (2 tasks, 1 commit)
-- [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 2 commits)
+- [x] Plan 03-04: Auth Endpoints (2 tasks, 3 commits)
+- [x] Plan 03-05: MFA, OAuth2 Scaffolds, API Key Management (2 tasks, 3 commits)
+- [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 4 commits)
+- [x] Plan 03-07: Service & Employee CRUD with Working Hours (2 tasks, 3 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: Complete ✅
-Phase 3: In Progress - MFA, OAuth scaffolds, API keys, customer CRUD, resources, and settings complete; full auth endpoints and service CRUD pending
+Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
+Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 
-Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-07 - Service CRUD
+Next: Phase 4 — Frontend Shell (app shell, design system, auth pages, dashboard, calendar)
 
 ## Decisions
 
@@ -144,19 +146,29 @@ Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-
 - [Phase 03-08]: Resource types are company-scoped with left join for optional type assignment
 - [Phase 03-08]: Company settings partial update maps snake_case request to camelCase database columns
 - [Phase 03-08]: Company working hours bulk replace pattern (delete + insert) for company-level defaults (employeeId IS NULL)
+- [Phase 03-04]: Register creates company + user in single transaction with slug generation (name + nanoid suffix)
+- [Phase 03-04]: Login handles MFA challenge flow (returns mfa_required + mfa_token for Redis-based temporary auth)
+- [Phase 03-04]: Refresh token accepts from body OR httpOnly cookie for flexibility
+- [Phase 03-04]: Forgot password NEVER reveals email existence (always returns success message)
+- [Phase 03-04]: Reset password disables MFA and revokes all sessions (security best practice)
+- [Phase 03-04]: Profile endpoint (GET/PUT /me) returns company UUID, never internal SERIAL ID
+- [Phase 03-07]: Service CRUD with category filtering, is_active filtering, and soft delete
+- [Phase 03-07]: Employee service assignment uses atomic delete + insert (replace all pattern)
+- [Phase 03-07]: Working hours bulk update replaces all hours for employee or company
+- [Phase 03-07]: Schedule overrides create per-date exceptions (day off or modified hours)
 
 ## Blockers
 
-None — ready to start implementation.
+None — Phase 3 complete, ready for Phase 4.
 
 ## Metrics
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Requirements | 103 | ~22 implemented (database + error handling + resources + settings) |
-| Phases | 15 | 2 complete, 1 in progress (Phase 3) |
-| DB Tables | 47 | 46 (all schemas + views + relations complete) |
-| API Endpoints | 99 | ~15 (health, readiness, resources, settings, services, customers, tags) |
+| Requirements | 103 | ~35 implemented (infra + database + auth + core entities) |
+| Phases | 15 | 3 complete, ready for Phase 4 |
+| DB Tables | 47 | 47 (all schemas + views + relations complete) |
+| API Endpoints | 99 | ~39 (auth, customers, services, employees, resources, settings, tags, health) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
 
@@ -183,12 +195,15 @@ None — ready to start implementation.
 | 03-03 | 220s | 2 | 5 | 2 |
 | 03-05 | 426s | 2 | 12 | 1 |
 | 03-06 | 335s | 2 | 10 | 2 |
+| 03-02 | 340s | 2 | 5 | 2 |
+| 03-04 | 420s | 2 | 9 | 3 |
+| 03-07 | 313s | 2 | 11 | 3 |
 | 03-08 | 233s | 2 | 7 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T20:15:32Z
-**Stopped at:** Completed 03-05-PLAN.md
+**Last session:** 2026-02-10
+**Stopped at:** Completed Phase 3 — Auth & Core Services (all 8 plans)
 
 ---
-*Last updated: 2026-02-10T20:15:32Z after completing Plan 03-05*
+*Last updated: 2026-02-10 after completing Phase 3*

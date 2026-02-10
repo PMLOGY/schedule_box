@@ -72,9 +72,11 @@ Plans:
 
 ---
 
-### Phase 3: Auth & Core Services
+### Phase 3: Auth & Core Services ✓
 
 **Goal:** Implement authentication with JWT/RBAC and CRUD for all core entities (customers, services, employees, resources) so the platform has a functional API layer.
+
+**Status:** Complete (2026-02-10)
 
 **Segments:** BACKEND (primary), DATABASE (schema support), DEVOPS (test setup)
 
@@ -82,24 +84,24 @@ Plans:
 
 **Depends on:** Phase 2
 
-**Plans:** 8 plans
+**Plans:** 8/8 complete
 
 Plans:
-- [ ] 03-01-PLAN.md — Shared error classes, error codes, API response utilities
-- [ ] 03-02-PLAN.md — JWT management, Argon2id password hashing, Redis client, Zod validation middleware
-- [ ] 03-03-PLAN.md — Route handler factory, auth/RBAC middleware, auth Zod schemas
-- [ ] 03-04-PLAN.md — Auth endpoints: register, login, refresh, logout, password reset, email verify, profile
-- [ ] 03-05-PLAN.md — MFA setup/verify, OAuth2 scaffolds, API key management
-- [ ] 03-06-PLAN.md — Customer CRUD with pagination, search, tags, GDPR export
-- [ ] 03-07-PLAN.md — Service CRUD with categories, Employee CRUD with working hours and overrides
-- [ ] 03-08-PLAN.md — Resource CRUD with types, company settings, company working hours
+- [x] 03-01-PLAN.md — Shared error classes, error codes, API response utilities
+- [x] 03-02-PLAN.md — JWT management, Argon2id password hashing, Redis client, Zod validation middleware
+- [x] 03-03-PLAN.md — Route handler factory, auth/RBAC middleware, auth Zod schemas
+- [x] 03-04-PLAN.md — Auth endpoints: register, login, refresh, logout, password reset, email verify, profile
+- [x] 03-05-PLAN.md — MFA setup/verify, OAuth2 scaffolds, API key management
+- [x] 03-06-PLAN.md — Customer CRUD with pagination, search, tags, GDPR export
+- [x] 03-07-PLAN.md — Service CRUD with categories, Employee CRUD with working hours and overrides
+- [x] 03-08-PLAN.md — Resource CRUD with types, company settings, company working hours
 
 **Success Criteria:**
-1. User can register, verify email, log in, and receive JWT tokens
-2. Refresh token rotation works (old token rejected after rotation)
-3. RBAC middleware blocks unauthorized access per role (owner, employee, customer)
-4. CRUD operations work for customers, services, employees, and resources
-5. All API inputs validated with Zod; invalid input returns structured error
+1. ~~User can register, verify email, log in, and receive JWT tokens~~ ✓
+2. ~~Refresh token rotation works (old token rejected after rotation)~~ ✓
+3. ~~RBAC middleware blocks unauthorized access per role (owner, employee, customer)~~ ✓
+4. ~~CRUD operations work for customers, services, employees, and resources~~ ✓
+5. ~~All API inputs validated with Zod; invalid input returns structured error~~ ✓
 
 ---
 
@@ -340,7 +342,7 @@ Plans:
 |---|-------|------|--------------|--------------|
 | 1 | Project Setup & Infrastructure | Monorepo + Docker + CI/CD | INFRA-01..05 (5) | None |
 | 2 | Database Foundation | 47 tables + RLS + migrations | DB-01..07 (7) | Phase 1 |
-| 3 | Auth & Core Services | JWT/RBAC + entity CRUD | AUTH-01..09, CORE-01..11 (20) | Phase 2 |
+| 3 | Auth & Core Services ✓ | JWT/RBAC + entity CRUD | AUTH-01..09, CORE-01..11 (20) | Phase 2 |
 | 4 | Frontend Shell | App shell + design system + calendar | UI-01..09 (9) | Phase 3 |
 | 5 | Booking MVP | Availability + booking flow + events | BOOK-01..10 (10) | Phase 3, 4 |
 | 6 | Payment Integration | Comgate + QRcomat + SAGA | PAY-01..07 (7) | Phase 5 |
