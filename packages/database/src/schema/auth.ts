@@ -26,6 +26,7 @@ import {
   primaryKey,
   index,
   check,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
@@ -132,5 +133,112 @@ export const rolePermissions = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.roleId, table.permissionId] }),
+  }),
+);
+
+// ============================================================================
+// USERS TABLE
+// ============================================================================
+
+export const users = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    uuid: uuid('uuid').defaultRandom().notNull().unique(),
+    companyId: integer('company_id').references(() => companies.id, { onDelete: 'set null' }),
+    roleId: integer('role_id')
+      .notNull()
+      .references(() => roles.id),
+    email: varchar('email', { length: 255 }).notNull(),
+    passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
+    phone: varchar('phone', { length: 50 }),
+    avatarUrl: varchar('avatar_url', { length: 500 }),
+    isActive: boolean('is_active').default(true),
+    emailVerified: boolean('email_verified').default(false),
+    mfaEnabled: boolean('mfa_enabled').default(false),
+    mfaSecret: varchar('mfa_secret', { length: 255 }),
+    oauthProvider: varchar('oauth_provider', { length: 50 }),
+    oauthProviderId: varchar('oauth_provider_id', { length: 255 }),
+    lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+    passwordChangedAt: timestamp('password_changed_at', { withTimezone: true }).defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    emailCompanyUnique: unique('users_email_company_id_unique').on(table.email, table.companyId),
+    emailIdx: index('idx_users_email').on(table.email),
+    companyIdx: index('idx_users_company').on(table.companyId),
+    roleIdx: index('idx_users_role').on(table.roleId),
+    oauthIdx: index('idx_users_oauth').on(table.oauthProvider, table.oauthProviderId),
+  }),
+);
+
+// ============================================================================
+// PASSWORD_HISTORY TABLE
+// ============================================================================
+
+export const passwordHistory = pgTable(
+  'password_history',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    userIdx: index('idx_password_history_user').on(table.userId),
+  }),
+);
+
+// ============================================================================
+// REFRESH_TOKENS TABLE
+// ============================================================================
+
+export const refreshTokens = pgTable(
+  'refresh_tokens',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    revoked: boolean('revoked').default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    userIdx: index('idx_refresh_tokens_user').on(table.userId),
+    hashIdx: index('idx_refresh_tokens_hash').on(table.tokenHash),
+  }),
+);
+
+// ============================================================================
+// API_KEYS TABLE
+// ============================================================================
+
+export const apiKeys = pgTable(
+  'api_keys',
+  {
+    id: serial('id').primaryKey(),
+    companyId: integer('company_id')
+      .notNull()
+      .references(() => companies.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 100 }).notNull(),
+    keyHash: varchar('key_hash', { length: 255 }).notNull().unique(),
+    keyPrefix: varchar('key_prefix', { length: 10 }).notNull(),
+    scopes: text('scopes')
+      .array()
+      .default(sql`'{}'::text[]`),
+    isActive: boolean('is_active').default(true),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    companyIdx: index('idx_api_keys_company').on(table.companyId),
+    hashIdx: index('idx_api_keys_hash').on(table.keyHash),
   }),
 );
