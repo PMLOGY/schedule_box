@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
 - **Status:** In Progress
-- **Current Plan:** 4 of TBD in Phase 02
-- **Plans Executed:** 10
+- **Current Plan:** 5 of TBD in Phase 02
+- **Plans Executed:** 11
 
 ## What's Done
 
@@ -31,13 +31,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-01: Drizzle ORM infrastructure setup (2 tasks, 2 commits)
 - [x] Plan 02-02: Auth & Tenancy schema (2 tasks, 2 commits)
 - [x] Plan 02-03: Core Entity schemas (2 tasks, 2 commits)
+- [x] Plan 02-04: Bookings & Payments schema (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - Auth & core entities complete (20 tables: 8 auth + 12 entities)
+Phase 2: In Progress - Core schemas complete (25 tables: 8 auth + 12 entities + 5 bookings/payments)
 
-Next: Define remaining schema groups (bookings, payments, business features)
+Next: Define remaining schema groups (coupons, gift cards, video meetings, notifications, reviews, AI)
 
 ## Decisions
 
@@ -76,6 +77,10 @@ Next: Define remaining schema groups (bookings, payments, business features)
 - [Phase 02-03]: Working hours support both company-level defaults (employeeId NULL) and per-employee overrides
 - [Phase 02-03]: Resource quantity tracking supports fractional allocation via quantity_needed field
 - [Phase 02-03]: AI-computed fields added to customers (health_score, clv_predicted, no_show_count)
+- [Phase 02-04]: Deferred FK pattern for coupon_id, gift_card_id, video_meeting_id allows parallel Wave 2 execution
+- [Phase 02-04]: Booking pricing snapshots capture price, currency, discount at booking time for audit trail
+- [Phase 02-04]: Payment gateway composite index (gateway, gateway_transaction_id) enables idempotency checks
+- [Phase 02-04]: Invoice unique constraint (company_id, invoice_number) enforces per-company numbering
 
 ## Blockers
 
@@ -87,7 +92,7 @@ None — ready to start implementation.
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
 | Phases | 15 | 1 complete, 1 in progress |
-| DB Tables | 47 | 20 (auth + core entities) |
+| DB Tables | 47 | 25 (auth + entities + bookings/payments) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -105,11 +110,12 @@ None — ready to start implementation.
 | 01-g | 203s | 2 | 5 | 2 |
 | 02-02 | 240s | 2 | 2 | 2 |
 | 02-03 | 139s | 2 | 5 | 2 |
+| 02-04 | 328s | 2 | 3 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T18:33:07Z
-**Stopped at:** Completed 02-03-PLAN.md (Core Entity Schemas)
+**Last session:** 2026-02-10T18:41:27Z
+**Stopped at:** Completed 02-04-PLAN.md (Bookings & Payments Schema)
 
 ---
-*Last updated: 2026-02-10T18:33:07Z after completing Plan 02-03*
+*Last updated: 2026-02-10T18:41:27Z after completing Plan 02-04*
