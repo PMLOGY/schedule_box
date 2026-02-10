@@ -16,6 +16,17 @@
 
 **Depends on:** None
 
+**Plans:** 7 plans
+
+Plans:
+- [ ] 01-a-PLAN.md — Root monorepo scaffold (pnpm workspace, tsconfig, env vars, ignore files)
+- [ ] 01-b-PLAN.md — Shared packages stubs (database, shared, events, ui)
+- [ ] 01-c-PLAN.md — Next.js 14 app setup (apps/web with App Router, Tailwind)
+- [ ] 01-d-PLAN.md — Docker Compose environment (PostgreSQL, Redis, RabbitMQ, Dockerfile)
+- [ ] 01-e-PLAN.md — Developer tooling (ESLint 9, Prettier, husky, commitlint)
+- [ ] 01-f-PLAN.md — CI/CD pipeline (GitHub Actions, Trivy scanning)
+- [ ] 01-g-PLAN.md — Health endpoints and monorepo validation
+
 **Success Criteria:**
 1. `pnpm install` succeeds and workspace packages resolve
 2. `docker compose up` starts PostgreSQL, Redis, and RabbitMQ with passing health checks
