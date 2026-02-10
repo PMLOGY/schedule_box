@@ -33,13 +33,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-03: Core Entity schemas (2 tasks, 2 commits)
 - [x] Plan 02-04: Bookings & Payments schema (2 tasks, 2 commits)
 - [x] Plan 02-05: Business Features schema (2 tasks, 2 commits)
+- [x] Plan 02-06: Platform Tables schema (2 tasks, 1 commit - merged with parallel plans)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - Core schemas complete (34 tables: 8 auth + 12 entities + 5 bookings/payments + 9 business features)
+Phase 2: In Progress - All schemas complete (46 tables: 8 auth + 12 entities + 5 bookings/payments + 9 business features + 12 platform tables)
 
-Next: Define remaining schema groups (video meetings, notifications, reviews, AI, marketplace, analytics)
+Next: Generate Drizzle migrations and apply to PostgreSQL
 
 ## Decisions
 
@@ -87,6 +88,11 @@ Next: Define remaining schema groups (video meetings, notifications, reviews, AI
 - [Phase 02-05]: Single loyalty program per company enforced via UNIQUE(company_id) constraint
 - [Phase 02-05]: Dual points_balance and stamps_balance on cards for flexible program types
 - [Phase 02-05]: JSONB benefits field for extensible tier configuration in loyalty programs
+- [Phase 02-06]: varchar(45) for IP addresses instead of inet type (Drizzle ORM compatibility)
+- [Phase 02-06]: ai_model_metrics as global table without company_id for system-wide ML metrics
+- [Phase 02-06]: audit_logs.company_id nullable to preserve audit trail after company deletion
+- [Phase 02-06]: Partial index on notifications.scheduled_at WHERE status='pending' for queue efficiency
+- [Phase 02-06]: DESC index on marketplace.average_rating for featured listing optimization
 
 ## Blockers
 
@@ -98,7 +104,7 @@ None — ready to start implementation.
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
 | Phases | 15 | 1 complete, 1 in progress |
-| DB Tables | 47 | 34 (auth + entities + bookings/payments + business features) |
+| DB Tables | 47 | 46 (all schemas defined, awaiting migrations) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -118,11 +124,12 @@ None — ready to start implementation.
 | 02-03 | 139s | 2 | 5 | 2 |
 | 02-04 | 328s | 2 | 3 | 2 |
 | 02-05 | 444s | 2 | 4 | 2 |
+| 02-06 | 485s | 2 | 9 | 1 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T18:43:33Z
-**Stopped at:** Completed 02-05-PLAN.md (Business Features Schema)
+**Last session:** 2026-02-10T18:44:12Z
+**Stopped at:** Completed 02-06-PLAN.md (Platform Tables Schema)
 
 ---
-*Last updated: 2026-02-10T18:43:33Z after completing Plan 02-05*
+*Last updated: 2026-02-10T18:44:12Z after completing Plan 02-06*
