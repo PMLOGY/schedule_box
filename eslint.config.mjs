@@ -55,6 +55,7 @@ export default tseslint.config(
       'docker/**',
       'k8s/**',
       '.planning/**',
+      '.claude/**',
     ],
   },
 );
