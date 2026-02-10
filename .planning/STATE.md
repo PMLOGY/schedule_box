@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 3 of 15 — Authentication & Core Services
 - **Status:** In Progress
-- **Current Plan:** 03-02 (JWT & Token Management)
-- **Plans Executed:** 17
+- **Current Plan:** 03-03 (Auth Middleware & Validation)
+- **Plans Executed:** 18
 
 ## What's Done
 
@@ -38,6 +38,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-09: Database Functions & Constraints (2 tasks, 2 commits)
 - [x] Plan 02-08: Database Integration & Seed Data (2 tasks, 2 commits)
 - [x] Plan 03-01: Error Handling & API Response Foundation (2 tasks, 2 commits)
+- [x] Plan 03-02: JWT & Token Management (2 tasks, 2 commits)
+- [x] Plan 03-03: Auth Middleware & Validation (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -45,7 +47,7 @@ Phase 1: Complete ✅
 Phase 2: Complete ✅
 Phase 3: In Progress - Error handling foundation complete, continuing with JWT and auth endpoints
 
-Next: Plan 03-02 - JWT token generation/verification using jose library
+Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout)
 
 ## Decisions
 
@@ -117,6 +119,14 @@ Next: Plan 03-02 - JWT token generation/verification using jose library
 - [Phase 03-01]: ERROR_CODES constant with 19 predefined error codes matching API documentation
 - [Phase 03-01]: Security-first validation errors never include raw input values (prevents password leaks)
 - [Phase 03-01]: Standard response utilities (successResponse, errorResponse, paginatedResponse) ensure consistent API format
+- [Phase 03-02]: JWT generation using jsonwebtoken with 15-min access tokens and 30-day refresh tokens
+- [Phase 03-02]: Refresh token rotation with SELECT FOR UPDATE prevents race conditions
+- [Phase 03-02]: Redis blacklist for immediate JWT invalidation on logout
+- [Phase 03-02]: Password hashing with Argon2id (OWASP parameters) and 5-password history tracking
+- [Phase 03-03]: createRouteHandler factory is THE single composable pattern for all protected API endpoints
+- [Phase 03-03]: PERMISSIONS constant defines all 23 system permissions for RBAC checks
+- [Phase 03-03]: findCompanyId helper resolves user UUID to company ID for tenant-scoped queries
+- [Phase 03-03]: Password complexity enforced via Zod regex (min 12 chars + uppercase + lowercase + number + special)
 
 ## Blockers
 
@@ -153,11 +163,12 @@ None — ready to start implementation.
 | 02-09 | 113s | 2 | 8 | 2 |
 | 02-08 | 640s | 2 | 9 | 2 |
 | 03-01 | 175s | 2 | 7 | 2 |
+| 03-03 | 220s | 2 | 5 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T19:54:09.924Z
-**Stopped at:** Completed 03-01-PLAN.md
+**Last session:** 2026-02-10T20:04:53Z
+**Stopped at:** Completed 03-03-PLAN.md
 
 ---
-*Last updated: 2026-02-10T20:54:09Z after completing Plan 03-01*
+*Last updated: 2026-02-10T20:04:53Z after completing Plan 03-03*
