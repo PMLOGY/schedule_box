@@ -69,6 +69,8 @@ Next: Define remaining schema groups (booking, customer, services)
 - [Phase 02-01]: Drizzle ORM with postgres driver (ESM-compatible) configured with connection pooling
 - [Phase 02-01]: Separate migration client (max: 1) and query client (max: 10) for transactional safety
 - [Phase 02-01]: Runtime DATABASE_URL validation instead of non-null assertions for better error messages
+- [Phase 02-02]: Auth & tenancy schema uses unique() for (email, company_id) multi-tenancy
+- [Phase 02-02]: PostgreSQL text[] array type for API key scopes with default empty array
 
 ## Blockers
 
@@ -79,8 +81,8 @@ None — ready to start implementation.
 | Metric | Target | Current |
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
-| Phases | 15 | 1 complete |
-| DB Tables | 47 | 0 |
+| Phases | 15 | 1 complete, 1 in progress |
+| DB Tables | 47 | 8 (auth & tenancy) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -96,11 +98,12 @@ None — ready to start implementation.
 | 01-e | 116s | 3 | 7 | 3 |
 | 01-f | 46s | 2 | 2 | 2 |
 | 01-g | 203s | 2 | 5 | 2 |
+| 02-02 | 240s | 2 | 2 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T17:32:00Z
-**Stopped at:** Completed 01-g-PLAN.md (Phase 1 Complete)
+**Last session:** 2026-02-10T19:45:00Z
+**Stopped at:** Completed 02-02-PLAN.md (Auth & Tenancy Schema)
 
 ---
-*Last updated: 2026-02-10T17:32:00Z after completing Plan 01-g*
+*Last updated: 2026-02-10T19:45:00Z after completing Plan 02-02*
