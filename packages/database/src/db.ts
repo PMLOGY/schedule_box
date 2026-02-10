@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import * as schema from './schema/index.js';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -19,8 +20,8 @@ const queryClient = postgres(DATABASE_URL, {
   connect_timeout: 10,
 });
 
-// Database instance - schema will be added as schemas are created
-export const db = drizzle(queryClient);
+// Database instance with full schema for relations and query builder
+export const db = drizzle(queryClient, { schema });
 
 // Export database type for use in application code
 export type Database = typeof db;

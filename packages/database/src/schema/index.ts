@@ -22,3 +22,5 @@ export * from './video.js';
 export * from './apps.js';
 export * from './automation.js';
 export * from './analytics.js';
+export * from './views.js';
+export * from './relations.js';
