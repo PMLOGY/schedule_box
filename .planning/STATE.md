@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 3 of 15 — Authentication & Core Services
 - **Status:** In Progress
-- **Current Plan:** 03-06 (Customer CRUD with Tags & GDPR Export)
-- **Plans Executed:** 20
+- **Current Plan:** 03-05 (MFA, OAuth2 Scaffolds, API Key Management)
+- **Plans Executed:** 21
 
 ## What's Done
 
@@ -40,6 +40,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-01: Error Handling & API Response Foundation (2 tasks, 2 commits)
 - [x] Plan 03-02: JWT & Token Management (2 tasks, 2 commits)
 - [x] Plan 03-03: Auth Middleware & Validation (2 tasks, 2 commits)
+- [x] Plan 03-05: MFA, OAuth2 Scaffolds, API Key Management (2 tasks, 1 commit)
 - [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 2 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
 
@@ -47,9 +48,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 Phase 1: Complete ✅
 Phase 2: Complete ✅
-Phase 3: In Progress - Customer CRUD with tags, resources, and settings complete; auth endpoints and service CRUD pending
+Phase 3: In Progress - MFA, OAuth scaffolds, API keys, customer CRUD, resources, and settings complete; full auth endpoints and service CRUD pending
 
-Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-05 - Service CRUD
+Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-07 - Service CRUD
 
 ## Decisions
 
@@ -133,6 +134,12 @@ Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-
 - [Phase 03-06]: Atomic tag replacement pattern (DELETE + INSERT) for PUT /customers/{id}/tags
 - [Phase 03-06]: Customer export endpoint provides full GDPR data portability (customer + bookings + payments + tags)
 - [Phase 03-06]: Customer list supports pagination, search (name/email/phone ILIKE), tag filter (JOIN), and multi-field sorting
+- [Phase 03-05]: TOTP MFA uses otplib functional API (generateSecret, generateURI, verifySync) for cleaner implementation
+- [Phase 03-05]: MFA setup generates TOTP secret, QR code data URL, and 10 backup codes (nanoid)
+- [Phase 03-05]: OAuth2 endpoints return 501 Not Implemented (full PKCE flow deferred to integration phase)
+- [Phase 03-05]: API keys use SHA-256 hashing and sb_live_ prefix, full key returned only once on creation
+- [Phase 03-05]: API key deletion is soft delete (isActive=false) for audit trail preservation
+- [Phase 03-05]: NotImplementedError class added for 501 responses (auto-fixed Rule 2 deviation)
 - [Phase 03-08]: Resource CRUD with hard delete and FK constraint handling (deactivate via is_active flag)
 - [Phase 03-08]: Resource types are company-scoped with left join for optional type assignment
 - [Phase 03-08]: Company settings partial update maps snake_case request to camelCase database columns
@@ -174,13 +181,14 @@ None — ready to start implementation.
 | 02-08 | 640s | 2 | 9 | 2 |
 | 03-01 | 175s | 2 | 7 | 2 |
 | 03-03 | 220s | 2 | 5 | 2 |
+| 03-05 | 426s | 2 | 12 | 1 |
 | 03-06 | 335s | 2 | 10 | 2 |
 | 03-08 | 233s | 2 | 7 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T21:19:23Z
-**Stopped at:** Completed 03-06-PLAN.md
+**Last session:** 2026-02-10T20:15:32Z
+**Stopped at:** Completed 03-05-PLAN.md
 
 ---
-*Last updated: 2026-02-10T21:19:23Z after completing Plan 03-06*
+*Last updated: 2026-02-10T20:15:32Z after completing Plan 03-05*
