@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 - **Milestone:** v1.0
 - **Phase:** 1 of 15 — Project Setup & Infrastructure
-- **Status:** In Progress
-- **Current Plan:** 6 of 7 in Phase 01
-- **Plans Executed:** 6
+- **Status:** Complete
+- **Current Plan:** 7 of 7 in Phase 01
+- **Plans Executed:** 7
 
 ## What's Done
 
@@ -27,11 +27,13 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 01-d: Docker environment (2 tasks, 2 commits)
 - [x] Plan 01-e: Developer tooling configuration (3 tasks, 3 commits)
 - [x] Plan 01-f: GitHub Actions CI/CD pipeline (2 tasks, 2 commits)
+- [x] Plan 01-g: Health endpoints and monorepo validation (2 tasks, 2 commits)
 
 ## What's Next
 
-Phase 1: Project Setup & Infrastructure (1 plan remaining)
-- Run pnpm install to validate workspace (Plan 01-g)
+Phase 1: Complete ✅
+
+Ready to begin Phase 2: Database Schema & Drizzle ORM
 
 ## Decisions
 
@@ -58,6 +60,9 @@ Phase 1: Project Setup & Infrastructure (1 plan remaining)
 - [Phase 01-f]: GitHub Actions CI/CD pipeline validates every push/PR with lint and type-check
 - [Phase 01-f]: Docker images built on main branch only and pushed to ghcr.io with Trivy security scanning
 - [Phase 01-f]: Dependency review workflow denies copyleft licenses (AGPL, GPL) for SaaS compatibility
+- [Phase 01-g]: Health endpoint provides liveness probe for Docker and Kubernetes
+- [Phase 01-g]: Readiness endpoint checks service connectivity with per-service status
+- [Phase 01-g]: Phase 1 readiness checks only env var presence, actual connections added in Phase 2
 
 ## Blockers
 
@@ -68,9 +73,9 @@ None — ready to start implementation.
 | Metric | Target | Current |
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
-| Phases | 15 | 0 complete |
+| Phases | 15 | 1 complete |
 | DB Tables | 47 | 0 |
-| API Endpoints | 99 | 0 |
+| API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
 
@@ -84,11 +89,12 @@ None — ready to start implementation.
 | 01-d | 81s | 2 | 2 | 2 |
 | 01-e | 116s | 3 | 7 | 3 |
 | 01-f | 46s | 2 | 2 | 2 |
+| 01-g | 203s | 2 | 5 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T17:29:28Z
-**Stopped at:** Completed 01-f-PLAN.md
+**Last session:** 2026-02-10T17:32:00Z
+**Stopped at:** Completed 01-g-PLAN.md (Phase 1 Complete)
 
 ---
-*Last updated: 2026-02-10T17:29:28Z after completing Plan 01-f*
+*Last updated: 2026-02-10T17:32:00Z after completing Plan 01-g*
