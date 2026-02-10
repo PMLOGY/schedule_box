@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 4 of 15 — Frontend Shell
 - **Status:** In Progress
-- **Current Plan:** 04-02 (State Management & API Client)
-- **Plans Executed:** 25
+- **Current Plan:** 04-04 (Next plan after 04-03)
+- **Plans Executed:** 26
 
 ## What's Done
 
@@ -46,6 +46,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-07: Service & Employee CRUD with Working Hours (2 tasks, 3 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
 - [x] Plan 04-02: State Management & API Client (2 tasks, 2 commits)
+- [x] Plan 04-03: Internationalization Setup (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -161,6 +162,9 @@ Next: Phase 4 Plan 03 — Component library setup (shadcn/ui base components)
 - [Phase 04-02]: Zustand stores with selective persistence (auth persists user only, UI persists sidebar, calendar no persist)
 - [Phase 04-02]: API client singleton with automatic auth header injection and 401 token refresh retry
 - [Phase 04-02]: TanStack Query created in useState for RSC safety (prevents cross-request sharing)
+- [Phase 04-03]: Middleware-based i18n (next-intl) instead of [locale] route segments to avoid app directory restructuring
+- [Phase 04-03]: Czech (cs) as default locale with as-needed prefix (no /cs in URLs, but /sk and /en for other languages)
+- [Phase 04-03]: Comprehensive translation coverage (70+ keys) created before component development to prevent hardcoded text
 - [Phase 04-02]: Safe circular dependency pattern between auth.store and apiClient (both use lazy getState())
 - [Phase 04-02]: i18n locale type issue fixed with fallback to 'cs' (blocking type-check error)
 
@@ -207,11 +211,12 @@ None — Phase 4 in progress.
 | 03-07 | 313s | 2 | 11 | 3 |
 | 03-08 | 233s | 2 | 7 | 2 |
 | 04-02 | 368s | 2 | 9 | 2 |
+| 04-03 | 471s | 2 | 8 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-10
-**Stopped at:** Completed Plan 04-02 — State Management & API Client
+**Stopped at:** Completed Plan 04-03 — Internationalization Setup
 
 ---
 *Last updated: 2026-02-10 after completing Plan 04-02*
