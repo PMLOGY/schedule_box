@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v1.0
-- **Phase:** 3 of 15 — Authentication & Core Services
-- **Status:** Complete
-- **Current Plan:** Phase 3 Complete
-- **Plans Executed:** 24
+- **Phase:** 4 of 15 — Frontend Shell
+- **Status:** In Progress
+- **Current Plan:** 04-02 (State Management & API Client)
+- **Plans Executed:** 25
 
 ## What's Done
 
@@ -45,14 +45,16 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 4 commits)
 - [x] Plan 03-07: Service & Employee CRUD with Working Hours (2 tasks, 3 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
+- [x] Plan 04-02: State Management & API Client (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
 Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
+Phase 4: In Progress — Plan 04-02 complete (Zustand stores, API client, TanStack Query)
 
-Next: Phase 4 — Frontend Shell (app shell, design system, auth pages, dashboard, calendar)
+Next: Phase 4 Plan 03 — Component library setup (shadcn/ui base components)
 
 ## Decisions
 
@@ -156,10 +158,15 @@ Next: Phase 4 — Frontend Shell (app shell, design system, auth pages, dashboar
 - [Phase 03-07]: Employee service assignment uses atomic delete + insert (replace all pattern)
 - [Phase 03-07]: Working hours bulk update replaces all hours for employee or company
 - [Phase 03-07]: Schedule overrides create per-date exceptions (day off or modified hours)
+- [Phase 04-02]: Zustand stores with selective persistence (auth persists user only, UI persists sidebar, calendar no persist)
+- [Phase 04-02]: API client singleton with automatic auth header injection and 401 token refresh retry
+- [Phase 04-02]: TanStack Query created in useState for RSC safety (prevents cross-request sharing)
+- [Phase 04-02]: Safe circular dependency pattern between auth.store and apiClient (both use lazy getState())
+- [Phase 04-02]: i18n locale type issue fixed with fallback to 'cs' (blocking type-check error)
 
 ## Blockers
 
-None — Phase 3 complete, ready for Phase 4.
+None — Phase 4 in progress.
 
 ## Metrics
 
@@ -199,11 +206,12 @@ None — Phase 3 complete, ready for Phase 4.
 | 03-04 | 420s | 2 | 9 | 3 |
 | 03-07 | 313s | 2 | 11 | 3 |
 | 03-08 | 233s | 2 | 7 | 2 |
+| 04-02 | 368s | 2 | 9 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-10
-**Stopped at:** Completed Phase 3 — Auth & Core Services (all 8 plans)
+**Stopped at:** Completed Plan 04-02 — State Management & API Client
 
 ---
-*Last updated: 2026-02-10 after completing Phase 3*
+*Last updated: 2026-02-10 after completing Plan 04-02*
