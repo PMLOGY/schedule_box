@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 - **Milestone:** v1.0
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
-- **Status:** In Progress
-- **Current Plan:** 8 of TBD in Phase 02
-- **Plans Executed:** 15
+- **Status:** Complete
+- **Current Plan:** Phase 2 Complete
+- **Plans Executed:** 16
 
 ## What's Done
 
@@ -36,13 +36,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-06: Platform Tables schema (2 tasks, 1 commit - merged with parallel plans)
 - [x] Plan 02-07: Row Level Security policies (1 task, 1 commit)
 - [x] Plan 02-09: Database Functions & Constraints (2 tasks, 2 commits)
+- [x] Plan 02-08: Database Integration & Seed Data (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - All schemas complete (46 tables + 8 SQL function files + RLS policies)
+Phase 2: Complete ✅ - All schemas, RLS policies, functions, views, relations, and seed data ready
 
-Next: Generate Drizzle migrations and apply SQL functions and RLS to PostgreSQL
+Next: Phase 3 - Backend API Development (Authentication, Booking APIs, Payment Integration)
 
 ## Decisions
 
@@ -104,6 +105,12 @@ Next: Generate Drizzle migrations and apply SQL functions and RLS to PostgreSQL
 - [Phase 02-09]: Partial indexes on deleted_at IS NULL optimize soft-delete queries (deleted_at columns in Drizzle)
 - [Phase 02-09]: Dynamic trigger application via DO $$ loop for updated_at columns
 - [Phase 02-09]: Audit trail triggers on 5 critical tables (bookings, customers, services, employees, payments)
+- [Phase 02-08]: pgView used for v_daily_booking_summary and v_customer_metrics with query builder syntax
+- [Phase 02-08]: Comprehensive Drizzle relations for all 46 tables enabling type-safe nested queries
+- [Phase 02-08]: apply-sql.ts script executes SQL files in dependency order (RLS functions -> triggers -> policies)
+- [Phase 02-08]: Czech/Slovak locale seed data via @faker-js/faker with realistic names, addresses, services
+- [Phase 02-08]: Fixed password hash (password123) for all development users for easy testing
+- [Phase 02-08]: Three industry-specific companies (beauty salon, barbershop, fitness gym) to showcase verticals
 
 ## Blockers
 
@@ -113,9 +120,9 @@ None — ready to start implementation.
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Requirements | 103 | 0 implemented |
-| Phases | 15 | 1 complete, 1 in progress |
-| DB Tables | 47 | 46 (all schemas defined, awaiting migrations) |
+| Requirements | 103 | ~15 implemented (database foundation) |
+| Phases | 15 | 2 complete, ready for Phase 3 |
+| DB Tables | 47 | 46 (all schemas + views + relations complete) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -138,11 +145,12 @@ None — ready to start implementation.
 | 02-06 | 485s | 2 | 9 | 1 |
 | 02-07 | 146s | 1 | 2 | 1 |
 | 02-09 | 113s | 2 | 8 | 2 |
+| 02-08 | 640s | 2 | 9 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T19:51:00Z
-**Stopped at:** Completed 02-07-PLAN.md (Row Level Security)
+**Last session:** 2026-02-10T19:03:35Z
+**Stopped at:** Completed Phase 2 - Database Foundation (Plan 02-08)
 
 ---
-*Last updated: 2026-02-10T19:51:00Z after completing Plan 02-07*
+*Last updated: 2026-02-10T19:03:35Z after completing Plan 02-08 and Phase 2*
