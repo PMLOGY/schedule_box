@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
 - **Status:** In Progress
-- **Current Plan:** 5 of TBD in Phase 02
-- **Plans Executed:** 11
+- **Current Plan:** 7 of TBD in Phase 02
+- **Plans Executed:** 13
 
 ## What's Done
 
@@ -32,13 +32,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-02: Auth & Tenancy schema (2 tasks, 2 commits)
 - [x] Plan 02-03: Core Entity schemas (2 tasks, 2 commits)
 - [x] Plan 02-04: Bookings & Payments schema (2 tasks, 2 commits)
+- [x] Plan 02-05: Business Features schema (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - Core schemas complete (25 tables: 8 auth + 12 entities + 5 bookings/payments)
+Phase 2: In Progress - Core schemas complete (34 tables: 8 auth + 12 entities + 5 bookings/payments + 9 business features)
 
-Next: Define remaining schema groups (coupons, gift cards, video meetings, notifications, reviews, AI)
+Next: Define remaining schema groups (video meetings, notifications, reviews, AI, marketplace, analytics)
 
 ## Decisions
 
@@ -81,6 +82,11 @@ Next: Define remaining schema groups (coupons, gift cards, video meetings, notif
 - [Phase 02-04]: Booking pricing snapshots capture price, currency, discount at booking time for audit trail
 - [Phase 02-04]: Payment gateway composite index (gateway, gateway_transaction_id) enables idempotency checks
 - [Phase 02-04]: Invoice unique constraint (company_id, invoice_number) enforces per-company numbering
+- [Phase 02-05]: Integer array type for applicable_service_ids instead of junction table for flexibility
+- [Phase 02-05]: NULL maxUses/maxRedemptions means unlimited rather than requiring large numbers
+- [Phase 02-05]: Single loyalty program per company enforced via UNIQUE(company_id) constraint
+- [Phase 02-05]: Dual points_balance and stamps_balance on cards for flexible program types
+- [Phase 02-05]: JSONB benefits field for extensible tier configuration in loyalty programs
 
 ## Blockers
 
@@ -92,7 +98,7 @@ None — ready to start implementation.
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
 | Phases | 15 | 1 complete, 1 in progress |
-| DB Tables | 47 | 25 (auth + entities + bookings/payments) |
+| DB Tables | 47 | 34 (auth + entities + bookings/payments + business features) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -111,11 +117,12 @@ None — ready to start implementation.
 | 02-02 | 240s | 2 | 2 | 2 |
 | 02-03 | 139s | 2 | 5 | 2 |
 | 02-04 | 328s | 2 | 3 | 2 |
+| 02-05 | 444s | 2 | 4 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T18:41:27Z
-**Stopped at:** Completed 02-04-PLAN.md (Bookings & Payments Schema)
+**Last session:** 2026-02-10T18:43:33Z
+**Stopped at:** Completed 02-05-PLAN.md (Business Features Schema)
 
 ---
-*Last updated: 2026-02-10T18:41:27Z after completing Plan 02-04*
+*Last updated: 2026-02-10T18:43:33Z after completing Plan 02-05*
