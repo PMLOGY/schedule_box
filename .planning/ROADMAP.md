@@ -48,7 +48,7 @@ Plans:
 
 **Depends on:** Phase 1
 
-**Plans:** 8 plans
+**Plans:** 9 plans
 
 Plans:
 - [ ] 02-01-PLAN.md — Drizzle ORM setup, connection, config, migration runner
@@ -57,8 +57,9 @@ Plans:
 - [ ] 02-04-PLAN.md — Booking & Payment schemas (5 tables: bookings, payments, invoices, etc.)
 - [ ] 02-05-PLAN.md — Business feature schemas (9 tables: coupons, gift cards, loyalty)
 - [ ] 02-06-PLAN.md — Platform schemas (12 tables: notifications, reviews, AI, marketplace, etc.)
-- [ ] 02-07-PLAN.md — RLS policies, triggers, double-booking constraint, soft delete, deferred FKs
+- [ ] 02-07-PLAN.md — RLS helper functions and tenant isolation policies
 - [ ] 02-08-PLAN.md — Views, relations, migration execution, seed data, validation
+- [ ] 02-09-PLAN.md — Triggers, double-booking constraint, soft delete indexes, deferred FKs
 
 **Success Criteria:**
 1. All 47 tables created via migration and match documentation schema
