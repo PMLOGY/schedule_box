@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
 - **Status:** In Progress
 - **Current Plan:** 8 of TBD in Phase 02
-- **Plans Executed:** 14
+- **Plans Executed:** 15
 
 ## What's Done
 
@@ -34,14 +34,15 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 02-04: Bookings & Payments schema (2 tasks, 2 commits)
 - [x] Plan 02-05: Business Features schema (2 tasks, 2 commits)
 - [x] Plan 02-06: Platform Tables schema (2 tasks, 1 commit - merged with parallel plans)
+- [x] Plan 02-07: Row Level Security policies (1 task, 1 commit)
 - [x] Plan 02-09: Database Functions & Constraints (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - All schemas complete (46 tables + 8 SQL function files)
+Phase 2: In Progress - All schemas complete (46 tables + 8 SQL function files + RLS policies)
 
-Next: Generate Drizzle migrations and apply SQL functions to PostgreSQL
+Next: Generate Drizzle migrations and apply SQL functions and RLS to PostgreSQL
 
 ## Decisions
 
@@ -94,6 +95,11 @@ Next: Generate Drizzle migrations and apply SQL functions to PostgreSQL
 - [Phase 02-06]: audit_logs.company_id nullable to preserve audit trail after company deletion
 - [Phase 02-06]: Partial index on notifications.scheduled_at WHERE status='pending' for queue efficiency
 - [Phase 02-06]: DESC index on marketplace.average_rating for featured listing optimization
+- [Phase 02-07]: RLS enabled on 29 tables with company_id for database-level multi-tenant isolation
+- [Phase 02-07]: Junction tables and global tables skip RLS (accessed through parent FK or system-wide)
+- [Phase 02-07]: Session variable-based RLS using current_company_id(), current_user_role(), current_user_id()
+- [Phase 02-07]: Dual policy pattern (tenant_isolation + admin_bypass) for all RLS-enabled tables
+- [Phase 02-07]: Customer self-access policy allows customers to SELECT their own bookings via user_id match
 - [Phase 02-09]: btree_gist exclusion constraint for double-booking prevention (defense in depth)
 - [Phase 02-09]: Partial indexes on deleted_at IS NULL optimize soft-delete queries (deleted_at columns in Drizzle)
 - [Phase 02-09]: Dynamic trigger application via DO $$ loop for updated_at columns
@@ -130,12 +136,13 @@ None — ready to start implementation.
 | 02-04 | 328s | 2 | 3 | 2 |
 | 02-05 | 444s | 2 | 4 | 2 |
 | 02-06 | 485s | 2 | 9 | 1 |
+| 02-07 | 146s | 1 | 2 | 1 |
 | 02-09 | 113s | 2 | 8 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T19:48:47Z
-**Stopped at:** Completed 02-09-PLAN.md (Database Functions & Constraints)
+**Last session:** 2026-02-10T19:51:00Z
+**Stopped at:** Completed 02-07-PLAN.md (Row Level Security)
 
 ---
-*Last updated: 2026-02-10T19:48:47Z after completing Plan 02-09*
+*Last updated: 2026-02-10T19:51:00Z after completing Plan 02-07*
