@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 1 — Project Setup & Infrastructure
+**Current focus:** Phase 2 — Database Schema & Drizzle ORM
 
 ## Position
 
 - **Milestone:** v1.0
-- **Phase:** 1 of 15 — Project Setup & Infrastructure
-- **Status:** Complete
-- **Current Plan:** 7 of 7 in Phase 01
-- **Plans Executed:** 7
+- **Phase:** 2 of 15 — Database Schema & Drizzle ORM
+- **Status:** In Progress
+- **Current Plan:** 3 of TBD in Phase 02
+- **Plans Executed:** 9
 
 ## What's Done
 
@@ -28,19 +28,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 01-e: Developer tooling configuration (3 tasks, 3 commits)
 - [x] Plan 01-f: GitHub Actions CI/CD pipeline (2 tasks, 2 commits)
 - [x] Plan 01-g: Health endpoints and monorepo validation (2 tasks, 2 commits)
+- [x] Plan 02-01: Drizzle ORM infrastructure setup (2 tasks, 2 commits)
+- [x] Plan 02-02: Auth & Tenancy schema (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
+Phase 2: In Progress - Auth & tenancy schema complete (8 tables)
 
-Ready to begin Phase 2: Database Schema & Drizzle ORM
+Next: Define remaining schema groups (booking, customer, services)
 
 ## Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Next.js 14 monorepo | App Router + API routes + standalone microservices for AI/notifications | Implemented (01-c) |
-| Drizzle ORM over Prisma | Better SQL control, migration flexibility, lighter weight | -- Pending |
+| Drizzle ORM over Prisma | Better SQL control, migration flexibility, lighter weight | Implemented (02-01) |
 | RabbitMQ over Kafka | Simpler for target scale (5000 businesses), sufficient throughput | -- Pending |
 | Cloudflare R2 over AWS S3 | Cost-effective, S3-compatible API | -- Pending |
 | PostgreSQL full-text search | Simpler than Elasticsearch, sufficient for v1 | -- Pending |
@@ -63,6 +66,9 @@ Ready to begin Phase 2: Database Schema & Drizzle ORM
 - [Phase 01-g]: Health endpoint provides liveness probe for Docker and Kubernetes
 - [Phase 01-g]: Readiness endpoint checks service connectivity with per-service status
 - [Phase 01-g]: Phase 1 readiness checks only env var presence, actual connections added in Phase 2
+- [Phase 02-01]: Drizzle ORM with postgres driver (ESM-compatible) configured with connection pooling
+- [Phase 02-01]: Separate migration client (max: 1) and query client (max: 10) for transactional safety
+- [Phase 02-01]: Runtime DATABASE_URL validation instead of non-null assertions for better error messages
 
 ## Blockers
 
