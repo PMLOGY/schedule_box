@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 2 of 15 — Database Schema & Drizzle ORM
 - **Status:** In Progress
-- **Current Plan:** 3 of TBD in Phase 02
-- **Plans Executed:** 9
+- **Current Plan:** 4 of TBD in Phase 02
+- **Plans Executed:** 10
 
 ## What's Done
 
@@ -30,13 +30,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 01-g: Health endpoints and monorepo validation (2 tasks, 2 commits)
 - [x] Plan 02-01: Drizzle ORM infrastructure setup (2 tasks, 2 commits)
 - [x] Plan 02-02: Auth & Tenancy schema (2 tasks, 2 commits)
+- [x] Plan 02-03: Core Entity schemas (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
-Phase 2: In Progress - Auth & tenancy schema complete (8 tables)
+Phase 2: In Progress - Auth & core entities complete (20 tables: 8 auth + 12 entities)
 
-Next: Define remaining schema groups (booking, customer, services)
+Next: Define remaining schema groups (bookings, payments, business features)
 
 ## Decisions
 
@@ -71,6 +72,10 @@ Next: Define remaining schema groups (booking, customer, services)
 - [Phase 02-01]: Runtime DATABASE_URL validation instead of non-null assertions for better error messages
 - [Phase 02-02]: Auth & tenancy schema uses unique() for (email, company_id) multi-tenancy
 - [Phase 02-02]: PostgreSQL text[] array type for API key scopes with default empty array
+- [Phase 02-03]: Soft delete pattern via deletedAt column on customers, services, and employees tables
+- [Phase 02-03]: Working hours support both company-level defaults (employeeId NULL) and per-employee overrides
+- [Phase 02-03]: Resource quantity tracking supports fractional allocation via quantity_needed field
+- [Phase 02-03]: AI-computed fields added to customers (health_score, clv_predicted, no_show_count)
 
 ## Blockers
 
@@ -82,7 +87,7 @@ None — ready to start implementation.
 |--------|--------|---------|
 | Requirements | 103 | 0 implemented |
 | Phases | 15 | 1 complete, 1 in progress |
-| DB Tables | 47 | 8 (auth & tenancy) |
+| DB Tables | 47 | 20 (auth + core entities) |
 | API Endpoints | 99 | 2 (/api/health, /api/readiness) |
 | Frontend Components | 32+ | 0 |
 | Test Coverage | 80% | 0% |
@@ -99,11 +104,12 @@ None — ready to start implementation.
 | 01-f | 46s | 2 | 2 | 2 |
 | 01-g | 203s | 2 | 5 | 2 |
 | 02-02 | 240s | 2 | 2 | 2 |
+| 02-03 | 139s | 2 | 5 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T19:45:00Z
-**Stopped at:** Completed 02-02-PLAN.md (Auth & Tenancy Schema)
+**Last session:** 2026-02-10T18:33:07Z
+**Stopped at:** Completed 02-03-PLAN.md (Core Entity Schemas)
 
 ---
-*Last updated: 2026-02-10T19:45:00Z after completing Plan 02-02*
+*Last updated: 2026-02-10T18:33:07Z after completing Plan 02-03*
