@@ -63,10 +63,7 @@ export async function GET() {
   });
 }
 
-async function checkService(
-  name: string,
-  check: () => Promise<boolean>,
-): Promise<ServiceCheck> {
+async function checkService(name: string, check: () => Promise<boolean>): Promise<ServiceCheck> {
   const start = Date.now();
   try {
     await check();

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "WebSearch",
+      "Bash(npx get-shit-done-cc --claude --local)",
+      "Bash(claude mcp add filesystem --scope project -- npx -y @modelcontextprotocol/server-filesystem \"D:\\\\Project\\\\ScheduleBox\")",
+      "Bash(claude mcp add memory --scope project -- npx -y @modelcontextprotocol/server-memory)",
+      "Bash(claude mcp add:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

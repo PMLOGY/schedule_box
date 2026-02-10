@@ -6,11 +6,7 @@ export const metadata: Metadata = {
   description: 'AI-powered reservation and scheduling platform',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="cs">
       <body>{children}</body>

@@ -121,17 +121,17 @@ const { execSync } = require('child_process');
 // ─── Model Profile Table ─────────────────────────────────────────────────────
 
 const MODEL_PROFILES = {
-  'gsd-planner':              { quality: 'opus', balanced: 'opus',   budget: 'sonnet' },
-  'gsd-roadmapper':           { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'gsd-executor':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'gsd-phase-researcher':     { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
-  'gsd-project-researcher':   { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-planner': { quality: 'opus', balanced: 'opus', budget: 'sonnet' },
+  'gsd-roadmapper': { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-executor': { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-phase-researcher': { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-project-researcher': { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
   'gsd-research-synthesizer': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'gsd-debugger':             { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
-  'gsd-codebase-mapper':      { quality: 'sonnet', balanced: 'haiku', budget: 'haiku' },
-  'gsd-verifier':             { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'gsd-plan-checker':         { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
-  'gsd-integration-checker':  { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-debugger': { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
+  'gsd-codebase-mapper': { quality: 'sonnet', balanced: 'haiku', budget: 'haiku' },
+  'gsd-verifier': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-plan-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  'gsd-integration-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -141,7 +141,7 @@ function parseIncludeFlag(args) {
   if (includeIndex === -1) return new Set();
   const includeValue = args[includeIndex + 1];
   if (!includeValue) return new Set();
-  return new Set(includeValue.split(',').map(s => s.trim()));
+  return new Set(includeValue.split(',').map((s) => s.trim()));
 }
 
 function safeReadFile(filePath) {
@@ -188,13 +188,23 @@ function loadConfig(cwd) {
 
     return {
       model_profile: get('model_profile') ?? defaults.model_profile,
-      commit_docs: get('commit_docs', { section: 'planning', field: 'commit_docs' }) ?? defaults.commit_docs,
-      search_gitignored: get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) ?? defaults.search_gitignored,
-      branching_strategy: get('branching_strategy', { section: 'git', field: 'branching_strategy' }) ?? defaults.branching_strategy,
-      phase_branch_template: get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) ?? defaults.phase_branch_template,
-      milestone_branch_template: get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) ?? defaults.milestone_branch_template,
+      commit_docs:
+        get('commit_docs', { section: 'planning', field: 'commit_docs' }) ?? defaults.commit_docs,
+      search_gitignored:
+        get('search_gitignored', { section: 'planning', field: 'search_gitignored' }) ??
+        defaults.search_gitignored,
+      branching_strategy:
+        get('branching_strategy', { section: 'git', field: 'branching_strategy' }) ??
+        defaults.branching_strategy,
+      phase_branch_template:
+        get('phase_branch_template', { section: 'git', field: 'phase_branch_template' }) ??
+        defaults.phase_branch_template,
+      milestone_branch_template:
+        get('milestone_branch_template', { section: 'git', field: 'milestone_branch_template' }) ??
+        defaults.milestone_branch_template,
       research: get('research', { section: 'workflow', field: 'research' }) ?? defaults.research,
-      plan_checker: get('plan_checker', { section: 'workflow', field: 'plan_check' }) ?? defaults.plan_checker,
+      plan_checker:
+        get('plan_checker', { section: 'workflow', field: 'plan_check' }) ?? defaults.plan_checker,
       verifier: get('verifier', { section: 'workflow', field: 'verifier' }) ?? defaults.verifier,
       parallelization,
     };
@@ -217,7 +227,7 @@ function isGitIgnored(cwd, targetPath) {
 
 function execGit(cwd, args) {
   try {
-    const escaped = args.map(a => {
+    const escaped = args.map((a) => {
       if (/^[a-zA-Z0-9._\-/=:@]+$/.test(a)) return a;
       return "'" + a.replace(/'/g, "'\\''") + "'";
     });
@@ -287,7 +297,11 @@ function extractFrontmatter(content) {
         stack.push({ obj: current.obj[key], key: null, indent });
       } else if (value.startsWith('[') && value.endsWith(']')) {
         // Inline array: key: [a, b, c]
-        current.obj[key] = value.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+        current.obj[key] = value
+          .slice(1, -1)
+          .split(',')
+          .map((s) => s.trim().replace(/^["']|["']$/g, ''))
+          .filter(Boolean);
         current.key = null;
       } else {
         // Simple key: value
@@ -296,10 +310,17 @@ function extractFrontmatter(content) {
       }
     } else if (line.trim().startsWith('- ')) {
       // Array item
-      const itemValue = line.trim().slice(2).replace(/^["']|["']$/g, '');
+      const itemValue = line
+        .trim()
+        .slice(2)
+        .replace(/^["']|["']$/g, '');
 
       // If current context is an empty object, convert to array
-      if (typeof current.obj === 'object' && !Array.isArray(current.obj) && Object.keys(current.obj).length === 0) {
+      if (
+        typeof current.obj === 'object' &&
+        !Array.isArray(current.obj) &&
+        Object.keys(current.obj).length === 0
+      ) {
         // Find the key in parent that points to this object and convert it
         const parent = stack.length > 1 ? stack[stack.length - 2] : null;
         if (parent) {
@@ -327,12 +348,18 @@ function reconstructFrontmatter(obj) {
     if (Array.isArray(value)) {
       if (value.length === 0) {
         lines.push(`${key}: []`);
-      } else if (value.every(v => typeof v === 'string') && value.length <= 3 && value.join(', ').length < 60) {
+      } else if (
+        value.every((v) => typeof v === 'string') &&
+        value.length <= 3 &&
+        value.join(', ').length < 60
+      ) {
         lines.push(`${key}: [${value.join(', ')}]`);
       } else {
         lines.push(`${key}:`);
         for (const item of value) {
-          lines.push(`  - ${typeof item === 'string' && (item.includes(':') || item.includes('#')) ? `"${item}"` : item}`);
+          lines.push(
+            `  - ${typeof item === 'string' && (item.includes(':') || item.includes('#')) ? `"${item}"` : item}`,
+          );
         }
       }
     } else if (typeof value === 'object') {
@@ -342,12 +369,18 @@ function reconstructFrontmatter(obj) {
         if (Array.isArray(subval)) {
           if (subval.length === 0) {
             lines.push(`  ${subkey}: []`);
-          } else if (subval.every(v => typeof v === 'string') && subval.length <= 3 && subval.join(', ').length < 60) {
+          } else if (
+            subval.every((v) => typeof v === 'string') &&
+            subval.length <= 3 &&
+            subval.join(', ').length < 60
+          ) {
             lines.push(`  ${subkey}: [${subval.join(', ')}]`);
           } else {
             lines.push(`  ${subkey}:`);
             for (const item of subval) {
-              lines.push(`    - ${typeof item === 'string' && (item.includes(':') || item.includes('#')) ? `"${item}"` : item}`);
+              lines.push(
+                `    - ${typeof item === 'string' && (item.includes(':') || item.includes('#')) ? `"${item}"` : item}`,
+              );
             }
           }
         } else if (typeof subval === 'object') {
@@ -516,7 +549,7 @@ function cmdListTodos(cwd, area, raw) {
   const todos = [];
 
   try {
-    const files = fs.readdirSync(pendingDir).filter(f => f.endsWith('.md'));
+    const files = fs.readdirSync(pendingDir).filter((f) => f.endsWith('.md'));
 
     for (const file of files) {
       try {
@@ -665,22 +698,25 @@ function cmdHistoryDigest(cwd, raw) {
   }
 
   try {
-    const phaseDirs = fs.readdirSync(phasesDir, { withFileTypes: true })
-      .filter(e => e.isDirectory())
-      .map(e => e.name)
+    const phaseDirs = fs
+      .readdirSync(phasesDir, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
       .sort();
 
     for (const dir of phaseDirs) {
       const dirPath = path.join(phasesDir, dir);
-      const summaries = fs.readdirSync(dirPath).filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const summaries = fs
+        .readdirSync(dirPath)
+        .filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
 
       for (const summary of summaries) {
         try {
           const content = fs.readFileSync(path.join(dirPath, summary), 'utf-8');
           const fm = extractFrontmatter(content);
-          
+
           const phaseNum = fm.phase || dir.split('-')[0];
-          
+
           if (!digest.phases[phaseNum]) {
             digest.phases[phaseNum] = {
               name: fm.name || dir.split('-').slice(1).join(' ') || 'Unknown',
@@ -692,33 +728,34 @@ function cmdHistoryDigest(cwd, raw) {
 
           // Merge provides
           if (fm['dependency-graph'] && fm['dependency-graph'].provides) {
-            fm['dependency-graph'].provides.forEach(p => digest.phases[phaseNum].provides.add(p));
+            fm['dependency-graph'].provides.forEach((p) => digest.phases[phaseNum].provides.add(p));
           } else if (fm.provides) {
-            fm.provides.forEach(p => digest.phases[phaseNum].provides.add(p));
+            fm.provides.forEach((p) => digest.phases[phaseNum].provides.add(p));
           }
 
           // Merge affects
           if (fm['dependency-graph'] && fm['dependency-graph'].affects) {
-            fm['dependency-graph'].affects.forEach(a => digest.phases[phaseNum].affects.add(a));
+            fm['dependency-graph'].affects.forEach((a) => digest.phases[phaseNum].affects.add(a));
           }
 
           // Merge patterns
           if (fm['patterns-established']) {
-            fm['patterns-established'].forEach(p => digest.phases[phaseNum].patterns.add(p));
+            fm['patterns-established'].forEach((p) => digest.phases[phaseNum].patterns.add(p));
           }
 
           // Merge decisions
           if (fm['key-decisions']) {
-            fm['key-decisions'].forEach(d => {
+            fm['key-decisions'].forEach((d) => {
               digest.decisions.push({ phase: phaseNum, decision: d });
             });
           }
 
           // Merge tech stack
           if (fm['tech-stack'] && fm['tech-stack'].added) {
-            fm['tech-stack'].added.forEach(t => digest.tech_stack.add(typeof t === 'string' ? t : t.name));
+            fm['tech-stack'].added.forEach((t) =>
+              digest.tech_stack.add(typeof t === 'string' ? t : t.name),
+            );
           }
-
         } catch (e) {
           // Skip malformed summaries
         }
@@ -726,7 +763,7 @@ function cmdHistoryDigest(cwd, raw) {
     }
 
     // Convert Sets to Arrays for JSON output
-    Object.keys(digest.phases).forEach(p => {
+    Object.keys(digest.phases).forEach((p) => {
       digest.phases[p].provides = [...digest.phases[p].provides];
       digest.phases[p].affects = [...digest.phases[p].affects];
       digest.phases[p].patterns = [...digest.phases[p].patterns];
@@ -756,7 +793,7 @@ function cmdPhasesList(cwd, options, raw) {
   try {
     // Get all phase directories
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    let dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    let dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
     // Sort numerically (handles decimals: 01, 02, 02.1, 02.2, 03)
     dirs.sort((a, b) => {
@@ -768,7 +805,7 @@ function cmdPhasesList(cwd, options, raw) {
     // If filtering by phase number
     if (phase) {
       const normalized = normalizePhaseName(phase);
-      const match = dirs.find(d => d.startsWith(normalized));
+      const match = dirs.find((d) => d.startsWith(normalized));
       if (!match) {
         output({ files: [], count: 0, phase_dir: null, error: 'Phase not found' }, raw, '');
         return;
@@ -785,9 +822,9 @@ function cmdPhasesList(cwd, options, raw) {
 
         let filtered;
         if (type === 'plans') {
-          filtered = dirFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
+          filtered = dirFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md');
         } else if (type === 'summaries') {
-          filtered = dirFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+          filtered = dirFiles.filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
         } else {
           filtered = dirFiles;
         }
@@ -826,10 +863,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
     const escapedPhase = phaseNum.replace(/\./g, '\\.');
 
     // Match "### Phase X:" or "### Phase X.Y:" with optional name
-    const phasePattern = new RegExp(
-      `###\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`,
-      'i'
-    );
+    const phasePattern = new RegExp(`###\\s*Phase\\s+${escapedPhase}:\\s*([^\\n]+)`, 'i');
     const headerMatch = content.match(phasePattern);
 
     if (!headerMatch) {
@@ -843,9 +877,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
     // Find the end of this section (next ### or end of file)
     const restOfContent = content.slice(headerIndex);
     const nextHeaderMatch = restOfContent.match(/\n###\s+Phase\s+\d/i);
-    const sectionEnd = nextHeaderMatch
-      ? headerIndex + nextHeaderMatch.index
-      : content.length;
+    const sectionEnd = nextHeaderMatch ? headerIndex + nextHeaderMatch.index : content.length;
 
     const section = content.slice(headerIndex, sectionEnd).trim();
 
@@ -862,7 +894,7 @@ function cmdRoadmapGetPhase(cwd, phaseNum, raw) {
         section,
       },
       raw,
-      section
+      section,
     );
   } catch (e) {
     error('Failed to read ROADMAP.md: ' + e.message);
@@ -883,17 +915,17 @@ function cmdPhaseNextDecimal(cwd, basePhase, raw) {
         existing: [],
       },
       raw,
-      `${normalized}.1`
+      `${normalized}.1`,
     );
     return;
   }
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
     // Check if base phase exists
-    const baseExists = dirs.some(d => d.startsWith(normalized + '-') || d === normalized);
+    const baseExists = dirs.some((d) => d.startsWith(normalized + '-') || d === normalized);
 
     // Find existing decimal phases for this base
     const decimalPattern = new RegExp(`^${normalized}\\.(\\d+)`);
@@ -931,7 +963,7 @@ function cmdPhaseNextDecimal(cwd, basePhase, raw) {
         existing: existingDecimals,
       },
       raw,
-      nextDecimal
+      nextDecimal,
     );
   } catch (e) {
     error('Failed to calculate next decimal phase: ' + e.message);
@@ -987,7 +1019,7 @@ function cmdStateGet(cwd, section, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
   try {
     const content = fs.readFileSync(statePath, 'utf-8');
-    
+
     if (!section) {
       output({ content }, raw, content);
       return;
@@ -995,7 +1027,7 @@ function cmdStateGet(cwd, section, raw) {
 
     // Try to find markdown section or field
     const fieldEscaped = section.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    
+
     // Check for **field:** value
     const fieldPattern = new RegExp(`\\*\\*${fieldEscaped}:\\*\\*\\s*(.*)`, 'i');
     const fieldMatch = content.match(fieldPattern);
@@ -1027,7 +1059,7 @@ function cmdStatePatch(cwd, patches, raw) {
     for (const [field, value] of Object.entries(patches)) {
       const fieldEscaped = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`(\\*\\*${fieldEscaped}:\\*\\*\\s*)(.*)`, 'i');
-      
+
       if (pattern.test(content)) {
         content = content.replace(pattern, `$1${value}`);
         results.updated.push(field);
@@ -1087,7 +1119,10 @@ function stateReplaceField(content, fieldName, newValue) {
 
 function cmdStateAdvancePlan(cwd, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const currentPlan = parseInt(stateExtractField(content, 'Current Plan'), 10);
@@ -1100,23 +1135,46 @@ function cmdStateAdvancePlan(cwd, raw) {
   }
 
   if (currentPlan >= totalPlans) {
-    content = stateReplaceField(content, 'Status', 'Phase complete — ready for verification') || content;
+    content =
+      stateReplaceField(content, 'Status', 'Phase complete — ready for verification') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ advanced: false, reason: 'last_plan', current_plan: currentPlan, total_plans: totalPlans, status: 'ready_for_verification' }, raw, 'false');
+    output(
+      {
+        advanced: false,
+        reason: 'last_plan',
+        current_plan: currentPlan,
+        total_plans: totalPlans,
+        status: 'ready_for_verification',
+      },
+      raw,
+      'false',
+    );
   } else {
     const newPlan = currentPlan + 1;
     content = stateReplaceField(content, 'Current Plan', String(newPlan)) || content;
     content = stateReplaceField(content, 'Status', 'Ready to execute') || content;
     content = stateReplaceField(content, 'Last Activity', today) || content;
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ advanced: true, previous_plan: currentPlan, current_plan: newPlan, total_plans: totalPlans }, raw, 'true');
+    output(
+      {
+        advanced: true,
+        previous_plan: currentPlan,
+        current_plan: newPlan,
+        total_plans: totalPlans,
+      },
+      raw,
+      'true',
+    );
   }
 }
 
 function cmdStateRecordMetric(cwd, options, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const { phase, plan, duration, tasks, files } = options;
@@ -1127,7 +1185,8 @@ function cmdStateRecordMetric(cwd, options, raw) {
   }
 
   // Find Performance Metrics section and its table
-  const metricsPattern = /(##\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n)([\s\S]*?)(?=\n##|\n$|$)/i;
+  const metricsPattern =
+    /(##\s*Performance Metrics[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n)([\s\S]*?)(?=\n##|\n$|$)/i;
   const metricsMatch = content.match(metricsPattern);
 
   if (metricsMatch) {
@@ -1145,13 +1204,20 @@ function cmdStateRecordMetric(cwd, options, raw) {
     fs.writeFileSync(statePath, content, 'utf-8');
     output({ recorded: true, phase, plan, duration }, raw, 'true');
   } else {
-    output({ recorded: false, reason: 'Performance Metrics section not found in STATE.md' }, raw, 'false');
+    output(
+      { recorded: false, reason: 'Performance Metrics section not found in STATE.md' },
+      raw,
+      'false',
+    );
   }
 }
 
 function cmdStateUpdateProgress(cwd, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
@@ -1161,18 +1227,20 @@ function cmdStateUpdateProgress(cwd, raw) {
   let totalSummaries = 0;
 
   if (fs.existsSync(phasesDir)) {
-    const phaseDirs = fs.readdirSync(phasesDir, { withFileTypes: true })
-      .filter(e => e.isDirectory()).map(e => e.name);
+    const phaseDirs = fs
+      .readdirSync(phasesDir, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name);
     for (const dir of phaseDirs) {
       const files = fs.readdirSync(path.join(phasesDir, dir));
-      totalPlans += files.filter(f => f.match(/-PLAN\.md$/i)).length;
-      totalSummaries += files.filter(f => f.match(/-SUMMARY\.md$/i)).length;
+      totalPlans += files.filter((f) => f.match(/-PLAN\.md$/i)).length;
+      totalSummaries += files.filter((f) => f.match(/-SUMMARY\.md$/i)).length;
     }
   }
 
-  const percent = totalPlans > 0 ? Math.round(totalSummaries / totalPlans * 100) : 0;
+  const percent = totalPlans > 0 ? Math.round((totalSummaries / totalPlans) * 100) : 0;
   const barWidth = 10;
-  const filled = Math.round(percent / 100 * barWidth);
+  const filled = Math.round((percent / 100) * barWidth);
   const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(barWidth - filled);
   const progressStr = `[${bar}] ${percent}%`;
 
@@ -1180,7 +1248,11 @@ function cmdStateUpdateProgress(cwd, raw) {
   if (progressPattern.test(content)) {
     content = content.replace(progressPattern, `$1${progressStr}`);
     fs.writeFileSync(statePath, content, 'utf-8');
-    output({ updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr }, raw, progressStr);
+    output(
+      { updated: true, percent, completed: totalSummaries, total: totalPlans, bar: progressStr },
+      raw,
+      progressStr,
+    );
   } else {
     output({ updated: false, reason: 'Progress field not found in STATE.md' }, raw, 'false');
   }
@@ -1188,22 +1260,31 @@ function cmdStateUpdateProgress(cwd, raw) {
 
 function cmdStateAddDecision(cwd, options, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
 
   const { phase, summary, rationale } = options;
-  if (!summary) { output({ error: 'summary required' }, raw); return; }
+  if (!summary) {
+    output({ error: 'summary required' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- [Phase ${phase || '?'}]: ${summary}${rationale ? ` — ${rationale}` : ''}`;
 
   // Find Decisions section (various heading patterns)
-  const sectionPattern = /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+  const sectionPattern =
+    /(###?\s*(?:Decisions|Decisions Made|Accumulated.*Decisions)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
   const match = content.match(sectionPattern);
 
   if (match) {
     let sectionBody = match[2];
     // Remove placeholders
-    sectionBody = sectionBody.replace(/None yet\.?\s*\n?/gi, '').replace(/No decisions yet\.?\s*\n?/gi, '');
+    sectionBody = sectionBody
+      .replace(/None yet\.?\s*\n?/gi, '')
+      .replace(/No decisions yet\.?\s*\n?/gi, '');
     sectionBody = sectionBody.trimEnd() + '\n' + entry + '\n';
     content = content.replace(sectionPattern, `${match[1]}${sectionBody}`);
     fs.writeFileSync(statePath, content, 'utf-8');
@@ -1215,13 +1296,20 @@ function cmdStateAddDecision(cwd, options, raw) {
 
 function cmdStateAddBlocker(cwd, text, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
-  if (!text) { output({ error: 'text required' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
+  if (!text) {
+    output({ error: 'text required' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const entry = `- ${text}`;
 
-  const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+  const sectionPattern =
+    /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
   const match = content.match(sectionPattern);
 
   if (match) {
@@ -1238,18 +1326,25 @@ function cmdStateAddBlocker(cwd, text, raw) {
 
 function cmdStateResolveBlocker(cwd, text, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
-  if (!text) { output({ error: 'text required' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
+  if (!text) {
+    output({ error: 'text required' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
 
-  const sectionPattern = /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
+  const sectionPattern =
+    /(###?\s*(?:Blockers|Blockers\/Concerns|Concerns)\s*\n)([\s\S]*?)(?=\n###?|\n##[^#]|$)/i;
   const match = content.match(sectionPattern);
 
   if (match) {
     const sectionBody = match[2];
     const lines = sectionBody.split('\n');
-    const filtered = lines.filter(line => {
+    const filtered = lines.filter((line) => {
       if (!line.startsWith('- ')) return true;
       return !line.toLowerCase().includes(text.toLowerCase());
     });
@@ -1270,7 +1365,10 @@ function cmdStateResolveBlocker(cwd, text, raw) {
 
 function cmdStateRecordSession(cwd, options, raw) {
   const statePath = path.join(cwd, '.planning', 'STATE.md');
-  if (!fs.existsSync(statePath)) { output({ error: 'STATE.md not found' }, raw); return; }
+  if (!fs.existsSync(statePath)) {
+    output({ error: 'STATE.md not found' }, raw);
+    return;
+  }
 
   let content = fs.readFileSync(statePath, 'utf-8');
   const now = new Date().toISOString();
@@ -1278,22 +1376,34 @@ function cmdStateRecordSession(cwd, options, raw) {
 
   // Update Last session / Last Date
   let result = stateReplaceField(content, 'Last session', now);
-  if (result) { content = result; updated.push('Last session'); }
+  if (result) {
+    content = result;
+    updated.push('Last session');
+  }
   result = stateReplaceField(content, 'Last Date', now);
-  if (result) { content = result; updated.push('Last Date'); }
+  if (result) {
+    content = result;
+    updated.push('Last Date');
+  }
 
   // Update Stopped at
   if (options.stopped_at) {
     result = stateReplaceField(content, 'Stopped At', options.stopped_at);
     if (!result) result = stateReplaceField(content, 'Stopped at', options.stopped_at);
-    if (result) { content = result; updated.push('Stopped At'); }
+    if (result) {
+      content = result;
+      updated.push('Stopped At');
+    }
   }
 
   // Update Resume file
   const resumeFile = options.resume_file || 'None';
   result = stateReplaceField(content, 'Resume File', resumeFile);
   if (!result) result = stateReplaceField(content, 'Resume file', resumeFile);
-  if (result) { content = result; updated.push('Resume File'); }
+  if (result) {
+    content = result;
+    updated.push('Resume File');
+  }
 
   if (updated.length > 0) {
     fs.writeFileSync(statePath, content, 'utf-8');
@@ -1331,13 +1441,23 @@ function cmdFindPhase(cwd, phase, raw) {
   const phasesDir = path.join(cwd, '.planning', 'phases');
   const normalized = normalizePhaseName(phase);
 
-  const notFound = { found: false, directory: null, phase_number: null, phase_name: null, plans: [], summaries: [] };
+  const notFound = {
+    found: false,
+    directory: null,
+    phase_number: null,
+    phase_name: null,
+    plans: [],
+    summaries: [],
+  };
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
 
-    const match = dirs.find(d => d.startsWith(normalized));
+    const match = dirs.find((d) => d.startsWith(normalized));
     if (!match) {
       output(notFound, raw, '');
       return;
@@ -1349,8 +1469,10 @@ function cmdFindPhase(cwd, phase, raw) {
 
     const phaseDir = path.join(phasesDir, match);
     const phaseFiles = fs.readdirSync(phaseDir);
-    const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
-    const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').sort();
+    const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
+    const summaries = phaseFiles
+      .filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md')
+      .sort();
 
     const result = {
       found: true,
@@ -1398,12 +1520,20 @@ function cmdCommit(cwd, message, files, raw, amend) {
   const commitArgs = amend ? ['commit', '--amend', '--no-edit'] : ['commit', '-m', message];
   const commitResult = execGit(cwd, commitArgs);
   if (commitResult.exitCode !== 0) {
-    if (commitResult.stdout.includes('nothing to commit') || commitResult.stderr.includes('nothing to commit')) {
+    if (
+      commitResult.stdout.includes('nothing to commit') ||
+      commitResult.stderr.includes('nothing to commit')
+    ) {
       const result = { committed: false, hash: null, reason: 'nothing_to_commit' };
       output(result, raw, 'nothing');
       return;
     }
-    const result = { committed: false, hash: null, reason: 'nothing_to_commit', error: commitResult.stderr };
+    const result = {
+      committed: false,
+      hash: null,
+      reason: 'nothing_to_commit',
+      error: commitResult.stderr,
+    };
     output(result, raw, 'nothing');
     return;
   }
@@ -1496,12 +1626,17 @@ function cmdVerifySummary(cwd, summaryPath, checkFileCount, raw) {
   }
 
   if (missing.length > 0) errors.push('Missing files: ' + missing.join(', '));
-  if (!commitsExist && hashes.length > 0) errors.push('Referenced commit hashes not found in git history');
+  if (!commitsExist && hashes.length > 0)
+    errors.push('Referenced commit hashes not found in git history');
   if (selfCheck === 'failed') errors.push('Self-check section indicates failure');
 
   const checks = {
     summary_exists: true,
-    files_created: { checked: filesToCheck.length, found: filesToCheck.length - missing.length, missing },
+    files_created: {
+      checked: filesToCheck.length,
+      found: filesToCheck.length - missing.length,
+      missing,
+    },
     commits_exist: commitsExist,
     self_check: selfCheck,
   };
@@ -1519,14 +1654,14 @@ function cmdTemplateSelect(cwd, planPath, raw) {
   try {
     const fullPath = path.join(cwd, planPath);
     const content = fs.readFileSync(fullPath, 'utf-8');
-    
+
     // Simple heuristics
     const taskMatch = content.match(/###\s*Task\s*\d+/g) || [];
     const taskCount = taskMatch.length;
-    
+
     const decisionMatch = content.match(/decision/gi) || [];
     const hasDecisions = decisionMatch.length > 0;
-    
+
     // Count file mentions
     const fileMentions = new Set();
     const filePattern = /`([^`]+\.[a-zA-Z]+)`/g;
@@ -1553,16 +1688,27 @@ function cmdTemplateSelect(cwd, planPath, raw) {
     output(result, raw, template);
   } catch (e) {
     // Fallback to standard
-    output({ template: 'templates/summary-standard.md', type: 'standard', error: e.message }, raw, 'templates/summary-standard.md');
+    output(
+      { template: 'templates/summary-standard.md', type: 'standard', error: e.message },
+      raw,
+      'templates/summary-standard.md',
+    );
   }
 }
 
 function cmdTemplateFill(cwd, templateType, options, raw) {
-  if (!templateType) { error('template type required: summary, plan, or verification'); }
-  if (!options.phase) { error('--phase required'); }
+  if (!templateType) {
+    error('template type required: summary, plan, or verification');
+  }
+  if (!options.phase) {
+    error('--phase required');
+  }
 
   const phaseInfo = findPhaseInternal(cwd, options.phase);
-  if (!phaseInfo || !phaseInfo.found) { output({ error: 'Phase not found', phase: options.phase }, raw); return; }
+  if (!phaseInfo || !phaseInfo.found) {
+    output({ error: 'Phase not found', phase: options.phase }, raw);
+    return;
+  }
 
   const padded = normalizePhaseName(options.phase);
   const today = new Date().toISOString().split('T')[0];
@@ -1615,7 +1761,7 @@ function cmdTemplateFill(cwd, templateType, options, raw) {
         '[Key decisions or "None - followed plan as specified"]',
         '',
         '## Next Phase Readiness',
-        '[What\'s ready for next phase]',
+        "[What's ready for next phase]",
       ].join('\n');
       fileName = `${padded}-${planNum}-SUMMARY.md`;
       break;
@@ -1736,8 +1882,11 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
   let phaseDirName = null;
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
-    const match = dirs.find(d => d.startsWith(normalized));
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    const match = dirs.find((d) => d.startsWith(normalized));
     if (match) {
       phaseDir = path.join(phasesDir, match);
       phaseDirName = match;
@@ -1747,18 +1896,28 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
   }
 
   if (!phaseDir) {
-    output({ phase: normalized, error: 'Phase not found', plans: [], waves: {}, incomplete: [], has_checkpoints: false }, raw);
+    output(
+      {
+        phase: normalized,
+        error: 'Phase not found',
+        plans: [],
+        waves: {},
+        incomplete: [],
+        has_checkpoints: false,
+      },
+      raw,
+    );
     return;
   }
 
   // Get all files in phase directory
   const phaseFiles = fs.readdirSync(phaseDir);
-  const planFiles = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
-  const summaryFiles = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+  const planFiles = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
+  const summaryFiles = phaseFiles.filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
 
   // Build set of plan IDs with summaries
   const completedPlanIds = new Set(
-    summaryFiles.map(s => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', ''))
+    summaryFiles.map((s) => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', '')),
   );
 
   const plans = [];
@@ -1792,7 +1951,9 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
     // Parse files-modified
     let filesModified = [];
     if (fm['files-modified']) {
-      filesModified = Array.isArray(fm['files-modified']) ? fm['files-modified'] : [fm['files-modified']];
+      filesModified = Array.isArray(fm['files-modified'])
+        ? fm['files-modified']
+        : [fm['files-modified']];
     }
 
     const hasSummary = completedPlanIds.has(planId);
@@ -1867,12 +2028,20 @@ function cmdStateSnapshot(cwd, raw) {
 
   // Extract decisions table
   const decisions = [];
-  const decisionsMatch = content.match(/##\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n([\s\S]*?)(?=\n##|\n$|$)/i);
+  const decisionsMatch = content.match(
+    /##\s*Decisions Made[\s\S]*?\n\|[^\n]+\n\|[-|\s]+\n([\s\S]*?)(?=\n##|\n$|$)/i,
+  );
   if (decisionsMatch) {
     const tableBody = decisionsMatch[1];
-    const rows = tableBody.trim().split('\n').filter(r => r.includes('|'));
+    const rows = tableBody
+      .trim()
+      .split('\n')
+      .filter((r) => r.includes('|'));
     for (const row of rows) {
-      const cells = row.split('|').map(c => c.trim()).filter(Boolean);
+      const cells = row
+        .split('|')
+        .map((c) => c.trim())
+        .filter(Boolean);
       if (cells.length >= 3) {
         decisions.push({
           phase: cells[0],
@@ -1950,7 +2119,7 @@ function cmdSummaryExtract(cwd, summaryPath, fields, raw) {
   // Parse key-decisions into structured format
   const parseDecisions = (decisionsList) => {
     if (!decisionsList || !Array.isArray(decisionsList)) return [];
-    return decisionsList.map(d => {
+    return decisionsList.map((d) => {
       const colonIdx = d.indexOf(':');
       if (colonIdx > 0) {
         return {
@@ -1990,14 +2159,22 @@ function cmdSummaryExtract(cwd, summaryPath, fields, raw) {
 // ─── Frontmatter CRUD ────────────────────────────────────────────────────────
 
 function cmdFrontmatterGet(cwd, filePath, field, raw) {
-  if (!filePath) { error('file path required'); }
+  if (!filePath) {
+    error('file path required');
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
   const fm = extractFrontmatter(content);
   if (field) {
     const value = fm[field];
-    if (value === undefined) { output({ error: 'Field not found', field }, raw); return; }
+    if (value === undefined) {
+      output({ error: 'Field not found', field }, raw);
+      return;
+    }
     output({ [field]: value }, raw, JSON.stringify(value));
   } else {
     output(fm, raw);
@@ -2005,13 +2182,22 @@ function cmdFrontmatterGet(cwd, filePath, field, raw) {
 }
 
 function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
-  if (!filePath || !field || value === undefined) { error('file, field, and value required'); }
+  if (!filePath || !field || value === undefined) {
+    error('file, field, and value required');
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
-  if (!fs.existsSync(fullPath)) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!fs.existsSync(fullPath)) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
   const content = fs.readFileSync(fullPath, 'utf-8');
   const fm = extractFrontmatter(content);
   let parsedValue;
-  try { parsedValue = JSON.parse(value); } catch { parsedValue = value; }
+  try {
+    parsedValue = JSON.parse(value);
+  } catch {
+    parsedValue = value;
+  }
   fm[field] = parsedValue;
   const newContent = spliceFrontmatter(content, fm);
   fs.writeFileSync(fullPath, newContent, 'utf-8');
@@ -2019,13 +2205,23 @@ function cmdFrontmatterSet(cwd, filePath, field, value, raw) {
 }
 
 function cmdFrontmatterMerge(cwd, filePath, data, raw) {
-  if (!filePath || !data) { error('file and data required'); }
+  if (!filePath || !data) {
+    error('file and data required');
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
-  if (!fs.existsSync(fullPath)) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!fs.existsSync(fullPath)) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
   const content = fs.readFileSync(fullPath, 'utf-8');
   const fm = extractFrontmatter(content);
   let mergeData;
-  try { mergeData = JSON.parse(data); } catch { error('Invalid JSON for --data'); return; }
+  try {
+    mergeData = JSON.parse(data);
+  } catch {
+    error('Invalid JSON for --data');
+    return;
+  }
   Object.assign(fm, mergeData);
   const newContent = spliceFrontmatter(content, fm);
   fs.writeFileSync(fullPath, newContent, 'utf-8');
@@ -2033,38 +2229,76 @@ function cmdFrontmatterMerge(cwd, filePath, data, raw) {
 }
 
 const FRONTMATTER_SCHEMAS = {
-  plan: { required: ['phase', 'plan', 'type', 'wave', 'depends_on', 'files_modified', 'autonomous', 'must_haves'] },
+  plan: {
+    required: [
+      'phase',
+      'plan',
+      'type',
+      'wave',
+      'depends_on',
+      'files_modified',
+      'autonomous',
+      'must_haves',
+    ],
+  },
   summary: { required: ['phase', 'plan', 'subsystem', 'tags', 'duration', 'completed'] },
   verification: { required: ['phase', 'verified', 'status', 'score'] },
 };
 
 function cmdFrontmatterValidate(cwd, filePath, schemaName, raw) {
-  if (!filePath || !schemaName) { error('file and schema required'); }
+  if (!filePath || !schemaName) {
+    error('file and schema required');
+  }
   const schema = FRONTMATTER_SCHEMAS[schemaName];
-  if (!schema) { error(`Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(', ')}`); }
+  if (!schema) {
+    error(
+      `Unknown schema: ${schemaName}. Available: ${Object.keys(FRONTMATTER_SCHEMAS).join(', ')}`,
+    );
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
   const fm = extractFrontmatter(content);
-  const missing = schema.required.filter(f => fm[f] === undefined);
-  const present = schema.required.filter(f => fm[f] !== undefined);
-  output({ valid: missing.length === 0, missing, present, schema: schemaName }, raw, missing.length === 0 ? 'valid' : 'invalid');
+  const missing = schema.required.filter((f) => fm[f] === undefined);
+  const present = schema.required.filter((f) => fm[f] !== undefined);
+  output(
+    { valid: missing.length === 0, missing, present, schema: schemaName },
+    raw,
+    missing.length === 0 ? 'valid' : 'invalid',
+  );
 }
 
 // ─── Verification Suite ──────────────────────────────────────────────────────
 
 function cmdVerifyPlanStructure(cwd, filePath, raw) {
-  if (!filePath) { error('file path required'); }
+  if (!filePath) {
+    error('file path required');
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
 
   const fm = extractFrontmatter(content);
   const errors = [];
   const warnings = [];
 
   // Check required frontmatter fields
-  const required = ['phase', 'plan', 'type', 'wave', 'depends_on', 'files_modified', 'autonomous', 'must_haves'];
+  const required = [
+    'phase',
+    'plan',
+    'type',
+    'wave',
+    'depends_on',
+    'files_modified',
+    'autonomous',
+    'must_haves',
+  ];
   for (const field of required) {
     if (fm[field] === undefined) errors.push(`Missing required frontmatter field: ${field}`);
   }
@@ -2094,7 +2328,11 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
   if (tasks.length === 0) warnings.push('No <task> elements found');
 
   // Wave/depends_on consistency
-  if (fm.wave && parseInt(fm.wave) > 1 && (!fm.depends_on || (Array.isArray(fm.depends_on) && fm.depends_on.length === 0))) {
+  if (
+    fm.wave &&
+    parseInt(fm.wave) > 1 &&
+    (!fm.depends_on || (Array.isArray(fm.depends_on) && fm.depends_on.length === 0))
+  ) {
     warnings.push('Wave > 1 but depends_on is empty');
   }
 
@@ -2104,18 +2342,24 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
     errors.push('Has checkpoint tasks but autonomous is not false');
   }
 
-  output({
-    valid: errors.length === 0,
-    errors,
-    warnings,
-    task_count: tasks.length,
-    tasks,
-    frontmatter_fields: Object.keys(fm),
-  }, raw, errors.length === 0 ? 'valid' : 'invalid');
+  output(
+    {
+      valid: errors.length === 0,
+      errors,
+      warnings,
+      task_count: tasks.length,
+      tasks,
+      frontmatter_fields: Object.keys(fm),
+    },
+    raw,
+    errors.length === 0 ? 'valid' : 'invalid',
+  );
 }
 
 function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
-  if (!phase) { error('phase required'); }
+  if (!phase) {
+    error('phase required');
+  }
   const phaseInfo = findPhaseInternal(cwd, phase);
   if (!phaseInfo || !phaseInfo.found) {
     output({ error: 'Phase not found', phase }, raw);
@@ -2128,44 +2372,58 @@ function cmdVerifyPhaseCompleteness(cwd, phase, raw) {
 
   // List plans and summaries
   let files;
-  try { files = fs.readdirSync(phaseDir); } catch { output({ error: 'Cannot read phase directory' }, raw); return; }
+  try {
+    files = fs.readdirSync(phaseDir);
+  } catch {
+    output({ error: 'Cannot read phase directory' }, raw);
+    return;
+  }
 
-  const plans = files.filter(f => f.match(/-PLAN\.md$/i));
-  const summaries = files.filter(f => f.match(/-SUMMARY\.md$/i));
+  const plans = files.filter((f) => f.match(/-PLAN\.md$/i));
+  const summaries = files.filter((f) => f.match(/-SUMMARY\.md$/i));
 
   // Extract plan IDs (everything before -PLAN.md)
-  const planIds = new Set(plans.map(p => p.replace(/-PLAN\.md$/i, '')));
-  const summaryIds = new Set(summaries.map(s => s.replace(/-SUMMARY\.md$/i, '')));
+  const planIds = new Set(plans.map((p) => p.replace(/-PLAN\.md$/i, '')));
+  const summaryIds = new Set(summaries.map((s) => s.replace(/-SUMMARY\.md$/i, '')));
 
   // Plans without summaries
-  const incompletePlans = [...planIds].filter(id => !summaryIds.has(id));
+  const incompletePlans = [...planIds].filter((id) => !summaryIds.has(id));
   if (incompletePlans.length > 0) {
     errors.push(`Plans without summaries: ${incompletePlans.join(', ')}`);
   }
 
   // Summaries without plans (orphans)
-  const orphanSummaries = [...summaryIds].filter(id => !planIds.has(id));
+  const orphanSummaries = [...summaryIds].filter((id) => !planIds.has(id));
   if (orphanSummaries.length > 0) {
     warnings.push(`Summaries without plans: ${orphanSummaries.join(', ')}`);
   }
 
-  output({
-    complete: errors.length === 0,
-    phase: phaseInfo.phase_number,
-    plan_count: plans.length,
-    summary_count: summaries.length,
-    incomplete_plans: incompletePlans,
-    orphan_summaries: orphanSummaries,
-    errors,
-    warnings,
-  }, raw, errors.length === 0 ? 'complete' : 'incomplete');
+  output(
+    {
+      complete: errors.length === 0,
+      phase: phaseInfo.phase_number,
+      plan_count: plans.length,
+      summary_count: summaries.length,
+      incomplete_plans: incompletePlans,
+      orphan_summaries: orphanSummaries,
+      errors,
+      warnings,
+    },
+    raw,
+    errors.length === 0 ? 'complete' : 'incomplete',
+  );
 }
 
 function cmdVerifyReferences(cwd, filePath, raw) {
-  if (!filePath) { error('file path required'); }
+  if (!filePath) {
+    error('file path required');
+  }
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: filePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: filePath }, raw);
+    return;
+  }
 
   const found = [];
   const missing = [];
@@ -2198,16 +2456,22 @@ function cmdVerifyReferences(cwd, filePath, raw) {
     }
   }
 
-  output({
-    valid: missing.length === 0,
-    found: found.length,
-    missing,
-    total: found.length + missing.length,
-  }, raw, missing.length === 0 ? 'valid' : 'invalid');
+  output(
+    {
+      valid: missing.length === 0,
+      found: found.length,
+      missing,
+      total: found.length + missing.length,
+    },
+    raw,
+    missing.length === 0 ? 'valid' : 'invalid',
+  );
 }
 
 function cmdVerifyCommits(cwd, hashes, raw) {
-  if (!hashes || hashes.length === 0) { error('At least one commit hash required'); }
+  if (!hashes || hashes.length === 0) {
+    error('At least one commit hash required');
+  }
 
   const valid = [];
   const invalid = [];
@@ -2220,19 +2484,28 @@ function cmdVerifyCommits(cwd, hashes, raw) {
     }
   }
 
-  output({
-    all_valid: invalid.length === 0,
-    valid,
-    invalid,
-    total: hashes.length,
-  }, raw, invalid.length === 0 ? 'valid' : 'invalid');
+  output(
+    {
+      all_valid: invalid.length === 0,
+      valid,
+      invalid,
+      total: hashes.length,
+    },
+    raw,
+    invalid.length === 0 ? 'valid' : 'invalid',
+  );
 }
 
 function cmdVerifyArtifacts(cwd, planFilePath, raw) {
-  if (!planFilePath) { error('plan file path required'); }
+  if (!planFilePath) {
+    error('plan file path required');
+  }
   const fullPath = path.isAbsolute(planFilePath) ? planFilePath : path.join(cwd, planFilePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: planFilePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: planFilePath }, raw);
+    return;
+  }
 
   const artifacts = parseMustHavesBlock(content, 'artifacts');
   if (artifacts.length === 0) {
@@ -2274,20 +2547,29 @@ function cmdVerifyArtifacts(cwd, planFilePath, raw) {
     results.push(check);
   }
 
-  const passed = results.filter(r => r.passed).length;
-  output({
-    all_passed: passed === results.length,
-    passed,
-    total: results.length,
-    artifacts: results,
-  }, raw, passed === results.length ? 'valid' : 'invalid');
+  const passed = results.filter((r) => r.passed).length;
+  output(
+    {
+      all_passed: passed === results.length,
+      passed,
+      total: results.length,
+      artifacts: results,
+    },
+    raw,
+    passed === results.length ? 'valid' : 'invalid',
+  );
 }
 
 function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
-  if (!planFilePath) { error('plan file path required'); }
+  if (!planFilePath) {
+    error('plan file path required');
+  }
   const fullPath = path.isAbsolute(planFilePath) ? planFilePath : path.join(cwd, planFilePath);
   const content = safeReadFile(fullPath);
-  if (!content) { output({ error: 'File not found', path: planFilePath }, raw); return; }
+  if (!content) {
+    output({ error: 'File not found', path: planFilePath }, raw);
+    return;
+  }
 
   const keyLinks = parseMustHavesBlock(content, 'key_links');
   if (keyLinks.length === 0) {
@@ -2298,7 +2580,13 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
   const results = [];
   for (const link of keyLinks) {
     if (typeof link === 'string') continue;
-    const check = { from: link.from, to: link.to, via: link.via || '', verified: false, detail: '' };
+    const check = {
+      from: link.from,
+      to: link.to,
+      via: link.via || '',
+      verified: false,
+      detail: '',
+    };
 
     const sourceContent = safeReadFile(path.join(cwd, link.from || ''));
     if (!sourceContent) {
@@ -2334,13 +2622,17 @@ function cmdVerifyKeyLinks(cwd, planFilePath, raw) {
     results.push(check);
   }
 
-  const verified = results.filter(r => r.verified).length;
-  output({
-    all_verified: verified === results.length,
-    verified,
-    total: results.length,
-    links: results,
-  }, raw, verified === results.length ? 'valid' : 'invalid');
+  const verified = results.filter((r) => r.verified).length;
+  output(
+    {
+      all_verified: verified === results.length,
+      verified,
+      total: results.length,
+      links: results,
+    },
+    raw,
+    verified === results.length ? 'valid' : 'invalid',
+  );
 }
 
 // ─── Roadmap Analysis ─────────────────────────────────────────────────────────
@@ -2388,15 +2680,17 @@ function cmdRoadmapAnalyze(cwd, raw) {
 
     try {
       const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
-      const dirMatch = dirs.find(d => d.startsWith(normalized + '-') || d === normalized);
+      const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+      const dirMatch = dirs.find((d) => d.startsWith(normalized + '-') || d === normalized);
 
       if (dirMatch) {
         const phaseFiles = fs.readdirSync(path.join(phasesDir, dirMatch));
-        planCount = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
-        summaryCount = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').length;
-        hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
-        hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+        planCount = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
+        summaryCount = phaseFiles.filter(
+          (f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md',
+        ).length;
+        hasContext = phaseFiles.some((f) => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
+        hasResearch = phaseFiles.some((f) => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
 
         if (summaryCount >= planCount && planCount > 0) diskStatus = 'complete';
         else if (summaryCount > 0) diskStatus = 'partial';
@@ -2408,7 +2702,10 @@ function cmdRoadmapAnalyze(cwd, raw) {
     } catch {}
 
     // Check ROADMAP checkbox status
-    const checkboxPattern = new RegExp(`-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`, 'i');
+    const checkboxPattern = new RegExp(
+      `-\\s*\\[(x| )\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}`,
+      'i',
+    );
     const checkboxMatch = content.match(checkboxPattern);
     const roadmapComplete = checkboxMatch ? checkboxMatch[1] === 'x' : false;
 
@@ -2438,13 +2735,21 @@ function cmdRoadmapAnalyze(cwd, raw) {
   }
 
   // Find current and next phase
-  const currentPhase = phases.find(p => p.disk_status === 'planned' || p.disk_status === 'partial') || null;
-  const nextPhase = phases.find(p => p.disk_status === 'empty' || p.disk_status === 'no_directory' || p.disk_status === 'discussed' || p.disk_status === 'researched') || null;
+  const currentPhase =
+    phases.find((p) => p.disk_status === 'planned' || p.disk_status === 'partial') || null;
+  const nextPhase =
+    phases.find(
+      (p) =>
+        p.disk_status === 'empty' ||
+        p.disk_status === 'no_directory' ||
+        p.disk_status === 'discussed' ||
+        p.disk_status === 'researched',
+    ) || null;
 
   // Aggregated stats
   const totalPlans = phases.reduce((sum, p) => sum + p.plan_count, 0);
   const totalSummaries = phases.reduce((sum, p) => sum + p.summary_count, 0);
-  const completedPhases = phases.filter(p => p.disk_status === 'complete').length;
+  const completedPhases = phases.filter((p) => p.disk_status === 'complete').length;
 
   const result = {
     milestones,
@@ -2547,7 +2852,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
     const decimalPattern = new RegExp(`^${normalizedBase}\\.(\\d+)`);
     for (const dir of dirs) {
       const dm = dir.match(decimalPattern);
@@ -2621,17 +2926,22 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
   let targetDir = null;
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
-    targetDir = dirs.find(d => d.startsWith(normalized + '-') || d === normalized);
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    targetDir = dirs.find((d) => d.startsWith(normalized + '-') || d === normalized);
   } catch {}
 
   // Check for executed work (SUMMARY.md files)
   if (targetDir && !force) {
     const targetPath = path.join(phasesDir, targetDir);
     const files = fs.readdirSync(targetPath);
-    const summaries = files.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+    const summaries = files.filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
     if (summaries.length > 0) {
-      error(`Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`);
+      error(
+        `Phase ${targetPhase} has ${summaries.length} executed plan(s). Use --force to remove anyway.`,
+      );
     }
   }
 
@@ -2652,7 +2962,10 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
 
     try {
       const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+      const dirs = entries
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name)
+        .sort();
 
       // Find sibling decimals with higher numbers
       const decPattern = new RegExp(`^${baseInt}\\.(\\d+)-(.+)$`);
@@ -2685,21 +2998,23 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
             const newFileName = f.replace(oldPhaseId, newPhaseId);
             fs.renameSync(
               path.join(phasesDir, newDirName, f),
-              path.join(phasesDir, newDirName, newFileName)
+              path.join(phasesDir, newDirName, newFileName),
             );
             renamedFiles.push({ from: f, to: newFileName });
           }
         }
       }
     } catch {}
-
   } else {
     // Integer removal: renumber all subsequent integer phases
     const removedInt = parseInt(normalized, 10);
 
     try {
       const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-      const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+      const dirs = entries
+        .filter((e) => e.isDirectory())
+        .map((e) => e.name)
+        .sort();
 
       // Collect directories that need renumbering (integer phases > removed, and their decimals)
       const toRename = [];
@@ -2743,7 +3058,7 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
             const newFileName = newPrefix + f.slice(oldPrefix.length);
             fs.renameSync(
               path.join(phasesDir, newDirName, f),
-              path.join(phasesDir, newDirName, newFileName)
+              path.join(phasesDir, newDirName, newFileName),
             );
             renamedFiles.push({ from: f, to: newFileName });
           }
@@ -2759,12 +3074,15 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
   const targetEscaped = targetPhase.replace(/\./g, '\\.');
   const sectionPattern = new RegExp(
     `\\n?###\\s*Phase\\s+${targetEscaped}\\s*:[\\s\\S]*?(?=\\n###\\s+Phase\\s+\\d|$)`,
-    'i'
+    'i',
   );
   roadmapContent = roadmapContent.replace(sectionPattern, '');
 
   // Remove from phase list (checkbox)
-  const checkboxPattern = new RegExp(`\\n?-\\s*\\[[ x]\\]\\s*.*Phase\\s+${targetEscaped}[:\\s][^\\n]*`, 'gi');
+  const checkboxPattern = new RegExp(
+    `\\n?-\\s*\\[[ x]\\]\\s*.*Phase\\s+${targetEscaped}[:\\s][^\\n]*`,
+    'gi',
+  );
   roadmapContent = roadmapContent.replace(checkboxPattern, '');
 
   // Remove from progress table
@@ -2787,31 +3105,31 @@ function cmdPhaseRemove(cwd, targetPhase, options, raw) {
       // Phase headings: ### Phase 18: → ### Phase 17:
       roadmapContent = roadmapContent.replace(
         new RegExp(`(###\\s*Phase\\s+)${oldStr}(\\s*:)`, 'gi'),
-        `$1${newStr}$2`
+        `$1${newStr}$2`,
       );
 
       // Checkbox items: - [ ] **Phase 18:** → - [ ] **Phase 17:**
       roadmapContent = roadmapContent.replace(
         new RegExp(`(Phase\\s+)${oldStr}([:\\s])`, 'g'),
-        `$1${newStr}$2`
+        `$1${newStr}$2`,
       );
 
       // Plan references: 18-01 → 17-01
       roadmapContent = roadmapContent.replace(
         new RegExp(`${oldPad}-(\\d{2})`, 'g'),
-        `${newPad}-$1`
+        `${newPad}-$1`,
       );
 
       // Table rows: | 18. → | 17.
       roadmapContent = roadmapContent.replace(
         new RegExp(`(\\|\\s*)${oldStr}\\.\\s`, 'g'),
-        `$1${newStr}. `
+        `$1${newStr}. `,
       );
 
       // Depends on references
       roadmapContent = roadmapContent.replace(
         new RegExp(`(Depends on:\\*\\*\\s*Phase\\s+)${oldStr}\\b`, 'gi'),
-        `$1${newStr}`
+        `$1${newStr}`,
       );
     }
   }
@@ -2880,7 +3198,7 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
     // Checkbox: - [ ] Phase N: → - [x] Phase N: (...completed DATE)
     const checkboxPattern = new RegExp(
       `(-\\s*\\[)[ ](\\]\\s*.*Phase\\s+${phaseNum.replace('.', '\\.')}[:\\s][^\\n]*)`,
-      'i'
+      'i',
     );
     roadmapContent = roadmapContent.replace(checkboxPattern, `$1x$2 (completed ${today})`);
 
@@ -2888,21 +3206,18 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
     const phaseEscaped = phaseNum.replace('.', '\\.');
     const tablePattern = new RegExp(
       `(\\|\\s*${phaseEscaped}\\.?\\s[^|]*\\|[^|]*\\|)\\s*[^|]*(\\|)\\s*[^|]*(\\|)`,
-      'i'
+      'i',
     );
-    roadmapContent = roadmapContent.replace(
-      tablePattern,
-      `$1 Complete    $2 ${today} $3`
-    );
+    roadmapContent = roadmapContent.replace(tablePattern, `$1 Complete    $2 ${today} $3`);
 
     // Update plan count in phase section
     const planCountPattern = new RegExp(
       `(###\\s*Phase\\s+${phaseEscaped}[\\s\\S]*?\\*\\*Plans:\\*\\*\\s*)[^\\n]+`,
-      'i'
+      'i',
     );
     roadmapContent = roadmapContent.replace(
       planCountPattern,
-      `$1${summaryCount}/${planCount} plans complete`
+      `$1${summaryCount}/${planCount} plans complete`,
     );
 
     fs.writeFileSync(roadmapPath, roadmapContent, 'utf-8');
@@ -2915,7 +3230,10 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
     const currentFloat = parseFloat(phaseNum);
 
     // Find the next phase directory after current
@@ -2940,39 +3258,33 @@ function cmdPhaseComplete(cwd, phaseNum, raw) {
     // Update Current Phase
     stateContent = stateContent.replace(
       /(\*\*Current Phase:\*\*\s*).*/,
-      `$1${nextPhaseNum || phaseNum}`
+      `$1${nextPhaseNum || phaseNum}`,
     );
 
     // Update Current Phase Name
     if (nextPhaseName) {
       stateContent = stateContent.replace(
         /(\*\*Current Phase Name:\*\*\s*).*/,
-        `$1${nextPhaseName.replace(/-/g, ' ')}`
+        `$1${nextPhaseName.replace(/-/g, ' ')}`,
       );
     }
 
     // Update Status
     stateContent = stateContent.replace(
       /(\*\*Status:\*\*\s*).*/,
-      `$1${isLastPhase ? 'Milestone complete' : 'Ready to plan'}`
+      `$1${isLastPhase ? 'Milestone complete' : 'Ready to plan'}`,
     );
 
     // Update Current Plan
-    stateContent = stateContent.replace(
-      /(\*\*Current Plan:\*\*\s*).*/,
-      `$1Not started`
-    );
+    stateContent = stateContent.replace(/(\*\*Current Plan:\*\*\s*).*/, `$1Not started`);
 
     // Update Last Activity
-    stateContent = stateContent.replace(
-      /(\*\*Last Activity:\*\*\s*).*/,
-      `$1${today}`
-    );
+    stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
 
     // Update Last Activity Description
     stateContent = stateContent.replace(
       /(\*\*Last Activity Description:\*\*\s*).*/,
-      `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ''}`
+      `$1Phase ${phaseNum} complete${nextPhaseNum ? `, transitioned to Phase ${nextPhaseNum}` : ''}`,
     );
 
     fs.writeFileSync(statePath, stateContent, 'utf-8');
@@ -3020,13 +3332,16 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
 
     for (const dir of dirs) {
       phaseCount++;
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md');
+      const summaries = phaseFiles.filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
       totalPlans += plans.length;
 
       // Extract one-liners from summaries
@@ -3055,7 +3370,11 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
   if (fs.existsSync(reqPath)) {
     const reqContent = fs.readFileSync(reqPath, 'utf-8');
     const archiveHeader = `# Requirements Archive: ${version} ${milestoneName}\n\n**Archived:** ${today}\n**Status:** SHIPPED\n\nFor current requirements, see \`.planning/REQUIREMENTS.md\`.\n\n---\n\n`;
-    fs.writeFileSync(path.join(archiveDir, `${version}-REQUIREMENTS.md`), archiveHeader + reqContent, 'utf-8');
+    fs.writeFileSync(
+      path.join(archiveDir, `${version}-REQUIREMENTS.md`),
+      archiveHeader + reqContent,
+      'utf-8',
+    );
   }
 
   // Archive audit file if exists
@@ -3065,7 +3384,7 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
   }
 
   // Create/append MILESTONES.md entry
-  const accomplishmentsList = accomplishments.map(a => `- ${a}`).join('\n');
+  const accomplishmentsList = accomplishments.map((a) => `- ${a}`).join('\n');
   const milestoneEntry = `## ${version} ${milestoneName} (Shipped: ${today})\n\n**Phases completed:** ${phaseCount} phases, ${totalPlans} plans, ${totalTasks} tasks\n\n**Key accomplishments:**\n${accomplishmentsList || '- (none recorded)'}\n\n---\n\n`;
 
   if (fs.existsSync(milestonesPath)) {
@@ -3080,15 +3399,12 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
     let stateContent = fs.readFileSync(statePath, 'utf-8');
     stateContent = stateContent.replace(
       /(\*\*Status:\*\*\s*).*/,
-      `$1${version} milestone complete`
+      `$1${version} milestone complete`,
     );
-    stateContent = stateContent.replace(
-      /(\*\*Last Activity:\*\*\s*).*/,
-      `$1${today}`
-    );
+    stateContent = stateContent.replace(/(\*\*Last Activity:\*\*\s*).*/, `$1${today}`);
     stateContent = stateContent.replace(
       /(\*\*Last Activity Description:\*\*\s*).*/,
-      `$1${version} milestone completed and archived`
+      `$1${version} milestone completed and archived`,
     );
     fs.writeFileSync(statePath, stateContent, 'utf-8');
   }
@@ -3142,7 +3458,7 @@ function cmdValidateConsistency(cwd, raw) {
   const diskPhases = new Set();
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
     for (const dir of dirs) {
       const dm = dir.match(/^(\d+(?:\.\d+)?)/);
       if (dm) diskPhases.add(dm[1]);
@@ -3166,8 +3482,8 @@ function cmdValidateConsistency(cwd, raw) {
 
   // Check: sequential phase numbers (integers only)
   const integerPhases = [...diskPhases]
-    .filter(p => !p.includes('.'))
-    .map(p => parseInt(p, 10))
+    .filter((p) => !p.includes('.'))
+    .map((p) => parseInt(p, 10))
     .sort((a, b) => a - b);
 
   for (let i = 1; i < integerPhases.length; i++) {
@@ -3179,28 +3495,35 @@ function cmdValidateConsistency(cwd, raw) {
   // Check: plan numbering within phases
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
 
     for (const dir of dirs) {
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md')).sort();
+      const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md')).sort();
 
       // Extract plan numbers
-      const planNums = plans.map(p => {
-        const pm = p.match(/-(\d{2})-PLAN\.md$/);
-        return pm ? parseInt(pm[1], 10) : null;
-      }).filter(n => n !== null);
+      const planNums = plans
+        .map((p) => {
+          const pm = p.match(/-(\d{2})-PLAN\.md$/);
+          return pm ? parseInt(pm[1], 10) : null;
+        })
+        .filter((n) => n !== null);
 
       for (let i = 1; i < planNums.length; i++) {
         if (planNums[i] !== planNums[i - 1] + 1) {
-          warnings.push(`Gap in plan numbering in ${dir}: plan ${planNums[i - 1]} → ${planNums[i]}`);
+          warnings.push(
+            `Gap in plan numbering in ${dir}: plan ${planNums[i - 1]} → ${planNums[i]}`,
+          );
         }
       }
 
       // Check: plans without summaries (completed plans)
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md'));
-      const planIds = new Set(plans.map(p => p.replace('-PLAN.md', '')));
-      const summaryIds = new Set(summaries.map(s => s.replace('-SUMMARY.md', '')));
+      const summaries = phaseFiles.filter((f) => f.endsWith('-SUMMARY.md'));
+      const planIds = new Set(plans.map((p) => p.replace('-PLAN.md', '')));
+      const summaryIds = new Set(summaries.map((s) => s.replace('-SUMMARY.md', '')));
 
       // Summary without matching plan is suspicious
       for (const sid of summaryIds) {
@@ -3214,11 +3537,11 @@ function cmdValidateConsistency(cwd, raw) {
   // Check: frontmatter in plans has required fields
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
     for (const dir of dirs) {
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md'));
+      const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md'));
 
       for (const plan of plans) {
         const content = fs.readFileSync(path.join(phasesDir, dir, plan), 'utf-8');
@@ -3232,7 +3555,11 @@ function cmdValidateConsistency(cwd, raw) {
   } catch {}
 
   const passed = errors.length === 0;
-  output({ passed, errors, warnings, warning_count: warnings.length }, raw, passed ? 'passed' : 'failed');
+  output(
+    { passed, errors, warnings, warning_count: warnings.length },
+    raw,
+    passed ? 'passed' : 'failed',
+  );
 }
 
 // ─── Progress Render ──────────────────────────────────────────────────────────
@@ -3248,19 +3575,24 @@ function cmdProgressRender(cwd, format, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort((a, b) => {
-      const aNum = parseFloat(a.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
-      const bNum = parseFloat(b.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
-      return aNum - bNum;
-    });
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort((a, b) => {
+        const aNum = parseFloat(a.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
+        const bNum = parseFloat(b.match(/^(\d+(?:\.\d+)?)/)?.[1] || '0');
+        return aNum - bNum;
+      });
 
     for (const dir of dirs) {
       const dm = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
       const phaseNum = dm ? dm[1] : dir;
       const phaseName = dm && dm[2] ? dm[2].replace(/-/g, ' ') : '';
       const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').length;
+      const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md').length;
+      const summaries = phaseFiles.filter(
+        (f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md',
+      ).length;
 
       totalPlans += plans;
       totalSummaries += summaries;
@@ -3298,14 +3630,17 @@ function cmdProgressRender(cwd, format, raw) {
     output({ bar: text, percent, completed: totalSummaries, total: totalPlans }, raw, text);
   } else {
     // JSON format
-    output({
-      milestone_version: milestone.version,
-      milestone_name: milestone.name,
-      phases,
-      total_plans: totalPlans,
-      total_summaries: totalSummaries,
-      percent,
-    }, raw);
+    output(
+      {
+        milestone_version: milestone.version,
+        milestone_name: milestone.name,
+        phases,
+        total_plans: totalPlans,
+        total_summaries: totalSummaries,
+        percent,
+      },
+      raw,
+    );
   }
 }
 
@@ -3381,7 +3716,11 @@ function cmdScaffold(cwd, type, options, raw) {
       fs.mkdirSync(phasesParent, { recursive: true });
       const dirPath = path.join(phasesParent, dirName);
       fs.mkdirSync(dirPath, { recursive: true });
-      output({ created: true, directory: `.planning/phases/${dirName}`, path: dirPath }, raw, dirPath);
+      output(
+        { created: true, directory: `.planning/phases/${dirName}`, path: dirPath },
+        raw,
+        dirPath,
+      );
       return;
     }
     default:
@@ -3416,8 +3755,11 @@ function findPhaseInternal(cwd, phase) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
-    const match = dirs.find(d => d.startsWith(normalized));
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+    const match = dirs.find((d) => d.startsWith(normalized));
     if (!match) return null;
 
     const dirMatch = match.match(/^(\d+(?:\.\d+)?)-?(.*)/);
@@ -3426,17 +3768,21 @@ function findPhaseInternal(cwd, phase) {
     const phaseDir = path.join(phasesDir, match);
     const phaseFiles = fs.readdirSync(phaseDir);
 
-    const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
-    const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md').sort();
-    const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
-    const hasContext = phaseFiles.some(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
-    const hasVerification = phaseFiles.some(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
+    const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md').sort();
+    const summaries = phaseFiles
+      .filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md')
+      .sort();
+    const hasResearch = phaseFiles.some((f) => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+    const hasContext = phaseFiles.some((f) => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
+    const hasVerification = phaseFiles.some(
+      (f) => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md',
+    );
 
     // Determine incomplete plans (plans without matching summaries)
     const completedPlanIds = new Set(
-      summaries.map(s => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', ''))
+      summaries.map((s) => s.replace('-SUMMARY.md', '').replace('SUMMARY.md', '')),
     );
-    const incompletePlans = plans.filter(p => {
+    const incompletePlans = plans.filter((p) => {
       const planId = p.replace('-PLAN.md', '').replace('PLAN.md', '');
       return !completedPlanIds.has(planId);
     });
@@ -3446,7 +3792,12 @@ function findPhaseInternal(cwd, phase) {
       directory: path.join('.planning', 'phases', match),
       phase_number: phaseNumber,
       phase_name: phaseName,
-      phase_slug: phaseName ? phaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null,
+      phase_slug: phaseName
+        ? phaseName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+        : null,
       plans,
       summaries,
       incomplete_plans: incompletePlans,
@@ -3471,7 +3822,10 @@ function pathExistsInternal(cwd, targetPath) {
 
 function generateSlugInternal(text) {
   if (!text) return null;
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function getMilestoneInfo(cwd) {
@@ -3525,15 +3879,16 @@ function cmdInitExecutePhase(cwd, phase, includes, raw) {
     incomplete_count: phaseInfo?.incomplete_plans?.length || 0,
 
     // Branch name (pre-computed)
-    branch_name: config.branching_strategy === 'phase' && phaseInfo
-      ? config.phase_branch_template
-          .replace('{phase}', phaseInfo.phase_number)
-          .replace('{slug}', phaseInfo.phase_slug || 'phase')
-      : config.branching_strategy === 'milestone'
-        ? config.milestone_branch_template
-            .replace('{milestone}', milestone.version)
-            .replace('{slug}', generateSlugInternal(milestone.name) || 'milestone')
-        : null,
+    branch_name:
+      config.branching_strategy === 'phase' && phaseInfo
+        ? config.phase_branch_template
+            .replace('{phase}', phaseInfo.phase_number)
+            .replace('{slug}', phaseInfo.phase_slug || 'phase')
+        : config.branching_strategy === 'milestone'
+          ? config.milestone_branch_template
+              .replace('{milestone}', milestone.version)
+              .replace('{slug}', generateSlugInternal(milestone.name) || 'milestone')
+          : null,
 
     // Milestone info
     milestone_version: milestone.version,
@@ -3613,7 +3968,7 @@ function cmdInitPlanPhase(cwd, phase, includes, raw) {
     const phaseDirFull = path.join(cwd, phaseInfo.directory);
     try {
       const files = fs.readdirSync(phaseDirFull);
-      const contextFile = files.find(f => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
+      const contextFile = files.find((f) => f.endsWith('-CONTEXT.md') || f === 'CONTEXT.md');
       if (contextFile) {
         result.context_content = safeReadFile(path.join(phaseDirFull, contextFile));
       }
@@ -3624,7 +3979,7 @@ function cmdInitPlanPhase(cwd, phase, includes, raw) {
     const phaseDirFull = path.join(cwd, phaseInfo.directory);
     try {
       const files = fs.readdirSync(phaseDirFull);
-      const researchFile = files.find(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+      const researchFile = files.find((f) => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
       if (researchFile) {
         result.research_content = safeReadFile(path.join(phaseDirFull, researchFile));
       }
@@ -3635,7 +3990,9 @@ function cmdInitPlanPhase(cwd, phase, includes, raw) {
     const phaseDirFull = path.join(cwd, phaseInfo.directory);
     try {
       const files = fs.readdirSync(phaseDirFull);
-      const verificationFile = files.find(f => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md');
+      const verificationFile = files.find(
+        (f) => f.endsWith('-VERIFICATION.md') || f === 'VERIFICATION.md',
+      );
       if (verificationFile) {
         result.verification_content = safeReadFile(path.join(phaseDirFull, verificationFile));
       }
@@ -3646,7 +4003,7 @@ function cmdInitPlanPhase(cwd, phase, includes, raw) {
     const phaseDirFull = path.join(cwd, phaseInfo.directory);
     try {
       const files = fs.readdirSync(phaseDirFull);
-      const uatFile = files.find(f => f.endsWith('-UAT.md') || f === 'UAT.md');
+      const uatFile = files.find((f) => f.endsWith('-UAT.md') || f === 'UAT.md');
       if (uatFile) {
         result.uat_content = safeReadFile(path.join(phaseDirFull, uatFile));
       }
@@ -3663,19 +4020,23 @@ function cmdInitNewProject(cwd, raw) {
   let hasCode = false;
   let hasPackageFile = false;
   try {
-    const files = execSync('find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5', {
-      cwd,
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
+    const files = execSync(
+      'find . -maxdepth 3 \\( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" \\) 2>/dev/null | grep -v node_modules | grep -v .git | head -5',
+      {
+        cwd,
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      },
+    );
     hasCode = files.trim().length > 0;
   } catch {}
 
-  hasPackageFile = pathExistsInternal(cwd, 'package.json') ||
-                   pathExistsInternal(cwd, 'requirements.txt') ||
-                   pathExistsInternal(cwd, 'Cargo.toml') ||
-                   pathExistsInternal(cwd, 'go.mod') ||
-                   pathExistsInternal(cwd, 'Package.swift');
+  hasPackageFile =
+    pathExistsInternal(cwd, 'package.json') ||
+    pathExistsInternal(cwd, 'requirements.txt') ||
+    pathExistsInternal(cwd, 'Cargo.toml') ||
+    pathExistsInternal(cwd, 'go.mod') ||
+    pathExistsInternal(cwd, 'Package.swift');
 
   const result = {
     // Models
@@ -3695,7 +4056,8 @@ function cmdInitNewProject(cwd, raw) {
     has_existing_code: hasCode,
     has_package_file: hasPackageFile,
     is_brownfield: hasCode || hasPackageFile,
-    needs_codebase_map: (hasCode || hasPackageFile) && !pathExistsInternal(cwd, '.planning/codebase'),
+    needs_codebase_map:
+      (hasCode || hasPackageFile) && !pathExistsInternal(cwd, '.planning/codebase'),
 
     // Git state
     has_git: pathExistsInternal(cwd, '.git'),
@@ -3740,10 +4102,11 @@ function cmdInitQuick(cwd, description, raw) {
   const quickDir = path.join(cwd, '.planning', 'quick');
   let nextNum = 1;
   try {
-    const existing = fs.readdirSync(quickDir)
-      .filter(f => /^\d+-/.test(f))
-      .map(f => parseInt(f.split('-')[0], 10))
-      .filter(n => !isNaN(n));
+    const existing = fs
+      .readdirSync(quickDir)
+      .filter((f) => /^\d+-/.test(f))
+      .map((f) => parseInt(f.split('-')[0], 10))
+      .filter((n) => !isNaN(n));
     if (existing.length > 0) {
       nextNum = Math.max(...existing) + 1;
     }
@@ -3784,7 +4147,9 @@ function cmdInitResume(cwd, raw) {
   // Check for interrupted agent
   let interruptedAgentId = null;
   try {
-    interruptedAgentId = fs.readFileSync(path.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8').trim();
+    interruptedAgentId = fs
+      .readFileSync(path.join(cwd, '.planning', 'current-agent-id.txt'), 'utf-8')
+      .trim();
   } catch {}
 
   const result = {
@@ -3875,7 +4240,7 @@ function cmdInitTodos(cwd, area, raw) {
   const todos = [];
 
   try {
-    const files = fs.readdirSync(pendingDir).filter(f => f.endsWith('.md'));
+    const files = fs.readdirSync(pendingDir).filter((f) => f.endsWith('.md'));
     for (const file of files) {
       try {
         const content = fs.readFileSync(path.join(pendingDir, file), 'utf-8');
@@ -3934,14 +4299,14 @@ function cmdInitMilestoneOp(cwd, raw) {
   const phasesDir = path.join(cwd, '.planning', 'phases');
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+    const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
     phaseCount = dirs.length;
 
     // Count phases with summaries (completed)
     for (const dir of dirs) {
       try {
         const phaseFiles = fs.readdirSync(path.join(phasesDir, dir));
-        const hasSummary = phaseFiles.some(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+        const hasSummary = phaseFiles.some((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
         if (hasSummary) completedPhases++;
       } catch {}
     }
@@ -3951,9 +4316,10 @@ function cmdInitMilestoneOp(cwd, raw) {
   const archiveDir = path.join(cwd, '.planning', 'archive');
   let archivedMilestones = [];
   try {
-    archivedMilestones = fs.readdirSync(archiveDir, { withFileTypes: true })
-      .filter(e => e.isDirectory())
-      .map(e => e.name);
+    archivedMilestones = fs
+      .readdirSync(archiveDir, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name);
   } catch {}
 
   const result = {
@@ -3992,7 +4358,7 @@ function cmdInitMapCodebase(cwd, raw) {
   const codebaseDir = path.join(cwd, '.planning', 'codebase');
   let existingMaps = [];
   try {
-    existingMaps = fs.readdirSync(codebaseDir).filter(f => f.endsWith('.md'));
+    existingMaps = fs.readdirSync(codebaseDir).filter((f) => f.endsWith('.md'));
   } catch {}
 
   const result = {
@@ -4031,7 +4397,10 @@ function cmdInitProgress(cwd, includes, raw) {
 
   try {
     const entries = fs.readdirSync(phasesDir, { withFileTypes: true });
-    const dirs = entries.filter(e => e.isDirectory()).map(e => e.name).sort();
+    const dirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
 
     for (const dir of dirs) {
       const match = dir.match(/^(\d+(?:\.\d+)?)-?(.*)/);
@@ -4041,13 +4410,18 @@ function cmdInitProgress(cwd, includes, raw) {
       const phasePath = path.join(phasesDir, dir);
       const phaseFiles = fs.readdirSync(phasePath);
 
-      const plans = phaseFiles.filter(f => f.endsWith('-PLAN.md') || f === 'PLAN.md');
-      const summaries = phaseFiles.filter(f => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
-      const hasResearch = phaseFiles.some(f => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
+      const plans = phaseFiles.filter((f) => f.endsWith('-PLAN.md') || f === 'PLAN.md');
+      const summaries = phaseFiles.filter((f) => f.endsWith('-SUMMARY.md') || f === 'SUMMARY.md');
+      const hasResearch = phaseFiles.some((f) => f.endsWith('-RESEARCH.md') || f === 'RESEARCH.md');
 
-      const status = summaries.length >= plans.length && plans.length > 0 ? 'complete' :
-                     plans.length > 0 ? 'in_progress' :
-                     hasResearch ? 'researched' : 'pending';
+      const status =
+        summaries.length >= plans.length && plans.length > 0
+          ? 'complete'
+          : plans.length > 0
+            ? 'in_progress'
+            : hasResearch
+              ? 'researched'
+              : 'pending';
 
       const phaseInfo = {
         number: phaseNumber,
@@ -4094,8 +4468,8 @@ function cmdInitProgress(cwd, includes, raw) {
     // Phase overview
     phases,
     phase_count: phases.length,
-    completed_count: phases.filter(p => p.status === 'complete').length,
-    in_progress_count: phases.filter(p => p.status === 'in_progress').length,
+    completed_count: phases.filter((p) => p.status === 'complete').length,
+    in_progress_count: phases.filter((p) => p.status === 'in_progress').length,
 
     // Current state
     current_phase: currentPhase,
@@ -4138,7 +4512,9 @@ function main() {
   const cwd = process.cwd();
 
   if (!command) {
-    error('Usage: gsd-tools <command> [args] [--raw]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init');
+    error(
+      'Usage: gsd-tools <command> [args] [--raw]\nCommands: state, resolve-model, find-phase, commit, verify-summary, verify, frontmatter, template, generate-slug, current-timestamp, list-todos, verify-path-exists, config-ensure-section, init',
+    );
   }
 
   switch (command) {
@@ -4166,24 +4542,32 @@ function main() {
         const durationIdx = args.indexOf('--duration');
         const tasksIdx = args.indexOf('--tasks');
         const filesIdx = args.indexOf('--files');
-        cmdStateRecordMetric(cwd, {
-          phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
-          plan: planIdx !== -1 ? args[planIdx + 1] : null,
-          duration: durationIdx !== -1 ? args[durationIdx + 1] : null,
-          tasks: tasksIdx !== -1 ? args[tasksIdx + 1] : null,
-          files: filesIdx !== -1 ? args[filesIdx + 1] : null,
-        }, raw);
+        cmdStateRecordMetric(
+          cwd,
+          {
+            phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
+            plan: planIdx !== -1 ? args[planIdx + 1] : null,
+            duration: durationIdx !== -1 ? args[durationIdx + 1] : null,
+            tasks: tasksIdx !== -1 ? args[tasksIdx + 1] : null,
+            files: filesIdx !== -1 ? args[filesIdx + 1] : null,
+          },
+          raw,
+        );
       } else if (subcommand === 'update-progress') {
         cmdStateUpdateProgress(cwd, raw);
       } else if (subcommand === 'add-decision') {
         const phaseIdx = args.indexOf('--phase');
         const summaryIdx = args.indexOf('--summary');
         const rationaleIdx = args.indexOf('--rationale');
-        cmdStateAddDecision(cwd, {
-          phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
-          summary: summaryIdx !== -1 ? args[summaryIdx + 1] : null,
-          rationale: rationaleIdx !== -1 ? args[rationaleIdx + 1] : '',
-        }, raw);
+        cmdStateAddDecision(
+          cwd,
+          {
+            phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
+            summary: summaryIdx !== -1 ? args[summaryIdx + 1] : null,
+            rationale: rationaleIdx !== -1 ? args[rationaleIdx + 1] : '',
+          },
+          raw,
+        );
       } else if (subcommand === 'add-blocker') {
         const textIdx = args.indexOf('--text');
         cmdStateAddBlocker(cwd, textIdx !== -1 ? args[textIdx + 1] : null, raw);
@@ -4193,10 +4577,14 @@ function main() {
       } else if (subcommand === 'record-session') {
         const stoppedIdx = args.indexOf('--stopped-at');
         const resumeIdx = args.indexOf('--resume-file');
-        cmdStateRecordSession(cwd, {
-          stopped_at: stoppedIdx !== -1 ? args[stoppedIdx + 1] : null,
-          resume_file: resumeIdx !== -1 ? args[resumeIdx + 1] : 'None',
-        }, raw);
+        cmdStateRecordSession(
+          cwd,
+          {
+            stopped_at: stoppedIdx !== -1 ? args[stoppedIdx + 1] : null,
+            resume_file: resumeIdx !== -1 ? args[resumeIdx + 1] : 'None',
+          },
+          raw,
+        );
       } else {
         cmdStateLoad(cwd, raw);
       }
@@ -4218,7 +4606,8 @@ function main() {
       const message = args[1];
       // Parse --files flag (collect args after --files, stopping at other flags)
       const filesIndex = args.indexOf('--files');
-      const files = filesIndex !== -1 ? args.slice(filesIndex + 1).filter(a => !a.startsWith('--')) : [];
+      const files =
+        filesIndex !== -1 ? args.slice(filesIndex + 1).filter((a) => !a.startsWith('--')) : [];
       cmdCommit(cwd, message, files, raw, amend);
       break;
     }
@@ -4243,14 +4632,19 @@ function main() {
         const typeIdx = args.indexOf('--type');
         const waveIdx = args.indexOf('--wave');
         const fieldsIdx = args.indexOf('--fields');
-        cmdTemplateFill(cwd, templateType, {
-          phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
-          plan: planIdx !== -1 ? args[planIdx + 1] : null,
-          name: nameIdx !== -1 ? args[nameIdx + 1] : null,
-          type: typeIdx !== -1 ? args[typeIdx + 1] : 'execute',
-          wave: waveIdx !== -1 ? args[waveIdx + 1] : '1',
-          fields: fieldsIdx !== -1 ? JSON.parse(args[fieldsIdx + 1]) : {},
-        }, raw);
+        cmdTemplateFill(
+          cwd,
+          templateType,
+          {
+            phase: phaseIdx !== -1 ? args[phaseIdx + 1] : null,
+            plan: planIdx !== -1 ? args[planIdx + 1] : null,
+            name: nameIdx !== -1 ? args[nameIdx + 1] : null,
+            type: typeIdx !== -1 ? args[typeIdx + 1] : 'execute',
+            wave: waveIdx !== -1 ? args[waveIdx + 1] : '1',
+            fields: fieldsIdx !== -1 ? JSON.parse(args[fieldsIdx + 1]) : {},
+          },
+          raw,
+        );
       } else {
         error('Unknown template subcommand. Available: select, fill');
       }
@@ -4266,7 +4660,13 @@ function main() {
       } else if (subcommand === 'set') {
         const fieldIdx = args.indexOf('--field');
         const valueIdx = args.indexOf('--value');
-        cmdFrontmatterSet(cwd, file, fieldIdx !== -1 ? args[fieldIdx + 1] : null, valueIdx !== -1 ? args[valueIdx + 1] : undefined, raw);
+        cmdFrontmatterSet(
+          cwd,
+          file,
+          fieldIdx !== -1 ? args[fieldIdx + 1] : null,
+          valueIdx !== -1 ? args[valueIdx + 1] : undefined,
+          raw,
+        );
       } else if (subcommand === 'merge') {
         const dataIdx = args.indexOf('--data');
         cmdFrontmatterMerge(cwd, file, dataIdx !== -1 ? args[dataIdx + 1] : null, raw);
@@ -4294,7 +4694,9 @@ function main() {
       } else if (subcommand === 'key-links') {
         cmdVerifyKeyLinks(cwd, args[2], raw);
       } else {
-        error('Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links');
+        error(
+          'Unknown verify subcommand. Available: plan-structure, phase-completeness, references, commits, artifacts, key-links',
+        );
       }
       break;
     }
@@ -4472,7 +4874,9 @@ function main() {
           cmdInitProgress(cwd, includes, raw);
           break;
         default:
-          error(`Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`);
+          error(
+            `Unknown init workflow: ${workflow}\nAvailable: execute-phase, plan-phase, new-project, new-milestone, quick, resume, verify-work, phase-op, todos, milestone-op, map-codebase, progress`,
+          );
       }
       break;
     }
