@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 4 of 15 — Frontend Shell
 - **Status:** In Progress
-- **Current Plan:** 04-04 (Next plan after 04-03)
-- **Plans Executed:** 26
+- **Current Plan:** 04-04 (Next plan after 04-01)
+- **Plans Executed:** 27
 
 ## What's Done
 
@@ -45,6 +45,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 4 commits)
 - [x] Plan 03-07: Service & Employee CRUD with Working Hours (2 tasks, 3 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
+- [x] Plan 04-01: Design System Foundation (3 tasks, 3 commits)
 - [x] Plan 04-02: State Management & API Client (2 tasks, 2 commits)
 - [x] Plan 04-03: Internationalization Setup (2 tasks, 2 commits)
 
@@ -53,9 +54,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase 1: Complete ✅
 Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
-Phase 4: In Progress — Plan 04-02 complete (Zustand stores, API client, TanStack Query)
+Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete
 
-Next: Phase 4 Plan 03 — Component library setup (shadcn/ui base components)
+Next: Phase 4 Plan 04 — Layouts (AppShell, Navbar, Sidebar)
 
 ## Decisions
 
@@ -159,6 +160,12 @@ Next: Phase 4 Plan 03 — Component library setup (shadcn/ui base components)
 - [Phase 03-07]: Employee service assignment uses atomic delete + insert (replace all pattern)
 - [Phase 03-07]: Working hours bulk update replaces all hours for employee or company
 - [Phase 03-07]: Schedule overrides create per-date exceptions (day off or modified hours)
+- [Phase 04-01]: shadcn/ui design system chosen for consistency and accessibility compliance
+- [Phase 04-01]: CSS variables for theming (light/dark mode) instead of direct Tailwind color tokens
+- [Phase 04-01]: ScheduleBox brand colors defined: primary #3B82F6, secondary #22C55E, destructive #EF4444
+- [Phase 04-01]: Inter font family set as default sans-serif for clean modern look
+- [Phase 04-01]: 16 shadcn/ui components created (8 simple atoms, 8 complex Radix-based)
+- [Phase 04-01]: ESM import for tailwindcss-animate (not require() to comply with ESM-first project)
 - [Phase 04-02]: Zustand stores with selective persistence (auth persists user only, UI persists sidebar, calendar no persist)
 - [Phase 04-02]: API client singleton with automatic auth header injection and 401 token refresh retry
 - [Phase 04-02]: TanStack Query created in useState for RSC safety (prevents cross-request sharing)
@@ -210,13 +217,14 @@ None — Phase 4 in progress.
 | 03-04 | 420s | 2 | 9 | 3 |
 | 03-07 | 313s | 2 | 11 | 3 |
 | 03-08 | 233s | 2 | 7 | 2 |
+| 04-01 | 596s | 3 | 19 | 3 |
 | 04-02 | 368s | 2 | 9 | 2 |
 | 04-03 | 471s | 2 | 8 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-10
-**Stopped at:** Completed Plan 04-03 — Internationalization Setup
+**Stopped at:** Completed Plan 04-01 — Design System Foundation
 
 ---
-*Last updated: 2026-02-10 after completing Plan 04-02*
+*Last updated: 2026-02-10 after completing Plan 04-01*
