@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 3 of 15 — Authentication & Core Services
 - **Status:** In Progress
-- **Current Plan:** 03-08 (Resource CRUD & Settings)
-- **Plans Executed:** 19
+- **Current Plan:** 03-06 (Customer CRUD with Tags & GDPR Export)
+- **Plans Executed:** 20
 
 ## What's Done
 
@@ -40,15 +40,16 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 03-01: Error Handling & API Response Foundation (2 tasks, 2 commits)
 - [x] Plan 03-02: JWT & Token Management (2 tasks, 2 commits)
 - [x] Plan 03-03: Auth Middleware & Validation (2 tasks, 2 commits)
+- [x] Plan 03-06: Customer CRUD with Tags & GDPR Export (2 tasks, 2 commits)
 - [x] Plan 03-08: Resource CRUD & Settings (2 tasks, 2 commits)
 
 ## What's Next
 
 Phase 1: Complete ✅
 Phase 2: Complete ✅
-Phase 3: In Progress - Core services endpoints (resources, settings) complete, auth endpoints pending
+Phase 3: In Progress - Customer CRUD with tags, resources, and settings complete; auth endpoints and service CRUD pending
 
-Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) or other core CRUD endpoints
+Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) OR Plan 03-05 - Service CRUD
 
 ## Decisions
 
@@ -128,6 +129,10 @@ Next: Plan 03-04 - Auth endpoints (register, login, refresh, logout) or other co
 - [Phase 03-03]: PERMISSIONS constant defines all 23 system permissions for RBAC checks
 - [Phase 03-03]: findCompanyId helper resolves user UUID to company ID for tenant-scoped queries
 - [Phase 03-03]: Password complexity enforced via Zod regex (min 12 chars + uppercase + lowercase + number + special)
+- [Phase 03-06]: Customer soft delete (sets deletedAt) for GDPR compliance and audit trail
+- [Phase 03-06]: Atomic tag replacement pattern (DELETE + INSERT) for PUT /customers/{id}/tags
+- [Phase 03-06]: Customer export endpoint provides full GDPR data portability (customer + bookings + payments + tags)
+- [Phase 03-06]: Customer list supports pagination, search (name/email/phone ILIKE), tag filter (JOIN), and multi-field sorting
 - [Phase 03-08]: Resource CRUD with hard delete and FK constraint handling (deactivate via is_active flag)
 - [Phase 03-08]: Resource types are company-scoped with left join for optional type assignment
 - [Phase 03-08]: Company settings partial update maps snake_case request to camelCase database columns
@@ -169,12 +174,13 @@ None — ready to start implementation.
 | 02-08 | 640s | 2 | 9 | 2 |
 | 03-01 | 175s | 2 | 7 | 2 |
 | 03-03 | 220s | 2 | 5 | 2 |
+| 03-06 | 335s | 2 | 10 | 2 |
 | 03-08 | 233s | 2 | 7 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-10T21:16:05Z
-**Stopped at:** Completed 03-08-PLAN.md
+**Last session:** 2026-02-10T21:19:23Z
+**Stopped at:** Completed 03-06-PLAN.md
 
 ---
-*Last updated: 2026-02-10T21:16:05Z after completing Plan 03-08*
+*Last updated: 2026-02-10T21:19:23Z after completing Plan 03-06*
