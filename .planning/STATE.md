@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 1 of 15 — Project Setup & Infrastructure
 - **Status:** In Progress
-- **Current Plan:** 3 of 7 in Phase 01
-- **Plans Executed:** 3
+- **Current Plan:** 5 of 7 in Phase 01
+- **Plans Executed:** 5
 
 ## What's Done
 
@@ -23,13 +23,13 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] 15 phases mapped across 4 milestones
 - [x] Plan 01-a: Root monorepo scaffold (3 tasks, 3 commits)
 - [x] Plan 01-b: Workspace packages stub (2 tasks, 2 commits)
+- [x] Plan 01-c: Next.js 14 app setup (2 tasks, 1 commit)
 - [x] Plan 01-d: Docker environment (2 tasks, 2 commits)
+- [x] Plan 01-e: Developer tooling configuration (3 tasks, 3 commits)
 
 ## What's Next
 
-Phase 1: Project Setup & Infrastructure (5 plans remaining)
-- Create apps/web Next.js 14 application (Plan 01-c)
-- Add ESLint, Prettier, Husky tooling (Plan 01-e)
+Phase 1: Project Setup & Infrastructure (2 plans remaining)
 - Create Docker Compose configuration (Plan 01-f)
 - Run pnpm install to validate workspace (Plan 01-g)
 
@@ -37,7 +37,7 @@ Phase 1: Project Setup & Infrastructure (5 plans remaining)
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js 14 monorepo | App Router + API routes + standalone microservices for AI/notifications | -- Pending |
+| Next.js 14 monorepo | App Router + API routes + standalone microservices for AI/notifications | Implemented (01-c) |
 | Drizzle ORM over Prisma | Better SQL control, migration flexibility, lighter weight | -- Pending |
 | RabbitMQ over Kafka | Simpler for target scale (5000 businesses), sufficient throughput | -- Pending |
 | Cloudflare R2 over AWS S3 | Cost-effective, S3-compatible API | -- Pending |
@@ -52,6 +52,9 @@ Phase 1: Project Setup & Infrastructure (5 plans remaining)
 | Alpine-based images | Minimal size, fast startup, security-focused | Implemented (01-d) |
 | Multi-stage Dockerfile | Separate dev/prod concerns, minimal production image | Implemented (01-d) |
 | Non-root user in production | Security best practice, reduces attack surface | Implemented (01-d) |
+- [Phase 01-e]: ESLint 9 flat config with TypeScript strict rules established as code quality baseline
+- [Phase 01-e]: Conventional Commits with segment-based scopes enforced via commitlint
+- [Phase 01-e]: Pre-commit hooks run lint-staged for automatic code quality enforcement
 
 ## Blockers
 
@@ -74,12 +77,14 @@ None — ready to start implementation.
 |------------|----------|-------|-------|---------|
 | 01-a | 89s | 3 | 9 | 3 |
 | 01-b | 115s | 2 | 18 | 2 |
+| 01-c | 114s | 2 | 8 | 1 |
 | 01-d | 81s | 2 | 2 | 2 |
+| Phase 01 Pe | 116 | 3 tasks | 7 files |
 
 ## Session Info
 
-**Last session:** 2026-02-10T17:26:10Z
-**Stopped at:** Completed 01-b-PLAN.md
+**Last session:** 2026-02-10T17:27:01.181Z
+**Stopped at:** Completed 01-e-PLAN.md
 
 ---
 *Last updated: 2026-02-10T17:26:10Z after completing Plan 01-b*
