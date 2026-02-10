@@ -92,3 +92,13 @@ export class BadRequestError extends AppError {
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 }
+
+/**
+ * 501 Not Implemented - Feature not yet implemented
+ */
+export class NotImplementedError extends AppError {
+  constructor(message = 'Feature not implemented', details?: unknown) {
+    super('NOT_IMPLEMENTED', message, 501, details);
+    Object.setPrototypeOf(this, NotImplementedError.prototype);
+  }
+}
