@@ -9,3 +9,5 @@ export * from './customers.js';
 export * from './services.js';
 export * from './employees.js';
 export * from './resources.js';
+export * from './bookings.js';
+export * from './payments.js';
