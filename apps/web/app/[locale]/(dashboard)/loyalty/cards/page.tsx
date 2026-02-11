@@ -59,29 +59,29 @@ function IssueCardDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Issue Loyalty Card</DialogTitle>
-          <DialogDescription>Create a new loyalty card for a customer.</DialogDescription>
+          <DialogTitle>Vydat věrnostní kartu</DialogTitle>
+          <DialogDescription>Vytvořte novou věrnostní kartu pro zákazníka.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="customer-id">Customer UUID</Label>
+            <Label htmlFor="customer-id">UUID zákazníka</Label>
             <Input
               id="customer-id"
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              placeholder="Enter customer UUID"
+              placeholder="Zadejte UUID zákazníka"
               required
             />
             <p className="text-xs text-muted-foreground">
-              The customer UUID from the customer management page
+              UUID zákazníka ze stránky správy zákazníků
             </p>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Zrušit
             </Button>
             <Button type="submit" disabled={createCard.isPending || !customerId}>
-              {createCard.isPending ? 'Issuing...' : 'Issue Card'}
+              {createCard.isPending ? 'Vydávání...' : 'Vydat kartu'}
             </Button>
           </DialogFooter>
         </form>
@@ -117,12 +117,12 @@ export default function LoyaltyCardsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Loyalty Cards"
-        description="View and manage customer loyalty cards"
+        title="Věrnostní karty"
+        description="Zobrazení a správa věrnostních karet zákazníků"
         actions={
           <Button onClick={() => setIssueDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Issue Card
+            Vydat kartu
           </Button>
         }
       />
@@ -130,12 +130,12 @@ export default function LoyaltyCardsPage() {
       {/* Search */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Search</CardTitle>
+          <CardTitle className="text-base">Hledat</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-end gap-4">
             <div className="flex-1">
-              <Label className="mb-2 block text-sm">Customer UUID (optional)</Label>
+              <Label className="mb-2 block text-sm">UUID zákazníka (volitelné)</Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -144,7 +144,7 @@ export default function LoyaltyCardsPage() {
                     setCustomerFilter(e.target.value);
                     setPage(1);
                   }}
-                  placeholder="Filter by customer UUID..."
+                  placeholder="Filtrovat podle UUID zákazníka..."
                   className="pl-9"
                 />
               </div>
@@ -157,7 +157,7 @@ export default function LoyaltyCardsPage() {
                   setPage(1);
                 }}
               >
-                Clear
+                Vymazat
               </Button>
             )}
           </div>
@@ -176,15 +176,15 @@ export default function LoyaltyCardsPage() {
           ) : cards.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center space-y-2">
               <CreditCard className="h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium">No loyalty cards</p>
+              <p className="text-lg font-medium">Žádné věrnostní karty</p>
               <p className="text-sm text-muted-foreground">
                 {customerFilter
-                  ? 'No cards found for this customer'
-                  : 'Cards are created when customers join your program'}
+                  ? 'Pro tohoto zákazníka nebyly nalezeny žádné karty'
+                  : 'Karty se vytvoří, když se zákazníci připojí k vašemu programu'}
               </p>
               <Button size="sm" className="mt-2" onClick={() => setIssueDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Issue Card
+                Vydat kartu
               </Button>
             </div>
           ) : (
@@ -192,11 +192,11 @@ export default function LoyaltyCardsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Card Number</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Points Balance</TableHead>
-                    <TableHead>Tier</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead>Číslo karty</TableHead>
+                    <TableHead>Zákazník</TableHead>
+                    <TableHead>Stav bodů</TableHead>
+                    <TableHead>Úroveň</TableHead>
+                    <TableHead>Vytvořeno</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -229,7 +229,7 @@ export default function LoyaltyCardsPage() {
                             {card.currentTier.name}
                           </Badge>
                         ) : (
-                          <span className="text-sm text-muted-foreground">None</span>
+                          <span className="text-sm text-muted-foreground">Žádná</span>
                         )}
                       </TableCell>
                       <TableCell>{new Date(card.createdAt).toLocaleDateString('cs-CZ')}</TableCell>
@@ -241,7 +241,7 @@ export default function LoyaltyCardsPage() {
               {pagination && pagination.total_pages > 1 && (
                 <div className="flex items-center justify-between border-t px-6 py-4">
                   <p className="text-sm text-muted-foreground">
-                    Page {pagination.page} of {pagination.total_pages} ({pagination.total} total)
+                    Stránka {pagination.page} z {pagination.total_pages} (celkem {pagination.total})
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -251,7 +251,7 @@ export default function LoyaltyCardsPage() {
                       disabled={pagination.page === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Previous
+                      Předchozí
                     </Button>
                     <Button
                       variant="outline"
@@ -259,7 +259,7 @@ export default function LoyaltyCardsPage() {
                       onClick={() => setPage((p) => p + 1)}
                       disabled={pagination.page === pagination.total_pages}
                     >
-                      Next
+                      Další
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

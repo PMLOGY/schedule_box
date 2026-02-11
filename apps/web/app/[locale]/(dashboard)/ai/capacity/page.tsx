@@ -25,11 +25,31 @@ import {
   TrendingDown,
   BarChart3,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from '@/lib/i18n/navigation';
 import type { CapacityForecastEntry, CapacityScheduleSuggestion } from '@/hooks/useOptimization';
 
 // ============================================================================
 // HELPERS
 // ============================================================================
+
+const UTILIZATION_LABELS: Record<string, string> = {
+  low: 'nízké',
+  medium: 'střední',
+  high: 'vysoké',
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  low: 'nízká',
+  medium: 'střední',
+  high: 'vysoká',
+};
+
+const SUGGESTION_TYPE_LABELS: Record<string, string> = {
+  extend_hours: 'prodloužit hodiny',
+  reduce_hours: 'zkrátit hodiny',
+  add_employee: 'přidat zaměstnance',
+};
 
 function getUtilizationColor(level: 'low' | 'medium' | 'high') {
   switch (level) {
@@ -59,10 +79,10 @@ function getUtilizationColor(level: 'low' | 'medium' | 'high') {
 
 function formatDate(datetime: string): string {
   const date = new Date(datetime);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('cs-CZ', {
     weekday: 'short',
-    month: 'short',
     day: 'numeric',
+    month: 'short',
   });
 }
 
@@ -103,19 +123,19 @@ function ForecastDayCard({ entry }: { entry: CapacityForecastEntry }) {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">{formatDate(entry.datetime)}</p>
-            <Badge variant="outline" className={`capitalize ${colors.text}`}>
-              {entry.utilization_level}
+            <Badge variant="outline" className={`${colors.text}`}>
+              {UTILIZATION_LABELS[entry.utilization_level] ?? entry.utilization_level}
             </Badge>
           </div>
 
           <div className="text-center">
             <p className="text-3xl font-bold">{Math.round(entry.predicted_bookings)}</p>
-            <p className="text-xs text-muted-foreground">predicted bookings</p>
+            <p className="text-xs text-muted-foreground">předpokládané rezervace</p>
           </div>
 
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Low: {Math.round(entry.lower_bound)}</span>
-            <span>High: {Math.round(entry.upper_bound)}</span>
+            <span>Min: {Math.round(entry.lower_bound)}</span>
+            <span>Max: {Math.round(entry.upper_bound)}</span>
           </div>
 
           {/* Utilization bar */}
@@ -149,7 +169,7 @@ function SuggestionsList({ suggestions }: { suggestions: CapacityScheduleSuggest
       <div className="flex flex-col items-center gap-2 py-8">
         <Lightbulb className="h-8 w-8 text-muted-foreground" />
         <p className="text-center text-sm text-muted-foreground">
-          No schedule changes recommended for the next 7 days.
+          Žádné změny v rozvrhu nejsou pro příštích 7 dní doporučeny.
         </p>
       </div>
     );
@@ -164,10 +184,10 @@ function SuggestionsList({ suggestions }: { suggestions: CapacityScheduleSuggest
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium">{formatDate(suggestion.datetime)}</p>
               <Badge variant={getPriorityColor(suggestion.priority)} className="text-xs">
-                {suggestion.priority}
+                {PRIORITY_LABELS[suggestion.priority] ?? suggestion.priority}
               </Badge>
-              <Badge variant="outline" className="text-xs capitalize">
-                {suggestion.type.replace('_', ' ')}
+              <Badge variant="outline" className="text-xs">
+                {SUGGESTION_TYPE_LABELS[suggestion.type] ?? suggestion.type.replace('_', ' ')}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">{suggestion.reason}</p>
@@ -193,7 +213,7 @@ export default function CapacityDashboard() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Capacity Forecast" />
+        <PageHeader title="Predikce kapacity" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-7">
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
             <Card key={i}>
@@ -214,12 +234,12 @@ export default function CapacityDashboard() {
   if (isError) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Capacity Forecast" />
+        <PageHeader title="Predikce kapacity" />
         <Card className="border-destructive/50">
           <CardContent className="flex items-center gap-3 p-6">
             <AlertCircle className="h-5 w-5 text-destructive" />
             <p className="text-sm text-destructive">
-              Failed to load capacity forecast. Please try again later.
+              Nepodařilo se načíst predikci kapacity. Zkuste to prosím později.
             </p>
           </CardContent>
         </Card>
@@ -233,16 +253,32 @@ export default function CapacityDashboard() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Capacity Forecast"
-        description="AI-powered demand forecasting shows predicted booking volumes and schedule optimization suggestions for the next 7 days."
+        title="AI optimalizace"
+        description="AI predikce poptávky zobrazuje předpokládané objemy rezervací a návrhy na optimalizaci rozvrhu na příštích 7 dní."
       />
+
+      {/* AI Sub-navigation */}
+      <div className="flex gap-3">
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/ai/pricing">
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Dynamické ceny
+          </Link>
+        </Button>
+        <Button variant="default" size="sm" asChild>
+          <Link href="/ai/capacity">
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Predikce kapacity
+          </Link>
+        </Button>
+      </div>
 
       {/* Fallback Banner */}
       {data?.fallback && (
         <div className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            AI forecasting is not available — requires minimum 12 weeks of booking data.
+            AI predikce není k dispozici — je potřeba minimálně 12 týdnů dat o rezervacích.
           </p>
         </div>
       )}
@@ -253,7 +289,8 @@ export default function CapacityDashboard() {
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <BarChart3 className="h-12 w-12 text-muted-foreground" />
             <p className="text-center text-muted-foreground">
-              Capacity forecast will be available after sufficient booking data is collected.
+              Predikce kapacity bude k dispozici po nasbírání dostatečného množství dat o
+              rezervacích.
             </p>
           </CardContent>
         </Card>
@@ -262,9 +299,9 @@ export default function CapacityDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5" />
-              7-Day Forecast
+              Predikce na 7 dní
             </CardTitle>
-            <CardDescription>Predicted booking volumes and utilization levels</CardDescription>
+            <CardDescription>Předpokládané objemy rezervací a úrovně vytížení</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
@@ -281,9 +318,11 @@ export default function CapacityDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5" />
-            Schedule Suggestions
+            Návrhy na úpravu rozvrhu
           </CardTitle>
-          <CardDescription>AI-generated recommendations for schedule adjustments</CardDescription>
+          <CardDescription>
+            AI doporučení pro úpravy rozvrhu na základě predikce poptávky
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <SuggestionsList suggestions={data?.suggestions ?? []} />

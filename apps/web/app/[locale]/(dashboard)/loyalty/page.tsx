@@ -39,7 +39,8 @@ import {
   useTiers,
 } from '@/hooks/use-loyalty-queries';
 import { useLoyaltyStore } from '@/stores/loyalty.store';
-import { Settings, Plus, Star, Pencil } from 'lucide-react';
+import { Settings, Plus, Star, Pencil, CreditCard, Gift } from 'lucide-react';
+import { Link } from '@/lib/i18n/navigation';
 import type { LoyaltyProgramType } from '@schedulebox/shared/types';
 
 // ============================================================================
@@ -85,42 +86,42 @@ function ProgramForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="program-name">Name</Label>
+        <Label htmlFor="program-name">Název</Label>
         <Input
           id="program-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="My Loyalty Program"
+          placeholder="Můj věrnostní program"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-description">Description</Label>
+        <Label htmlFor="program-description">Popis</Label>
         <Input
           id="program-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Earn points with every booking"
+          placeholder="Získejte body s každou rezervací"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-type">Program Type</Label>
+        <Label htmlFor="program-type">Typ programu</Label>
         <Select value={type} onValueChange={(v) => setType(v as LoyaltyProgramType)}>
           <SelectTrigger id="program-type">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="points">Points</SelectItem>
-            <SelectItem value="stamps">Stamps</SelectItem>
-            <SelectItem value="tiers">Tiers</SelectItem>
+            <SelectItem value="points">Body</SelectItem>
+            <SelectItem value="stamps">Razítka</SelectItem>
+            <SelectItem value="tiers">Úrovně</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-ppc">Points per Currency Unit</Label>
+        <Label htmlFor="program-ppc">Body za korunu</Label>
         <Input
           id="program-ppc"
           type="number"
@@ -130,13 +131,11 @@ function ProgramForm({
           onChange={(e) => setPointsPerCurrency(Number(e.target.value))}
           required
         />
-        <p className="text-xs text-muted-foreground">
-          How many points a customer earns per 1 CZK spent
-        </p>
+        <p className="text-xs text-muted-foreground">Kolik bodů zákazník získá za 1 Kč</p>
       </div>
 
       <Button type="submit" disabled={isSubmitting || !name}>
-        {isSubmitting ? 'Saving...' : initialValues ? 'Update Program' : 'Create Program'}
+        {isSubmitting ? 'Ukládání...' : initialValues ? 'Aktualizovat program' : 'Vytvořit program'}
       </Button>
     </form>
   );
@@ -185,23 +184,23 @@ function TierFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Tier</DialogTitle>
-          <DialogDescription>Create a new loyalty tier for your program.</DialogDescription>
+          <DialogTitle>Přidat úroveň</DialogTitle>
+          <DialogDescription>Vytvořte novou věrnostní úroveň pro váš program.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="tier-name">Name</Label>
+            <Label htmlFor="tier-name">Název</Label>
             <Input
               id="tier-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Silver"
+              placeholder="např. Stříbrná"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-min-points">Minimum Points</Label>
+            <Label htmlFor="tier-min-points">Minimální počet bodů</Label>
             <Input
               id="tier-min-points"
               type="number"
@@ -213,7 +212,7 @@ function TierFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-color">Color</Label>
+            <Label htmlFor="tier-color">Barva</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="tier-color"
@@ -232,7 +231,7 @@ function TierFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-sort">Sort Order</Label>
+            <Label htmlFor="tier-sort">Pořadí</Label>
             <Input
               id="tier-sort"
               type="number"
@@ -244,10 +243,10 @@ function TierFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Zrušit
             </Button>
             <Button type="submit" disabled={createTier.isPending || !name}>
-              {createTier.isPending ? 'Creating...' : 'Create Tier'}
+              {createTier.isPending ? 'Vytváření...' : 'Vytvořit úroveň'}
             </Button>
           </DialogFooter>
         </form>
@@ -265,9 +264,9 @@ function SuggestedTiers() {
   const [applied, setApplied] = useState(false);
 
   const suggestedTiers = [
-    { name: 'Bronze', min_points: 0, color: '#CD7F32', sort_order: 0 },
-    { name: 'Silver', min_points: 500, color: '#C0C0C0', sort_order: 1 },
-    { name: 'Gold', min_points: 1500, color: '#FFD700', sort_order: 2 },
+    { name: 'Bronzová', min_points: 0, color: '#CD7F32', sort_order: 0 },
+    { name: 'Stříbrná', min_points: 500, color: '#C0C0C0', sort_order: 1 },
+    { name: 'Zlatá', min_points: 1500, color: '#FFD700', sort_order: 2 },
   ];
 
   const applyDefaults = async () => {
@@ -280,12 +279,12 @@ function SuggestedTiers() {
   return (
     <div className="rounded-lg border border-dashed p-4">
       <p className="mb-2 text-sm text-muted-foreground">
-        No tiers configured. Apply suggested defaults?
+        Žádné úrovně nejsou nakonfigurovány. Použít navrhované výchozí hodnoty?
       </p>
       <div className="mb-3 flex gap-2">
         {suggestedTiers.map((t) => (
           <Badge key={t.name} variant="outline" style={{ borderColor: t.color, color: t.color }}>
-            {t.name} ({t.min_points} pts)
+            {t.name} ({t.min_points} b.)
           </Badge>
         ))}
       </div>
@@ -295,7 +294,7 @@ function SuggestedTiers() {
         onClick={applyDefaults}
         disabled={applied || createTier.isPending}
       >
-        {applied ? 'Applied' : 'Apply Default Tiers'}
+        {applied ? 'Použito' : 'Použít výchozí úrovně'}
       </Button>
     </div>
   );
@@ -347,7 +346,7 @@ export default function LoyaltyProgramPage() {
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Loyalty Program" />
+        <PageHeader title="Věrnostní program" />
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-48" />
@@ -368,13 +367,13 @@ export default function LoyaltyProgramPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Loyalty Program"
-        description="Configure your loyalty program settings and tiers"
+        title="Věrnostní program"
+        description="Nastavení věrnostního programu a úrovní"
         actions={
           hasProgram && !programFormOpen ? (
             <Button variant="outline" onClick={openProgramForm}>
               <Pencil className="mr-2 h-4 w-4" />
-              Edit Settings
+              Upravit nastavení
             </Button>
           ) : undefined
         }
@@ -385,12 +384,12 @@ export default function LoyaltyProgramPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Program Settings
+            Nastavení programu
           </CardTitle>
           <CardDescription>
             {hasProgram
-              ? 'View and edit your loyalty program configuration'
-              : 'Create a new loyalty program for your business'}
+              ? 'Zobrazení a úprava konfigurace věrnostního programu'
+              : 'Vytvořte nový věrnostní program pro vaše podnikání'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -409,34 +408,38 @@ export default function LoyaltyProgramPage() {
                 isSubmitting={updateProgram.isPending}
               />
               <Button variant="ghost" onClick={closeProgramForm}>
-                Cancel
+                Zrušit
               </Button>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div>
-                <p className="text-sm text-muted-foreground">Name</p>
+                <p className="text-sm text-muted-foreground">Název</p>
                 <p className="font-medium">{program.name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Type</p>
+                <p className="text-sm text-muted-foreground">Typ</p>
                 <Badge variant="outline" className="capitalize">
-                  {program.type}
+                  {program.type === 'points'
+                    ? 'Body'
+                    : program.type === 'stamps'
+                      ? 'Razítka'
+                      : 'Úrovně'}
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Points per CZK</p>
+                <p className="text-sm text-muted-foreground">Bodů za Kč</p>
                 <p className="font-medium">{program.pointsPerCurrency}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Status</p>
+                <p className="text-sm text-muted-foreground">Stav</p>
                 <Badge variant={program.isActive ? 'default' : 'secondary'}>
-                  {program.isActive ? 'Active' : 'Inactive'}
+                  {program.isActive ? 'Aktivní' : 'Neaktivní'}
                 </Badge>
               </div>
               {program.description && (
                 <div className="col-span-full">
-                  <p className="text-sm text-muted-foreground">Description</p>
+                  <p className="text-sm text-muted-foreground">Popis</p>
                   <p className="text-sm">{program.description}</p>
                 </div>
               )}
@@ -453,13 +456,13 @@ export default function LoyaltyProgramPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="h-5 w-5" />
-                  Tiers
+                  Úrovně
                 </CardTitle>
-                <CardDescription>Manage loyalty tiers and their point thresholds</CardDescription>
+                <CardDescription>Správa věrnostních úrovní a jejich bodových prahů</CardDescription>
               </div>
               <Button onClick={() => setTierDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Tier
+                Přidat úroveň
               </Button>
             </div>
           </CardHeader>
@@ -470,10 +473,10 @@ export default function LoyaltyProgramPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Min Points</TableHead>
-                    <TableHead>Color</TableHead>
+                    <TableHead>Pořadí</TableHead>
+                    <TableHead>Název</TableHead>
+                    <TableHead>Min. bodů</TableHead>
+                    <TableHead>Barva</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -503,6 +506,36 @@ export default function LoyaltyProgramPage() {
       )}
 
       <TierFormDialog open={tierDialogOpen} onOpenChange={setTierDialogOpen} />
+
+      {/* Quick Links to sub-pages */}
+      {hasProgram && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link href="/loyalty/cards">
+            <Card className="transition-colors hover:bg-accent/50 cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CreditCard className="h-5 w-5" />
+                  Věrnostní karty
+                </CardTitle>
+                <CardDescription>Správa karet zákazníků, bodů a razítek</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+          <Link href="/loyalty/rewards">
+            <Card className="transition-colors hover:bg-accent/50 cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Gift className="h-5 w-5" />
+                  Katalog odměn
+                </CardTitle>
+                <CardDescription>
+                  Správa odměn, které mohou zákazníci získat za body
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

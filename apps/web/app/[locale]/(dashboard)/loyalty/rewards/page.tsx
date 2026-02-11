@@ -42,10 +42,10 @@ import type { RewardType } from '@schedulebox/shared/types';
 // ============================================================================
 
 const rewardTypeLabels: Record<RewardType, string> = {
-  discount_percentage: 'Discount %',
-  discount_fixed: 'Fixed Discount',
-  free_service: 'Free Service',
-  gift: 'Gift',
+  discount_percentage: 'Sleva %',
+  discount_fixed: 'Pevná sleva',
+  free_service: 'Služba zdarma',
+  gift: 'Dárek',
 };
 
 // ============================================================================
@@ -131,38 +131,38 @@ function RewardFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Reward' : 'Add Reward'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Upravit odměnu' : 'Přidat odměnu'}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Update the reward details.'
-              : 'Create a new reward for your loyalty program.'}
+              ? 'Aktualizujte detaily odměny.'
+              : 'Vytvořte novou odměnu pro váš věrnostní program.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reward-name">Name</Label>
+            <Label htmlFor="reward-name">Název</Label>
             <Input
               id="reward-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. 10% Off Next Booking"
+              placeholder="např. 10% sleva na další rezervaci"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reward-description">Description</Label>
+            <Label htmlFor="reward-description">Popis</Label>
             <Input
               id="reward-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Reward description"
+              placeholder="Popis odměny"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="reward-points">Points Cost</Label>
+              <Label htmlFor="reward-points">Cena v bodech</Label>
               <Input
                 id="reward-points"
                 type="number"
@@ -174,16 +174,16 @@ function RewardFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reward-type">Reward Type</Label>
+              <Label htmlFor="reward-type">Typ odměny</Label>
               <Select value={rewardType} onValueChange={(v) => setRewardType(v as RewardType)}>
                 <SelectTrigger id="reward-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="discount_percentage">Discount %</SelectItem>
-                  <SelectItem value="discount_fixed">Fixed Discount</SelectItem>
-                  <SelectItem value="free_service">Free Service</SelectItem>
-                  <SelectItem value="gift">Gift</SelectItem>
+                  <SelectItem value="discount_percentage">Sleva %</SelectItem>
+                  <SelectItem value="discount_fixed">Pevná sleva</SelectItem>
+                  <SelectItem value="free_service">Služba zdarma</SelectItem>
+                  <SelectItem value="gift">Dárek</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -192,7 +192,7 @@ function RewardFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="reward-value">
-                Value <span className="text-muted-foreground">(optional)</span>
+                Hodnota <span className="text-muted-foreground">(volitelné)</span>
               </Label>
               <Input
                 id="reward-value"
@@ -202,13 +202,13 @@ function RewardFormDialog({
                 onChange={(e) =>
                   setRewardValue(e.target.value ? Number(e.target.value) : undefined)
                 }
-                placeholder={rewardType === 'discount_percentage' ? 'e.g. 10' : 'e.g. 100'}
+                placeholder={rewardType === 'discount_percentage' ? 'např. 10' : 'např. 100'}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="reward-max">
-                Max Redemptions <span className="text-muted-foreground">(optional)</span>
+                Max. uplatnění <span className="text-muted-foreground">(volitelné)</span>
               </Label>
               <Input
                 id="reward-max"
@@ -218,17 +218,17 @@ function RewardFormDialog({
                 onChange={(e) =>
                   setMaxRedemptions(e.target.value ? Number(e.target.value) : undefined)
                 }
-                placeholder="Unlimited"
+                placeholder="Neomezeno"
               />
             </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Zrušit
             </Button>
             <Button type="submit" disabled={isPending || !name}>
-              {isPending ? 'Saving...' : isEditing ? 'Update Reward' : 'Create Reward'}
+              {isPending ? 'Ukládání...' : isEditing ? 'Aktualizovat odměnu' : 'Vytvořit odměnu'}
             </Button>
           </DialogFooter>
         </form>
@@ -277,12 +277,12 @@ export default function RewardsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Rewards Catalog"
-        description="Manage rewards customers can redeem with points"
+        title="Katalog odměn"
+        description="Správa odměn, které zákazníci mohou uplatnit za body"
         actions={
           <Button onClick={() => openRewardForm()}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Reward
+            Přidat odměnu
           </Button>
         }
       />
@@ -290,20 +290,20 @@ export default function RewardsPage() {
       {/* Filter */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Filters</CardTitle>
+          <CardTitle className="text-base">Filtry</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
             <div>
-              <Label className="mb-2 block text-sm">Status</Label>
+              <Label className="mb-2 block text-sm">Stav</Label>
               <Select value={activeFilter} onValueChange={setActiveFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="all">Vše</SelectItem>
+                  <SelectItem value="active">Aktivní</SelectItem>
+                  <SelectItem value="inactive">Neaktivní</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -323,13 +323,13 @@ export default function RewardsPage() {
           ) : rewards.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center space-y-2">
               <Gift className="h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium">No rewards yet</p>
+              <p className="text-lg font-medium">Zatím žádné odměny</p>
               <p className="text-sm text-muted-foreground">
-                Create your first reward for customers to redeem
+                Vytvořte první odměnu, kterou zákazníci mohou uplatnit
               </p>
               <Button size="sm" className="mt-2" onClick={() => openRewardForm()}>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Reward
+                Přidat odměnu
               </Button>
             </div>
           ) : (
@@ -337,19 +337,19 @@ export default function RewardsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Points Cost</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Redemptions</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Název</TableHead>
+                    <TableHead>Cena v bodech</TableHead>
+                    <TableHead>Typ</TableHead>
+                    <TableHead>Uplatnění</TableHead>
+                    <TableHead>Stav</TableHead>
+                    <TableHead className="text-right">Akce</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {rewards.map((reward) => (
                     <TableRow key={reward.id}>
                       <TableCell className="font-medium">{reward.name}</TableCell>
-                      <TableCell>{reward.pointsCost.toLocaleString()} pts</TableCell>
+                      <TableCell>{reward.pointsCost.toLocaleString()} b.</TableCell>
                       <TableCell>
                         <Badge variant="outline">{rewardTypeLabels[reward.rewardType]}</Badge>
                       </TableCell>
@@ -359,7 +359,7 @@ export default function RewardsPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={reward.isActive ? 'default' : 'secondary'}>
-                          {reward.isActive ? 'Active' : 'Inactive'}
+                          {reward.isActive ? 'Aktivní' : 'Neaktivní'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -389,7 +389,7 @@ export default function RewardsPage() {
               {pagination && pagination.total_pages > 1 && (
                 <div className="flex items-center justify-between border-t px-6 py-4">
                   <p className="text-sm text-muted-foreground">
-                    Page {pagination.page} of {pagination.total_pages} ({pagination.total} total)
+                    Stránka {pagination.page} z {pagination.total_pages} (celkem {pagination.total})
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -399,7 +399,7 @@ export default function RewardsPage() {
                       disabled={pagination.page === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Previous
+                      Předchozí
                     </Button>
                     <Button
                       variant="outline"
@@ -407,7 +407,7 @@ export default function RewardsPage() {
                       onClick={() => setPage((p) => p + 1)}
                       disabled={pagination.page === pagination.total_pages}
                     >
-                      Next
+                      Další
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

@@ -28,7 +28,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader } from '@/components/shared/page-header';
 import { useDynamicPricing } from '@/hooks/useOptimization';
 import { apiClient } from '@/lib/api-client';
-import { TrendingUp, AlertCircle, DollarSign } from 'lucide-react';
+import { TrendingUp, AlertCircle, BarChart3, CalendarDays } from 'lucide-react';
+import { Link } from '@/lib/i18n/navigation';
 
 // ============================================================================
 // TYPES
@@ -43,7 +44,7 @@ interface Service {
   is_active: boolean;
 }
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_NAMES = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 
 // ============================================================================
 // PRICE CHECK FORM
@@ -97,10 +98,10 @@ function PriceCheckForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="pricing-service">Service</Label>
+        <Label htmlFor="pricing-service">Služba</Label>
         <Select value={serviceId} onValueChange={setServiceId}>
           <SelectTrigger id="pricing-service">
-            <SelectValue placeholder="Select a service" />
+            <SelectValue placeholder="Vyberte službu" />
           </SelectTrigger>
           <SelectContent>
             {services.map((service) => (
@@ -114,7 +115,7 @@ function PriceCheckForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="pricing-hour">Hour of Day ({hourOfDay}:00)</Label>
+          <Label htmlFor="pricing-hour">Hodina dne ({hourOfDay}:00)</Label>
           <Input
             id="pricing-hour"
             type="range"
@@ -129,7 +130,7 @@ function PriceCheckForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pricing-day">Day of Week</Label>
+          <Label htmlFor="pricing-day">Den v týdnu</Label>
           <Select value={dayOfWeek.toString()} onValueChange={(v) => setDayOfWeek(parseInt(v))}>
             <SelectTrigger id="pricing-day">
               <SelectValue />
@@ -145,7 +146,7 @@ function PriceCheckForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pricing-util">Utilization ({utilization}%)</Label>
+          <Label htmlFor="pricing-util">Vytížení ({utilization} %)</Label>
           <Input
             id="pricing-util"
             type="range"
@@ -154,13 +155,13 @@ function PriceCheckForm({
             value={utilization}
             onChange={(e) => setUtilization(parseInt(e.target.value))}
           />
-          <p className="text-xs text-muted-foreground">Current capacity usage</p>
+          <p className="text-xs text-muted-foreground">Aktuální využití kapacity</p>
         </div>
       </div>
 
       <Button type="submit" disabled={!serviceId}>
         <TrendingUp className="mr-2 h-4 w-4" />
-        Check Price
+        Zkontrolovat cenu
       </Button>
     </form>
   );
@@ -214,7 +215,7 @@ function PriceResult({
         <CardContent className="flex items-center gap-3 p-6">
           <AlertCircle className="h-5 w-5 text-destructive" />
           <p className="text-sm text-destructive">
-            Failed to fetch pricing data. Please try again.
+            Nepodařilo se načíst cenová data. Zkuste to prosím znovu.
           </p>
         </CardContent>
       </Card>
@@ -232,7 +233,7 @@ function PriceResult({
         <div className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            AI pricing is not available — showing static prices.
+            AI ceny nejsou k dispozici — zobrazují se statické ceny.
           </p>
         </div>
       )}
@@ -241,21 +242,21 @@ function PriceResult({
         <CardContent className="p-6">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             <div>
-              <p className="text-sm text-muted-foreground">Static Price</p>
+              <p className="text-sm text-muted-foreground">Statická cena</p>
               <p className="text-xl font-medium">
                 {staticPrice.toFixed(0)} {currency}
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Optimized Price</p>
+              <p className="text-sm text-muted-foreground">Optimalizovaná cena</p>
               <p className="text-2xl font-bold text-primary">
                 {data.optimal_price.toFixed(0)} {currency}
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Difference</p>
+              <p className="text-sm text-muted-foreground">Rozdíl</p>
               <p
                 className={`text-lg font-medium ${
                   isHigher
@@ -266,12 +267,12 @@ function PriceResult({
                 }`}
               >
                 {isHigher ? '+' : ''}
-                {priceDiffPercent}%
+                {priceDiffPercent} %
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Confidence</p>
+              <p className="text-sm text-muted-foreground">Spolehlivost</p>
               <div className="flex items-center gap-2">
                 <div className="h-2 flex-1 rounded-full bg-muted">
                   <div
@@ -281,14 +282,14 @@ function PriceResult({
                     }}
                   />
                 </div>
-                <span className="text-sm font-medium">{Math.round(data.confidence * 100)}%</span>
+                <span className="text-sm font-medium">{Math.round(data.confidence * 100)} %</span>
               </div>
               {data.constrained && (
                 <Badge
                   variant="outline"
                   className="mt-1 text-xs text-orange-600 dark:text-orange-400"
                 >
-                  Constrained
+                  Omezeno
                 </Badge>
               )}
             </div>
@@ -326,7 +327,7 @@ export default function PricingDashboard() {
   if (isLoadingServices) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Dynamic Pricing" />
+        <PageHeader title="Dynamické ceny" />
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-48" />
@@ -344,12 +345,12 @@ export default function PricingDashboard() {
   if (!services || services.length === 0) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Dynamic Pricing" />
+        <PageHeader title="Dynamické ceny" />
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <DollarSign className="h-12 w-12 text-muted-foreground" />
+            <BarChart3 className="h-12 w-12 text-muted-foreground" />
             <p className="text-center text-muted-foreground">
-              Dynamic pricing will be available after sufficient booking data is collected.
+              Dynamické ceny budou k dispozici po nasbírání dostatečného množství dat o rezervacích.
             </p>
           </CardContent>
         </Card>
@@ -360,20 +361,36 @@ export default function PricingDashboard() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Dynamic Pricing"
-        description="AI-optimized pricing adjusts service prices within a 30% range based on demand, time of day, and capacity utilization."
+        title="AI optimalizace"
+        description="AI optimalizace cen upravuje ceny služeb v rozmezí 30 % na základě poptávky, denní doby a vytížení kapacity."
       />
+
+      {/* AI Sub-navigation */}
+      <div className="flex gap-3">
+        <Button variant="default" size="sm" asChild>
+          <Link href="/ai/pricing">
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Dynamické ceny
+          </Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/ai/capacity">
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Predikce kapacity
+          </Link>
+        </Button>
+      </div>
 
       {/* Price Check Form */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Price Check
+            Kontrola ceny
           </CardTitle>
           <CardDescription>
-            Select a service and set context parameters to see the AI-optimized price. Prices are
-            constrained to within 30% of the static price.
+            Vyberte službu a nastavte kontextové parametry pro zobrazení AI-optimalizované ceny.
+            Ceny jsou omezeny na rozmezí 30 % od statické ceny.
           </CardDescription>
         </CardHeader>
         <CardContent>
