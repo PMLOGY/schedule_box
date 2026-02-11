@@ -8,6 +8,10 @@ import {
   BarChart3,
   Megaphone,
   Settings,
+  Bell,
+  Zap,
+  Award,
+  Brain,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -56,9 +60,33 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ['owner', 'manager'],
   },
   {
+    key: 'notifications',
+    href: '/notifications',
+    icon: Bell,
+    roles: ['owner', 'manager'],
+  },
+  {
+    key: 'automation',
+    href: '/automation',
+    icon: Zap,
+    roles: ['owner', 'manager'],
+  },
+  {
+    key: 'loyalty',
+    href: '/loyalty',
+    icon: Award,
+    roles: ['owner', 'manager'],
+  },
+  {
     key: 'analytics',
     href: '/analytics',
     icon: BarChart3,
+    roles: ['owner'],
+  },
+  {
+    key: 'ai',
+    href: '/ai/pricing',
+    icon: Brain,
     roles: ['owner'],
   },
   {
