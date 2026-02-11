@@ -13,12 +13,7 @@ export {
   bookingListQuerySchema,
   bookingStatusEnum,
   bookingSourceEnum,
-  type BookingCreateInput,
-  type BookingUpdateInput,
-  type BookingCancelInput,
-  type BookingRescheduleInput,
-  type BookingListQuery,
 } from './booking';
 
 // Availability schemas
-export { availabilityRequestSchema, type AvailabilityRequestInput } from './availability';
+export { availabilityRequestSchema } from './availability';

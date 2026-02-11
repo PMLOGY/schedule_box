@@ -46,5 +46,3 @@ export const availabilityRequestSchema = z
       path: ['date_to'],
     },
   );
-
-export type AvailabilityRequestInput = z.infer<typeof availabilityRequestSchema>;

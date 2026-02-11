@@ -50,8 +50,6 @@ export const bookingCreateSchema = z.object({
   resource_ids: z.array(z.number().int().positive()).optional(),
 });
 
-export type BookingCreateInput = z.infer<typeof bookingCreateSchema>;
-
 // ============================================================================
 // BOOKING UPDATE SCHEMA
 // ============================================================================
@@ -68,8 +66,6 @@ export const bookingUpdateSchema = z.object({
   status: bookingStatusEnum.optional(),
 });
 
-export type BookingUpdateInput = z.infer<typeof bookingUpdateSchema>;
-
 // ============================================================================
 // BOOKING CANCEL SCHEMA
 // ============================================================================
@@ -80,8 +76,6 @@ export type BookingUpdateInput = z.infer<typeof bookingUpdateSchema>;
 export const bookingCancelSchema = z.object({
   reason: z.string().max(500).optional(),
 });
-
-export type BookingCancelInput = z.infer<typeof bookingCancelSchema>;
 
 // ============================================================================
 // BOOKING RESCHEDULE SCHEMA
@@ -94,8 +88,6 @@ export const bookingRescheduleSchema = z.object({
   start_time: z.string().datetime(),
   employee_id: z.number().int().positive().optional(),
 });
-
-export type BookingRescheduleInput = z.infer<typeof bookingRescheduleSchema>;
 
 // ============================================================================
 // BOOKING LIST QUERY SCHEMA
@@ -116,5 +108,3 @@ export const bookingListQuerySchema = z.object({
   date_to: z.string().date().optional(),
   source: bookingSourceEnum.optional(),
 });
-
-export type BookingListQuery = z.infer<typeof bookingListQuerySchema>;
