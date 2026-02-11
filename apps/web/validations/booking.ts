@@ -10,6 +10,8 @@ export {
   bookingCreateSchema,
   bookingUpdateSchema,
   bookingListQuerySchema,
+  bookingCancelSchema,
+  bookingRescheduleSchema,
   bookingStatusEnum,
   bookingSourceEnum,
   type BookingCreate,
