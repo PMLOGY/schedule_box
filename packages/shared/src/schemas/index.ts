@@ -67,3 +67,11 @@ export {
   transactionTypeEnum,
   rewardTypeEnum,
 } from './loyalty';
+
+// AI Optimization schemas
+export {
+  upsellRequestSchema,
+  dynamicPricingRequestSchema,
+  capacityForecastRequestSchema,
+  reminderTimingRequestSchema,
+} from './ai-optimization';
