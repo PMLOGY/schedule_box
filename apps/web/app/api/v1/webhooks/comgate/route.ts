@@ -113,8 +113,7 @@ export async function POST(req: NextRequest) {
         amount: payment.amount,
         currency: payment.currency || 'CZK',
         gateway: 'comgate',
-        gatewayTransactionId: transId,
-        paidAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
       };
 
       // Publish payment.completed event
@@ -143,6 +142,7 @@ export async function POST(req: NextRequest) {
         companyId: payment.companyId,
         gateway: 'comgate',
         reason: 'Payment cancelled by customer',
+        failedAt: new Date().toISOString(),
       };
 
       // Publish payment.failed event

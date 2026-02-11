@@ -5,9 +5,17 @@
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./app/*", "./components/*", "./lib/*", "./validations/*", "./stores/*", "./hooks/*"],
+      "@/*": [
+        "./app/*",
+        "./components/*",
+        "./src/components/*",
+        "./lib/*",
+        "./validations/*",
+        "./stores/*",
+        "./hooks/*"
+      ],
       "@/app/*": ["./app/*"],
-      "@/components/*": ["./components/*"],
+      "@/components/*": ["./components/*", "./src/components/*"],
       "@/lib/*": ["./lib/*"],
       "@/validations/*": ["./validations/*"],
       "@/stores/*": ["./stores/*"],

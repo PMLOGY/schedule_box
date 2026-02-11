@@ -79,6 +79,7 @@ export const POST = createRouteHandler<PaymentRefundBody, PaymentIdParam>({
         status: payments.status,
         gateway: payments.gateway,
         gatewayTransactionId: payments.gatewayTransactionId,
+        currency: payments.currency,
       })
       .from(payments)
       .where(eq(payments.uuid, paymentUuid))
@@ -182,8 +183,8 @@ export const POST = createRouteHandler<PaymentRefundBody, PaymentIdParam>({
           paymentUuid: payment.uuid,
           bookingUuid,
           companyId,
-          refundAmount: thisRefundAmount.toString(),
-          reason,
+          amount: thisRefundAmount.toString(),
+          currency: payment.currency || 'CZK',
           refundedAt: new Date().toISOString(),
         }),
       );

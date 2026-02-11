@@ -208,8 +208,7 @@ export const POST = createRouteHandler({
           amount: updatedPayment.amount ?? '0',
           currency: updatedPayment.currency ?? 'CZK',
           gateway: updatedPayment.gateway ?? 'cash',
-          gatewayTransactionId: updatedPayment.gatewayTransactionId ?? '',
-          paidAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
+          completedAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
         }),
       );
     } catch (error) {
@@ -225,8 +224,7 @@ export const POST = createRouteHandler({
       amount: updatedPayment.amount ?? '0',
       currency: updatedPayment.currency ?? 'CZK',
       gateway: updatedPayment.gateway ?? 'cash',
-      gatewayTransactionId: updatedPayment.gatewayTransactionId ?? '',
-      paidAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
+      completedAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
     });
 
     // Create invoice within transaction
