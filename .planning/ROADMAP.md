@@ -271,6 +271,14 @@ Plans:
 
 **Depends on:** Phase 5, Phase 3
 
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 10-01-PLAN.md — AI Python microservice foundation (FastAPI, ML model classes, schemas, Dockerfile) [Wave 1]
+- [ ] 10-02-PLAN.md — Node.js circuit breaker client (Opossum, fallback values, AI HTTP client) [Wave 1]
+- [ ] 10-03-PLAN.md — Prediction endpoints, feature store, training scripts, dummy models [Wave 2]
+- [ ] 10-04-PLAN.md — Next.js AI API routes, Docker Compose integration, env vars [Wave 3]
+
 **Success Criteria:**
 1. No-show risk percentage displays in booking detail view
 2. CLV prediction shows in customer detail
