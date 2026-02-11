@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 6 of 15 — Payment Integration
 - **Status:** In Progress
-- **Current Plan:** 06-07 (Next plan after 06-06)
-- **Plans Executed:** 40
+- **Current Plan:** Next phase pending
+- **Plans Executed:** 41
 
 ## What's Done
 
@@ -61,6 +61,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-04: Czech QR Payment Generation (SPD Format) (2 tasks, 2 commits)
 - [x] Plan 06-05: SAGA Choreography and Payment Timeout (2 tasks, 2 commits)
 - [x] Plan 06-06: Invoice PDF Generation and Payment Refund (3 tasks, 3 commits)
+- [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -69,9 +70,9 @@ Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
-Phase 6: In Progress — Plans 06-01, 06-02, 06-03, 06-04, 06-05, 06-06 complete (Payment foundation + webhook idempotency + Comgate integration + QR payment + SAGA choreography + invoice PDF + refund ready)
+Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
 
-Next: Phase 6 Plan 07 — Payment list and status tracking endpoints
+Next: Phase 4 or Phase 7 — Frontend components or notification system
 
 ## Decisions
 
@@ -234,6 +235,9 @@ Next: Phase 6 Plan 07 — Payment list and status tracking endpoints
 - [Phase 06-06]: On-the-fly PDF generation instead of R2 storage (MVP optimization for expected low volume, deferred optimization to Phase 15)
 - [Phase 06-06]: Partial refund support from day one (common Czech business requirement, cumulative refundAmount tracking)
 - [Phase 06-06]: Manual reconciliation for non-Comgate gateways (QR/cash/bank transfer have no webhook, admin confirms manually)
+- [Phase 06-07]: Manual payment creation auto-confirms booking via SAGA (cash and bank transfers already received when recorded)
+- [Phase 06-07]: Payment list excludes gatewayResponse for performance (large JSONB field available in detail endpoint)
+- [Phase 06-07]: Invoice list includes payment UUID and customer name for context (reduces additional API calls)
 
 ## Blockers
 
@@ -293,11 +297,12 @@ None — Phase 4 in progress.
 | 06-05 | 293s | 2 | 5 | 2 |
 | 05-08 | 699s | 2 | 10 | 2 |
 | 06-06 | 700s | 3 | 3 | 3 |
+| 06-07 | 280s | 2 | 3 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 06-06 — Invoice PDF Generation and Payment Refund
+**Stopped at:** Completed Plan 06-07 — Payment List and Status Tracking Endpoints (Phase 6 Complete)
 
 ---
-*Last updated: 2026-02-11 after completing Plan 06-06*
+*Last updated: 2026-02-11 after completing Plan 06-07*
