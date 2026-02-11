@@ -52,3 +52,26 @@ export type {
   AutomationRuleUpdate,
   AutomationRuleListQuery,
 } from './automation';
+
+// Loyalty types
+export type {
+  LoyaltyProgramType,
+  TransactionType,
+  RewardType,
+  LoyaltyTier,
+  LoyaltyProgram,
+  LoyaltyCard,
+  LoyaltyTransaction,
+  Reward,
+  LoyaltyProgramCreate,
+  LoyaltyProgramUpdate,
+  LoyaltyCardCreate,
+  RewardCreate,
+  RewardUpdate,
+  AddPoints,
+  RedeemReward,
+  LoyaltyCardListQuery,
+  TransactionListQuery,
+  TierCreate,
+  TierUpdate,
+} from './loyalty';
