@@ -13,6 +13,7 @@ import type {
   BookingCancelledEvent,
 } from '@schedulebox/events';
 import { renderTemplate, renderTemplateFile } from '../services/template-renderer.js';
+import { processAutomationRules } from '../schedulers/automation-engine.js';
 import { config } from '../config.js';
 
 /**
@@ -454,6 +455,15 @@ export async function setupBookingConsumer(channel: Channel, queues: Queues): Pr
       } else {
         console.log(`[Booking Consumer] Unhandled event type: ${event.type}`);
       }
+
+      // Process automation rules after built-in notification logic
+      await processAutomationRules(
+        event.type,
+        event.data as unknown as Record<string, unknown>,
+        event.data.companyId,
+        event.id,
+        queues,
+      );
 
       // ACK message on success
       channel.ack(msg);

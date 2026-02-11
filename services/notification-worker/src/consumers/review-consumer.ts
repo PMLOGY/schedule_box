@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm';
 import { db, reviews, companies } from '@schedulebox/database';
 import type { CloudEvent } from '@schedulebox/events';
 import { renderTemplate } from '../services/template-renderer.js';
+import { processAutomationRules } from '../schedulers/automation-engine.js';
 import { config } from '../config.js';
 
 /**
@@ -16,6 +17,7 @@ import { config } from '../config.js';
  */
 interface Queues {
   emailQueue: Queue;
+  smsQueue: Queue;
   pushQueue: Queue;
 }
 
@@ -317,6 +319,15 @@ export async function setupReviewConsumer(channel: Channel, queues: Queues): Pro
       } else {
         console.log(`[Review Consumer] Unhandled event type: ${event.type}`);
       }
+
+      // Process automation rules after built-in notification logic
+      await processAutomationRules(
+        event.type,
+        event.data as unknown as Record<string, unknown>,
+        event.data.companyId,
+        event.id,
+        queues,
+      );
 
       // ACK message on success
       channel.ack(msg);
