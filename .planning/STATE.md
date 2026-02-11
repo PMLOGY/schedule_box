@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 5 of 15 — Booking MVP
 - **Status:** In Progress
-- **Current Plan:** 05-02 (Next plan after 05-01)
-- **Plans Executed:** 28
+- **Current Plan:** 05-03 (Next plan after 05-02)
+- **Plans Executed:** 29
 
 ## What's Done
 
@@ -49,6 +49,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 04-02: State Management & API Client (2 tasks, 2 commits)
 - [x] Plan 04-03: Internationalization Setup (2 tasks, 2 commits)
 - [x] Plan 05-01: Booking & Availability Schemas and Types (2 tasks, 2 commits)
+- [x] Plan 05-02: RabbitMQ Event Infrastructure (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -56,9 +57,9 @@ Phase 1: Complete ✅
 Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
-Phase 5: In Progress — Plan 05-01 complete (Booking & Availability schemas and types)
+Phase 5: In Progress — Plans 05-01, 05-02 complete (Booking schemas and RabbitMQ events ready)
 
-Next: Phase 5 Plan 02 — Availability Engine
+Next: Phase 5 Plan 03 — Booking API Routes
 
 ## Decisions
 
@@ -176,6 +177,9 @@ Next: Phase 5 Plan 02 — Availability Engine
 - [Phase 04-03]: Comprehensive translation coverage (70+ keys) created before component development to prevent hardcoded text
 - [Phase 04-02]: Safe circular dependency pattern between auth.store and apiClient (both use lazy getState())
 - [Phase 04-02]: i18n locale type issue fixed with fallback to 'cs' (blocking type-check error)
+- [Phase 05-02]: Callback-based amqplib API used for better TypeScript type support over promise-based API
+- [Phase 05-02]: Fire-and-forget event publishing for MVP (reliable delivery with retry deferred to Phase 7)
+- [Phase 05-02]: Topic exchange (schedulebox.events) with routing key derivation (com.schedulebox.booking.created → booking.created)
 - [Phase 05-01]: Schema-only exports from schemas/ files, types inferred in types/ files to avoid TS module conflicts
 - [Phase 05-01]: z.coerce.number() for query parameters enables automatic string-to-number conversion
 - [Phase 05-01]: Dual .refine() validation on availability date range for specific error messages (date_to >= date_from, max 31 days)
@@ -225,12 +229,13 @@ None — Phase 4 in progress.
 | 04-01 | 596s | 3 | 19 | 3 |
 | 04-02 | 368s | 2 | 9 | 2 |
 | 04-03 | 471s | 2 | 8 | 2 |
+| 05-02 | 273s | 2 | 6 | 2 |
 | 05-01 | 200s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 05-01 — Booking & Availability Schemas and Types
+**Stopped at:** Completed Plan 05-02 — RabbitMQ Event Infrastructure
 
 ---
-*Last updated: 2026-02-11 after completing Plan 05-01*
+*Last updated: 2026-02-11 after completing Plan 05-02*
