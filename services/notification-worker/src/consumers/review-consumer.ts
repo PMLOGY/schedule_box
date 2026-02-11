@@ -3,7 +3,7 @@
  * Listens to review.created events and implements smart routing
  */
 
-import type { Channel, Message } from 'amqplib/callback_api.js';
+import type { Channel, Message } from 'amqplib';
 import type { Queue } from 'bullmq';
 import { eq } from 'drizzle-orm';
 import { db, reviews, companies } from '@schedulebox/database';

@@ -3,7 +3,7 @@
  * Starts all RabbitMQ event consumers for notification worker
  */
 
-import type { Channel } from 'amqplib/callback_api.js';
+import type { Channel } from 'amqplib';
 import type { Queue } from 'bullmq';
 import { setupBookingConsumer } from './booking-consumer.js';
 import { setupPaymentConsumer } from './payment-consumer.js';

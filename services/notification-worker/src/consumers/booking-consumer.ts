@@ -3,7 +3,7 @@
  * Listens to booking lifecycle events and enqueues notifications
  */
 
-import type { Channel, ConsumeMessage } from 'amqplib';
+import type { Channel, Message } from 'amqplib';
 import type { Queue } from 'bullmq';
 import { eq } from 'drizzle-orm';
 import { db, bookings } from '@schedulebox/database';
@@ -433,7 +433,7 @@ export async function setupBookingConsumer(channel: Channel, queues: Queues): Pr
   channel.prefetch(10);
 
   // Consume messages
-  await channel.consume(queueName, async (msg: ConsumeMessage | null) => {
+  await channel.consume(queueName, async (msg: Message | null) => {
     if (!msg) return;
 
     try {
