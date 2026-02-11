@@ -53,6 +53,43 @@
         "churning": "<40"
       },
       "status": "active"
+    },
+    "upselling_recommender": {
+      "model_name": "upselling_recommender",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "algorithm": "item-based collaborative filtering (cosine similarity)",
+      "min_data": "100 customers, 10 services",
+      "retraining": "weekly",
+      "status": "placeholder"
+    },
+    "pricing_optimizer": {
+      "model_name": "pricing_optimizer",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "algorithm": "Thompson Sampling (Multi-Armed Bandit)",
+      "constraints": "30% daily price change limit",
+      "retraining": "continuous (reward updates)",
+      "status": "placeholder"
+    },
+    "capacity_forecaster": {
+      "model_name": "capacity_forecaster",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "algorithm": "Prophet (time series forecasting)",
+      "min_data": "12 weeks booking history",
+      "retraining": "weekly",
+      "status": "placeholder"
+    },
+    "reminder_timing": {
+      "model_name": "reminder_timing",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "algorithm": "Bayesian Optimization (Gaussian Process)",
+      "min_data": "50 completed bookings with notification tracking",
+      "retraining": "weekly",
+      "fallback": "1440 minutes (24 hours)",
+      "status": "placeholder"
     }
   },
   "version_format": "v{major}.{minor}.{patch}",
