@@ -92,7 +92,8 @@ export async function blockTimeSlot(
       );
 
     // Step 2: Get employee's working hours for this day of week
-    const regularHours = await tx
+    // First try employee-specific hours, then fall back to company defaults
+    let regularHours = await tx
       .select()
       .from(workingHours)
       .where(
@@ -102,6 +103,20 @@ export async function blockTimeSlot(
           eq(workingHours.dayOfWeek, dayOfWeek),
         ),
       );
+
+    // Fallback to company-level defaults (employeeId IS NULL)
+    if (regularHours.length === 0) {
+      regularHours = await tx
+        .select()
+        .from(workingHours)
+        .where(
+          and(
+            eq(workingHours.companyId, companyId),
+            isNull(workingHours.employeeId),
+            eq(workingHours.dayOfWeek, dayOfWeek),
+          ),
+        );
+    }
 
     // If no regular hours found, employee doesn't work on this day
     if (regularHours.length === 0) {

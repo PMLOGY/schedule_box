@@ -12,9 +12,8 @@ import type { ApiResponse } from '@schedulebox/shared/types';
 import { toast } from 'sonner';
 
 interface RescheduleParams {
-  bookingId: number;
+  bookingId: string;
   startTime: string;
-  employeeId?: number;
 }
 
 interface RescheduleContext {
@@ -41,16 +40,15 @@ export function useRescheduleBooking() {
 
   return useMutation<
     ApiResponse<Booking>,
-    Error,
+    { code?: string; message?: string; statusCode?: number },
     RescheduleParams & { revertFn?: () => void },
     RescheduleContext
   >({
-    mutationFn: async ({ bookingId, startTime, employeeId }) => {
+    mutationFn: async ({ bookingId, startTime }) => {
       const response = await apiClient.post<ApiResponse<Booking>>(
         `/bookings/${bookingId}/reschedule`,
         {
           start_time: startTime,
-          employee_id: employeeId,
         },
       );
       return response;
@@ -68,8 +66,9 @@ export function useRescheduleBooking() {
       return { previousEvents, revertFn };
     },
 
-    // On error: rollback optimistic update and show error toast
-    onError: (error, _variables, context) => {
+    // On error: rollback optimistic update and show Czech error toast
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any, _variables, context) => {
       // Rollback calendar to previous state
       if (context?.previousEvents) {
         queryClient.setQueryData(['bookings', 'calendar'], context.previousEvents);
@@ -80,17 +79,33 @@ export function useRescheduleBooking() {
         context.revertFn();
       }
 
-      // Show error toast
-      toast.error('Failed to reschedule booking', {
-        description: 'The time slot may already be taken. Please try another time.',
-      });
+      // Map error codes/status to Czech messages
+      const code = error?.code ?? '';
+      const status = error?.statusCode ?? 0;
+      let title: string;
+      let description: string;
 
-      console.error('Reschedule error:', error);
+      if (code === 'SLOT_TAKEN' || status === 409) {
+        title = 'Časový slot je obsazený';
+        description = 'Jiná rezervace již zabírá tento čas. Zvolte jiný čas.';
+      } else if (status === 422) {
+        title = 'Nelze přesunout';
+        description = 'Přesouvat lze pouze čekající nebo potvrzené rezervace.';
+      } else if (status === 404) {
+        title = 'Rezervace nenalezena';
+        description = 'Rezervace již neexistuje.';
+      } else {
+        title = 'Přesunutí selhalo';
+        description = 'Zkuste to prosím znovu.';
+      }
+
+      toast.error(title, { description });
+      console.error('[Calendar] Reschedule error:', JSON.stringify(error));
     },
 
     // On success: show success toast
     onSuccess: () => {
-      toast.success('Booking rescheduled successfully');
+      toast.success('Rezervace přesunuta');
     },
 
     // Always refetch to ensure data is in sync

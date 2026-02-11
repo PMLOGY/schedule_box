@@ -21,8 +21,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Mail, MessageSquare, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Mail, MessageSquare, Bell, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
+import { Link } from '@/lib/i18n/navigation';
 
 type NotificationChannel = 'email' | 'sms' | 'push';
 type NotificationStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'opened' | 'clicked';
@@ -94,11 +95,19 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Historie notifikací</h1>
-        <p className="text-muted-foreground">
-          Přehled všech odeslaných notifikací a jejich doručení
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Historie notifikací</h1>
+          <p className="text-muted-foreground">
+            Přehled všech odeslaných notifikací a jejich doručení
+          </p>
+        </div>
+        <Button variant="outline" asChild>
+          <Link href="/templates">
+            <FileText className="mr-2 h-4 w-4" />
+            Šablony
+          </Link>
+        </Button>
       </div>
 
       <Card>

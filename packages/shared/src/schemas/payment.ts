@@ -38,7 +38,7 @@ export const invoiceStatusEnum = z.enum(['draft', 'issued', 'paid', 'cancelled']
  * API spec: lines 3015-3025
  */
 export const paymentCreateSchema = z.object({
-  booking_id: z.number().int().positive(),
+  booking_id: z.string().uuid(),
   gateway: paymentGatewayEnum,
   amount: z.number().positive(),
   currency: z.string().length(3).default('CZK'),
@@ -54,7 +54,7 @@ export const paymentCreateSchema = z.object({
  * API spec: lines 3027-3036
  */
 export const comgateCreateSchema = z.object({
-  booking_id: z.number().int().positive(),
+  booking_id: z.string().uuid(),
 });
 
 // ============================================================================
@@ -67,7 +67,7 @@ export const comgateCreateSchema = z.object({
  * API spec: lines 3057-3066
  */
 export const qrPaymentGenerateSchema = z.object({
-  booking_id: z.number().int().positive(),
+  booking_id: z.string().uuid(),
 });
 
 // ============================================================================
@@ -98,5 +98,5 @@ export const paymentListQuerySchema = z.object({
   gateway: paymentGatewayEnum.optional(),
   date_from: z.string().date().optional(),
   date_to: z.string().date().optional(),
-  booking_id: z.coerce.number().int().positive().optional(),
+  booking_id: z.string().uuid().optional(),
 });

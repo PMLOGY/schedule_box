@@ -12,13 +12,25 @@ export interface User {
   companyName: string;
 }
 
-interface LoginResponse {
-  user: User;
-  accessToken: string;
+interface LoginApiResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: {
+    uuid: string;
+    email: string;
+    name: string;
+    role: string;
+    company_id: string;
+    mfa_enabled: boolean;
+    email_verified: boolean;
+  };
 }
 
-interface RefreshResponse {
-  accessToken: string;
+interface RefreshApiResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
 }
 
 interface AuthState {
@@ -41,13 +53,23 @@ export const useAuthStore = create<AuthState>()(
 
       // login() throws on error - caller must catch
       login: async (email: string, password: string) => {
-        const response = await apiClient.post<LoginResponse>('/auth/login', {
+        const response = await apiClient.post<LoginApiResponse>('/auth/login', {
           email,
           password,
         });
+        const apiUser = response.user;
+        const nameParts = apiUser.name.split(' ');
         set({
-          user: response.user,
-          accessToken: response.accessToken,
+          user: {
+            id: apiUser.uuid,
+            email: apiUser.email,
+            firstName: nameParts[0] || apiUser.name,
+            lastName: nameParts.slice(1).join(' ') || '',
+            role: apiUser.role,
+            companyId: apiUser.company_id,
+            companyName: '',
+          },
+          accessToken: response.access_token,
           isAuthenticated: true,
         });
       },
@@ -74,8 +96,8 @@ export const useAuthStore = create<AuthState>()(
 
       refreshToken: async () => {
         try {
-          const response = await apiClient.post<RefreshResponse>('/auth/refresh');
-          set({ accessToken: response.accessToken });
+          const response = await apiClient.post<RefreshApiResponse>('/auth/refresh');
+          set({ accessToken: response.access_token });
         } catch {
           // Refresh failed - clear state
           get().logout();

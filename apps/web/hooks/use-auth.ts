@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/lib/i18n/navigation';
 import { useAuthStore } from '@/stores/auth.store';
 
 export function useAuth() {

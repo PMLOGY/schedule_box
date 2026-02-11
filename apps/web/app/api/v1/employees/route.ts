@@ -32,6 +32,7 @@ export const GET = createRouteHandler({
     // Query employees with their assigned services
     const employeeList = await db
       .select({
+        id: employees.id,
         uuid: employees.uuid,
         name: employees.name,
         email: employees.email,
@@ -78,7 +79,7 @@ export const GET = createRouteHandler({
       }),
     );
 
-    return successResponse({ data: employeesWithServices });
+    return successResponse(employeesWithServices);
   },
 });
 

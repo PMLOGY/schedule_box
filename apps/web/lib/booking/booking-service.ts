@@ -8,7 +8,7 @@
  * 3. btree_gist exclusion constraint as safety net (database-level enforcement)
  */
 
-import { eq, and, isNull, or, gte, lte, sql } from 'drizzle-orm';
+import { eq, and, isNull, or, gte, lte, lt, gt, sql } from 'drizzle-orm';
 import {
   db,
   bookings,
@@ -31,7 +31,7 @@ import type { BookingCreate, BookingUpdate, BookingListQuery } from '@schedulebo
  */
 export interface BookingWithRelations {
   id: string; // UUID for API response
-  company_id: string; // UUID
+  companyId: string; // UUID
   customer: {
     id: string;
     name: string;
@@ -41,28 +41,28 @@ export interface BookingWithRelations {
   service: {
     id: string;
     name: string;
-    duration_minutes: number;
+    durationMinutes: number;
     price: string;
   };
   employee: {
     id: string;
     name: string;
   } | null;
-  start_time: string;
-  end_time: string;
+  startTime: string;
+  endTime: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
   source: 'online' | 'admin' | 'phone' | 'walk_in' | 'voice_ai' | 'marketplace' | 'api' | 'widget';
   notes: string | null;
-  internal_notes: string | null;
+  internalNotes: string | null;
   price: string;
   currency: string;
-  discount_amount: string;
-  no_show_probability: number | null;
-  cancelled_at: string | null;
-  cancellation_reason: string | null;
-  cancelled_by: 'customer' | 'employee' | 'admin' | 'system' | null;
-  created_at: string;
-  updated_at: string;
+  discountAmount: string;
+  noShowProbability: number | null;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  cancelledBy: 'customer' | 'employee' | 'admin' | 'system' | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ============================================================================
@@ -242,7 +242,8 @@ export async function createBooking(
           ),
           // Time range overlap check
           // Booking overlaps if: existing_start < new_buffered_end AND existing_end > new_buffered_start
-          sql`${bookings.startTime} < ${bufferedEnd} AND ${bookings.endTime} > ${bufferedStart}`,
+          lt(bookings.startTime, bufferedEnd),
+          gt(bookings.endTime, bufferedStart),
         ),
       )
       .limit(1);
@@ -451,7 +452,7 @@ export async function listBookings(
   // Map to response format
   const responseData: BookingWithRelations[] = data.map((row) => ({
     id: row.id,
-    company_id: row.companyId.toString(), // TODO: Map to company UUID
+    companyId: row.companyId.toString(), // TODO: Map to company UUID
     customer: {
       id: row.customerUuid,
       name: row.customerName,
@@ -461,7 +462,7 @@ export async function listBookings(
     service: {
       id: row.serviceUuid,
       name: row.serviceName,
-      duration_minutes: row.serviceDurationMinutes,
+      durationMinutes: row.serviceDurationMinutes,
       price: row.servicePrice,
     },
     employee:
@@ -471,21 +472,21 @@ export async function listBookings(
             name: row.employeeName,
           }
         : null,
-    start_time: row.startTime.toISOString(),
-    end_time: row.endTime.toISOString(),
+    startTime: row.startTime.toISOString(),
+    endTime: row.endTime.toISOString(),
     status: row.status ?? 'pending',
     source: row.source ?? 'online',
     notes: row.notes,
-    internal_notes: row.internalNotes,
+    internalNotes: row.internalNotes,
     price: row.price,
     currency: row.currency ?? 'CZK',
-    discount_amount: row.discountAmount ?? '0',
-    no_show_probability: row.noShowProbability,
-    cancelled_at: row.cancelledAt?.toISOString() ?? null,
-    cancellation_reason: row.cancellationReason,
-    cancelled_by: row.cancelledBy,
-    created_at: row.createdAt?.toISOString() ?? new Date().toISOString(),
-    updated_at: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+    discountAmount: row.discountAmount ?? '0',
+    noShowProbability: row.noShowProbability,
+    cancelledAt: row.cancelledAt?.toISOString() ?? null,
+    cancellationReason: row.cancellationReason,
+    cancelledBy: row.cancelledBy,
+    createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
+    updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
   }));
 
   return {
@@ -567,7 +568,7 @@ export async function getBooking(
 
   return {
     id: booking.id,
-    company_id: booking.companyId.toString(), // TODO: Map to company UUID
+    companyId: booking.companyId.toString(), // TODO: Map to company UUID
     customer: {
       id: booking.customerUuid,
       name: booking.customerName,
@@ -577,7 +578,7 @@ export async function getBooking(
     service: {
       id: booking.serviceUuid,
       name: booking.serviceName,
-      duration_minutes: booking.serviceDurationMinutes,
+      durationMinutes: booking.serviceDurationMinutes,
       price: booking.servicePrice,
     },
     employee:
@@ -587,21 +588,21 @@ export async function getBooking(
             name: booking.employeeName,
           }
         : null,
-    start_time: booking.startTime.toISOString(),
-    end_time: booking.endTime.toISOString(),
+    startTime: booking.startTime.toISOString(),
+    endTime: booking.endTime.toISOString(),
     status: booking.status ?? 'pending',
     source: booking.source ?? 'online',
     notes: booking.notes,
-    internal_notes: booking.internalNotes,
+    internalNotes: booking.internalNotes,
     price: booking.price,
     currency: booking.currency ?? 'CZK',
-    discount_amount: booking.discountAmount ?? '0',
-    no_show_probability: booking.noShowProbability,
-    cancelled_at: booking.cancelledAt?.toISOString() ?? null,
-    cancellation_reason: booking.cancellationReason,
-    cancelled_by: booking.cancelledBy,
-    created_at: booking.createdAt?.toISOString() ?? new Date().toISOString(),
-    updated_at: booking.updatedAt?.toISOString() ?? new Date().toISOString(),
+    discountAmount: booking.discountAmount ?? '0',
+    noShowProbability: booking.noShowProbability,
+    cancelledAt: booking.cancelledAt?.toISOString() ?? null,
+    cancellationReason: booking.cancellationReason,
+    cancelledBy: booking.cancelledBy,
+    createdAt: booking.createdAt?.toISOString() ?? new Date().toISOString(),
+    updatedAt: booking.updatedAt?.toISOString() ?? new Date().toISOString(),
   };
 }
 
@@ -692,7 +693,8 @@ export async function updateBooking(
               eq(bookings.status, 'confirmed'),
               eq(bookings.status, 'completed'),
             ),
-            sql`${bookings.startTime} < ${bufferedEnd} AND ${bookings.endTime} > ${bufferedStart}`,
+            lt(bookings.startTime, bufferedEnd),
+            gt(bookings.endTime, bufferedStart),
           ),
         )
         .limit(1);

@@ -30,14 +30,14 @@ export const GET = createRouteHandler({
     // Get company scope
     const { companyId } = await findCompanyId(user.sub);
 
-    // Parse query parameters
+    // Parse query parameters (use undefined for missing params, not null)
     const url = new URL(req.url);
     const categoryIdParam = url.searchParams.get('category_id');
     const isActiveParam = url.searchParams.get('is_active');
 
     const query = serviceQuerySchema.parse({
-      category_id: categoryIdParam,
-      is_active: isActiveParam,
+      category_id: categoryIdParam ?? undefined,
+      is_active: isActiveParam ?? undefined,
     });
 
     // Build WHERE conditions
@@ -57,6 +57,7 @@ export const GET = createRouteHandler({
     // Query services with category join
     const serviceList = await db
       .select({
+        id: services.id,
         uuid: services.uuid,
         name: services.name,
         description: services.description,
@@ -88,7 +89,7 @@ export const GET = createRouteHandler({
       .where(and(...conditions))
       .orderBy(services.sortOrder, services.name);
 
-    return successResponse({ data: serviceList });
+    return successResponse(serviceList);
   },
 });
 

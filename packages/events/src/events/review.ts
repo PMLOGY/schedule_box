@@ -3,8 +3,8 @@
  * CloudEvents for review lifecycle
  */
 
-import { createCloudEvent } from '../publisher.js';
-import type { CloudEvent } from '../types.js';
+import { createCloudEvent } from '../publisher';
+import type { CloudEvent } from '../types';
 
 // Event type constants
 const EVENT_SOURCE = 'review-service';

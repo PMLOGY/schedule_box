@@ -13,9 +13,15 @@
  * Run with: pnpm --filter @schedulebox/database db:seed
  */
 
+import { config } from 'dotenv';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+config({ path: resolve(__dirname, '../../../../.env') });
+
 import { faker } from '@faker-js/faker';
-import { db, migrationClient } from '../db';
-import * as schema from '../schema/index';
 import {
   DEV_PASSWORD_HASH,
   czechName,
@@ -34,6 +40,10 @@ import {
  */
 async function seed() {
   console.log('🌱 Starting database seed...\n');
+
+  // Dynamic import so dotenv config() runs first
+  const { db, migrationClient } = await import('../db');
+  const schema = await import('../schema/index');
 
   try {
     // ========================================================================
@@ -79,22 +89,81 @@ async function seed() {
 
     console.log(`   ✅ Created 4 roles\n`);
 
-    // Create permissions (simplified for dev - just create core ones)
+    // Create all 23 permissions matching RBAC PERMISSIONS constant (dot notation)
     const permissions = [
-      { name: 'bookings:read', description: 'Read bookings' },
-      { name: 'bookings:write', description: 'Create bookings' },
-      { name: 'bookings:delete', description: 'Delete bookings' },
-      { name: 'customers:read', description: 'Read customers' },
-      { name: 'customers:write', description: 'Create/update customers' },
-      { name: 'services:read', description: 'Read services' },
-      { name: 'services:write', description: 'Create/update services' },
-      { name: 'employees:read', description: 'Read employees' },
-      { name: 'employees:write', description: 'Create/update employees' },
-      { name: 'company:admin', description: 'Full company admin access' },
+      { name: 'bookings.create', description: 'Create bookings' },
+      { name: 'bookings.read', description: 'Read bookings' },
+      { name: 'bookings.update', description: 'Update bookings' },
+      { name: 'bookings.delete', description: 'Delete bookings' },
+      { name: 'customers.create', description: 'Create customers' },
+      { name: 'customers.read', description: 'Read customers' },
+      { name: 'customers.update', description: 'Update customers' },
+      { name: 'customers.delete', description: 'Delete customers' },
+      { name: 'services.create', description: 'Create services' },
+      { name: 'services.read', description: 'Read services' },
+      { name: 'services.update', description: 'Update services' },
+      { name: 'services.delete', description: 'Delete services' },
+      { name: 'employees.manage', description: 'Manage employees' },
+      { name: 'resources.manage', description: 'Manage resources' },
+      { name: 'payments.create', description: 'Create payments' },
+      { name: 'payments.read', description: 'Read payments' },
+      { name: 'payments.refund', description: 'Refund payments' },
+      { name: 'invoices.read', description: 'Read invoices' },
+      { name: 'reports.read', description: 'Read reports' },
+      { name: 'settings.manage', description: 'Manage company settings' },
+      { name: 'loyalty.manage', description: 'Manage loyalty programs' },
+      { name: 'coupons.manage', description: 'Manage coupons' },
+      { name: 'marketplace.manage', description: 'Manage marketplace' },
+      { name: 'ai.use', description: 'Use AI features' },
+      { name: 'whitelabel.manage', description: 'Manage white-label settings' },
     ];
 
-    await db.insert(schema.permissions).values(permissions);
+    const permissionResults = await db.insert(schema.permissions).values(permissions).returning();
     console.log(`   ✅ Created ${permissions.length} permissions\n`);
+
+    // Build permission lookup by name
+    const permByName = new Map(permissionResults.map((p) => [p.name, p]));
+
+    // Assign permissions to roles via role_permissions junction table
+    const allPermNames = permissions.map((p) => p.name);
+    const employeePermNames = [
+      'bookings.create',
+      'bookings.read',
+      'bookings.update',
+      'customers.read',
+      'services.read',
+      'employees.manage',
+      'payments.create',
+      'payments.read',
+    ];
+    const customerPermNames = ['bookings.create', 'bookings.read', 'services.read'];
+
+    const rolePermissionAssignments: { roleId: number; permissionId: number }[] = [];
+
+    // Owner and Admin get ALL permissions
+    for (const permName of allPermNames) {
+      const perm = permByName.get(permName);
+      if (!perm) continue;
+      rolePermissionAssignments.push({ roleId: ownerRole.id, permissionId: perm.id });
+      rolePermissionAssignments.push({ roleId: adminRole.id, permissionId: perm.id });
+    }
+
+    // Employee gets subset
+    for (const permName of employeePermNames) {
+      const perm = permByName.get(permName);
+      if (!perm) continue;
+      rolePermissionAssignments.push({ roleId: employeeRole.id, permissionId: perm.id });
+    }
+
+    // Customer gets minimal
+    for (const permName of customerPermNames) {
+      const perm = permByName.get(permName);
+      if (!perm) continue;
+      rolePermissionAssignments.push({ roleId: customerRole.id, permissionId: perm.id });
+    }
+
+    await db.insert(schema.rolePermissions).values(rolePermissionAssignments);
+    console.log(`   ✅ Created ${rolePermissionAssignments.length} role-permission assignments\n`);
 
     // ========================================================================
     // 2. COMPANIES
@@ -198,10 +267,9 @@ async function seed() {
       .values({
         email: 'admin@schedulebox.cz',
         passwordHash: DEV_PASSWORD_HASH,
-        firstName: adminName.firstName,
-        lastName: adminName.lastName,
+        name: `${adminName.firstName} ${adminName.lastName}`,
         roleId: adminRole.id,
-        isEmailVerified: true,
+        emailVerified: true,
         isActive: true,
       })
       .returning();
@@ -216,11 +284,10 @@ async function seed() {
           companyId: company.id,
           email: czechEmail(ownerName.firstName, ownerName.lastName),
           passwordHash: DEV_PASSWORD_HASH,
-          firstName: ownerName.firstName,
-          lastName: ownerName.lastName,
+          name: `${ownerName.firstName} ${ownerName.lastName}`,
           phone: czechPhone(),
           roleId: ownerRole.id,
-          isEmailVerified: true,
+          emailVerified: true,
           isActive: true,
         })
         .returning();
@@ -237,11 +304,10 @@ async function seed() {
             companyId: company.id,
             email: czechEmail(employeeName.firstName, employeeName.lastName),
             passwordHash: DEV_PASSWORD_HASH,
-            firstName: employeeName.firstName,
-            lastName: employeeName.lastName,
+            name: `${employeeName.firstName} ${employeeName.lastName}`,
             phone: czechPhone(),
             roleId: employeeRole.id,
-            isEmailVerified: true,
+            emailVerified: true,
             isActive: true,
           })
           .returning();
@@ -259,11 +325,10 @@ async function seed() {
             companyId: company.id,
             email: czechEmail(customerName.firstName, customerName.lastName),
             passwordHash: DEV_PASSWORD_HASH,
-            firstName: customerName.firstName,
-            lastName: customerName.lastName,
+            name: `${customerName.firstName} ${customerName.lastName}`,
             phone: czechPhone(),
             roleId: customerRole.id,
-            isEmailVerified: true,
+            emailVerified: true,
             isActive: true,
           })
           .returning();
@@ -320,11 +385,10 @@ async function seed() {
             categoryId: category.id,
             name: serviceData.name,
             description: `${serviceData.name} - profesionální služba`,
-            duration: serviceData.duration,
+            durationMinutes: serviceData.duration,
             price: serviceData.price.toString(),
             currency: 'CZK',
             isActive: true,
-            isBookable: true,
           })
           .returning();
         services.push(serviceResult[0]);
@@ -352,20 +416,12 @@ async function seed() {
           .values({
             companyId: company.id,
             userId: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            name: user.name,
             email: user.email,
             phone: user.phone,
-            position: faker.helpers.arrayElement([
-              'Stylista',
-              'Kadeřník',
-              'Trenér',
-              'Masér',
-              'Holič',
-            ]),
+            title: faker.helpers.arrayElement(['Stylista', 'Kadeřník', 'Trenér', 'Masér', 'Holič']),
             bio: `Profesionální ${faker.helpers.arrayElement(['stylista', 'kadeřník', 'trenér'])} s dlouholetou praxí.`,
             isActive: true,
-            isBookable: true,
           })
           .returning();
         employees.push(employeeResult[0]);
@@ -379,13 +435,11 @@ async function seed() {
           .insert(schema.employees)
           .values({
             companyId: company.id,
-            firstName: employeeName.firstName,
-            lastName: employeeName.lastName,
+            name: `${employeeName.firstName} ${employeeName.lastName}`,
             email: czechEmail(employeeName.firstName, employeeName.lastName),
             phone: czechPhone(),
-            position: faker.helpers.arrayElement(['Stylista', 'Kadeřník', 'Trenér', 'Masér']),
+            title: faker.helpers.arrayElement(['Stylista', 'Kadeřník', 'Trenér', 'Masér']),
             isActive: true,
-            isBookable: true,
           })
           .returning();
         employees.push(employeeResult[0]);
@@ -475,13 +529,14 @@ async function seed() {
           .values({
             companyId: company.id,
             userId: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            name: user.name,
             email: user.email,
             phone: user.phone,
             marketingConsent: faker.datatype.boolean(),
-            healthScore: faker.number.float({ min: 0, max: 100, fractionDigits: 1 }),
-            clvPredicted: faker.number.float({ min: 500, max: 10000, fractionDigits: 2 }),
+            healthScore: faker.number.int({ min: 0, max: 100 }),
+            clvPredicted: faker.number
+              .float({ min: 500, max: 10000, fractionDigits: 2 })
+              .toString(),
             noShowCount: faker.number.int({ min: 0, max: 3 }),
           })
           .returning();
@@ -492,18 +547,20 @@ async function seed() {
       const additionalCustomersCount = faker.number.int({ min: 20, max: 25 });
       for (let i = 0; i < additionalCustomersCount; i++) {
         const customerName = czechName();
+        const uniqueSuffix = faker.string.numeric(3);
         const customerResult = await db
           .insert(schema.customers)
           .values({
             companyId: company.id,
-            firstName: customerName.firstName,
-            lastName: customerName.lastName,
-            email: czechEmail(customerName.firstName, customerName.lastName),
+            name: `${customerName.firstName} ${customerName.lastName}`,
+            email: czechEmail(customerName.firstName, `${customerName.lastName}${uniqueSuffix}`),
             phone: czechPhone(),
             notes: faker.datatype.boolean() ? faker.lorem.sentence() : null,
             marketingConsent: faker.datatype.boolean(),
-            healthScore: faker.number.float({ min: 0, max: 100, fractionDigits: 1 }),
-            clvPredicted: faker.number.float({ min: 500, max: 10000, fractionDigits: 2 }),
+            healthScore: faker.number.int({ min: 0, max: 100 }),
+            clvPredicted: faker.number
+              .float({ min: 500, max: 10000, fractionDigits: 2 })
+              .toString(),
             noShowCount: faker.number.int({ min: 0, max: 3 }),
           })
           .returning();
@@ -587,7 +644,7 @@ async function seed() {
         startTime.setMinutes(faker.helpers.arrayElement([0, 30]));
         startTime.setSeconds(0);
 
-        const endTime = calculateEndTime(startTime, service.duration);
+        const endTime = calculateEndTime(startTime, service.durationMinutes);
 
         // Status based on whether it's past or future
         let status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
@@ -606,29 +663,33 @@ async function seed() {
           ]);
         }
 
-        const bookingResult = await db
-          .insert(schema.bookings)
-          .values({
-            companyId: company.id,
-            customerId: customer.id,
-            serviceId: service.id,
-            employeeId: employee.id,
-            startTime,
-            endTime,
-            status,
-            source: faker.helpers.arrayElement(['online', 'admin', 'phone', 'walk_in']),
-            price: service.price,
-            currency: 'CZK',
-            discountAmount: faker.datatype.boolean({ probability: 0.2 })
-              ? faker.number.int({ min: 50, max: 200 }).toString()
-              : '0',
-            noShowProbability: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
-            notes: faker.datatype.boolean({ probability: 0.3 }) ? faker.lorem.sentence() : null,
-            cancelledAt: status === 'cancelled' ? new Date() : null,
-            cancellationReason: status === 'cancelled' ? 'Změna plánů' : null,
-          })
-          .returning();
-        bookings.push(bookingResult[0]);
+        try {
+          const bookingResult = await db
+            .insert(schema.bookings)
+            .values({
+              companyId: company.id,
+              customerId: customer.id,
+              serviceId: service.id,
+              employeeId: employee.id,
+              startTime,
+              endTime,
+              status,
+              source: faker.helpers.arrayElement(['online', 'admin', 'phone', 'walk_in']),
+              price: service.price,
+              currency: 'CZK',
+              discountAmount: faker.datatype.boolean({ probability: 0.2 })
+                ? faker.number.int({ min: 50, max: 200 }).toString()
+                : '0',
+              noShowProbability: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
+              notes: faker.datatype.boolean({ probability: 0.3 }) ? faker.lorem.sentence() : null,
+              cancelledAt: status === 'cancelled' ? new Date() : null,
+              cancellationReason: status === 'cancelled' ? 'Změna plánů' : null,
+            })
+            .returning();
+          bookings.push(bookingResult[0]);
+        } catch {
+          // Skip overlapping bookings (exclusion constraint)
+        }
       }
     }
 
@@ -643,8 +704,9 @@ async function seed() {
     let paymentCount = 0;
 
     for (const booking of completedBookings) {
-      const amount = (
-        parseFloat(booking.price) - parseFloat(booking.discountAmount || '0')
+      const amount = Math.max(
+        0,
+        parseFloat(booking.price) - parseFloat(booking.discountAmount || '0'),
       ).toFixed(2);
 
       await db.insert(schema.payments).values({

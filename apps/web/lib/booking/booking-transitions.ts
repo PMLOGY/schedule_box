@@ -13,7 +13,7 @@
  * Each transition publishes a corresponding domain event.
  */
 
-import { eq, and, isNull, or, sql } from 'drizzle-orm';
+import { eq, and, isNull, or, lt, gt, ne } from 'drizzle-orm';
 import { db, bookings, services, employees, employeeServices } from '@schedulebox/database';
 import { AppError, NotFoundError, ValidationError } from '@schedulebox/shared';
 import {
@@ -384,8 +384,8 @@ export async function rescheduleBooking(
   }
 
   // Save old times for event payload
-  const oldStartTime = existing.start_time;
-  const oldEndTime = existing.end_time;
+  const oldStartTime = existing.startTime;
+  const oldEndTime = existing.endTime;
 
   // Parse new start time
   const newStartTime = new Date(input.start_time);
@@ -496,13 +496,14 @@ export async function rescheduleBooking(
         and(
           eq(bookings.employeeId, newEmployeeId),
           eq(bookings.companyId, companyId),
-          sql`${bookings.id} != ${bookingData.id}`, // EXCLUDE current booking
+          ne(bookings.id, bookingData.id), // EXCLUDE current booking
           or(
             eq(bookings.status, 'pending'),
             eq(bookings.status, 'confirmed'),
             eq(bookings.status, 'completed'),
           ),
-          sql`${bookings.startTime} < ${bufferedEnd} AND ${bookings.endTime} > ${bufferedStart}`,
+          lt(bookings.startTime, bufferedEnd),
+          gt(bookings.endTime, bufferedStart),
         ),
       )
       .limit(1);

@@ -250,8 +250,8 @@ async function getWorkingPeriods(
           continue; // Invalid override, skip
         }
       } else {
-        // Use regular working hours
-        const regularHours = await db.query.workingHours.findFirst({
+        // Try employee-specific working hours first
+        let regularHours = await db.query.workingHours.findFirst({
           where: and(
             eq(workingHours.companyId, companyId),
             eq(workingHours.employeeId, employeeId),
@@ -259,6 +259,18 @@ async function getWorkingPeriods(
             eq(workingHours.isActive, true),
           ),
         });
+
+        // Fall back to company-level defaults (employeeId IS NULL)
+        if (!regularHours) {
+          regularHours = await db.query.workingHours.findFirst({
+            where: and(
+              eq(workingHours.companyId, companyId),
+              sql`${workingHours.employeeId} IS NULL`,
+              eq(workingHours.dayOfWeek, dayOfWeek),
+              eq(workingHours.isActive, true),
+            ),
+          });
+        }
 
         if (regularHours) {
           workingStartTime = regularHours.startTime;

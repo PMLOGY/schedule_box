@@ -5,7 +5,7 @@
 
 import * as amqp from 'amqplib/callback_api.js';
 import { randomUUID } from 'node:crypto';
-import type { CloudEvent } from './types.js';
+import type { CloudEvent } from './types';
 
 // Singleton connection and channel
 let connection: amqp.Connection | null = null;

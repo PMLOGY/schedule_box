@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 11 Complete — AI Optimization (all 5 plans complete)
+**Current focus:** Phase 6 UAT Complete — Payment Integration verified (12/12 tests pass, 8 fixes applied)
 
 ## Position
 
@@ -97,7 +97,7 @@ Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
-Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
+Phase 6: Complete ✅ — All 7 plans executed + UAT 12/12 pass (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, CRUD endpoints — 8 bug fixes applied during UAT)
 Phase 7: Complete ✅ — All 7 plans executed (Consumer infrastructure, notification worker, event consumers, API routes, scheduler, automation engine, frontend UI, Docker Compose integration ready)
 Phase 8: Complete ✅ — All 3 plans executed, verified 20/20 (Coupons, gift cards, CSV import, GDPR ready)
 
@@ -477,8 +477,8 @@ None — Phase 11 complete.
 
 ## Session Info
 
-**Last session:** 2026-02-11
-**Stopped at:** Completed 11-05-PLAN.md — Frontend Integration (Phase 11 Complete)
+**Last session:** 2026-02-12
+**Stopped at:** Phase 6 UAT complete — 12/12 tests pass, 8 bug fixes applied
 
 ---
-*Last updated: 2026-02-11 after completing Phase 11 Plan 05*
+*Last updated: 2026-02-12 after completing Phase 6 UAT (12/12 pass)*

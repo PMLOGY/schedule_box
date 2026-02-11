@@ -19,6 +19,7 @@ import { verifyPassword } from '@/lib/auth/password';
 import { generateTokenPair } from '@/lib/auth/jwt';
 import { redis } from '@/lib/redis/client';
 import { loginSchema } from '@/validations/auth';
+import { validateBody } from '@/lib/middleware/validate';
 import { handleRouteError } from '@/lib/utils/errors';
 import { successResponse } from '@/lib/utils/response';
 import { UnauthorizedError } from '@schedulebox/shared';
@@ -26,8 +27,7 @@ import { UnauthorizedError } from '@schedulebox/shared';
 export async function POST(req: NextRequest) {
   try {
     // 1. Validate request body
-    const body = await req.json();
-    const input = loginSchema.parse(body);
+    const input = await validateBody(loginSchema, req);
 
     // 2. Find user with role name and company UUID (JOIN roles and companies)
     const [userRecord] = await db

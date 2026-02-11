@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { CalendarToolbar } from '@/components/calendar/calendar-toolbar';
 import { Button } from '@/components/ui/button';

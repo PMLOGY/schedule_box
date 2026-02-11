@@ -5,16 +5,14 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { hashSync } from 'bcryptjs';
-
-// Configure faker for Czech locale
-faker.locale = 'cs';
 
 /**
  * Fixed password hash for all development users
- * Password: "password123" (hashed with bcrypt, 10 rounds)
+ * Password: "password123" (argon2id, OWASP params: m=19456, t=2, p=1)
+ * Pre-computed to avoid argon2 native dependency in database package.
  */
-export const DEV_PASSWORD_HASH = hashSync('password123', 10);
+export const DEV_PASSWORD_HASH =
+  '$argon2id$v=19$m=19456,t=2,p=1$o9HZEfYmTdhVwnbViv1Gqg$5XSCJzlZpmHyUsQrVPQUKK48Z5HIqPTweLQYYqtV71Y';
 
 /**
  * Generate a random date within the last N days

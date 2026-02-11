@@ -4,7 +4,7 @@
  */
 
 import * as amqp from 'amqplib/callback_api.js';
-import type { CloudEvent } from './types.js';
+import type { CloudEvent } from './types';
 
 const EXCHANGE_NAME = 'schedulebox.events';
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://schedulebox:schedulebox@localhost:5672';

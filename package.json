@@ -14,7 +14,7 @@
     "build": "pnpm --filter @schedulebox/web build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit",
+    "type-check": "pnpm -r --parallel type-check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",

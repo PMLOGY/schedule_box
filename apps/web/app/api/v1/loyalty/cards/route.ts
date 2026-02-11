@@ -5,19 +5,13 @@
  */
 
 import { eq, and } from 'drizzle-orm';
-import {
-  db,
-  loyaltyCards,
-  loyaltyPrograms,
-  loyaltyTiers,
-  customers,
-} from '@schedulebox/database';
+import { db, loyaltyCards, loyaltyPrograms, loyaltyTiers, customers } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
-import { successResponse, createdResponse, paginatedResponse } from '@/lib/utils/response';
+import { createdResponse, paginatedResponse } from '@/lib/utils/response';
 import { loyaltyCardCreateSchema, loyaltyCardListQuerySchema } from '@schedulebox/shared';
 import crypto from 'crypto';
 

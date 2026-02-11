@@ -159,7 +159,7 @@ export const POST = createRouteHandler({
       );
     }
 
-    // Find booking by ID (assume booking_id is internal SERIAL ID for now, could be UUID)
+    // Find booking by UUID
     const [booking] = await db
       .select({
         id: bookings.id,
@@ -169,7 +169,7 @@ export const POST = createRouteHandler({
         status: bookings.status,
       })
       .from(bookings)
-      .where(eq(bookings.id, booking_id))
+      .where(eq(bookings.uuid, booking_id))
       .limit(1);
 
     // Validate booking exists and belongs to company

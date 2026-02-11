@@ -34,13 +34,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     // Parse query parameters from URL
     const searchParams = req.nextUrl.searchParams;
-    const queryParams = {
+    const queryParams: Record<string, string | null> = {
       company_slug: searchParams.get('company_slug'),
       service_id: searchParams.get('service_id'),
-      employee_id: searchParams.get('employee_id'),
       date_from: searchParams.get('date_from'),
       date_to: searchParams.get('date_to'),
     };
+    // Only include employee_id if provided (null coerces to 0, failing .positive())
+    const employeeId = searchParams.get('employee_id');
+    if (employeeId) {
+      queryParams.employee_id = employeeId;
+    }
 
     // Validate query parameters with Zod schema
     const validationResult = availabilityRequestSchema.safeParse(queryParams);
@@ -51,14 +55,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const params = validationResult.data;
 
-    // Look up company by slug
-    const company = await db.query.companies.findFirst({
+    // Look up company by slug, or by UUID (for dashboard/internal use)
+    let company = await db.query.companies.findFirst({
       where: eq(companies.slug, params.company_slug),
       columns: {
         id: true,
         timezone: true,
       },
     });
+
+    if (!company) {
+      // Fallback: try looking up by UUID (dashboard passes companyId UUID)
+      company = await db.query.companies.findFirst({
+        where: eq(companies.uuid, params.company_slug),
+        columns: {
+          id: true,
+          timezone: true,
+        },
+      });
+    }
 
     if (!company) {
       throw new NotFoundError('Company not found');

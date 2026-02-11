@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { CalendarPlus, UserPlus, Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +16,7 @@ export function QuickActions() {
       </CardHeader>
       <CardContent className="flex flex-wrap gap-3">
         <Button variant="outline" asChild>
-          <Link href="/calendar">
+          <Link href="/bookings/new">
             <CalendarPlus className="mr-2 h-4 w-4" />
             {t('newBooking')}
           </Link>

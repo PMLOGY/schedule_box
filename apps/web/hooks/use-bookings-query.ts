@@ -8,7 +8,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { Booking, BookingListQuery } from '@schedulebox/shared/types';
-import type { PaginatedResponse, ApiResponse } from '@schedulebox/shared/types';
+import type { PaginatedResponse } from '@schedulebox/shared/types';
 import type { EventInput } from '@fullcalendar/core';
 
 // ============================================================================
@@ -48,7 +48,7 @@ export function useBookingsForCalendar(dateFrom: string, dateTo: string, employe
       const params: Record<string, unknown> = {
         date_from: dateFrom,
         date_to: dateTo,
-        limit: 500, // Calendar shows limited range
+        limit: 100, // Max allowed by API schema
       };
 
       if (employeeIds && employeeIds.length > 0) {
@@ -58,14 +58,27 @@ export function useBookingsForCalendar(dateFrom: string, dateTo: string, employe
 
       const response = await apiClient.get<PaginatedResponse<Booking>>('/bookings', params);
 
+      // Status → color mapping for calendar events
+      const statusColors: Record<string, string> = {
+        pending: '#F59E0B', // amber
+        confirmed: '#3B82F6', // blue
+        completed: '#10B981', // green
+        cancelled: '#9CA3AF', // gray
+        no_show: '#EF4444', // red
+      };
+
       // Transform to FullCalendar EventInput format
-      const events: EventInput[] = response.data.map((booking: Booking) => ({
-        id: String(booking.id),
-        title: `${booking.customer.name} - ${booking.service.name}`,
+      // Only pending/confirmed bookings can be dragged
+      const draggableStatuses = ['pending', 'confirmed'];
+
+      const events: EventInput[] = response.data.map((booking) => ({
+        id: String(booking.uuid),
+        title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
         start: booking.startTime,
         end: booking.endTime,
-        backgroundColor: booking.service.color || booking.employee?.color || '#3B82F6',
+        backgroundColor: statusColors[booking.status] ?? '#3B82F6',
         borderColor: 'transparent',
+        editable: draggableStatuses.includes(booking.status),
         extendedProps: {
           booking,
         },
@@ -86,13 +99,13 @@ export function useBookingsForCalendar(dateFrom: string, dateTo: string, employe
  * Hook for fetching single booking detail
  * Disabled when bookingId is null
  */
-export function useBookingDetail(bookingId: number | null) {
+export function useBookingDetail(bookingId: string | null) {
   return useQuery({
     queryKey: ['bookings', bookingId],
     queryFn: async () => {
       if (!bookingId) return null;
-      const response = await apiClient.get<ApiResponse<Booking>>(`/bookings/${bookingId}`);
-      return response.data;
+      // apiClient already unwraps { data: booking } → booking
+      return apiClient.get<Booking>(`/bookings/${bookingId}`);
     },
     enabled: bookingId !== null,
     staleTime: 30_000,

@@ -12,6 +12,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import csLocale from '@fullcalendar/core/locales/cs';
 import type { EventDropArg, EventClickArg } from '@fullcalendar/core';
 import { format, subDays, addDays } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -35,15 +36,16 @@ export default function BookingCalendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const { view, selectedDate, selectedEmployeeIds, showCancelled } = useCalendarStore();
 
-  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  // Calculate date range for fetching bookings (visible range +/- 7 days for performance)
+  // Calculate date range based on current view
   const dateRange = useMemo(() => {
-    const from = format(subDays(selectedDate, 7), 'yyyy-MM-dd');
-    const to = format(addDays(selectedDate, 7), 'yyyy-MM-dd');
+    const days = view === 'dayGridMonth' ? 45 : view === 'resourceTimelineWeek' ? 14 : 7;
+    const from = format(subDays(selectedDate, days), 'yyyy-MM-dd');
+    const to = format(addDays(selectedDate, days), 'yyyy-MM-dd');
     return { from, to };
-  }, [selectedDate]);
+  }, [selectedDate, view]);
 
   // Fetch bookings for calendar view
   const employeeFilter =
@@ -86,12 +88,13 @@ export default function BookingCalendar() {
   }, [selectedDate]);
 
   // Handle drag-drop rescheduling
+  // In month view: changes date only, preserves original time
+  // In day/week view: changes both date and time
   const handleEventDrop = (info: EventDropArg) => {
-    const bookingId = Number(info.event.id);
+    const bookingId = info.event.id; // UUID string
     const newStartTime = info.event.start?.toISOString();
-    const employeeId = info.event.extendedProps?.booking?.employee?.id;
 
-    if (!newStartTime) {
+    if (!newStartTime || !bookingId) {
       info.revert();
       return;
     }
@@ -99,7 +102,6 @@ export default function BookingCalendar() {
     rescheduleMutation.mutate({
       bookingId,
       startTime: newStartTime,
-      employeeId,
       revertFn: info.revert,
     });
   };
@@ -115,7 +117,7 @@ export default function BookingCalendar() {
 
   // Handle event click to open detail panel
   const handleEventClick = (info: EventClickArg) => {
-    const bookingId = Number(info.event.id);
+    const bookingId = info.event.id; // UUID string
     setSelectedBookingId(bookingId);
     setDetailPanelOpen(true);
   };
@@ -142,11 +144,7 @@ export default function BookingCalendar() {
           initialView={VIEW_MAP[view]}
           initialDate={selectedDate}
           events={filteredEvents}
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'timeGridDay,timeGridWeek,dayGridMonth',
-          }}
+          headerToolbar={false}
           slotMinTime="06:00:00"
           slotMaxTime="22:00:00"
           slotDuration="00:15:00"
@@ -157,6 +155,7 @@ export default function BookingCalendar() {
           eventResize={handleEventResize}
           eventClick={handleEventClick}
           height="auto"
+          locales={[csLocale]}
           locale="cs"
           allDaySlot={false}
           nowIndicator={true}

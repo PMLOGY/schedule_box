@@ -193,9 +193,23 @@ export const POST = createRouteHandler<PaymentRefundBody, PaymentIdParam>({
       // Don't fail the request - event publishing is non-critical for MVP
     }
 
-    // Return updated payment
+    // Return updated payment (UUID-safe fields only, no SERIAL IDs)
     const [updatedPayment] = await db
-      .select()
+      .select({
+        id: payments.uuid,
+        uuid: payments.uuid,
+        amount: payments.amount,
+        currency: payments.currency,
+        status: payments.status,
+        gateway: payments.gateway,
+        gatewayTransactionId: payments.gatewayTransactionId,
+        refundAmount: payments.refundAmount,
+        refundReason: payments.refundReason,
+        paidAt: payments.paidAt,
+        refundedAt: payments.refundedAt,
+        createdAt: payments.createdAt,
+        updatedAt: payments.updatedAt,
+      })
       .from(payments)
       .where(eq(payments.id, payment.id))
       .limit(1);

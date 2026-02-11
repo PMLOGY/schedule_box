@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { type LucideIcon, Inbox } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

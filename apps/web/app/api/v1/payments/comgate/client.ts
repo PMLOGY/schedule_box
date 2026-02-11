@@ -30,15 +30,19 @@ export interface ComgatePaymentResponse {
 // ============================================================================
 
 const COMGATE_API_URL = process.env.COMGATE_API_URL || 'https://payments.comgate.cz';
-const COMGATE_MERCHANT_ID = process.env.COMGATE_MERCHANT_ID;
-const COMGATE_SECRET = process.env.COMGATE_SECRET;
 
-if (!COMGATE_MERCHANT_ID) {
-  throw new Error('COMGATE_MERCHANT_ID environment variable is required');
-}
-
-if (!COMGATE_SECRET) {
-  throw new Error('COMGATE_SECRET environment variable is required');
+/** Lazily validate Comgate credentials when a Comgate function is actually called */
+function getComgateCredentials() {
+  const merchantId = process.env.COMGATE_MERCHANT_ID;
+  const secret = process.env.COMGATE_SECRET;
+  if (!merchantId || !secret) {
+    throw new AppError(
+      'PAYMENT_GATEWAY_ERROR',
+      'Comgate credentials not configured (COMGATE_MERCHANT_ID, COMGATE_SECRET)',
+      500,
+    );
+  }
+  return { merchantId, secret };
 }
 
 // ============================================================================
@@ -89,8 +93,9 @@ export async function initComgatePayment(
   const priceInHellers = Math.round(price * 100);
 
   // Build request body (application/x-www-form-urlencoded)
+  const { merchantId } = getComgateCredentials();
   const requestParams = new URLSearchParams();
-  requestParams.set('merchant', COMGATE_MERCHANT_ID!);
+  requestParams.set('merchant', merchantId);
   requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
   requestParams.set('price', priceInHellers.toString());
   requestParams.set('curr', currency.toUpperCase());
@@ -157,10 +162,11 @@ export async function initComgatePayment(
  * @returns Parsed status response
  */
 export async function getComgatePaymentStatus(transId: string): Promise<Record<string, string>> {
+  const { merchantId, secret } = getComgateCredentials();
   const requestParams = new URLSearchParams();
-  requestParams.set('merchant', COMGATE_MERCHANT_ID!);
+  requestParams.set('merchant', merchantId);
   requestParams.set('transId', transId);
-  requestParams.set('secret', COMGATE_SECRET!);
+  requestParams.set('secret', secret);
 
   const response = await fetchWithTimeout(`${COMGATE_API_URL}/v1.0/status`, {
     method: 'POST',
@@ -197,10 +203,11 @@ export async function refundComgatePayment(
   transId: string,
   amount?: number,
 ): Promise<{ success: boolean; message?: string }> {
+  const { merchantId, secret } = getComgateCredentials();
   const requestParams = new URLSearchParams();
-  requestParams.set('merchant', COMGATE_MERCHANT_ID!);
+  requestParams.set('merchant', merchantId);
   requestParams.set('transId', transId);
-  requestParams.set('secret', COMGATE_SECRET!);
+  requestParams.set('secret', secret);
 
   // Add amount for partial refund
   if (amount !== undefined) {
@@ -243,10 +250,8 @@ export async function refundComgatePayment(
 export function verifyComgateSignature(rawBody: string, signature: string): boolean {
   try {
     // Compute expected signature using HMAC-SHA256
-    const expectedSignature = crypto
-      .createHmac('sha256', COMGATE_SECRET!)
-      .update(rawBody)
-      .digest('hex');
+    const { secret } = getComgateCredentials();
+    const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
 
     // Ensure both signatures are the same length before comparison
     if (expectedSignature.length !== signature.length) {

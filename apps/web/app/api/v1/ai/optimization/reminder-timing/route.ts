@@ -25,12 +25,16 @@ export const POST = createRouteHandler({
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.SETTINGS_MANAGE],
   handler: async ({ body }) => {
+    const request = {
+      customer_id: body.customer_id,
+      notification_channel: body.notification_channel ?? ('email' as const),
+    };
     try {
-      const prediction = await predictReminderTiming.fire(body);
+      const prediction = await predictReminderTiming.fire(request);
       return successResponse(prediction);
     } catch {
       // Optimization is advisory - return 200 with fallback
-      const fallback = getReminderTimingFallback(body);
+      const fallback = getReminderTimingFallback(request);
       return successResponse(fallback);
     }
   },

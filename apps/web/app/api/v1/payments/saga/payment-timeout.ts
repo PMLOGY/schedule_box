@@ -26,7 +26,7 @@ export async function expirePendingPayments(timeoutMinutes?: number): Promise<nu
 
   try {
     // Calculate cutoff timestamp (NOW - timeout minutes)
-    const cutoffTime = new Date(Date.now() - timeout * 60 * 1000);
+    const cutoffTime = new Date(Date.now() - timeout * 60 * 1000).toISOString();
 
     // Query: SELECT * FROM payments WHERE status = 'pending' AND created_at < cutoff
     const expiredPayments = await db
@@ -38,7 +38,9 @@ export async function expirePendingPayments(timeoutMinutes?: number): Promise<nu
         createdAt: payments.createdAt,
       })
       .from(payments)
-      .where(sql`${payments.status} = 'pending' AND ${payments.createdAt} < ${cutoffTime}`);
+      .where(
+        sql`${payments.status} = 'pending' AND ${payments.createdAt} < ${cutoffTime}::timestamptz`,
+      );
 
     if (expiredPayments.length === 0) {
       console.log('[Payment Timeout] No expired payments found');

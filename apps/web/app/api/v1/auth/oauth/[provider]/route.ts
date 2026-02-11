@@ -11,7 +11,7 @@
 
 import { type NextRequest } from 'next/server';
 import { errorResponse } from '@/lib/utils/response';
-import { NotImplementedError, ValidationError } from '@schedulebox/shared';
+import { AppError, NotImplementedError, ValidationError } from '@schedulebox/shared';
 
 const SUPPORTED_PROVIDERS = ['google', 'facebook', 'apple'] as const;
 type Provider = (typeof SUPPORTED_PROVIDERS)[number];
@@ -36,8 +36,8 @@ export async function GET(req: NextRequest, context: { params: Promise<{ provide
 
     throw new NotImplementedError(`OAuth2 ${provider} login is not yet available`);
   } catch (error) {
-    if (error instanceof Error && 'statusCode' in error) {
-      return errorResponse(error as Error & { statusCode: number });
+    if (error instanceof AppError) {
+      return errorResponse(error);
     }
     return errorResponse(new NotImplementedError('OAuth2 login is not yet available'));
   }

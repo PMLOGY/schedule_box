@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
-import { Loader2, Calendar, User, Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
+import { Loader2, Calendar, User, Briefcase, Clock, Coins, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBookingDetail } from '@/hooks/use-bookings-query';
 import { apiClient } from '@/lib/api-client';
@@ -24,12 +24,34 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import type { BookingStatus } from '@schedulebox/shared/types';
 import BookingStatusBadge from './BookingStatusBadge';
-import type { Booking } from '@schedulebox/shared/types';
-import type { ApiResponse } from '@schedulebox/shared/types';
+
+/** Booking shape matching the actual API snake_case response */
+interface BookingDetail {
+  id: string;
+  customer: { id: string; name: string; email: string | null; phone: string | null };
+  service: { id: string; name: string; durationMinutes: number; price: string };
+  employee: { id: string; name: string } | null;
+  startTime: string;
+  endTime: string;
+  status: string;
+  source: string;
+  price: string;
+  currency: string;
+  discountAmount: string;
+  notes: string | null;
+  internalNotes: string | null;
+  noShowProbability: number | null;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  cancelledBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface BookingDetailPanelProps {
-  bookingId: number | null;
+  bookingId: string | null;
   open: boolean;
   onClose: () => void;
 }
@@ -45,34 +67,36 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
   const tCommon = useTranslations('common');
   const queryClient = useQueryClient();
 
-  const { data: booking, isLoading } = useBookingDetail(bookingId);
+  const { data: booking, isLoading } = useBookingDetail(bookingId) as {
+    data: BookingDetail | null | undefined;
+    isLoading: boolean;
+  };
 
   // Get locale from next-intl (default to cs if not available)
   const locale = 'cs' as 'cs' | 'sk' | 'en'; // TODO: Get from useLocale() hook
   const dateLocale = LOCALE_MAP[locale] || cs;
 
+  // Map API action names to translation keys (no-show → noShow)
+  const actionToKey = (action: string) => action.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
   // Mutation for booking actions (confirm, cancel, complete, no-show)
-  const actionMutation = useMutation<
-    ApiResponse<Booking>,
-    Error,
-    { action: string; reason?: string }
-  >({
-    mutationFn: async ({ action, reason }) => {
+  const actionMutation = useMutation({
+    mutationFn: async ({ action, reason }: { action: string; reason?: string }) => {
       if (!bookingId) throw new Error('No booking ID');
 
       const endpoint = `/bookings/${bookingId}/${action}`;
-      const payload = reason ? { reason } : undefined;
+      const payload = reason ? { reason } : {};
 
-      return await apiClient.post<ApiResponse<Booking>>(endpoint, payload);
+      return await apiClient.post(endpoint, payload);
     },
     onSuccess: (_, { action }) => {
-      toast.success(t(`actions.${action}.success`));
+      toast.success(t(`actions.${actionToKey(action)}.success`));
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
       onClose();
     },
-    onError: (error, { action }) => {
-      toast.error(t(`actions.${action}.error`), {
-        description: error.message,
+    onError: (error: { message?: string }, { action }) => {
+      toast.error(t(`actions.${actionToKey(action)}.error`), {
+        description: typeof error.message === 'string' ? error.message : undefined,
       });
     },
   });
@@ -104,10 +128,10 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
             <SheetHeader>
               <SheetTitle className="flex items-center justify-between">
                 <span>{booking.service.name}</span>
-                <BookingStatusBadge status={booking.status} />
+                <BookingStatusBadge status={booking.status as BookingStatus} />
               </SheetTitle>
               <SheetDescription>
-                {t('bookingId')}: #{booking.id}
+                {t('bookingId')}: #{booking.id.slice(0, 8)}
               </SheetDescription>
             </SheetHeader>
 
@@ -168,7 +192,7 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
               {/* Price */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <DollarSign className="h-4 w-4" />
+                  <Coins className="h-4 w-4" />
                   {t('price')}
                 </div>
                 <div className="pl-6 text-sm">

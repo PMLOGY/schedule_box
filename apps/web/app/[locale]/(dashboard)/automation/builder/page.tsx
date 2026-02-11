@@ -61,7 +61,9 @@ export default function AutomationBuilderPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReturnType<typeof Object> | null>(
+    null,
+  );
 
   // Load existing rule if editing
   const { data: existingRule } = useQuery({
@@ -75,6 +77,39 @@ export default function AutomationBuilderPage() {
     },
     enabled: !!ruleId,
   });
+
+  const handleTriggerChange = useCallback(
+    (nodeId: string, triggerType: TriggerType) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, triggerType } } : node,
+        ),
+      );
+    },
+    [setNodes],
+  );
+
+  const handleDelayChange = useCallback(
+    (nodeId: string, delayMinutes: number) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, delayMinutes } } : node,
+        ),
+      );
+    },
+    [setNodes],
+  );
+
+  const handleActionChange = useCallback(
+    (nodeId: string, actionType: ActionType, actionConfig: { templateId?: number }) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, actionType, actionConfig } } : node,
+        ),
+      );
+    },
+    [setNodes],
+  );
 
   // Initialize nodes and edges from existing rule
   useEffect(() => {
@@ -183,39 +218,6 @@ export default function AutomationBuilderPage() {
     setNodes,
     setEdges,
   ]);
-
-  const handleTriggerChange = useCallback(
-    (nodeId: string, triggerType: TriggerType) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId ? { ...node, data: { ...node.data, triggerType } } : node,
-        ),
-      );
-    },
-    [setNodes],
-  );
-
-  const handleDelayChange = useCallback(
-    (nodeId: string, delayMinutes: number) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId ? { ...node, data: { ...node.data, delayMinutes } } : node,
-        ),
-      );
-    },
-    [setNodes],
-  );
-
-  const handleActionChange = useCallback(
-    (nodeId: string, actionType: ActionType, actionConfig: { templateId?: number }) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === nodeId ? { ...node, data: { ...node.data, actionType, actionConfig } } : node,
-        ),
-      );
-    },
-    [setNodes],
-  );
 
   const onConnect = useCallback(
     (connection: Connection) => {

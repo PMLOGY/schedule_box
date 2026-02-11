@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import { format } from 'date-fns';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,7 @@ export default function BookingsPage() {
   const [page, setPage] = useState(1);
 
   // Detail panel state
-  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
   // Fetch bookings with filters
@@ -51,7 +51,7 @@ export default function BookingsPage() {
     // For MVP, we'll filter client-side if needed
   });
 
-  const handleRowClick = (bookingId: number) => {
+  const handleRowClick = (bookingId: string) => {
     setSelectedBookingId(bookingId);
     setDetailPanelOpen(true);
   };
@@ -97,7 +97,12 @@ export default function BookingsPage() {
             />
           </div>
 
-          <Select value={status} onValueChange={(value) => setStatus(value as BookingStatus)}>
+          <Select
+            value={status ?? 'all'}
+            onValueChange={(value) =>
+              setStatus(value === 'all' ? undefined : (value as BookingStatus))
+            }
+          >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder={t('filters.allStatuses')} />
             </SelectTrigger>
@@ -153,7 +158,7 @@ export default function BookingsPage() {
                     <TableRow
                       key={booking.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(booking.id)}
+                      onClick={() => handleRowClick(String(booking.uuid))}
                     >
                       <TableCell className="font-medium">
                         {formatDateTime(booking.startTime)}

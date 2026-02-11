@@ -86,26 +86,33 @@ class ApiClient {
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
-    const data = await response.json();
+    const json = await response.json();
 
     if (!response.ok) {
-      throw this.buildError(response, data);
+      throw this.buildError(response, json);
     }
 
-    return data as T;
+    // Unwrap standard API envelope { data: ... }
+    // But preserve paginated responses { data: [...], meta: {...} } as-is
+    if (json && typeof json === 'object' && 'data' in json && !('meta' in json)) {
+      return json.data as T;
+    }
+
+    return json as T;
   }
 
   private buildError(response: Response, data: unknown): ApiError {
-    const errorData = data as {
-      error?: string;
-      code?: string;
-      message?: string;
-      details?: unknown;
-    };
+    const raw = data as Record<string, unknown>;
+
+    // API error responses are nested: { error: { code, message, details } }
+    const errorData =
+      raw?.error && typeof raw.error === 'object'
+        ? (raw.error as { code?: string; message?: string; details?: unknown })
+        : (raw as { code?: string; message?: string; details?: unknown });
 
     return {
       code: errorData.code || 'UNKNOWN_ERROR',
-      message: errorData.message || errorData.error || 'An error occurred',
+      message: errorData.message || 'An error occurred',
       details: errorData.details,
       statusCode: response.status,
     };

@@ -67,9 +67,12 @@ export async function createInvoiceForPayment(paymentId: number, companyId: numb
   const taxAmount = (amount * 0.21).toFixed(2);
 
   // Calculate due date (issue date + 14 days)
-  const issuedAt = new Date();
-  const dueAt = new Date(issuedAt);
-  dueAt.setDate(dueAt.getDate() + 14);
+  // Drizzle date() columns expect string format 'YYYY-MM-DD', not Date objects
+  const now = new Date();
+  const dueDate = new Date(now);
+  dueDate.setDate(dueDate.getDate() + 14);
+  const issuedAt = now.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const dueAt = dueDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
 
   // Insert invoice record
   const [invoice] = await tx

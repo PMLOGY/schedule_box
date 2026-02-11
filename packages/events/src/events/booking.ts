@@ -3,8 +3,8 @@
  * CloudEvents for booking lifecycle state changes
  */
 
-import { createCloudEvent } from '../publisher.js';
-import type { CloudEvent } from '../types.js';
+import { createCloudEvent } from '../publisher';
+import type { CloudEvent } from '../types';
 
 // Event type constants
 const EVENT_SOURCE = 'booking-service';

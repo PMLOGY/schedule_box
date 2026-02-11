@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
+import { cs } from 'react-day-picker/locale';
 import { apiClient } from '@/lib/api-client';
 import { useBookingWizard } from '@/stores/booking-wizard.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -27,6 +28,7 @@ interface AvailabilityResponse {
 
 export function Step2DateTimeSelect() {
   const t = useTranslations('booking.wizard.step2');
+  const tCommon = useTranslations('common');
   const { data, updateData, nextStep, prevStep } = useBookingWizard();
   const { user } = useAuthStore();
 
@@ -97,6 +99,8 @@ export function Step2DateTimeSelect() {
             selected={selectedDate}
             onSelect={handleDateSelect}
             disabled={(date) => date < new Date()}
+            showOutsideDays={false}
+            locale={cs}
             className="rounded-md border"
           />
         </div>
@@ -113,7 +117,7 @@ export function Step2DateTimeSelect() {
             ) : availabilityData?.slots ? (
               <AvailabilityGrid
                 slots={availabilityData.slots}
-                selectedDate={dateString!}
+                selectedDate={dateString ?? ''}
                 onSelect={handleSlotSelect}
               />
             ) : null}
@@ -123,7 +127,7 @@ export function Step2DateTimeSelect() {
 
       <div className="flex justify-between">
         <Button variant="outline" onClick={prevStep}>
-          {t('../../common.back')}
+          {tCommon('back')}
         </Button>
       </div>
     </div>

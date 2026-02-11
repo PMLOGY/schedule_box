@@ -11,6 +11,7 @@ const nextConfig = {
     '@schedulebox/events',
     '@schedulebox/database',
   ],
+  serverExternalPackages: ['pdfkit'],
   experimental: {
     // Enable server actions for future phases
   },

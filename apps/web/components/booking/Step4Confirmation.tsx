@@ -4,14 +4,18 @@ import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { cs } from 'date-fns/locale/cs';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
 import { useBookingWizard } from '@/stores/booking-wizard.store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+
+interface CustomerResponse {
+  id: number;
+  uuid: string;
+}
 
 interface BookingResponse {
   id: number;
@@ -20,17 +24,30 @@ interface BookingResponse {
 
 export function Step4Confirmation() {
   const t = useTranslations('booking.wizard.step4');
+  const tCommon = useTranslations('common');
+  const tStep1 = useTranslations('booking.wizard.step1');
   const { data, prevStep, setSubmitting, setError, setStep, reset } = useBookingWizard();
   const router = useRouter();
 
   const createBookingMutation = useMutation({
     mutationFn: async () => {
-      if (!data.customerId || !data.serviceId || !data.startTime) {
+      if (!data.serviceId || !data.startTime || !data.customerName) {
         throw new Error('Missing required booking data');
       }
 
+      // If no existing customer selected, create one first
+      let customerId = data.customerId;
+      if (!customerId) {
+        const customer = await apiClient.post<CustomerResponse>('/customers', {
+          name: data.customerName,
+          email: data.customerEmail || undefined,
+          phone: data.customerPhone || undefined,
+        });
+        customerId = customer.id;
+      }
+
       return apiClient.post<BookingResponse>('/bookings', {
-        customer_id: data.customerId,
+        customer_id: customerId,
         service_id: data.serviceId,
         employee_id: data.employeeId,
         start_time: data.startTime,
@@ -42,22 +59,23 @@ export function Step4Confirmation() {
       setSubmitting(true);
       setError(null);
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       setSubmitting(false);
       toast.success(t('bookingSuccess'));
       reset();
-      router.push(`/bookings/${response.uuid}`);
+      router.push('/bookings');
     },
-    onError: (error: any) => {
+    onError: (error: Error & { statusCode?: number; code?: string }) => {
       setSubmitting(false);
 
       // Handle 409 SLOT_TAKEN error
       if (error.statusCode === 409 && error.code === 'SLOT_TAKEN') {
-        setError(t('slotTaken'));
-        // Go back to Step 2 to select a different time
+        toast.error(t('slotTaken'));
+        // Go back to Step 2 — setStep clears error, so set error AFTER
         setStep(2);
+        setError(t('slotTaken'));
       } else {
-        const errorMessage = error.message || t('bookingError');
+        const errorMessage = typeof error.message === 'string' ? error.message : t('bookingError');
         setError(errorMessage);
         toast.error(errorMessage);
       }
@@ -75,7 +93,7 @@ export function Step4Confirmation() {
 
   // Format date and time for display
   const formattedDateTime = data.startTime
-    ? format(new Date(data.startTime), 'EEEE, MMMM d, yyyy')
+    ? format(new Date(data.startTime), 'EEEE, d. MMMM yyyy', { locale: cs })
     : '';
 
   return (
@@ -109,7 +127,7 @@ export function Step4Confirmation() {
 
           <div>
             <h3 className="font-medium text-sm text-muted-foreground">{t('employee')}</h3>
-            <p className="text-base">{data.employeeName || t('../../common.anyEmployee')}</p>
+            <p className="text-base">{data.employeeName || tStep1('anyEmployee')}</p>
           </div>
 
           <Separator />
@@ -117,8 +135,12 @@ export function Step4Confirmation() {
           <div>
             <h3 className="font-medium text-sm text-muted-foreground">{t('customer')}</h3>
             <p className="text-base">{data.customerName}</p>
-            {data.customerEmail && <p className="text-sm text-muted-foreground">{data.customerEmail}</p>}
-            {data.customerPhone && <p className="text-sm text-muted-foreground">{data.customerPhone}</p>}
+            {data.customerEmail && (
+              <p className="text-sm text-muted-foreground">{data.customerEmail}</p>
+            )}
+            {data.customerPhone && (
+              <p className="text-sm text-muted-foreground">{data.customerPhone}</p>
+            )}
           </div>
 
           {data.notes && (
@@ -135,17 +157,14 @@ export function Step4Confirmation() {
 
       <div className="flex justify-between gap-2">
         <Button variant="outline" onClick={handleCancel}>
-          {t('../../common.cancel')}
+          {tCommon('cancel')}
         </Button>
         <div className="flex gap-2">
           <Button variant="outline" onClick={prevStep}>
-            {t('../../common.back')}
+            {tCommon('back')}
           </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={createBookingMutation.isPending}
-          >
-            {createBookingMutation.isPending ? t('../../common.loading') : t('confirmBooking')}
+          <Button onClick={handleConfirm} disabled={createBookingMutation.isPending}>
+            {createBookingMutation.isPending ? tCommon('loading') : t('confirmBooking')}
           </Button>
         </div>
       </div>

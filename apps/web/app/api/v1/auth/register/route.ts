@@ -14,6 +14,7 @@ import { companies, users, roles, passwordHistory } from '@schedulebox/database'
 import { hashPassword } from '@/lib/auth/password';
 import { generateTokenPair } from '@/lib/auth/jwt';
 import { registerSchema } from '@/validations/auth';
+import { validateBody } from '@/lib/middleware/validate';
 import { handleRouteError } from '@/lib/utils/errors';
 import { createdResponse } from '@/lib/utils/response';
 import { ConflictError } from '@schedulebox/shared';
@@ -37,8 +38,7 @@ function generateSlug(name: string): string {
 export async function POST(req: NextRequest) {
   try {
     // 1. Validate request body
-    const body = await req.json();
-    const input = registerSchema.parse(body);
+    const input = await validateBody(registerSchema, req);
 
     // 2. Check if email already exists
     const existingUser = await db

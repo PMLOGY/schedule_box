@@ -3,14 +3,8 @@
  * GET /api/v1/loyalty/cards/:id - Get card detail with tier progress
  */
 
-import { eq, and, gt } from 'drizzle-orm';
-import {
-  db,
-  loyaltyCards,
-  loyaltyPrograms,
-  loyaltyTiers,
-  customers,
-} from '@schedulebox/database';
+import { eq, and } from 'drizzle-orm';
+import { db, loyaltyCards, loyaltyPrograms, loyaltyTiers, customers } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { findCompanyId } from '@/lib/db/tenant-scope';

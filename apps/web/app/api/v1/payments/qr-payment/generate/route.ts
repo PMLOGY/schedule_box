@@ -27,7 +27,7 @@ import { publishEvent, createPaymentInitiatedEvent } from '@schedulebox/events';
  *
  * @returns QR code as base64 PNG, SPD string, and variable symbol
  */
-export const POST = createRouteHandler<{ booking_id: number }>({
+export const POST = createRouteHandler<{ booking_id: string }>({
   bodySchema: qrPaymentGenerateSchema,
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.BOOKINGS_UPDATE],
@@ -47,7 +47,7 @@ export const POST = createRouteHandler<{ booking_id: number }>({
         status: bookings.status,
       })
       .from(bookings)
-      .where(eq(bookings.id, body.booking_id))
+      .where(eq(bookings.uuid, body.booking_id))
       .limit(1);
 
     if (!booking || booking.companyId !== companyId) {

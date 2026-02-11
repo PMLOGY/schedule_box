@@ -142,9 +142,10 @@ export const GET = createRouteHandler({
       totalCount = countResult.count;
     }
 
-    // Map to response format (use UUID, not SERIAL id)
+    // Map to response format (include both SERIAL id and UUID)
     const responseData = data.map((customer) => ({
-      id: customer.uuid,
+      id: customer.id,
+      uuid: customer.uuid,
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
@@ -248,9 +249,10 @@ export const POST = createRouteHandler({
       );
     }
 
-    // Return created customer (use UUID, not SERIAL id)
+    // Return created customer
     return createdResponse({
-      id: customer.uuid,
+      id: customer.id,
+      uuid: customer.uuid,
       name: customer.name,
       email: customer.email,
       phone: customer.phone,

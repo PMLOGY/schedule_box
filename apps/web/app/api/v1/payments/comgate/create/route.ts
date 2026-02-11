@@ -47,7 +47,7 @@ export const POST = createRouteHandler({
         currency: bookings.currency,
       })
       .from(bookings)
-      .where(eq(bookings.id, booking_id))
+      .where(eq(bookings.uuid, booking_id))
       .limit(1);
 
     if (!booking) {

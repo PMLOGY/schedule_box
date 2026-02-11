@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, Trash2, Wand2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Wand2, History } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
+import { Link } from '@/lib/i18n/navigation';
 
 type AutomationTriggerType =
   | 'booking_created'
@@ -104,10 +105,18 @@ export default function AutomationPage() {
             Vytvářejte pravidla pro automatické odesílání notifikací
           </p>
         </div>
-        <Button onClick={() => router.push('/automation/builder')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nová automatizace
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" asChild>
+            <Link href="/automation/logs">
+              <History className="mr-2 h-4 w-4" />
+              Historie
+            </Link>
+          </Button>
+          <Button onClick={() => router.push('/automation/builder')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nová automatizace
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

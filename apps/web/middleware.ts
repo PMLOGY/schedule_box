@@ -9,6 +9,9 @@ export default createMiddleware({
 
   // Don't add /cs prefix for default locale
   localePrefix: 'as-needed',
+
+  // Don't auto-detect browser language — always start in Czech
+  localeDetection: false,
 });
 
 export const config = {
