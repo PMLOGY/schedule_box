@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 5 of 15 — Booking MVP
 - **Status:** In Progress
-- **Current Plan:** 05-05 (Next plan after 05-04)
-- **Plans Executed:** 31
+- **Current Plan:** 05-08 (Next plan after 05-07)
+- **Plans Executed:** 32
 
 ## What's Done
 
@@ -52,6 +52,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 05-02: RabbitMQ Event Infrastructure (2 tasks, 2 commits)
 - [x] Plan 05-04: Booking CRUD API with Double-Booking Prevention (2 tasks, 2 commits)
 - [x] Plan 05-03: Availability Engine & Public API (2 tasks, 2 commits)
+- [x] Plan 05-07: Admin Time Blocking with Schedule Override Splitting (1 task, 1 commit)
 
 ## What's Next
 
@@ -59,9 +60,9 @@ Phase 1: Complete ✅
 Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
-Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04 complete (Booking CRUD with double-booking prevention ready)
+Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-07 complete (Booking CRUD, availability engine, and admin time blocking ready)
 
-Next: Phase 5 Plan 05 — Availability Engine (compute available time slots for booking form)
+Next: Phase 5 Plan 08 — Booking State Transitions and Expiration Logic
 
 ## Decisions
 
@@ -192,6 +193,9 @@ Next: Phase 5 Plan 05 — Availability Engine (compute available time slots for 
 - [Phase 05-04]: Buffer time handling uses nullish coalescing (?? 0) for nullable buffer fields from services schema
 - [Phase 05-04]: UUID to SERIAL mapping in API routes (accept UUID, query by SERIAL internally for performance)
 - [Phase 05-04]: Fire-and-forget event publishing with error logging (booking creation doesn't fail on event error)
+- [Phase 05-07]: Time blocking via schedule override splitting - partial-day blocks split working hours around blocked period
+- [Phase 05-07]: Full-day blocks use existing schedule override API with is_day_off=true (no new code needed)
+- [Phase 05-07]: Query parameter validation in route handlers via URLSearchParams + Zod parse (route handler doesn't support querySchema)
 
 ## Blockers
 
@@ -242,11 +246,12 @@ None — Phase 4 in progress.
 | 05-01 | 200s | 2 | 6 | 2 |
 | 05-03 | 500s | 2 | 3 | 2 |
 | 05-04 | 434s | 2 | 5 | 2 |
+| 05-07 | 203s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 05-04 — Booking CRUD API with Double-Booking Prevention
+**Stopped at:** Completed Plan 05-07 — Admin Time Blocking with Schedule Override Splitting
 
 ---
-*Last updated: 2026-02-11 after completing Plan 05-04*
+*Last updated: 2026-02-11 after completing Plan 05-07*
