@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 7 of 15 — Notifications & Automation
-- **Status:** Complete
-- **Current Plan:** Phase 7 complete, Phase 9 next
-- **Plans Executed:** 49
+- **Phase:** 9 of 15 — Loyalty Program
+- **Status:** In Progress
+- **Current Plan:** 09-02 complete, 09-03 next
+- **Plans Executed:** 50
 
 ## What's Done
 
@@ -72,6 +72,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 08-01: Coupon CRUD and Validation API (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
+- [x] Plan 09-02: Loyalty Domain CloudEvents (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -300,6 +301,9 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 07-07]: notification-worker runs as separate Docker Compose service alongside app (scalability and isolation)
 - [Phase 07-07]: SMTP/Twilio/VAPID env vars use ${VAR:-default} syntax for graceful degradation in development
 - [Phase 07-07]: Worker depends on postgres, redis, rabbitmq health checks (prevents connection errors on startup)
+- [Phase 09-02]: cardUuid used as CloudEvent subject for all loyalty events (loyalty card is primary entity)
+- [Phase 09-02]: bookingUuid in PointsEarnedPayload is nullable (points can be earned from bookings or manually)
+- [Phase 09-02]: previousTierName uses string | null (customer might not have tier when first assigned)
 
 ## Blockers
 
@@ -370,11 +374,12 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 08-03 | 247s | 2 | 4 | 2 |
 | 07-06 | 801s | 2 | 17 | 2 |
 | 07-07 | 42s | 1 | 2 | 1 |
+| 09-02 | 87s | 2 | 2 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 07 Plan 07 — Docker Compose Integration (checkpoint pending verification)
+**Stopped at:** Completed Phase 09 Plan 02 — Loyalty Domain CloudEvents
 
 ---
-*Last updated: 2026-02-11 after completing Phase 07 Plan 05*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 02*
