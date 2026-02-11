@@ -332,9 +332,11 @@ Plans:
 
 ---
 
-### Phase 11: AI Phase 2 — Optimization
+### Phase 11: AI Phase 2 — Optimization ✓
 
 **Goal:** Add smart upselling, dynamic pricing, capacity optimization, and reminder timing so AI actively increases revenue and efficiency.
+
+**Status:** Complete (2026-02-11)
 
 **Segments:** BACKEND (AI service), FRONTEND (AI UI widgets), DEVOPS (ML pipeline)
 
@@ -342,20 +344,20 @@ Plans:
 
 **Depends on:** Phase 10
 
-**Plans:** 5 plans in 3 waves
+**Plans:** 5/5 complete
 
 Plans:
-- [ ] 11-01-PLAN.md — Python optimization models (upselling CF, pricing MAB, capacity Prophet, reminder timing Bayesian) + FastAPI router [Wave 1]
-- [ ] 11-02-PLAN.md — Node.js circuit breaker extensions (optimization types, fallbacks, 2s upselling timeout) [Wave 1]
-- [ ] 11-03-PLAN.md — Training scripts and dummy model generator for all 4 optimization models [Wave 2]
-- [ ] 11-04-PLAN.md — Next.js API routes for optimization endpoints with Zod validation and RBAC [Wave 2]
-- [ ] 11-05-PLAN.md — Frontend: upselling widget in booking wizard, pricing dashboard, capacity dashboard [Wave 3]
+- [x] 11-01-PLAN.md — Python optimization models (upselling CF, pricing MAB, capacity Prophet, reminder timing Bayesian) + FastAPI router [Wave 1]
+- [x] 11-02-PLAN.md — Node.js circuit breaker extensions (optimization types, fallbacks, 2s upselling timeout) [Wave 1]
+- [x] 11-03-PLAN.md — Training scripts and dummy model generator for all 4 optimization models [Wave 2]
+- [x] 11-04-PLAN.md — Next.js API routes for optimization endpoints with Zod validation and RBAC [Wave 2]
+- [x] 11-05-PLAN.md — Frontend: upselling widget in booking wizard, pricing dashboard, capacity dashboard [Wave 3]
 
 **Success Criteria:**
-1. Upselling suggestions appear during booking (step 1) based on service selection
-2. Dynamic pricing adjusts service prices based on demand patterns
-3. Capacity optimizer suggests schedule changes to maximize utilization
-4. Smart reminder timing picks optimal send time per customer
+1. ~~Upselling suggestions appear during booking (step 1) based on service selection~~ ✓
+2. ~~Dynamic pricing adjusts service prices based on demand patterns~~ ✓
+3. ~~Capacity optimizer suggests schedule changes to maximize utilization~~ ✓
+4. ~~Smart reminder timing picks optimal send time per customer~~ ✓
 
 ---
 
@@ -461,7 +463,7 @@ Plans:
 | 8 | CRM & Marketing ✓ | Tags + coupons + gift cards + GDPR | CRM-01..07 (7) | Phase 3, 5 |
 | 9 | Loyalty Program | Points + tiers + wallet cards | LOYAL-01..07 (7) | Phase 5, 7 |
 | 10 | AI Phase 1 ✓ | No-show + CLV + health score | AI1-01..05 (5) | Phase 5, 3 |
-| 11 | AI Phase 2 | Upselling + pricing + capacity | AI2-01..04 (4) | Phase 10 |
+| 11 | AI Phase 2 ✓ | Upselling + pricing + capacity | AI2-01..04 (4) | Phase 10 |
 | 12 | Advanced Features | Marketplace + widget + video | ADV-01..08 (8) | Phase 5, 3 |
 | 13 | Polish | Analytics + i18n + a11y + perf | POL-01..05 (5) | Phase 1-12 |
 | 14 | AI Phase 3 | Voice booking + intelligence | AI3-01..03 (3) | Phase 10, 11 |
@@ -469,4 +471,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 12 planning complete*
+*Last updated: 2026-02-11 after Phase 11 execution complete*
