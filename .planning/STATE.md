@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 9 of 15 — Loyalty Program
 - **Status:** In Progress
-- **Current Plan:** 09-02 complete, 09-03 next
-- **Plans Executed:** 51
+- **Current Plan:** 09-03 complete, 09-04 next
+- **Plans Executed:** 52
 
 ## What's Done
 
@@ -74,6 +74,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
 - [x] Plan 09-01: Loyalty Schemas and Types (2 tasks, 2 commits)
 - [x] Plan 09-02: Loyalty Domain CloudEvents (2 tasks, 2 commits)
+- [x] Plan 09-03: Loyalty Service Layer (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -310,6 +311,10 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-02]: cardUuid used as CloudEvent subject for all loyalty events (loyalty card is primary entity)
 - [Phase 09-02]: bookingUuid in PointsEarnedPayload is nullable (points can be earned from bookings or manually)
 - [Phase 09-02]: previousTierName uses string | null (customer might not have tier when first assigned)
+- [Phase 09-03]: SELECT FOR UPDATE for all balance modifications prevents race conditions on concurrent operations
+- [Phase 09-03]: Auto-enrollment creates loyalty card on first booking completion for frictionless onboarding
+- [Phase 09-03]: Idempotency check via bookingId query prevents duplicate points awards
+- [Phase 09-03]: Fire-and-forget event publishing ensures transaction success doesn't depend on RabbitMQ availability
 
 ## Blockers
 
@@ -382,11 +387,12 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 07-07 | 42s | 1 | 2 | 1 |
 | 09-01 | 157s | 2 | 4 | 2 |
 | 09-02 | 87s | 2 | 2 | 2 |
+| 09-03 | 450s | 2 | 3 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-11
-**Stopped at:** Completed Phase 09 Plan 01 — Loyalty Schemas and Types
+**Last session:** 2026-02-11T20:04:47.885Z
+**Stopped at:** Completed Phase 09 Plan 03 — Loyalty Service Layer
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 01*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 03*
