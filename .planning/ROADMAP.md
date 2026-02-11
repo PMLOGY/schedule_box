@@ -184,6 +184,17 @@ Plans:
 
 **Depends on:** Phase 5
 
+**Plans:** 7 plans in 4 waves
+
+Plans:
+- [ ] 06-01-PLAN.md — Payment Zod schemas, TypeScript types, and domain events (CloudEvents) [Wave 1]
+- [ ] 06-02-PLAN.md — Webhook idempotency table and payment service foundation [Wave 1]
+- [ ] 06-03-PLAN.md — Comgate gateway integration (create, webhook, callback) [Wave 2]
+- [ ] 06-04-PLAN.md — Czech QR payment generation (@spayd/core SPD format) [Wave 2]
+- [ ] 06-05-PLAN.md — SAGA choreography handlers and payment timeout expiration [Wave 3]
+- [ ] 06-06-PLAN.md — Invoice PDF generation (PDFKit) and refund processing [Wave 3]
+- [ ] 06-07-PLAN.md — Payment CRUD API, invoice listing, and env configuration [Wave 4]
+
 **Success Criteria:**
 1. Customer can pay via Comgate during booking (redirect + callback)
 2. QRcomat generates QR code for on-site payment
@@ -404,4 +415,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 5 planning*
+*Last updated: 2026-02-11 after Phase 6 planning*
