@@ -54,6 +54,35 @@ services:
       start_period: 15s
     restart: unless-stopped
 
+  ai-service:
+    build:
+      context: ../services/ai
+      dockerfile: Dockerfile
+    container_name: schedulebox-ai
+    ports:
+      - '8000:8000'
+    environment:
+      - ENVIRONMENT=development
+      - AI_SERVICE_PORT=8000
+      - REDIS_URL=redis://redis:6379
+      - SCHEDULEBOX_API_URL=http://app:3000
+      - MODEL_DIR=/app/models
+      - ALLOWED_ORIGINS=http://localhost:3000,http://app:3000
+      - LOG_LEVEL=debug
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'python -c "import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")" || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ../services/ai:/app
+      - ai_models:/app/models
+    restart: unless-stopped
+
   app:
     build:
       context: ..
@@ -70,6 +99,7 @@ services:
       - NEXT_TELEMETRY_DISABLED=1
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+      - AI_SERVICE_URL=http://ai-service:8000
     depends_on:
       postgres:
         condition: service_healthy
@@ -124,3 +154,4 @@ volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
+  ai_models:
