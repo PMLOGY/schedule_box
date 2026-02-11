@@ -63,6 +63,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-06: Invoice PDF Generation and Payment Refund (3 tasks, 3 commits)
 - [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
 - [x] Plan 07-01: Event Consumer Infrastructure and Shared Types (2 tasks, 2 commits)
+- [x] Plan 07-02: Notification Worker Microservice with BullMQ (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
 
@@ -74,7 +75,7 @@ Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entiti
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
-Phase 7: In Progress — Plan 07-01 complete (Consumer helper and shared types ready)
+Phase 7: In Progress — Plans 07-01, 07-02 complete (Consumer infrastructure and notification worker ready)
 Phase 8: In Progress — Plan 08-03 complete (CSV import and GDPR anonymization ready)
 
 Next: Phase 8 Plan 08-04 — Marketing automation features
@@ -259,6 +260,12 @@ Next: Phase 8 Plan 08-04 — Marketing automation features
 - [Phase 08-03]: Duplicate handling via onConflictDoNothing instead of upsert (import is append-only)
 - [Phase 08-03]: GDPR anonymization preserves business analytics (totalBookings, totalSpent, AI metrics)
 - [Phase 08-03]: Anonymization different from soft delete: irreversible PII removal vs. recoverable data hiding
+- [Phase 07-02]: BullMQ queues for email/SMS/push notifications with concurrency and rate limiting
+- [Phase 07-02]: Graceful degradation when SMTP/Twilio/VAPID credentials not configured (development mode)
+- [Phase 07-02]: Template caching via Map for Handlebars compilation performance optimization
+- [Phase 07-02]: Tracking pixel injection before </body> tag for email open tracking
+- [Phase 07-02]: SMS segment estimation using GSM-7 (160 chars) vs UCS-2 (70 chars) for Czech diacritics
+- [Phase 07-02]: Czech locale helpers (formatDate, formatTime, formatCurrency) registered globally in Handlebars
 
 ## Blockers
 
@@ -320,13 +327,15 @@ None — Phase 8 Plan 03 complete, ready for Plan 04.
 | 06-06 | 700s | 3 | 3 | 3 |
 | 06-07 | 280s | 2 | 3 | 2 |
 | 07-01 | 202s | 2 | 11 | 2 |
+| 07-02 | 340s | 2 | 18 | 2 |
+| 08-01 | 352s | 2 | 4 | 2 |
 | 08-02 | 261s | 2 | 5 | 2 |
 | 08-03 | 247s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 08-02 — Gift Card CRUD and Redemption API
+**Stopped at:** Completed Plan 07-02 — Notification Worker Microservice with BullMQ
 
 ---
-*Last updated: 2026-02-11 after completing Plan 08-02*
+*Last updated: 2026-02-11 after completing Plan 07-02*
