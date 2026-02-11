@@ -31,3 +31,24 @@ export type {
   PaymentRefund,
   PaymentListQuery,
 } from './payment';
+
+// Notification types
+export type {
+  NotificationTemplateType,
+  NotificationChannel,
+  NotificationStatus,
+  NotificationTemplateCreate,
+  NotificationTemplateUpdate,
+  NotificationListQuery,
+  NotificationTemplatePreview,
+} from './notification';
+
+// Automation types
+export type {
+  AutomationTriggerType,
+  AutomationActionType,
+  AutomationLogStatus,
+  AutomationRuleCreate,
+  AutomationRuleUpdate,
+  AutomationRuleListQuery,
+} from './automation';

@@ -29,3 +29,23 @@ export {
   paymentGatewayEnum,
   invoiceStatusEnum,
 } from './payment';
+
+// Notification schemas
+export {
+  notificationTemplateCreateSchema,
+  notificationTemplateUpdateSchema,
+  notificationListQuerySchema,
+  notificationTemplatePreviewSchema,
+  notificationTemplateTypeEnum,
+  notificationChannelEnum,
+  notificationStatusEnum,
+} from './notification';
+
+// Automation schemas
+export {
+  automationRuleCreateSchema,
+  automationRuleUpdateSchema,
+  automationRuleListQuerySchema,
+  automationTriggerTypeEnum,
+  automationActionTypeEnum,
+} from './automation';
