@@ -80,6 +80,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-06: Digital Wallet Pass Generation (2 tasks, 2 commits)
 - [x] Plan 09-07: Loyalty Admin Hooks & Store (2 tasks, 2 commits)
 - [x] Plan 09-08: Customer-Facing Loyalty UI Components (2 tasks, 2 commits)
+- [x] Plan 10-01: AI Service Foundation (2 tasks, 2 commits)
 - [x] Plan 10-02: AI Client Circuit Breaker (2 tasks, 2 commits)
 
 ## What's Next
@@ -344,6 +345,10 @@ Next: Continue Phase 10 remaining plans
 - [Phase 09-08]: Standard pagination with local page state for TransactionHistory (compatible with existing useTransactions hook)
 - [Phase 09-08]: Apple Wallet as anchor download link, Google Wallet as fetch-then-redirect pattern
 - [Phase 09-08]: Transaction type color mapping: earn=green, redeem=red, adjust=yellow, expire=gray, stamp=blue
+- [Phase 10-01]: Heuristic fallback for all ML models when serialized model files unavailable (NoShowPredictor, CLVPredictor)
+- [Phase 10-01]: HealthScoreCalculator uses pure RFM calculation (no ML model needed) - always available
+- [Phase 10-01]: AI service starts in degraded mode on model load failure (does not crash, logs warnings)
+- [Phase 10-01]: Feature defaults use population averages for cold-start handling (no_show_rate=0.15, lead_time=24h)
 - [Phase 10-02]: Opossum circuit breaker with 5s timeout, 50% error threshold, 30s reset for AI service calls
 - [Phase 10-02]: Fallback values: no-show 15% probability, CLV 0, health score 50 - conservative defaults to avoid false alerts
 - [Phase 10-02]: Module-level singleton circuit breakers to share state across all callers
@@ -426,6 +431,7 @@ None — Phase 10 in progress.
 | 09-06 | 300s | 2 | 6 | 2 |
 | 09-07 | 404s | 2 | 6 | 2 |
 | 09-08 | 330s | 2 | 5 | 2 |
+| 10-01 | 267s | 2 | 21 | 2 |
 | 10-02 | 239s | 2 | 6 | 2 |
 
 ## Session Info
