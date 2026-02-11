@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v1.0 (complete) → v2.0 next
-- **Phase:** 6 of 15 — Payment Integration
-- **Status:** Complete
-- **Current Plan:** Phase 6 complete, Phase 7 next
-- **Plans Executed:** 41
+- **Phase:** 7 of 15 — Notifications & Automation
+- **Status:** In Progress
+- **Current Plan:** 07-01 complete, 07-02 next
+- **Plans Executed:** 42
 
 ## What's Done
 
@@ -62,6 +62,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-05: SAGA Choreography and Payment Timeout (2 tasks, 2 commits)
 - [x] Plan 06-06: Invoice PDF Generation and Payment Refund (3 tasks, 3 commits)
 - [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
+- [x] Plan 07-01: Event Consumer Infrastructure and Shared Types (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -71,8 +72,9 @@ Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entiti
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
+Phase 7: In Progress — Plan 07-01 complete (Consumer helper and shared types ready)
 
-Next: Phase 4 or Phase 7 — Frontend components or notification system
+Next: Phase 7 Plan 07-02 — Notification worker service
 
 ## Decisions
 
@@ -238,10 +240,14 @@ Next: Phase 4 or Phase 7 — Frontend components or notification system
 - [Phase 06-07]: Manual payment creation auto-confirms booking via SAGA (cash and bank transfers already received when recorded)
 - [Phase 06-07]: Payment list excludes gatewayResponse for performance (large JSONB field available in detail endpoint)
 - [Phase 06-07]: Invoice list includes payment UUID and customer name for context (reduces additional API calls)
+- [Phase 07-01]: Consumer helper mirrors publisher pattern with callback-based amqplib for consistency across event infrastructure
+- [Phase 07-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (following Phase 5 pattern)
+- [Phase 07-01]: Enum values in Zod schemas match database check constraints exactly
+- [Phase 07-01]: Payment event payloads updated (completedAt, failedAt, currency for refund) to align with notification/review patterns
 
 ## Blockers
 
-None — Phase 6 complete, ready for Milestone 2.
+None — Phase 7 Plan 01 complete, ready for Plan 02.
 
 ## Metrics
 
@@ -298,11 +304,12 @@ None — Phase 6 complete, ready for Milestone 2.
 | 05-08 | 699s | 2 | 10 | 2 |
 | 06-06 | 700s | 3 | 3 | 3 |
 | 06-07 | 280s | 2 | 3 | 2 |
+| 07-01 | 202s | 2 | 11 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 06-07 — Payment List and Status Tracking Endpoints (Phase 6 Complete)
+**Stopped at:** Completed Plan 07-01 — Event Consumer Infrastructure and Shared Types
 
 ---
 *Last updated: 2026-02-11 after completing Plan 06-07*
