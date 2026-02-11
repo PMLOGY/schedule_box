@@ -2,25 +2,32 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { Clock, DollarSign } from 'lucide-react';
+import { Clock, Coins } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { useBookingWizard } from '@/stores/booking-wizard.store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { UpsellingSuggestions } from '@/components/booking/UpsellingSuggestions';
 
 interface Service {
   id: number;
   uuid: string;
   name: string;
-  durationMinutes: number;
+  duration_minutes: number;
   price: string;
   currency: string;
-  categoryId: number | null;
-  isActive: boolean;
+  category_id: number | null;
+  is_active: boolean;
 }
 
 interface Employee {
@@ -31,16 +38,25 @@ interface Employee {
 
 export function Step1ServiceSelect() {
   const t = useTranslations('booking.wizard.step1');
+  const tCommon = useTranslations('common');
   const { data, updateData, nextStep } = useBookingWizard();
 
   const { data: services, isLoading: isLoadingServices } = useQuery<Service[]>({
     queryKey: ['services', { is_active: true }],
-    queryFn: () => apiClient.get('/services', { is_active: true }),
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: Service[] }>('/services', { is_active: true });
+      return Array.isArray(res) ? res : res.data;
+    },
   });
 
   const { data: employees, isLoading: isLoadingEmployees } = useQuery<Employee[]>({
     queryKey: ['employees', data.serviceId],
-    queryFn: () => apiClient.get('/employees', { service_id: data.serviceId }),
+    queryFn: async () => {
+      const res = await apiClient.get<{ data: Employee[] }>('/employees', {
+        service_id: data.serviceId,
+      });
+      return Array.isArray(res) ? res : res.data;
+    },
     enabled: !!data.serviceId,
   });
 
@@ -48,7 +64,7 @@ export function Step1ServiceSelect() {
     updateData({
       serviceId: service.id,
       serviceName: service.name,
-      serviceDuration: service.durationMinutes,
+      serviceDuration: service.duration_minutes,
       servicePrice: `${service.price} ${service.currency}`,
     });
   };
@@ -112,11 +128,11 @@ export function Step1ServiceSelect() {
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   <span>
-                    {service.durationMinutes} {t('minutes')}
+                    {service.duration_minutes} {t('minutes')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
+                  <Coins className="h-4 w-4" />
                   <span>
                     {service.price} {service.currency}
                   </span>
@@ -126,6 +142,9 @@ export function Step1ServiceSelect() {
           </Card>
         ))}
       </div>
+
+      {/* AI Upselling Suggestions - loads async, never blocks flow */}
+      <UpsellingSuggestions selectedServiceId={data.serviceId ?? null} />
 
       {data.serviceId && (
         <div className="space-y-4">
@@ -151,7 +170,7 @@ export function Step1ServiceSelect() {
           </div>
 
           <Button onClick={handleContinue} className="w-full">
-            {t('../../common.next')}
+            {tCommon('next')}
           </Button>
         </div>
       )}
