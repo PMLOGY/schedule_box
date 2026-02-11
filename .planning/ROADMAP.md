@@ -240,9 +240,11 @@ Plans:
 
 ---
 
-### Phase 8: CRM & Marketing
+### Phase 8: CRM & Marketing ✓
 
 **Goal:** Add customer tagging, coupons, gift cards, and import/export so businesses can segment customers and run promotions.
+
+**Status:** Complete (2026-02-11)
 
 **Segments:** BACKEND (CRM API), FRONTEND (CRM UI), DATABASE (CRM tables)
 
@@ -250,19 +252,19 @@ Plans:
 
 **Depends on:** Phase 3, Phase 5
 
-**Plans:** 3 plans in 1 wave
+**Plans:** 3/3 complete
 
 Plans:
-- [ ] 08-01-PLAN.md — Coupon CRUD and validation endpoint (percentage/fixed discounts, usage limits, service applicability)
-- [ ] 08-02-PLAN.md — Gift card CRUD, balance check, and atomic redemption with transaction log
-- [ ] 08-03-PLAN.md — Customer CSV import with PapaParse and GDPR anonymization endpoint
+- [x] 08-01-PLAN.md — Coupon CRUD and validation endpoint (percentage/fixed discounts, usage limits, service applicability)
+- [x] 08-02-PLAN.md — Gift card CRUD, balance check, and atomic redemption with transaction log
+- [x] 08-03-PLAN.md — Customer CSV import with PapaParse and GDPR anonymization endpoint
 
 **Success Criteria:**
-1. Owner can create and assign tags to customers
-2. Coupons apply correctly during booking (percentage and fixed discounts)
-3. Gift cards track balance and deduct on use
-4. CSV import creates customers in bulk without duplicates
-5. GDPR deletion anonymizes customer data while preserving booking statistics
+1. ~~Owner can create and assign tags to customers~~ ✓
+2. ~~Coupons apply correctly during booking (percentage and fixed discounts)~~ ✓
+3. ~~Gift cards track balance and deduct on use~~ ✓
+4. ~~CSV import creates customers in bulk without duplicates~~ ✓
+5. ~~GDPR deletion anonymizes customer data while preserving booking statistics~~ ✓
 
 ---
 
@@ -275,6 +277,18 @@ Plans:
 **Requirements:** LOYAL-01, LOYAL-02, LOYAL-03, LOYAL-04, LOYAL-05, LOYAL-06, LOYAL-07
 
 **Depends on:** Phase 5, Phase 7
+
+**Plans:** 8 plans in 4 waves
+
+Plans:
+- [ ] 09-01-PLAN.md — Shared Zod schemas + TypeScript types for loyalty domain [Wave 1]
+- [ ] 09-02-PLAN.md — Loyalty CloudEvents + event definitions [Wave 1]
+- [ ] 09-03-PLAN.md — Points engine + tier engine + rewards engine (SELECT FOR UPDATE) [Wave 2]
+- [ ] 09-04-PLAN.md — Loyalty CRUD API routes (programs, cards, rewards, tiers, transactions) [Wave 2]
+- [ ] 09-05-PLAN.md — Points operations API + booking.completed event consumer [Wave 3]
+- [ ] 09-06-PLAN.md — Digital wallet pass generation (Apple Wallet + Google Wallet) [Wave 3]
+- [ ] 09-07-PLAN.md — Admin loyalty management UI (settings, rewards, cards) [Wave 4]
+- [ ] 09-08-PLAN.md — Customer loyalty UI components (card display, tier progress, wallet buttons) [Wave 4]
 
 **Success Criteria:**
 1. Customer automatically earns points when booking is completed
@@ -419,7 +433,7 @@ Plans:
 | 5 | Booking MVP | Availability + booking flow + events | BOOK-01..10 (10) | Phase 3, 4 |
 | 6 | Payment Integration ✓ | Comgate + QRcomat + SAGA | PAY-01..07 (7) | Phase 5 |
 | 7 | Notifications & Automation | Email/SMS + templates + rule builder | NOTIF-01..10 (10) | Phase 5, 6 |
-| 8 | CRM & Marketing | Tags + coupons + gift cards + GDPR | CRM-01..07 (7) | Phase 3, 5 |
+| 8 | CRM & Marketing ✓ | Tags + coupons + gift cards + GDPR | CRM-01..07 (7) | Phase 3, 5 |
 | 9 | Loyalty Program | Points + tiers + wallet cards | LOYAL-01..07 (7) | Phase 5, 7 |
 | 10 | AI Phase 1 | No-show + CLV + health score | AI1-01..05 (5) | Phase 5, 3 |
 | 11 | AI Phase 2 | Upselling + pricing + capacity | AI2-01..04 (4) | Phase 10 |
@@ -430,4 +444,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 7 planning*
+*Last updated: 2026-02-11 after Phase 8 execution*
