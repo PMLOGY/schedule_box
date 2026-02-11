@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 10 In Progress — AI Predictions (Plan 02 complete)
+**Current focus:** Phase 10 In Progress — AI Predictions (Plan 03 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 10 of 15 — AI Predictions
 - **Status:** In Progress
-- **Current Plan:** 10-02 complete, continuing
-- **Plans Executed:** 58
+- **Current Plan:** 10-03 complete, continuing
+- **Plans Executed:** 59
 
 ## What's Done
 
@@ -82,6 +82,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-08: Customer-Facing Loyalty UI Components (2 tasks, 2 commits)
 - [x] Plan 10-01: AI Service Foundation (2 tasks, 2 commits)
 - [x] Plan 10-02: AI Client Circuit Breaker (2 tasks, 2 commits)
+- [x] Plan 10-03: Prediction Endpoints & Training Pipeline (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -96,7 +97,7 @@ Phase 8: Complete ✅ — All 3 plans executed, verified 20/20 (Coupons, gift ca
 
 Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD API, points ops, wallet passes, admin UI, customer components)
 
-Phase 10: In Progress — Plan 10-02 complete (AI client circuit breaker with opossum)
+Phase 10: In Progress — Plan 10-03 complete (prediction endpoints, Redis feature store, training scripts)
 
 Next: Continue Phase 10 remaining plans
 
@@ -353,6 +354,11 @@ Next: Continue Phase 10 remaining plans
 - [Phase 10-02]: Fallback values: no-show 15% probability, CLV 0, health score 50 - conservative defaults to avoid false alerts
 - [Phase 10-02]: Module-level singleton circuit breakers to share state across all callers
 - [Phase 10-02]: fetch() for HTTP calls consistent with existing api-client.ts pattern
+- [Phase 10-03]: Redis feature store returns None on unavailability (graceful degradation, not failure)
+- [Phase 10-03]: All prediction endpoints return fallback responses on any error (never crash)
+- [Phase 10-03]: Training scripts generate synthetic data when API unavailable (bootstrapping without real data)
+- [Phase 10-03]: Dummy model generator creates minimal trained models for end-to-end dev testing
+- [Phase 10-03]: Added .joblib/.pkl/.pyc to .gitignore to prevent binary model artifacts in git
 
 ## Blockers
 
@@ -365,7 +371,7 @@ None — Phase 10 in progress.
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 7 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~74 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet) |
+| API Endpoints | 99 | ~78 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions) |
 | Frontend Components | 32+ | ~19 (design system + booking wizard + calendar + notifications + loyalty) |
 | Test Coverage | 80% | 0% |
 
@@ -433,11 +439,12 @@ None — Phase 10 in progress.
 | 09-08 | 330s | 2 | 5 | 2 |
 | 10-01 | 267s | 2 | 21 | 2 |
 | 10-02 | 239s | 2 | 6 | 2 |
+| 10-03 | 276s | 2 | 9 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 10 Plan 02 — AI Client Circuit Breaker
+**Stopped at:** Completed Phase 10 Plan 03 — Prediction Endpoints & Training Pipeline
 
 ---
-*Last updated: 2026-02-11 after completing Phase 10 Plan 02*
+*Last updated: 2026-02-11 after completing Phase 10 Plan 03*
