@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Phase:** 9 of 15 — Loyalty Program
 - **Status:** In Progress
 - **Current Plan:** 09-02 complete, 09-03 next
-- **Plans Executed:** 50
+- **Plans Executed:** 51
 
 ## What's Done
 
@@ -72,6 +72,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 08-01: Coupon CRUD and Validation API (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
+- [x] Plan 09-01: Loyalty Schemas and Types (2 tasks, 2 commits)
 - [x] Plan 09-02: Loyalty Domain CloudEvents (2 tasks, 2 commits)
 
 ## What's Next
@@ -301,6 +302,11 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 07-07]: notification-worker runs as separate Docker Compose service alongside app (scalability and isolation)
 - [Phase 07-07]: SMTP/Twilio/VAPID env vars use ${VAR:-default} syntax for graceful degradation in development
 - [Phase 07-07]: Worker depends on postgres, redis, rabbitmq health checks (prevents connection errors on startup)
+- [Phase 09-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (following Phase 5 pattern)
+- [Phase 09-01]: Dual type definitions (response types + input types) inferred from Zod schemas for API flexibility
+- [Phase 09-01]: UUID validation for all foreign keys (customer_id, card_id, applicable_service_id) per API conventions
+- [Phase 09-01]: Dual balance fields (pointsBalance and stampsBalance) on cards support multiple program types
+- [Phase 09-01]: JSONB benefits field uses Record<string, unknown> for extensible tier configuration
 - [Phase 09-02]: cardUuid used as CloudEvent subject for all loyalty events (loyalty card is primary entity)
 - [Phase 09-02]: bookingUuid in PointsEarnedPayload is nullable (points can be earned from bookings or manually)
 - [Phase 09-02]: previousTierName uses string | null (customer might not have tier when first assigned)
@@ -374,12 +380,13 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 08-03 | 247s | 2 | 4 | 2 |
 | 07-06 | 801s | 2 | 17 | 2 |
 | 07-07 | 42s | 1 | 2 | 1 |
+| 09-01 | 157s | 2 | 4 | 2 |
 | 09-02 | 87s | 2 | 2 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 09 Plan 02 — Loyalty Domain CloudEvents
+**Stopped at:** Completed Phase 09 Plan 01 — Loyalty Schemas and Types
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 02*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 01*
