@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 3 Complete — Ready for Phase 4
+**Current focus:** Phase 6 Complete — Milestone 1 finished, ready for Milestone 2
 
 ## Position
 
-- **Milestone:** v1.0
+- **Milestone:** v1.0 (complete) → v2.0 next
 - **Phase:** 6 of 15 — Payment Integration
-- **Status:** In Progress
-- **Current Plan:** Next phase pending
+- **Status:** Complete
+- **Current Plan:** Phase 6 complete, Phase 7 next
 - **Plans Executed:** 41
 
 ## What's Done
@@ -241,17 +241,17 @@ Next: Phase 4 or Phase 7 — Frontend components or notification system
 
 ## Blockers
 
-None — Phase 4 in progress.
+None — Phase 6 complete, ready for Milestone 2.
 
 ## Metrics
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Requirements | 103 | ~35 implemented (infra + database + auth + core entities) |
-| Phases | 15 | 3 complete, ready for Phase 4 |
-| DB Tables | 47 | 47 (all schemas + views + relations complete) |
-| API Endpoints | 99 | ~39 (auth, customers, services, employees, resources, settings, tags, health) |
-| Frontend Components | 32+ | 0 |
+| Requirements | 103 | ~55 implemented (infra + database + auth + core + booking + payment) |
+| Phases | 15 | 6 complete (Milestone 1 done) |
+| DB Tables | 47 | 48 (47 original + processed_webhooks) |
+| API Endpoints | 99 | ~55 (auth, customers, services, employees, resources, bookings, availability, payments, invoices) |
+| Frontend Components | 32+ | ~10 (design system + booking wizard + calendar) |
 | Test Coverage | 80% | 0% |
 
 ## Performance Metrics

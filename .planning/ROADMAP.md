@@ -174,9 +174,11 @@ Plans:
 
 ---
 
-### Phase 6: Payment Integration
+### Phase 6: Payment Integration ✓
 
 **Goal:** Integrate Comgate and QRcomat payment gateways with SAGA pattern so customers can pay online or on-site with reliable transaction handling.
+
+**Status:** Complete (2026-02-11)
 
 **Segments:** BACKEND (primary), FRONTEND (Payment UI), DATABASE (payment tables), DEVOPS (webhook testing)
 
@@ -184,23 +186,23 @@ Plans:
 
 **Depends on:** Phase 5
 
-**Plans:** 7 plans in 4 waves
+**Plans:** 7/7 complete
 
 Plans:
-- [ ] 06-01-PLAN.md — Payment Zod schemas, TypeScript types, and domain events (CloudEvents) [Wave 1]
-- [ ] 06-02-PLAN.md — Webhook idempotency table and payment service foundation [Wave 1]
-- [ ] 06-03-PLAN.md — Comgate gateway integration (create, webhook, callback) [Wave 2]
-- [ ] 06-04-PLAN.md — Czech QR payment generation (@spayd/core SPD format) [Wave 2]
-- [ ] 06-05-PLAN.md — SAGA choreography handlers and payment timeout expiration [Wave 3]
-- [ ] 06-06-PLAN.md — Invoice PDF generation (PDFKit) and refund processing [Wave 3]
-- [ ] 06-07-PLAN.md — Payment CRUD API, invoice listing, and env configuration [Wave 4]
+- [x] 06-01-PLAN.md — Payment Zod schemas, TypeScript types, and domain events (CloudEvents) [Wave 1]
+- [x] 06-02-PLAN.md — Webhook idempotency table and payment service foundation [Wave 1]
+- [x] 06-03-PLAN.md — Comgate gateway integration (create, webhook, callback) [Wave 2]
+- [x] 06-04-PLAN.md — Czech QR payment generation (@spayd/core SPD format) [Wave 2]
+- [x] 06-05-PLAN.md — SAGA choreography handlers and payment timeout expiration [Wave 3]
+- [x] 06-06-PLAN.md — Invoice PDF generation (PDFKit) and refund processing [Wave 3]
+- [x] 06-07-PLAN.md — Payment CRUD API, invoice listing, and env configuration [Wave 4]
 
 **Success Criteria:**
-1. Customer can pay via Comgate during booking (redirect + callback)
-2. QRcomat generates QR code for on-site payment
-3. Webhooks process with idempotency (duplicate webhook doesn't double-charge)
-4. SAGA pattern: failed payment cancels booking, successful payment confirms booking
-5. Invoice PDF generates and downloads correctly
+1. ~~Customer can pay via Comgate during booking (redirect + callback)~~ ✓
+2. ~~QRcomat generates QR code for on-site payment~~ ✓
+3. ~~Webhooks process with idempotency (duplicate webhook doesn't double-charge)~~ ✓
+4. ~~SAGA pattern: failed payment cancels booking, successful payment confirms booking~~ ✓
+5. ~~Invoice PDF generates and downloads correctly~~ ✓
 
 ---
 
@@ -413,7 +415,7 @@ Plans:
 | 3 | Auth & Core Services ✓ | JWT/RBAC + entity CRUD | AUTH-01..09, CORE-01..11 (20) | Phase 2 |
 | 4 | Frontend Shell | App shell + design system + calendar | UI-01..09 (9) | Phase 3 |
 | 5 | Booking MVP | Availability + booking flow + events | BOOK-01..10 (10) | Phase 3, 4 |
-| 6 | Payment Integration | Comgate + QRcomat + SAGA | PAY-01..07 (7) | Phase 5 |
+| 6 | Payment Integration ✓ | Comgate + QRcomat + SAGA | PAY-01..07 (7) | Phase 5 |
 | 7 | Notifications & Automation | Email/SMS + templates + rule builder | NOTIF-01..10 (10) | Phase 5, 6 |
 | 8 | CRM & Marketing | Tags + coupons + gift cards + GDPR | CRM-01..07 (7) | Phase 3, 5 |
 | 9 | Loyalty Program | Points + tiers + wallet cards | LOYAL-01..07 (7) | Phase 5, 7 |
