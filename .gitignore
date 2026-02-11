@@ -38,5 +38,12 @@ pnpm-debug.log*
 # Docker
 docker/data/
 
+# ML model artifacts
+*.joblib
+*.pkl
+*.pickle
+__pycache__/
+*.pyc
+
 # Misc
 *.tsbuildinfo

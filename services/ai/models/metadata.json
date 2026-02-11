@@ -1,0 +1,60 @@
+{
+  "models": {
+    "no_show_predictor": {
+      "model_name": "no_show_predictor",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "features": [
+        "booking_lead_time_hours",
+        "customer_no_show_rate",
+        "customer_total_bookings",
+        "day_of_week",
+        "hour_of_day",
+        "is_weekend",
+        "service_duration_minutes",
+        "service_price",
+        "is_first_visit",
+        "has_payment",
+        "days_since_last_visit"
+      ],
+      "metrics": null,
+      "status": "placeholder"
+    },
+    "clv_predictor": {
+      "model_name": "clv_predictor",
+      "model_version": "v1.0.0",
+      "trained_at": null,
+      "features": [
+        "total_bookings",
+        "total_spent",
+        "avg_booking_value",
+        "days_since_first_visit",
+        "days_since_last_visit",
+        "booking_frequency",
+        "no_show_rate",
+        "service_diversity"
+      ],
+      "metrics": null,
+      "status": "placeholder"
+    },
+    "health_score": {
+      "model_name": "health_score",
+      "model_version": "v1.0.0",
+      "type": "rfm_calculator",
+      "weights": {
+        "recency": 0.4,
+        "frequency": 0.35,
+        "monetary": 0.25
+      },
+      "categories": {
+        "excellent": ">=80",
+        "good": ">=60",
+        "at_risk": ">=40",
+        "churning": "<40"
+      },
+      "status": "active"
+    }
+  },
+  "version_format": "v{major}.{minor}.{patch}",
+  "last_updated": null
+}
