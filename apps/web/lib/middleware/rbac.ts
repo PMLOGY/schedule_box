@@ -25,8 +25,11 @@ export const PERMISSIONS = {
   SERVICES_DELETE: 'services.delete',
   EMPLOYEES_MANAGE: 'employees.manage',
   RESOURCES_MANAGE: 'resources.manage',
+  PAYMENTS_CREATE: 'payments.create',
   PAYMENTS_READ: 'payments.read',
+  PAYMENTS_VIEW: 'payments.read', // Alias for backward compatibility
   PAYMENTS_REFUND: 'payments.refund',
+  INVOICES_READ: 'invoices.read',
   REPORTS_READ: 'reports.read',
   SETTINGS_MANAGE: 'settings.manage',
   LOYALTY_MANAGE: 'loyalty.manage',

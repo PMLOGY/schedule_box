@@ -209,7 +209,7 @@ export const POST = createRouteHandler({
           currency: updatedPayment.currency ?? 'CZK',
           gateway: updatedPayment.gateway ?? 'cash',
           gatewayTransactionId: updatedPayment.gatewayTransactionId ?? '',
-          paidAt: updatedPayment.paidAt ?? new Date(),
+          paidAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
         }),
       );
     } catch (error) {
@@ -226,12 +226,13 @@ export const POST = createRouteHandler({
       currency: updatedPayment.currency ?? 'CZK',
       gateway: updatedPayment.gateway ?? 'cash',
       gatewayTransactionId: updatedPayment.gatewayTransactionId ?? '',
-      paidAt: updatedPayment.paidAt ?? new Date(),
+      paidAt: (updatedPayment.paidAt ?? new Date()).toISOString(),
     });
 
     // Create invoice within transaction
     await db.transaction(async (tx) => {
-      await createInvoiceForPayment(updatedPayment.id, companyId, tx);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await createInvoiceForPayment(updatedPayment.id, companyId, tx as any);
     });
 
     // Return created payment (use UUID, not SERIAL id)

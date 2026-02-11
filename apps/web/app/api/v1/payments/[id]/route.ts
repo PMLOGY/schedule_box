@@ -4,7 +4,7 @@
  */
 
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, payments, bookings, customers, invoices } from '@schedulebox/database';
+import { db, payments, bookings, customers, invoices, services } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
@@ -43,7 +43,7 @@ export const GET = createRouteHandler({
 
     const paymentUuid = parseResult.data.id;
 
-    // Query payment with related entities (JOIN booking, customer, invoice)
+    // Query payment with related entities (JOIN booking, service, customer, invoice)
     const [paymentData] = await db
       .select({
         // Payment fields
@@ -66,7 +66,8 @@ export const GET = createRouteHandler({
         bookingStatus: bookings.status,
         bookingStartTime: bookings.startTime,
         bookingEndTime: bookings.endTime,
-        bookingServiceName: bookings.serviceName,
+        // Service name (from services table join)
+        serviceName: services.name,
         // Customer fields
         customerUuid: customers.uuid,
         customerName: customers.name,
@@ -78,6 +79,7 @@ export const GET = createRouteHandler({
       })
       .from(payments)
       .innerJoin(bookings, eq(payments.bookingId, bookings.id))
+      .innerJoin(services, eq(bookings.serviceId, services.id))
       .innerJoin(customers, eq(payments.customerId, customers.id))
       .leftJoin(invoices, eq(payments.id, invoices.paymentId))
       .where(
@@ -115,7 +117,7 @@ export const GET = createRouteHandler({
         status: paymentData.bookingStatus,
         start_time: paymentData.bookingStartTime,
         end_time: paymentData.bookingEndTime,
-        service_name: paymentData.bookingServiceName,
+        service_name: paymentData.serviceName,
       },
       // Related customer info
       customer: {
