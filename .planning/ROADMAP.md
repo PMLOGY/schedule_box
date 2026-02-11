@@ -369,6 +369,18 @@ Plans:
 
 **Depends on:** Phase 5, Phase 3
 
+**Plans:** 8 plans in 4 waves
+
+Plans:
+- [ ] 12-01-PLAN.md — Zod schemas and TypeScript types for marketplace, reviews, video, whitelabel [Wave 1]
+- [ ] 12-02-PLAN.md — Marketplace API (public catalog with geo-search, listing detail, owner management) [Wave 2]
+- [ ] 12-03-PLAN.md — Review system API (create with auto-moderation, reply, list, detail, delete) [Wave 2]
+- [ ] 12-04-PLAN.md — Video conferencing provider abstraction + API routes (Zoom/Meet/Teams) [Wave 2]
+- [ ] 12-05-PLAN.md — White-label app CRUD API and build trigger [Wave 2]
+- [ ] 12-06-PLAN.md — Public booking page with company branding, SEO, and JSON-LD [Wave 3]
+- [ ] 12-07-PLAN.md — Embeddable booking widget (Web Component loader + sandboxed iframe) [Wave 3]
+- [ ] 12-08-PLAN.md — Review-to-marketplace rating sync consumer [Wave 4]
+
 **Success Criteria:**
 1. Marketplace search returns businesses by location and category
 2. JavaScript widget embeds on external website and completes booking flow
@@ -457,4 +469,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 10 execution complete*
+*Last updated: 2026-02-11 after Phase 12 planning complete*
