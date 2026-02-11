@@ -108,6 +108,77 @@
     "new": {
       "title": "Nová rezervace"
     },
+    "status": {
+      "pending": "Čeká na potvrzení",
+      "confirmed": "Potvrzeno",
+      "completed": "Dokončeno",
+      "cancelled": "Zrušeno",
+      "no_show": "Nedostavil se"
+    },
+    "detail": {
+      "bookingId": "ID rezervace",
+      "customer": "Zákazník",
+      "service": "Služba",
+      "employee": "Zaměstnanec",
+      "dateTime": "Datum a čas",
+      "price": "Cena",
+      "discount": "Sleva",
+      "notes": "Poznámky",
+      "customerNotes": "Poznámky zákazníka",
+      "internalNotes": "Interní poznámky",
+      "metadata": "Metadata",
+      "createdAt": "Vytvořeno",
+      "source": "Zdroj",
+      "cancelledAt": "Zrušeno",
+      "cancellationReason": "Důvod zrušení",
+      "minutes": "minut",
+      "notFound": "Rezervace nenalezena",
+      "actions": {
+        "confirm": {
+          "button": "Potvrdit rezervaci",
+          "success": "Rezervace potvrzena",
+          "error": "Nepodařilo se potvrdit rezervaci"
+        },
+        "cancel": {
+          "button": "Zrušit rezervaci",
+          "success": "Rezervace zrušena",
+          "error": "Nepodařilo se zrušit rezervaci"
+        },
+        "complete": {
+          "button": "Označit jako dokončené",
+          "success": "Rezervace označena jako dokončená",
+          "error": "Nepodařilo se dokončit rezervaci"
+        },
+        "noShow": {
+          "button": "Označit jako nedostavil se",
+          "success": "Rezervace označena jako nedostavil se",
+          "error": "Nepodařilo se označit rezervaci"
+        }
+      }
+    },
+    "list": {
+      "title": "Seznam rezervací",
+      "filters": {
+        "status": "Stav",
+        "allStatuses": "Všechny stavy",
+        "dateRange": "Rozmezí dat",
+        "employee": "Zaměstnanec",
+        "allEmployees": "Všichni zaměstnanci",
+        "service": "Služba",
+        "allServices": "Všechny služby",
+        "search": "Hledat zákazníka..."
+      },
+      "columns": {
+        "dateTime": "Datum a čas",
+        "customer": "Zákazník",
+        "service": "Služba",
+        "employee": "Zaměstnanec",
+        "status": "Stav",
+        "price": "Cena",
+        "actions": "Akce"
+      },
+      "noBookings": "Žádné rezervace"
+    },
     "wizard": {
       "steps": {
         "service": "Služba",

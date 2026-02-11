@@ -108,6 +108,77 @@
     "new": {
       "title": "New Booking"
     },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No Show"
+    },
+    "detail": {
+      "bookingId": "Booking ID",
+      "customer": "Customer",
+      "service": "Service",
+      "employee": "Employee",
+      "dateTime": "Date & Time",
+      "price": "Price",
+      "discount": "Discount",
+      "notes": "Notes",
+      "customerNotes": "Customer notes",
+      "internalNotes": "Internal notes",
+      "metadata": "Metadata",
+      "createdAt": "Created",
+      "source": "Source",
+      "cancelledAt": "Cancelled",
+      "cancellationReason": "Cancellation reason",
+      "minutes": "minutes",
+      "notFound": "Booking not found",
+      "actions": {
+        "confirm": {
+          "button": "Confirm Booking",
+          "success": "Booking confirmed",
+          "error": "Failed to confirm booking"
+        },
+        "cancel": {
+          "button": "Cancel Booking",
+          "success": "Booking cancelled",
+          "error": "Failed to cancel booking"
+        },
+        "complete": {
+          "button": "Mark as Completed",
+          "success": "Booking marked as completed",
+          "error": "Failed to complete booking"
+        },
+        "noShow": {
+          "button": "Mark as No Show",
+          "success": "Booking marked as no show",
+          "error": "Failed to mark booking"
+        }
+      }
+    },
+    "list": {
+      "title": "Booking List",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "dateRange": "Date range",
+        "employee": "Employee",
+        "allEmployees": "All employees",
+        "service": "Service",
+        "allServices": "All services",
+        "search": "Search customer..."
+      },
+      "columns": {
+        "dateTime": "Date & Time",
+        "customer": "Customer",
+        "service": "Service",
+        "employee": "Employee",
+        "status": "Status",
+        "price": "Price",
+        "actions": "Actions"
+      },
+      "noBookings": "No bookings"
+    },
     "wizard": {
       "steps": {
         "service": "Service",
