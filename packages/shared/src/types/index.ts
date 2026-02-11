@@ -17,3 +17,17 @@ export type {
 
 // Availability types
 export type { AvailabilitySlot, AvailabilityRequest, AvailabilityResponse } from './availability';
+
+// Payment types
+export type {
+  PaymentStatus,
+  PaymentGateway,
+  InvoiceStatus,
+  Payment,
+  Invoice,
+  ComgateCreateResponse,
+  QrPaymentResponse,
+  PaymentCreate,
+  PaymentRefund,
+  PaymentListQuery,
+} from './payment';

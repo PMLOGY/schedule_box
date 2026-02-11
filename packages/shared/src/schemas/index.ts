@@ -17,3 +17,15 @@ export {
 
 // Availability schemas
 export { availabilityRequestSchema } from './availability';
+
+// Payment schemas
+export {
+  paymentCreateSchema,
+  comgateCreateSchema,
+  qrPaymentGenerateSchema,
+  paymentRefundSchema,
+  paymentListQuerySchema,
+  paymentStatusEnum,
+  paymentGatewayEnum,
+  invoiceStatusEnum,
+} from './payment';
