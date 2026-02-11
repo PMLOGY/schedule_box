@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 6 of 15 — Payment Integration
 - **Status:** In Progress
-- **Current Plan:** 06-05 (Next plan after 06-03)
-- **Plans Executed:** 37
+- **Current Plan:** 06-05 (Next plan after 05-08)
+- **Plans Executed:** 38
 
 ## What's Done
 
@@ -54,6 +54,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 05-03: Availability Engine & Public API (2 tasks, 2 commits)
 - [x] Plan 05-05: Booking Status Transitions & Expiration (2 tasks, 1 commit)
 - [x] Plan 05-06: Booking Wizard Implementation (2 tasks, 2 commits)
+- [x] Plan 05-08: Admin Booking Calendar (2 tasks, 2 commits)
 - [x] Plan 06-01: Payment Schemas, Types, and Events (2 tasks, 2 commits)
 - [x] Plan 06-02: Webhook Idempotency and Payment Service Foundation (2 tasks, 2 commits)
 - [x] Plan 06-03: Comgate Payment Gateway Integration (3 tasks, 3 commits)
@@ -65,7 +66,7 @@ Phase 1: Complete ✅
 Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations, and seed data ready
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
-Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-06 complete (Booking CRUD, availability engine, and booking wizard ready)
+Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: In Progress — Plans 06-01, 06-02, 06-03, 06-04 complete (Payment foundation + webhook idempotency + Comgate integration + QR payment ready)
 
 Next: Phase 6 Plan 05 — Payment list and refund endpoints
@@ -128,7 +129,7 @@ Next: Phase 6 Plan 05 — Payment list and refund endpoints
 - [Phase 02-07]: Customer self-access policy allows customers to SELECT their own bookings via user_id match
 - [Phase 02-09]: btree_gist exclusion constraint for double-booking prevention (defense in depth)
 - [Phase 02-09]: Partial indexes on deleted_at IS NULL optimize soft-delete queries (deleted_at columns in Drizzle)
-- [Phase 02-09]: Dynamic trigger application via DO $$ loop for updated_at columns
+- [Phase 02-09]: Dynamic trigger application via DO $ loop for updated_at columns
 - [Phase 02-09]: Audit trail triggers on 5 critical tables (bookings, customers, services, employees, payments)
 - [Phase 02-08]: pgView used for v_daily_booking_summary and v_customer_metrics with query builder syntax
 - [Phase 02-08]: Comprehensive Drizzle relations for all 46 tables enabling type-safe nested queries
@@ -221,6 +222,9 @@ Next: Phase 6 Plan 05 — Payment list and refund endpoints
 - [Phase 06-04]: Variable symbol (booking ID zero-padded) serves as QR payment reference since no gateway transaction ID exists upfront
 - [Phase 06-04]: QR payment confirmation requires manual admin action (or future FIO Bank API integration) since no webhook exists
 - [Phase 06-04]: Company IBAN from company.settings.iban or COMPANY_DEFAULT_IBAN env var for development flexibility
+- [Phase 05-08]: Use standard FullCalendar views instead of resource timeline for MVP (premium license not needed)
+- [Phase 05-08]: Implement optimistic updates for drag-drop rescheduling with automatic rollback on error
+- [Phase 05-08]: Fetch bookings for visible calendar range +/- 7 days for performance optimization
 
 ## Blockers
 
@@ -277,11 +281,12 @@ None — Phase 4 in progress.
 | 06-02 | 341s | 2 | 4 | 2 |
 | 06-03 | 363s | 3 | 4 | 3 |
 | 06-04 | 235s | 2 | 2 | 2 |
+| 05-08 | 699s | 2 | 10 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-11
-**Stopped at:** Completed Plan 06-03 — Comgate Payment Gateway Integration
+**Last session:** 2026-02-11T15:42:02.121Z
+**Stopped at:** Completed Plan 05-08 — Admin Booking Calendar
 
 ---
 *Last updated: 2026-02-11 after completing Plan 06-03*
