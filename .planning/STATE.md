@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 9 Loyalty Program — Plans 01-08 complete, customer-facing loyalty UI ready
+**Current focus:** Phase 10 In Progress — AI Predictions (Plan 02 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 9 of 15 — Loyalty Program
+- **Phase:** 10 of 15 — AI Predictions
 - **Status:** In Progress
-- **Current Plan:** 09-08 complete, 09-09 next
-- **Plans Executed:** 57
+- **Current Plan:** 10-02 complete, continuing
+- **Plans Executed:** 58
 
 ## What's Done
 
@@ -80,6 +80,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-06: Digital Wallet Pass Generation (2 tasks, 2 commits)
 - [x] Plan 09-07: Loyalty Admin Hooks & Store (2 tasks, 2 commits)
 - [x] Plan 09-08: Customer-Facing Loyalty UI Components (2 tasks, 2 commits)
+- [x] Plan 10-02: AI Client Circuit Breaker (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -92,7 +93,11 @@ Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR 
 Phase 7: Complete ✅ — All 7 plans executed (Consumer infrastructure, notification worker, event consumers, API routes, scheduler, automation engine, frontend UI, Docker Compose integration ready)
 Phase 8: Complete ✅ — All 3 plans executed, verified 20/20 (Coupons, gift cards, CSV import, GDPR ready)
 
-Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
+Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD API, points ops, wallet passes, admin UI, customer components)
+
+Phase 10: In Progress — Plan 10-02 complete (AI client circuit breaker with opossum)
+
+Next: Continue Phase 10 remaining plans
 
 ## Decisions
 
@@ -339,10 +344,14 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-08]: Standard pagination with local page state for TransactionHistory (compatible with existing useTransactions hook)
 - [Phase 09-08]: Apple Wallet as anchor download link, Google Wallet as fetch-then-redirect pattern
 - [Phase 09-08]: Transaction type color mapping: earn=green, redeem=red, adjust=yellow, expire=gray, stamp=blue
+- [Phase 10-02]: Opossum circuit breaker with 5s timeout, 50% error threshold, 30s reset for AI service calls
+- [Phase 10-02]: Fallback values: no-show 15% probability, CLV 0, health score 50 - conservative defaults to avoid false alerts
+- [Phase 10-02]: Module-level singleton circuit breakers to share state across all callers
+- [Phase 10-02]: fetch() for HTTP calls consistent with existing api-client.ts pattern
 
 ## Blockers
 
-None — Phase 9 Plans 01-08 complete, customer-facing loyalty UI ready.
+None — Phase 10 in progress.
 
 ## Metrics
 
@@ -417,11 +426,12 @@ None — Phase 9 Plans 01-08 complete, customer-facing loyalty UI ready.
 | 09-06 | 300s | 2 | 6 | 2 |
 | 09-07 | 404s | 2 | 6 | 2 |
 | 09-08 | 330s | 2 | 5 | 2 |
+| 10-02 | 239s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 09 Plan 08 — Customer-Facing Loyalty UI Components
+**Stopped at:** Completed Phase 10 Plan 02 — AI Client Circuit Breaker
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 08*
+*Last updated: 2026-02-11 after completing Phase 10 Plan 02*
