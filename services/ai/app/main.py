@@ -11,8 +11,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import health
+from .routers import health, predictions
 from .services.model_loader import load_models, cleanup_models
+from .services import feature_store
 
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
@@ -37,6 +38,7 @@ app.add_middleware(
 
 # Register routers
 app.include_router(health.router, tags=["health"])
+app.include_router(predictions.router, prefix="/api/v1", tags=["predictions"])
 
 
 @app.on_event("startup")
@@ -55,6 +57,7 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup resources on shutdown."""
     try:
+        await feature_store.close()
         await cleanup_models()
         logger.info("AI service shutdown complete")
     except Exception as e:
