@@ -60,11 +60,8 @@ export interface PaymentCompletedPayload {
   /** Payment gateway */
   gateway: string;
 
-  /** Gateway transaction ID */
-  gatewayTransactionId: string;
-
   /** Timestamp when payment was completed (ISO 8601) */
-  paidAt: string;
+  completedAt: string;
 }
 
 /**
@@ -86,6 +83,9 @@ export interface PaymentFailedPayload {
 
   /** Failure reason */
   reason: string;
+
+  /** Timestamp when payment failed (ISO 8601) */
+  failedAt: string;
 }
 
 /**
@@ -103,10 +103,10 @@ export interface PaymentRefundedPayload {
   companyId: number;
 
   /** Refund amount (decimal as string) */
-  refundAmount: string;
+  amount: string;
 
-  /** Refund reason */
-  reason: string;
+  /** Currency code */
+  currency: string;
 
   /** Timestamp when refund was processed (ISO 8601) */
   refundedAt: string;

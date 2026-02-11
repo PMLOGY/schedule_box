@@ -14,6 +14,10 @@ export {
   createEventPublisher,
 } from './publisher.js';
 
+// Consumer helper
+export type { ConsumerConnection, ConsumeOptions } from './consumer.js';
+export { createConsumerConnection, consumeMessages, gracefulShutdown } from './consumer.js';
+
 // Booking domain events
 export type {
   BookingCreatedPayload,
@@ -60,3 +64,27 @@ export {
   createPaymentRefundedEvent,
   createPaymentExpiredEvent,
 } from './events/payment.js';
+
+// Review domain events
+export type { ReviewCreatedPayload, ReviewCreatedEvent } from './events/review.js';
+
+export { createReviewCreatedEvent } from './events/review.js';
+
+// Notification domain events
+export type {
+  NotificationSentPayload,
+  NotificationFailedPayload,
+  NotificationOpenedPayload,
+  NotificationClickedPayload,
+  NotificationSentEvent,
+  NotificationFailedEvent,
+  NotificationOpenedEvent,
+  NotificationClickedEvent,
+} from './events/notification.js';
+
+export {
+  createNotificationSentEvent,
+  createNotificationFailedEvent,
+  createNotificationOpenedEvent,
+  createNotificationClickedEvent,
+} from './events/notification.js';

@@ -114,3 +114,36 @@ export const tagIdParamSchema = z.object({
 });
 
 export type TagIdParam = z.infer<typeof tagIdParamSchema>;
+
+/**
+ * Customer import row schema
+ * For CSV import - validates each row with optional fields that transform empty strings to undefined
+ */
+export const customerImportRowSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255),
+  email: z
+    .string()
+    .email('Invalid email')
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+  phone: z
+    .string()
+    .max(50)
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+  date_of_birth: z
+    .string()
+    .date('Invalid date')
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+  notes: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .transform((v) => v || undefined),
+});
+
+export type CustomerImportRow = z.infer<typeof customerImportRowSchema>;
