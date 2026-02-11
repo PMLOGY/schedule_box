@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 9 Loyalty Program — Plans 01-06 complete, wallet pass generation ready
+**Current focus:** Phase 9 Loyalty Program — Plans 01-08 complete, customer-facing loyalty UI ready
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 9 of 15 — Loyalty Program
 - **Status:** In Progress
-- **Current Plan:** 09-06 complete, 09-07 next
-- **Plans Executed:** 55
+- **Current Plan:** 09-08 complete, 09-09 next
+- **Plans Executed:** 57
 
 ## What's Done
 
@@ -78,6 +78,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-04: Loyalty CRUD API Routes (2 tasks, 1 commit)
 - [x] Plan 09-05: Points Operation Endpoints and Booking-Completed Consumer (2 tasks, 1 commit)
 - [x] Plan 09-06: Digital Wallet Pass Generation (2 tasks, 2 commits)
+- [x] Plan 09-07: Loyalty Admin Hooks & Store (2 tasks, 2 commits)
+- [x] Plan 09-08: Customer-Facing Loyalty UI Components (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -330,10 +332,14 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-06]: Skinny JWT for Google Wallet embeds class+object in JWT claims, avoids REST API round-trips
 - [Phase 09-06]: ConfigurationError class shared between Apple/Google wallet for consistent 503 on missing credentials
 - [Phase 09-06]: NextResponse with Uint8Array body for binary .pkpass file download from createRouteHandler
+- [Phase 09-08]: Custom Tailwind CSS progress bar instead of shadcn/ui Progress (component not installed in project)
+- [Phase 09-08]: Standard pagination with local page state for TransactionHistory (compatible with existing useTransactions hook)
+- [Phase 09-08]: Apple Wallet as anchor download link, Google Wallet as fetch-then-redirect pattern
+- [Phase 09-08]: Transaction type color mapping: earn=green, redeem=red, adjust=yellow, expire=gray, stamp=blue
 
 ## Blockers
 
-None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
+None — Phase 9 Plans 01-08 complete, customer-facing loyalty UI ready.
 
 ## Metrics
 
@@ -343,7 +349,7 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | Phases | 15 | 7 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
 | API Endpoints | 99 | ~74 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet) |
-| Frontend Components | 32+ | ~10 (design system + booking wizard + calendar) |
+| Frontend Components | 32+ | ~19 (design system + booking wizard + calendar + notifications + loyalty) |
 | Test Coverage | 80% | 0% |
 
 ## Performance Metrics
@@ -406,11 +412,13 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 09-04 | 580s | 2 | 3 | 1 |
 | 09-05 | 180s | 2 | 3 | 1 |
 | 09-06 | 300s | 2 | 6 | 2 |
+| 09-07 | ~300s | 2 | 5 | 2 |
+| 09-08 | 330s | 2 | 5 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 09 Plan 06 — Digital Wallet Pass Generation
+**Stopped at:** Completed Phase 09 Plan 08 — Customer-Facing Loyalty UI Components
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 06*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 08*
