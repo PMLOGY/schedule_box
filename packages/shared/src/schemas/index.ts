@@ -49,3 +49,21 @@ export {
   automationTriggerTypeEnum,
   automationActionTypeEnum,
 } from './automation';
+
+// Loyalty schemas
+export {
+  loyaltyProgramCreateSchema,
+  loyaltyProgramUpdateSchema,
+  loyaltyCardCreateSchema,
+  addPointsSchema,
+  redeemRewardSchema,
+  rewardCreateSchema,
+  rewardUpdateSchema,
+  loyaltyCardListQuerySchema,
+  transactionListQuerySchema,
+  tierCreateSchema,
+  tierUpdateSchema,
+  loyaltyProgramTypeEnum,
+  transactionTypeEnum,
+  rewardTypeEnum,
+} from './loyalty';
