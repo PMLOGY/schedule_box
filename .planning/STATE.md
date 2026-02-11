@@ -332,6 +332,9 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-06]: Skinny JWT for Google Wallet embeds class+object in JWT claims, avoids REST API round-trips
 - [Phase 09-06]: ConfigurationError class shared between Apple/Google wallet for consistent 503 on missing credentials
 - [Phase 09-06]: NextResponse with Uint8Array body for binary .pkpass file download from createRouteHandler
+- [Phase 09-07]: 404 retry prevention on useLoyaltyProgram (program may not exist yet for new accounts)
+- [Phase 09-07]: Hierarchical query keys (['loyalty', 'program'], ['loyalty', 'cards', params]) for targeted cache invalidation
+- [Phase 09-07]: Stale time 60s for program/tiers (rarely change), 30s for cards/transactions (change with activity)
 - [Phase 09-08]: Custom Tailwind CSS progress bar instead of shadcn/ui Progress (component not installed in project)
 - [Phase 09-08]: Standard pagination with local page state for TransactionHistory (compatible with existing useTransactions hook)
 - [Phase 09-08]: Apple Wallet as anchor download link, Google Wallet as fetch-then-redirect pattern
@@ -412,7 +415,7 @@ None — Phase 9 Plans 01-08 complete, customer-facing loyalty UI ready.
 | 09-04 | 580s | 2 | 3 | 1 |
 | 09-05 | 180s | 2 | 3 | 1 |
 | 09-06 | 300s | 2 | 6 | 2 |
-| 09-07 | ~300s | 2 | 5 | 2 |
+| 09-07 | 404s | 2 | 6 | 2 |
 | 09-08 | 330s | 2 | 5 | 2 |
 
 ## Session Info
