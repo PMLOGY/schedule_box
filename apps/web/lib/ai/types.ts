@@ -92,3 +92,90 @@ export interface AIServiceHealth {
     timeouts: number;
   };
 }
+
+// ============================================================================
+// Optimization Request Types (Phase 11)
+// ============================================================================
+
+export interface UpsellRequest {
+  customer_id: number;
+  current_service_id: number;
+  customer_history?: number[];
+}
+
+export interface DynamicPricingRequest {
+  service_id: number;
+  price_min: number;
+  price_max: number;
+  base_price?: number;
+  hour_of_day: number;
+  day_of_week: number;
+  utilization: number;
+}
+
+export interface CapacityForecastRequest {
+  company_id: number;
+  days_ahead?: number;
+  current_capacity?: number;
+}
+
+export interface ReminderTimingRequest {
+  customer_id: number;
+  notification_channel: 'email' | 'sms' | 'push';
+}
+
+// ============================================================================
+// Optimization Response Types (Phase 11)
+// ============================================================================
+
+export interface UpsellRecommendation {
+  service_id: number;
+  confidence: number;
+  reason: string;
+}
+
+export interface UpsellResponse {
+  recommendations: UpsellRecommendation[];
+  model_version: string;
+  fallback: boolean;
+}
+
+export interface DynamicPricingResponse {
+  service_id: number;
+  optimal_price: number;
+  confidence: number;
+  constrained: boolean;
+  model_version: string;
+  fallback: boolean;
+}
+
+export interface CapacityForecastEntry {
+  datetime: string;
+  predicted_bookings: number;
+  lower_bound: number;
+  upper_bound: number;
+  utilization_level: 'low' | 'medium' | 'high';
+}
+
+export interface CapacityScheduleSuggestion {
+  datetime: string;
+  type: 'extend_hours' | 'reduce_hours' | 'add_employee';
+  reason: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export interface CapacityForecastResponse {
+  forecast: CapacityForecastEntry[];
+  suggestions: CapacityScheduleSuggestion[];
+  model_version: string;
+  fallback: boolean;
+}
+
+export interface ReminderTimingResponse {
+  customer_id: number;
+  minutes_before: number;
+  expected_open_rate: number;
+  confidence: number;
+  model_version: string;
+  fallback: boolean;
+}

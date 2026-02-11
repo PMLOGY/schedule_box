@@ -2,12 +2,20 @@
 // Return sensible default values when the AI service is unavailable
 
 import type {
+  CapacityForecastRequest,
+  CapacityForecastResponse,
   CLVPredictionRequest,
   CLVPredictionResponse,
+  DynamicPricingRequest,
+  DynamicPricingResponse,
   HealthScorePredictionRequest,
   HealthScoreResponse,
   NoShowPredictionRequest,
   NoShowPredictionResponse,
+  ReminderTimingRequest,
+  ReminderTimingResponse,
+  UpsellRequest,
+  UpsellResponse,
 } from './types';
 
 /**
@@ -52,6 +60,67 @@ export function getHealthScoreFallback(request: HealthScorePredictionRequest): H
     customer_id: request.customer_id,
     health_score: 50,
     category: 'good',
+    model_version: 'fallback',
+    fallback: true,
+  };
+}
+
+// ============================================================================
+// Optimization Fallback Functions (Phase 11)
+// ============================================================================
+
+/**
+ * Fallback for upselling recommendations.
+ * Returns empty recommendations - no misleading suggestions when AI unavailable.
+ */
+export function getUpsellFallback(_request: UpsellRequest): UpsellResponse {
+  return {
+    recommendations: [],
+    model_version: 'fallback',
+    fallback: true,
+  };
+}
+
+/**
+ * Fallback for dynamic pricing.
+ * Returns midpoint of min/max range (static pricing behavior).
+ */
+export function getDynamicPricingFallback(request: DynamicPricingRequest): DynamicPricingResponse {
+  return {
+    service_id: request.service_id,
+    optimal_price: (request.price_min + request.price_max) / 2,
+    confidence: 0.0,
+    constrained: false,
+    model_version: 'fallback',
+    fallback: true,
+  };
+}
+
+/**
+ * Fallback for capacity forecasting.
+ * Returns empty forecast - no misleading predictions when AI unavailable.
+ */
+export function getCapacityForecastFallback(
+  _request: CapacityForecastRequest,
+): CapacityForecastResponse {
+  return {
+    forecast: [],
+    suggestions: [],
+    model_version: 'fallback',
+    fallback: true,
+  };
+}
+
+/**
+ * Fallback for reminder timing.
+ * Returns default 24h (1440 minutes) which is the standard reminder window.
+ */
+export function getReminderTimingFallback(request: ReminderTimingRequest): ReminderTimingResponse {
+  return {
+    customer_id: request.customer_id,
+    minutes_before: 1440,
+    expected_open_rate: 0.0,
+    confidence: 0.0,
     model_version: 'fallback',
     fallback: true,
   };
