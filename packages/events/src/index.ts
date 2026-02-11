@@ -4,19 +4,14 @@
  */
 
 // Core types
-export type { CloudEvent, EventMetadata, DomainEvent } from './types.js';
+export type { CloudEvent, EventMetadata, DomainEvent } from './types';
 
 // Publisher and utilities
-export {
-  publishEvent,
-  createCloudEvent,
-  closeConnection,
-  createEventPublisher,
-} from './publisher.js';
+export { publishEvent, createCloudEvent, closeConnection, createEventPublisher } from './publisher';
 
 // Consumer helper
-export type { ConsumerConnection, ConsumeOptions } from './consumer.js';
-export { createConsumerConnection, consumeMessages, gracefulShutdown } from './consumer.js';
+export type { ConsumerConnection, ConsumeOptions } from './consumer';
+export { createConsumerConnection, consumeMessages, gracefulShutdown } from './consumer';
 
 // Booking domain events
 export type {
@@ -32,7 +27,7 @@ export type {
   BookingCompletedEvent,
   BookingNoShowEvent,
   BookingRescheduledEvent,
-} from './events/booking.js';
+} from './events/booking';
 
 export {
   createBookingCreatedEvent,
@@ -41,7 +36,7 @@ export {
   createBookingCompletedEvent,
   createBookingNoShowEvent,
   createBookingRescheduledEvent,
-} from './events/booking.js';
+} from './events/booking';
 
 // Payment domain events
 export type {
@@ -55,7 +50,7 @@ export type {
   PaymentFailedEvent,
   PaymentRefundedEvent,
   PaymentExpiredEvent,
-} from './events/payment.js';
+} from './events/payment';
 
 export {
   createPaymentInitiatedEvent,
@@ -63,12 +58,12 @@ export {
   createPaymentFailedEvent,
   createPaymentRefundedEvent,
   createPaymentExpiredEvent,
-} from './events/payment.js';
+} from './events/payment';
 
 // Review domain events
-export type { ReviewCreatedPayload, ReviewCreatedEvent } from './events/review.js';
+export type { ReviewCreatedPayload, ReviewCreatedEvent } from './events/review';
 
-export { createReviewCreatedEvent } from './events/review.js';
+export { createReviewCreatedEvent } from './events/review';
 
 // Notification domain events
 export type {
@@ -80,11 +75,30 @@ export type {
   NotificationFailedEvent,
   NotificationOpenedEvent,
   NotificationClickedEvent,
-} from './events/notification.js';
+} from './events/notification';
 
 export {
   createNotificationSentEvent,
   createNotificationFailedEvent,
   createNotificationOpenedEvent,
   createNotificationClickedEvent,
-} from './events/notification.js';
+} from './events/notification';
+
+// Loyalty domain events
+export type {
+  LoyaltyCardCreatedPayload,
+  PointsEarnedPayload,
+  TierUpgradedPayload,
+  RewardRedeemedPayload,
+  LoyaltyCardCreatedEvent,
+  PointsEarnedEvent,
+  TierUpgradedEvent,
+  RewardRedeemedEvent,
+} from './events/loyalty';
+
+export {
+  createLoyaltyCardCreatedEvent,
+  createPointsEarnedEvent,
+  createTierUpgradedEvent,
+  createRewardRedeemedEvent,
+} from './events/loyalty';
