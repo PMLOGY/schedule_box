@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 7 of 15 — Notifications & Automation
-- **Status:** In Progress
-- **Current Plan:** 6 of 7 plans complete
-- **Plans Executed:** 48
+- **Status:** Complete (checkpoint pending)
+- **Current Plan:** 7 of 7 plans complete
+- **Plans Executed:** 49
 
 ## What's Done
 
@@ -68,6 +68,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 07-04: Notification & Automation API Routes (2 tasks, 2 commits)
 - [x] Plan 07-05: Reminder Scheduler and Automation Engine (2 tasks, 2 commits)
 - [x] Plan 07-06: Frontend Pages for Notifications, Templates, and Automation (2 tasks, 2 commits)
+- [x] Plan 07-07: Docker Compose Integration and Environment Documentation (1 task, 1 commit)
 - [x] Plan 08-01: Coupon CRUD and Validation API (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
@@ -80,10 +81,10 @@ Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entiti
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
-Phase 7: In Progress — Plans 07-01 through 07-06 complete (Consumer infrastructure, notification worker, event consumers, API routes, scheduler & automation engine, frontend UI ready)
+Phase 7: Complete ✅ — All 7 plans executed (Consumer infrastructure, notification worker, event consumers, API routes, scheduler, automation engine, frontend UI, Docker Compose integration ready)
 Phase 8: Complete ✅ — All 3 plans executed, verified 20/20 (Coupons, gift cards, CSV import, GDPR ready)
 
-Next: Phase 7 remaining plan (07-07) - WebSocket real-time notifications, or Phase 9 (Loyalty Program)
+Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 
 ## Decisions
 
@@ -296,6 +297,9 @@ Next: Phase 7 remaining plan (07-07) - WebSocket real-time notifications, or Pha
 - [Phase 07-05]: Delay converted to BullMQ delay milliseconds (delayMinutes * 60 * 1000)
 - [Phase 07-05]: Promise-based amqplib API used throughout (not callback/promise mix)
 - [Phase 07-05]: RabbitMQ consumers integrated into worker entrypoint alongside BullMQ workers
+- [Phase 07-07]: notification-worker runs as separate Docker Compose service alongside app (scalability and isolation)
+- [Phase 07-07]: SMTP/Twilio/VAPID env vars use ${VAR:-default} syntax for graceful degradation in development
+- [Phase 07-07]: Worker depends on postgres, redis, rabbitmq health checks (prevents connection errors on startup)
 
 ## Blockers
 
@@ -365,11 +369,12 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 08-02 | 261s | 2 | 5 | 2 |
 | 08-03 | 247s | 2 | 4 | 2 |
 | 07-06 | 801s | 2 | 17 | 2 |
+| 07-07 | 42s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 07 Plan 06 — Notification & Automation Frontend UI
+**Stopped at:** Completed Phase 07 Plan 07 — Docker Compose Integration (checkpoint pending verification)
 
 ---
 *Last updated: 2026-02-11 after completing Phase 07 Plan 05*
