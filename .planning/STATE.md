@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 8 Complete — CRM & Marketing verified, Milestone 2 in progress
+**Current focus:** Phase 7 & 8 Complete — Notifications & CRM done, Milestone 2 progressing
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 7 of 15 — Notifications & Automation
-- **Status:** Complete (checkpoint pending)
-- **Current Plan:** 7 of 7 plans complete
+- **Status:** Complete
+- **Current Plan:** Phase 7 complete, Phase 9 next
 - **Plans Executed:** 49
 
 ## What's Done

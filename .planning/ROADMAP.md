@@ -210,9 +210,11 @@ Plans:
 
 ## Milestone 2: Business Features
 
-### Phase 7: Notifications & Automation
+### Phase 7: Notifications & Automation ✓
 
 **Goal:** Build notification service (email/SMS/push) with template system and visual automation rule builder so businesses can automate customer communication.
+
+**Status:** Complete (2026-02-11)
 
 **Segments:** BACKEND (primary), DATABASE (notification tables), DEVOPS (email testing)
 
@@ -220,23 +222,23 @@ Plans:
 
 **Depends on:** Phase 5, Phase 6
 
-**Plans:** 7 plans in 4 waves
+**Plans:** 7/7 complete
 
 Plans:
-- [ ] 07-01-PLAN.md — Event consumer helper, payment/review/notification CloudEvent types, Zod schemas [Wave 1]
-- [ ] 07-02-PLAN.md — Notification worker scaffold (BullMQ, Nodemailer, Twilio, web-push, Handlebars templates) [Wave 1]
-- [ ] 07-03-PLAN.md — RabbitMQ event consumers (booking confirmation, review routing, payment notifications) [Wave 2]
-- [ ] 07-04-PLAN.md — API routes: notification templates CRUD, notifications list, automation rules CRUD, email tracking [Wave 2]
-- [ ] 07-05-PLAN.md — Reminder scheduler (24h/2h before appointment) and automation rule execution engine [Wave 3]
-- [ ] 07-06-PLAN.md — Frontend: notification history, template editor, visual automation builder (React Flow) [Wave 3]
-- [ ] 07-07-PLAN.md — Docker Compose integration and verification checkpoint [Wave 4]
+- [x] 07-01-PLAN.md — Event consumer helper, payment/review/notification CloudEvent types, Zod schemas [Wave 1]
+- [x] 07-02-PLAN.md — Notification worker scaffold (BullMQ, Nodemailer, Twilio, web-push, Handlebars templates) [Wave 1]
+- [x] 07-03-PLAN.md — RabbitMQ event consumers (booking confirmation, review routing, payment notifications) [Wave 2]
+- [x] 07-04-PLAN.md — API routes: notification templates CRUD, notifications list, automation rules CRUD, email tracking [Wave 2]
+- [x] 07-05-PLAN.md — Reminder scheduler (24h/2h before appointment) and automation rule execution engine [Wave 3]
+- [x] 07-06-PLAN.md — Frontend: notification history, template editor, visual automation builder (React Flow) [Wave 3]
+- [x] 07-07-PLAN.md — Docker Compose integration and verification checkpoint [Wave 4]
 
 **Success Criteria:**
-1. Booking creation triggers automatic confirmation email
-2. Reminder notifications sent 24h and 2h before appointment
-3. Notification templates render with dynamic variables (customer name, service, time)
-4. Visual rule builder creates automation: trigger -> delay -> action
-5. Review request sent automatically after completed visit with smart routing
+1. ~~Booking creation triggers automatic confirmation email~~ ✓
+2. ~~Reminder notifications sent 24h and 2h before appointment~~ ✓
+3. ~~Notification templates render with dynamic variables (customer name, service, time)~~ ✓
+4. ~~Visual rule builder creates automation: trigger -> delay -> action~~ ✓
+5. ~~Review request sent automatically after completed visit with smart routing~~ ✓
 
 ---
 
@@ -432,7 +434,7 @@ Plans:
 | 4 | Frontend Shell | App shell + design system + calendar | UI-01..09 (9) | Phase 3 |
 | 5 | Booking MVP | Availability + booking flow + events | BOOK-01..10 (10) | Phase 3, 4 |
 | 6 | Payment Integration ✓ | Comgate + QRcomat + SAGA | PAY-01..07 (7) | Phase 5 |
-| 7 | Notifications & Automation | Email/SMS + templates + rule builder | NOTIF-01..10 (10) | Phase 5, 6 |
+| 7 | Notifications & Automation ✓ | Email/SMS + templates + rule builder | NOTIF-01..10 (10) | Phase 5, 6 |
 | 8 | CRM & Marketing ✓ | Tags + coupons + gift cards + GDPR | CRM-01..07 (7) | Phase 3, 5 |
 | 9 | Loyalty Program | Points + tiers + wallet cards | LOYAL-01..07 (7) | Phase 5, 7 |
 | 10 | AI Phase 1 | No-show + CLV + health score | AI1-01..05 (5) | Phase 5, 3 |
