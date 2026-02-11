@@ -247,6 +247,12 @@ Next: Phase 8 Plan 08-04 — Marketing automation features
 - [Phase 07-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (following Phase 5 pattern)
 - [Phase 07-01]: Enum values in Zod schemas match database check constraints exactly
 - [Phase 07-01]: Payment event payloads updated (completedAt, failedAt, currency for refund) to align with notification/review patterns
+- [Phase 08-02]: Gift cards share PERMISSIONS.COUPONS_MANAGE permission (gift cards are similar to coupons)
+- [Phase 08-02]: Gift card code auto-generated in XXXX-XXXX-XXXX-XXXX format using crypto.randomBytes (16 hex chars)
+- [Phase 08-02]: Balance and code fields are NOT updateable via PUT (security constraint)
+- [Phase 08-02]: Redemption uses SELECT FOR UPDATE to prevent race conditions on concurrent redemptions
+- [Phase 08-02]: Transaction log is append-only (records purchase, redemption, refund events)
+- [Phase 08-02]: Expiration check happens at redemption time, not at query time (grace period allowed)
 - [Phase 08-03]: PapaParse chosen for CSV parsing (simple API, battle-tested, 5.5k+ weekly downloads)
 - [Phase 08-03]: Batch size set to 1000 rows for CSV import (balance between memory usage and database round-trips)
 - [Phase 08-03]: Error reporting capped at 100 errors to prevent large API responses during import
@@ -314,12 +320,13 @@ None — Phase 8 Plan 03 complete, ready for Plan 04.
 | 06-06 | 700s | 3 | 3 | 3 |
 | 06-07 | 280s | 2 | 3 | 2 |
 | 07-01 | 202s | 2 | 11 | 2 |
+| 08-02 | 261s | 2 | 5 | 2 |
 | 08-03 | 247s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 08-03 — CSV Import and GDPR Anonymization
+**Stopped at:** Completed Plan 08-02 — Gift Card CRUD and Redemption API
 
 ---
-*Last updated: 2026-02-11 after completing Plan 06-07*
+*Last updated: 2026-02-11 after completing Plan 08-02*
