@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 9 Loyalty Program — Plans 01-05 complete, points operations and event consumer ready
+**Current focus:** Phase 9 Loyalty Program — Plans 01-06 complete, wallet pass generation ready
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 9 of 15 — Loyalty Program
 - **Status:** In Progress
-- **Current Plan:** 09-05 complete, 09-06 next
-- **Plans Executed:** 54
+- **Current Plan:** 09-06 complete, 09-07 next
+- **Plans Executed:** 55
 
 ## What's Done
 
@@ -77,6 +77,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-03: Loyalty Service Layer (2 tasks, 2 commits)
 - [x] Plan 09-04: Loyalty CRUD API Routes (2 tasks, 1 commit)
 - [x] Plan 09-05: Points Operation Endpoints and Booking-Completed Consumer (2 tasks, 1 commit)
+- [x] Plan 09-06: Digital Wallet Pass Generation (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -325,6 +326,10 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-05]: Redeem endpoint pre-validates reward/card/program before delegating to engine for specific HTTP error codes (404/400/409)
 - [Phase 09-05]: Consumer handler exports handleBookingCompleted separately for testing, startBookingCompletedConsumer for lifecycle
 - [Phase 09-05]: Idempotent consumer: awardPointsForBooking returns silently on duplicate, message still ACKed (not requeued)
+- [Phase 09-06]: passkit-generator v3 constructor props API for serialNumber, description, colors (not instance properties)
+- [Phase 09-06]: Skinny JWT for Google Wallet embeds class+object in JWT claims, avoids REST API round-trips
+- [Phase 09-06]: ConfigurationError class shared between Apple/Google wallet for consistent 503 on missing credentials
+- [Phase 09-06]: NextResponse with Uint8Array body for binary .pkpass file download from createRouteHandler
 
 ## Blockers
 
@@ -337,7 +342,7 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 7 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~72 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty) |
+| API Endpoints | 99 | ~74 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet) |
 | Frontend Components | 32+ | ~10 (design system + booking wizard + calendar) |
 | Test Coverage | 80% | 0% |
 
@@ -400,11 +405,12 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 09-03 | 450s | 2 | 3 | 2 |
 | 09-04 | 580s | 2 | 3 | 1 |
 | 09-05 | 180s | 2 | 3 | 1 |
+| 09-06 | 300s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Phase 09 Plan 05 — Points Operation Endpoints and Booking-Completed Consumer
+**Stopped at:** Completed Phase 09 Plan 06 — Digital Wallet Pass Generation
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 05*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 06*
