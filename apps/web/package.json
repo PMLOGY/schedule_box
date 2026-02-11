@@ -47,6 +47,7 @@
     "nanoid": "^5.1.6",
     "next": "^14.2.21",
     "next-intl": "^4.8.2",
+    "opossum": "^9.0.0",
     "otplib": "^13.2.1",
     "papaparse": "^5.5.3",
     "passkit-generator": "^3.5.7",
@@ -64,6 +65,7 @@
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.91.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/opossum": "^8.1.9",
     "@types/papaparse": "^5.5.2",
     "@types/pdfkit": "^0.17.4",
     "@types/qrcode": "^1.5.6",
