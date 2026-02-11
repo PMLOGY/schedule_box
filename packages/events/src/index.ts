@@ -38,3 +38,25 @@ export {
   createBookingNoShowEvent,
   createBookingRescheduledEvent,
 } from './events/booking.js';
+
+// Payment domain events
+export type {
+  PaymentInitiatedPayload,
+  PaymentCompletedPayload,
+  PaymentFailedPayload,
+  PaymentRefundedPayload,
+  PaymentExpiredPayload,
+  PaymentInitiatedEvent,
+  PaymentCompletedEvent,
+  PaymentFailedEvent,
+  PaymentRefundedEvent,
+  PaymentExpiredEvent,
+} from './events/payment.js';
+
+export {
+  createPaymentInitiatedEvent,
+  createPaymentCompletedEvent,
+  createPaymentFailedEvent,
+  createPaymentRefundedEvent,
+  createPaymentExpiredEvent,
+} from './events/payment.js';
