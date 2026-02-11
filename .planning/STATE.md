@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 6 Complete — Milestone 1 finished, ready for Milestone 2
+**Current focus:** Phase 8 Complete — CRM & Marketing verified, Milestone 2 in progress
 
 ## Position
 
-- **Milestone:** v1.0 (complete) → v2.0 next
-- **Phase:** 8 of 15 — CRM & Marketing
+- **Milestone:** v2.0 (in progress)
+- **Phase:** 7 of 15 — Notifications & Automation
 - **Status:** In Progress
-- **Current Plan:** 08-02 complete, 08-03 next
-- **Plans Executed:** 42
+- **Current Plan:** 5 of 7 plans complete
+- **Plans Executed:** 47
 
 ## What's Done
 
@@ -64,6 +64,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
 - [x] Plan 07-01: Event Consumer Infrastructure and Shared Types (2 tasks, 2 commits)
 - [x] Plan 07-02: Notification Worker Microservice with BullMQ (2 tasks, 2 commits)
+- [x] Plan 07-03: RabbitMQ Event Consumers with Multi-Channel Notification Enqueue (2 tasks, 2 commits)
+- [x] Plan 07-04: Notification & Automation API Routes (2 tasks, 2 commits)
+- [x] Plan 07-05: Reminder Scheduler and Automation Engine (2 tasks, 2 commits)
 - [x] Plan 08-01: Coupon CRUD and Validation API (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
@@ -76,10 +79,10 @@ Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entiti
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
-Phase 7: In Progress — Plans 07-01, 07-02 complete (Consumer infrastructure and notification worker ready)
-Phase 8: In Progress — Plan 08-03 complete (CSV import and GDPR anonymization ready)
+Phase 7: In Progress — Plans 07-01 through 07-05 complete (Consumer infrastructure, notification worker, event consumers, API routes, scheduler & automation engine ready)
+Phase 8: Complete ✅ — All 3 plans executed, verified 20/20 (Coupons, gift cards, CSV import, GDPR ready)
 
-Next: Phase 8 Plan 08-04 — Marketing automation features
+Next: Phase 7 remaining plans (07-06, 07-07) - Frontend UI for notification templates and automation rules
 
 ## Decisions
 
@@ -267,19 +270,37 @@ Next: Phase 8 Plan 08-04 — Marketing automation features
 - [Phase 07-02]: Tracking pixel injection before </body> tag for email open tracking
 - [Phase 07-02]: SMS segment estimation using GSM-7 (160 chars) vs UCS-2 (70 chars) for Czech diacritics
 - [Phase 07-02]: Czech locale helpers (formatDate, formatTime, formatCurrency) registered globally in Handlebars
+- [Phase 07-03]: Callback-based amqplib API for consistency with Phase 5 publisher pattern
+- [Phase 07-03]: Push notification logic stubbed out (needs push_subscriptions table)
+- [Phase 07-03]: Customer name field used (not firstName/lastName as they don't exist)
+- [Phase 07-03]: Review routing threshold: >= 4 stars external, <= 3 stars internal
+- [Phase 07-03]: Idempotent job IDs use CloudEvent.id for deduplication
+- [Phase 07-03]: Graceful shutdown closes RabbitMQ before BullMQ for proper cleanup
+- [Phase 07-04]: Notification templates use numeric IDs (SERIAL) for route params per database design
+- [Phase 07-04]: Automation rules use UUID routing to never expose SERIAL IDs (API convention)
+- [Phase 07-04]: Email tracking webhooks are public (no auth) for embedded pixel/redirect usage
+- [Phase 07-04]: Push subscriptions stored in users.metadata JSONB field (flexible storage)
+- [Phase 07-04]: Template preview uses Handlebars directly in API route (lightweight, no worker needed)
+- [Phase 07-05]: Reminder scheduler runs every 15 minutes via BullMQ repeatable job
+- [Phase 07-05]: 30-minute time windows (±15 minutes) account for scanner interval
+- [Phase 07-05]: Idempotency check queries notifications table before enqueuing
+- [Phase 07-05]: Automation trigger mapping excludes notification.* and automation.* events (loop prevention)
+- [Phase 07-05]: Delay converted to BullMQ delay milliseconds (delayMinutes * 60 * 1000)
+- [Phase 07-05]: Promise-based amqplib API used throughout (not callback/promise mix)
+- [Phase 07-05]: RabbitMQ consumers integrated into worker entrypoint alongside BullMQ workers
 
 ## Blockers
 
-None — Phase 8 Plan 03 complete, ready for Plan 04.
+None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 
 ## Metrics
 
 | Metric | Target | Current |
 |--------|--------|---------|
-| Requirements | 103 | ~55 implemented (infra + database + auth + core + booking + payment) |
-| Phases | 15 | 6 complete (Milestone 1 done) |
+| Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
+| Phases | 15 | 7 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~55 (auth, customers, services, employees, resources, bookings, availability, payments, invoices) |
+| API Endpoints | 99 | ~70 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize) |
 | Frontend Components | 32+ | ~10 (design system + booking wizard + calendar) |
 | Test Coverage | 80% | 0% |
 
@@ -329,6 +350,9 @@ None — Phase 8 Plan 03 complete, ready for Plan 04.
 | 06-07 | 280s | 2 | 3 | 2 |
 | 07-01 | 202s | 2 | 11 | 2 |
 | 07-02 | 340s | 2 | 18 | 2 |
+| 07-03 | 482s | 2 | 4 | 2 |
+| 07-04 | 680s | 2 | 12 | 2 |
+| 07-05 | 531s | 2 | 8 | 2 |
 | 08-01 | 352s | 2 | 4 | 2 |
 | 08-02 | 261s | 2 | 5 | 2 |
 | 08-03 | 247s | 2 | 4 | 2 |
@@ -336,7 +360,7 @@ None — Phase 8 Plan 03 complete, ready for Plan 04.
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 07-02 — Notification Worker Microservice with BullMQ
+**Stopped at:** Completed Phase 07 Plan 05 — Reminder Scheduler and Automation Engine
 
 ---
-*Last updated: 2026-02-11 after completing Plan 07-02*
+*Last updated: 2026-02-11 after completing Phase 07 Plan 05*
