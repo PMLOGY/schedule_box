@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 6 of 15 — Payment Integration
 - **Status:** In Progress
-- **Current Plan:** 06-02 (Next plan after 06-01)
-- **Plans Executed:** 34
+- **Current Plan:** 06-03 (Next plan after 06-02)
+- **Plans Executed:** 35
 
 ## What's Done
 
@@ -55,6 +55,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 05-05: Booking Status Transitions & Expiration (2 tasks, 1 commit)
 - [x] Plan 05-06: Booking Wizard Implementation (2 tasks, 2 commits)
 - [x] Plan 06-01: Payment Schemas, Types, and Events (2 tasks, 2 commits)
+- [x] Plan 06-02: Webhook Idempotency and Payment Service Foundation (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -63,9 +64,9 @@ Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-06 complete (Booking CRUD, availability engine, and booking wizard ready)
-Phase 6: In Progress — Plan 06-01 complete (Payment schemas, types, and events foundation ready)
+Phase 6: In Progress — Plans 06-01, 06-02 complete (Payment foundation + webhook idempotency ready)
 
-Next: Phase 6 Plan 02 — Comgate payment gateway integration
+Next: Phase 6 Plan 03 — Comgate payment gateway integration
 
 ## Decisions
 
@@ -206,6 +207,9 @@ Next: Phase 6 Plan 02 — Comgate payment gateway integration
 - [Phase 05-05]: Fire-and-forget event publishing for status transitions (reliability deferred to Phase 7)
 - [Phase 06-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (types inferred separately in types/ files)
 - [Phase 06-01]: Payment amounts stored as strings to preserve decimal precision from PostgreSQL NUMERIC type
+- [Phase 06-02]: Webhook idempotency table is global (no company_id) since gateway transaction IDs are globally unique
+- [Phase 06-02]: Invoice numbering requires transaction parameter to prevent race conditions on concurrent generation
+- [Phase 06-02]: Status transition validation map enforces valid payment lifecycle (pending→paid, paid→refunded, etc)
 - [Phase 06-01]: Five payment CloudEvents (initiated, completed, failed, refunded, expired) enable SAGA choreography for booking confirmation
 - [Phase 06-01]: Gateway enum supports 5 payment methods (Comgate, QRcomat, cash, bank transfer, gift card) for CZ/SK market
 
@@ -261,11 +265,12 @@ None — Phase 4 in progress.
 | 05-05 | 790s | 2 | 8 | 1 |
 | 05-06 | 460s | 2 | 14 | 2 |
 | 06-01 | 181s | 2 | 6 | 2 |
+| 06-02 | 341s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 06-01 — Payment Schemas, Types, and Events
+**Stopped at:** Completed Plan 06-02 — Webhook Idempotency and Payment Service Foundation
 
 ---
-*Last updated: 2026-02-11 after recording Plan 05-05 execution*
+*Last updated: 2026-02-11 after completing Plan 06-02*
