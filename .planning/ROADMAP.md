@@ -340,6 +340,15 @@ Plans:
 
 **Depends on:** Phase 10
 
+**Plans:** 5 plans in 3 waves
+
+Plans:
+- [ ] 11-01-PLAN.md — Python optimization models (upselling CF, pricing MAB, capacity Prophet, reminder timing Bayesian) + FastAPI router [Wave 1]
+- [ ] 11-02-PLAN.md — Node.js circuit breaker extensions (optimization types, fallbacks, 2s upselling timeout) [Wave 1]
+- [ ] 11-03-PLAN.md — Training scripts and dummy model generator for all 4 optimization models [Wave 2]
+- [ ] 11-04-PLAN.md — Next.js API routes for optimization endpoints with Zod validation and RBAC [Wave 2]
+- [ ] 11-05-PLAN.md — Frontend: upselling widget in booking wizard, pricing dashboard, capacity dashboard [Wave 3]
+
 **Success Criteria:**
 1. Upselling suggestions appear during booking (step 1) based on service selection
 2. Dynamic pricing adjusts service prices based on demand patterns
@@ -446,4 +455,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 8 execution*
+*Last updated: 2026-02-11 after Phase 11 planning*
