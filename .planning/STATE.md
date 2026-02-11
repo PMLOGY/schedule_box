@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v1.0
-- **Phase:** 5 of 15 — Booking MVP
+- **Phase:** 6 of 15 — Payment Integration
 - **Status:** In Progress
-- **Current Plan:** 05-07 (Next plan after 05-06)
-- **Plans Executed:** 32
+- **Current Plan:** 06-02 (Next plan after 06-01)
+- **Plans Executed:** 34
 
 ## What's Done
 
@@ -52,7 +52,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 05-02: RabbitMQ Event Infrastructure (2 tasks, 2 commits)
 - [x] Plan 05-04: Booking CRUD API with Double-Booking Prevention (2 tasks, 2 commits)
 - [x] Plan 05-03: Availability Engine & Public API (2 tasks, 2 commits)
+- [x] Plan 05-05: Booking Status Transitions & Expiration (2 tasks, 1 commit)
 - [x] Plan 05-06: Booking Wizard Implementation (2 tasks, 2 commits)
+- [x] Plan 06-01: Payment Schemas, Types, and Events (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -61,8 +63,9 @@ Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-06 complete (Booking CRUD, availability engine, and booking wizard ready)
+Phase 6: In Progress — Plan 06-01 complete (Payment schemas, types, and events foundation ready)
 
-Next: Phase 5 Plan 07 — Continuation of booking MVP features
+Next: Phase 6 Plan 02 — Comgate payment gateway integration
 
 ## Decisions
 
@@ -197,6 +200,10 @@ Next: Phase 5 Plan 07 — Continuation of booking MVP features
 - [Phase 05-06]: Auto-advance to next step after slot selection in Step 2 (reduces clicks, smoother UX)
 - [Phase 05-06]: Calendar component using react-day-picker v9 (industry-standard date picker with accessibility support)
 - [Phase 05-06]: 409 SLOT_TAKEN error returns user to Step 2 (allows immediate retry without starting over)
+- [Phase 06-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (types inferred separately in types/ files)
+- [Phase 06-01]: Payment amounts stored as strings to preserve decimal precision from PostgreSQL NUMERIC type
+- [Phase 06-01]: Five payment CloudEvents (initiated, completed, failed, refunded, expired) enable SAGA choreography for booking confirmation
+- [Phase 06-01]: Gateway enum supports 5 payment methods (Comgate, QRcomat, cash, bank transfer, gift card) for CZ/SK market
 
 ## Blockers
 
@@ -248,11 +255,12 @@ None — Phase 4 in progress.
 | 05-03 | 500s | 2 | 3 | 2 |
 | 05-04 | 434s | 2 | 5 | 2 |
 | 05-06 | 460s | 2 | 14 | 2 |
+| 06-01 | 181s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 05-06 — Booking Wizard Implementation
+**Stopped at:** Completed Plan 06-01 — Payment Schemas, Types, and Events
 
 ---
-*Last updated: 2026-02-11 after completing Plan 05-06*
+*Last updated: 2026-02-11 after completing Plan 06-01*
