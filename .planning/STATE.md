@@ -200,6 +200,10 @@ Next: Phase 6 Plan 02 — Comgate payment gateway integration
 - [Phase 05-06]: Auto-advance to next step after slot selection in Step 2 (reduces clicks, smoother UX)
 - [Phase 05-06]: Calendar component using react-day-picker v9 (industry-standard date picker with accessibility support)
 - [Phase 05-06]: 409 SLOT_TAKEN error returns user to Step 2 (allows immediate retry without starting over)
+- [Phase 05-05]: Use 'cancelled' status with cancelledBy='system' for expired bookings instead of separate 'expired' status
+- [Phase 05-05]: Customer role blocked from cancelling within cancellationPolicyHours window (403 CANCELLATION_POLICY), admin/employee bypass policy
+- [Phase 05-05]: Reschedule excludes current booking from conflict check to prevent self-blocking
+- [Phase 05-05]: Fire-and-forget event publishing for status transitions (reliability deferred to Phase 7)
 - [Phase 06-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (types inferred separately in types/ files)
 - [Phase 06-01]: Payment amounts stored as strings to preserve decimal precision from PostgreSQL NUMERIC type
 - [Phase 06-01]: Five payment CloudEvents (initiated, completed, failed, refunded, expired) enable SAGA choreography for booking confirmation
@@ -254,6 +258,7 @@ None — Phase 4 in progress.
 | 05-01 | 200s | 2 | 6 | 2 |
 | 05-03 | 500s | 2 | 3 | 2 |
 | 05-04 | 434s | 2 | 5 | 2 |
+| 05-05 | 790s | 2 | 8 | 1 |
 | 05-06 | 460s | 2 | 14 | 2 |
 | 06-01 | 181s | 2 | 6 | 2 |
 
@@ -263,4 +268,4 @@ None — Phase 4 in progress.
 **Stopped at:** Completed Plan 06-01 — Payment Schemas, Types, and Events
 
 ---
-*Last updated: 2026-02-11 after completing Plan 06-01*
+*Last updated: 2026-02-11 after recording Plan 05-05 execution*
