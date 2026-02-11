@@ -103,6 +103,66 @@
     "noEvents": "Žádné události",
     "allEmployees": "Všichni zaměstnanci"
   },
+  "booking": {
+    "title": "Rezervace",
+    "new": {
+      "title": "Nová rezervace"
+    },
+    "wizard": {
+      "steps": {
+        "service": "Služba",
+        "datetime": "Datum a čas",
+        "customer": "Zákazník",
+        "confirm": "Potvrzení"
+      },
+      "step1": {
+        "title": "Vyberte službu",
+        "selectService": "Vyberte službu",
+        "duration": "Trvání",
+        "price": "Cena",
+        "minutes": "minut",
+        "noServices": "Žádné aktivní služby",
+        "preferredEmployee": "Preferovaný zaměstnanec",
+        "anyEmployee": "Kdokoliv"
+      },
+      "step2": {
+        "title": "Vyberte datum a čas",
+        "selectDate": "Vyberte datum",
+        "availableSlots": "Dostupné časy",
+        "noSlotsAvailable": "Pro vybrané datum nejsou dostupné žádné termíny",
+        "loading": "Načítání dostupnosti..."
+      },
+      "step3": {
+        "title": "Informace o zákazníkovi",
+        "existingCustomer": "Existující zákazník",
+        "newCustomer": "Nový zákazník",
+        "searchCustomer": "Hledat zákazníka...",
+        "name": "Jméno",
+        "email": "E-mail",
+        "phone": "Telefon",
+        "notes": "Poznámky",
+        "validation": {
+          "nameRequired": "Jméno je povinné",
+          "nameMin": "Jméno musí mít alespoň 2 znaky",
+          "emailInvalid": "Neplatný formát e-mailu",
+          "phoneInvalid": "Neplatný formát telefonu"
+        }
+      },
+      "step4": {
+        "title": "Potvrzení rezervace",
+        "summary": "Souhrn rezervace",
+        "service": "Služba",
+        "datetime": "Datum a čas",
+        "employee": "Zaměstnanec",
+        "customer": "Zákazník",
+        "notes": "Poznámky",
+        "confirmBooking": "Potvrdit rezervaci",
+        "slotTaken": "Tento termín již není dostupný. Prosím vyberte jiný.",
+        "bookingSuccess": "Rezervace byla úspěšně vytvořena",
+        "bookingError": "Chyba při vytváření rezervace"
+      }
+    }
+  },
   "table": {
     "noData": "Žádná data",
     "rowsPerPage": "Řádků na stránku",

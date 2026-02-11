@@ -103,6 +103,66 @@
     "noEvents": "No events",
     "allEmployees": "All employees"
   },
+  "booking": {
+    "title": "Bookings",
+    "new": {
+      "title": "New Booking"
+    },
+    "wizard": {
+      "steps": {
+        "service": "Service",
+        "datetime": "Date & Time",
+        "customer": "Customer",
+        "confirm": "Confirmation"
+      },
+      "step1": {
+        "title": "Select Service",
+        "selectService": "Select a service",
+        "duration": "Duration",
+        "price": "Price",
+        "minutes": "minutes",
+        "noServices": "No active services",
+        "preferredEmployee": "Preferred employee",
+        "anyEmployee": "Anyone"
+      },
+      "step2": {
+        "title": "Select Date and Time",
+        "selectDate": "Select date",
+        "availableSlots": "Available times",
+        "noSlotsAvailable": "No available times for selected date",
+        "loading": "Loading availability..."
+      },
+      "step3": {
+        "title": "Customer Information",
+        "existingCustomer": "Existing customer",
+        "newCustomer": "New customer",
+        "searchCustomer": "Search customer...",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "notes": "Notes",
+        "validation": {
+          "nameRequired": "Name is required",
+          "nameMin": "Name must be at least 2 characters",
+          "emailInvalid": "Invalid email format",
+          "phoneInvalid": "Invalid phone format"
+        }
+      },
+      "step4": {
+        "title": "Confirm Booking",
+        "summary": "Booking Summary",
+        "service": "Service",
+        "datetime": "Date & Time",
+        "employee": "Employee",
+        "customer": "Customer",
+        "notes": "Notes",
+        "confirmBooking": "Confirm Booking",
+        "slotTaken": "This time slot is no longer available. Please select a different time.",
+        "bookingSuccess": "Booking created successfully",
+        "bookingError": "Error creating booking"
+      }
+    }
+  },
   "table": {
     "noData": "No data",
     "rowsPerPage": "Rows per page",
