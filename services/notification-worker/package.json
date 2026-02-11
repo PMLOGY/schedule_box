@@ -13,6 +13,7 @@
     "handlebars": "^4.7.8",
     "twilio": "^5.3.5",
     "web-push": "^3.6.7",
+    "drizzle-orm": "^0.36.4",
     "@schedulebox/database": "workspace:*",
     "@schedulebox/events": "workspace:*"
   },

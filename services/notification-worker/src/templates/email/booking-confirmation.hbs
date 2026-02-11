@@ -1,0 +1,26 @@
+<h2>Potvrzení rezervace</h2>
+
+<p>Dobrý den {{customer_name}},</p>
+
+<p>Vaše rezervace byla úspěšně vytvořena. Těšíme se na Vaši návštěvu!</p>
+
+<div class="details-box">
+  <p><strong>Služba:</strong> {{service_name}}</p>
+  <p><strong>Datum:</strong> {{formatDate booking_date}}</p>
+  <p><strong>Čas:</strong> {{formatTime booking_time}}</p>
+  {{#if employee_name}}
+  <p><strong>Pracovník:</strong> {{employee_name}}</p>
+  {{/if}}
+  {{#if price}}
+  <p><strong>Cena:</strong> {{formatCurrency price currency}}</p>
+  {{/if}}
+</div>
+
+{{#if cancel_url}}
+<p><a href="{{cancel_url}}" class="button" style="background: #EF4444;">Zrušit rezervaci</a></p>
+{{/if}}
+
+<p>Máte-li jakékoliv dotazy, neváhejte nás kontaktovat.</p>
+
+<p>S pozdravem,<br>
+Tým {{company_name}}</p>
