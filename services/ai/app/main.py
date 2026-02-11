@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import health, predictions
+from .routers import health, optimization, predictions
 from .services.model_loader import load_models, cleanup_models
 from .services import feature_store
 
@@ -39,6 +39,7 @@ app.add_middleware(
 # Register routers
 app.include_router(health.router, tags=["health"])
 app.include_router(predictions.router, prefix="/api/v1", tags=["predictions"])
+app.include_router(optimization.router, prefix="/api/v1", tags=["optimization"])
 
 
 @app.on_event("startup")

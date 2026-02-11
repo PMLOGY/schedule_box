@@ -64,3 +64,74 @@ class ModelInfoResponse(BaseModel):
     trained_at: Optional[str] = None
     features: list[str]
     metrics: Optional[dict] = None
+
+
+# --- Optimization response models (Phase 11) ---
+
+
+class UpsellRecommendation(BaseModel):
+    """A single upselling recommendation."""
+
+    service_id: int
+    confidence: float
+    reason: str
+
+
+class UpsellResponse(BaseModel):
+    """Response for smart upselling."""
+
+    recommendations: list[UpsellRecommendation]
+    model_version: str
+    fallback: bool
+
+
+class DynamicPricingResponse(BaseModel):
+    """Response for dynamic pricing."""
+
+    service_id: int
+    optimal_price: float
+    confidence: float
+    constrained: bool = Field(
+        default=False, description="True if 30% daily limit was applied"
+    )
+    model_version: str
+    fallback: bool
+
+
+class CapacityForecastEntry(BaseModel):
+    """A single hourly forecast entry."""
+
+    datetime: str
+    predicted_bookings: float
+    lower_bound: float
+    upper_bound: float
+    utilization_level: Literal["low", "medium", "high"]
+
+
+class CapacityScheduleSuggestion(BaseModel):
+    """A schedule change suggestion."""
+
+    datetime: str
+    type: Literal["extend_hours", "reduce_hours", "add_employee"]
+    reason: str
+    priority: Literal["low", "medium", "high"]
+
+
+class CapacityForecastResponse(BaseModel):
+    """Response for capacity forecasting."""
+
+    forecast: list[CapacityForecastEntry]
+    suggestions: list[CapacityScheduleSuggestion]
+    model_version: str
+    fallback: bool
+
+
+class ReminderTimingResponse(BaseModel):
+    """Response for smart reminder timing."""
+
+    customer_id: int
+    minutes_before: int
+    expected_open_rate: float
+    confidence: float
+    model_version: str
+    fallback: bool

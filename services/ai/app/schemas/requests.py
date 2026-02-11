@@ -5,7 +5,7 @@ Validates incoming prediction requests with proper types and optional feature di
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, Optional
 
 
 class NoShowFeatures(BaseModel):
@@ -64,3 +64,47 @@ class BatchHealthScoreRequest(BaseModel):
     """Request for batch health score calculation."""
 
     customers: list[HealthScorePredictionRequest]
+
+
+# --- Optimization request models (Phase 11) ---
+
+
+class UpsellRequest(BaseModel):
+    """Request for smart upselling recommendations."""
+
+    customer_id: int
+    current_service_id: int
+    customer_history: Optional[list[int]] = None  # Previously booked service IDs
+
+
+class DynamicPricingRequest(BaseModel):
+    """Request for dynamic pricing optimization."""
+
+    service_id: int
+    price_min: float = Field(..., gt=0, description="Minimum allowed price")
+    price_max: float = Field(..., gt=0, description="Maximum allowed price")
+    base_price: Optional[float] = Field(
+        None, gt=0, description="Current static price for 30% constraint"
+    )
+    hour_of_day: int = Field(..., ge=0, le=23)
+    day_of_week: int = Field(..., ge=0, le=6)
+    utilization: float = Field(
+        ..., ge=0.0, le=1.0, description="Current utilization 0.0-1.0"
+    )
+
+
+class CapacityForecastRequest(BaseModel):
+    """Request for capacity demand forecasting."""
+
+    company_id: int
+    days_ahead: int = Field(default=7, ge=1, le=30)
+    current_capacity: int = Field(
+        default=8, ge=1, description="Max bookings per hour for suggestions"
+    )
+
+
+class ReminderTimingRequest(BaseModel):
+    """Request for smart reminder timing optimization."""
+
+    customer_id: int
+    notification_channel: Literal["email", "sms", "push"] = "email"
