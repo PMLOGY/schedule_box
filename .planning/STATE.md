@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v1.0 (complete) → v2.0 next
-- **Phase:** 7 of 15 — Notifications & Automation
+- **Phase:** 8 of 15 — CRM & Marketing
 - **Status:** In Progress
-- **Current Plan:** 07-01 complete, 07-02 next
+- **Current Plan:** 08-02 complete, 08-03 next
 - **Plans Executed:** 42
 
 ## What's Done
@@ -63,6 +63,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-06: Invoice PDF Generation and Payment Refund (3 tasks, 3 commits)
 - [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
 - [x] Plan 07-01: Event Consumer Infrastructure and Shared Types (2 tasks, 2 commits)
+- [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
+- [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -73,8 +75,9 @@ Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pen
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
 Phase 6: Complete ✅ — All 7 plans executed (Payment foundation, Comgate, QR payment, SAGA, invoice PDF, refund, and CRUD endpoints ready)
 Phase 7: In Progress — Plan 07-01 complete (Consumer helper and shared types ready)
+Phase 8: In Progress — Plan 08-03 complete (CSV import and GDPR anonymization ready)
 
-Next: Phase 7 Plan 07-02 — Notification worker service
+Next: Phase 8 Plan 08-04 — Marketing automation features
 
 ## Decisions
 
@@ -244,10 +247,16 @@ Next: Phase 7 Plan 07-02 — Notification worker service
 - [Phase 07-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (following Phase 5 pattern)
 - [Phase 07-01]: Enum values in Zod schemas match database check constraints exactly
 - [Phase 07-01]: Payment event payloads updated (completedAt, failedAt, currency for refund) to align with notification/review patterns
+- [Phase 08-03]: PapaParse chosen for CSV parsing (simple API, battle-tested, 5.5k+ weekly downloads)
+- [Phase 08-03]: Batch size set to 1000 rows for CSV import (balance between memory usage and database round-trips)
+- [Phase 08-03]: Error reporting capped at 100 errors to prevent large API responses during import
+- [Phase 08-03]: Duplicate handling via onConflictDoNothing instead of upsert (import is append-only)
+- [Phase 08-03]: GDPR anonymization preserves business analytics (totalBookings, totalSpent, AI metrics)
+- [Phase 08-03]: Anonymization different from soft delete: irreversible PII removal vs. recoverable data hiding
 
 ## Blockers
 
-None — Phase 7 Plan 01 complete, ready for Plan 02.
+None — Phase 8 Plan 03 complete, ready for Plan 04.
 
 ## Metrics
 
@@ -305,11 +314,12 @@ None — Phase 7 Plan 01 complete, ready for Plan 02.
 | 06-06 | 700s | 3 | 3 | 3 |
 | 06-07 | 280s | 2 | 3 | 2 |
 | 07-01 | 202s | 2 | 11 | 2 |
+| 08-03 | 247s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed Plan 07-01 — Event Consumer Infrastructure and Shared Types
+**Stopped at:** Completed Plan 08-03 — CSV Import and GDPR Anonymization
 
 ---
 *Last updated: 2026-02-11 after completing Plan 06-07*
