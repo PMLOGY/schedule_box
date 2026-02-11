@@ -14,6 +14,7 @@ export * from './coupons';
 export * from './gift-cards';
 export * from './loyalty';
 export * from './payments';
+export * from './webhooks';
 export * from './notifications';
 export * from './reviews';
 export * from './ai';
