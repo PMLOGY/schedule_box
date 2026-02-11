@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 11 In Progress — AI Optimization (plan 02 of 05 complete)
+**Current focus:** Phase 11 In Progress — AI Optimization (plans 01-02 of 05 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 11 of 15 — AI Optimization
 - **Status:** Phase 11 In Progress
-- **Current Plan:** 11-02 complete
-- **Plans Executed:** 61
+- **Current Plan:** 11-02 complete, 11-01 complete
+- **Plans Executed:** 62
 
 ## What's Done
 
@@ -84,6 +84,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 10-02: AI Client Circuit Breaker (2 tasks, 2 commits)
 - [x] Plan 10-03: Prediction Endpoints & Training Pipeline (2 tasks, 2 commits)
 - [x] Plan 10-04: API Routes & Docker Integration (2 tasks, 2 commits)
+- [x] Plan 11-01: AI Optimization Models & Endpoints (2 tasks, 2 commits)
 - [x] Plan 11-02: AI Optimization Client Types & Fallbacks (2 tasks, 2 commits)
 
 ## What's Next
@@ -101,7 +102,7 @@ Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD A
 
 Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit breaker client, prediction endpoints, API routes & Docker integration)
 
-Phase 11: In Progress — Plan 11-02 complete (optimization client types, fallbacks, circuit breaker functions)
+Phase 11: In Progress — Plans 11-01 and 11-02 complete (optimization models, endpoints, client types, fallbacks, circuit breaker)
 
 Next: Phase 11 Plans 03-05 remaining
 
@@ -366,6 +367,10 @@ Next: Phase 11 Plans 03-05 remaining
 - [Phase 10-04]: Used SETTINGS_MANAGE for AI health endpoint (settings.read does not exist in RBAC system)
 - [Phase 10-04]: No hard dependency from app to AI in Docker Compose (circuit breaker handles AI unavailability)
 - [Phase 10-04]: Circuit breaker proxy pattern: API route calls breaker.fire() in try/catch, returns fallback with 503 on failure
+- [Phase 11-01]: Prophet over LSTM for capacity forecasting (practical for SMB data volumes, LSTM as future upgrade)
+- [Phase 11-01]: Lazy imports for Prophet and BayesianOptimization (graceful degradation if not installed)
+- [Phase 11-01]: Thompson Sampling context key: {service_id}:{day}:{hour//4}:{util_bucket} for 6 time blocks x 3 util levels
+- [Phase 11-01]: 30% price constraint applied post-MAB-selection with confidence reduction (0.7x when constrained)
 - [Phase 11-02]: Upselling circuit breaker uses 2s timeout (vs 5s default) to avoid blocking booking wizard flow
 - [Phase 11-02]: Empty array fallback for recommendation/forecast endpoints (no misleading data when AI unavailable)
 - [Phase 11-02]: Midpoint price fallback for dynamic pricing (static pricing behavior as safe default)
@@ -451,12 +456,13 @@ None — Phase 11 in progress.
 | 10-02 | 239s | 2 | 6 | 2 |
 | 10-03 | 276s | 2 | 9 | 2 |
 | 10-04 | 136s | 2 | 6 | 2 |
+| 11-01 | 312s | 2 | 11 | 2 |
 | 11-02 | 170s | 2 | 3 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed 11-02-PLAN.md — AI Optimization Client Types, Fallbacks & Circuit Breaker
+**Stopped at:** Completed 11-01-PLAN.md — AI Optimization Models & Endpoints
 
 ---
-*Last updated: 2026-02-11 after completing Phase 11 Plan 02*
+*Last updated: 2026-02-11 after completing Phase 11 Plan 01*
