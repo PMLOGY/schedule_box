@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 9 of 15 — Loyalty Program
 - **Status:** In Progress
-- **Current Plan:** 09-03 complete, 09-04 next
-- **Plans Executed:** 52
+- **Current Plan:** 09-04 complete, 09-05 next
+- **Plans Executed:** 53
 
 ## What's Done
 
@@ -75,6 +75,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 09-01: Loyalty Schemas and Types (2 tasks, 2 commits)
 - [x] Plan 09-02: Loyalty Domain CloudEvents (2 tasks, 2 commits)
 - [x] Plan 09-03: Loyalty Service Layer (2 tasks, 2 commits)
+- [x] Plan 09-04: Loyalty CRUD API Routes (2 tasks, 1 commit)
 
 ## What's Next
 
@@ -314,6 +315,10 @@ Next: Phase 9 (Loyalty Program) or continue with Phase 4 completion
 - [Phase 09-03]: SELECT FOR UPDATE for all balance modifications prevents race conditions on concurrent operations
 - [Phase 09-03]: Auto-enrollment creates loyalty card on first booking completion for frictionless onboarding
 - [Phase 09-03]: Idempotency check via bookingId query prevents duplicate points awards
+- [Phase 09-04]: Card number format SB-XXXX-XXXX-XXXX with crypto.randomBytes for secure unique generation
+- [Phase 09-04]: Tier progress calculated on-demand (next tier, points needed, progress percent) avoids stale data
+- [Phase 09-04]: Transaction bookingUuid returns null for performance (deferred JOIN until frontend needs it)
+- [Phase 09-04]: Reward ID uses numeric ID in route params (rewards don't have UUID field per DB design)
 - [Phase 09-03]: Fire-and-forget event publishing ensures transaction success doesn't depend on RabbitMQ availability
 
 ## Blockers
@@ -388,11 +393,12 @@ None — Phase 8 complete, Phase 7 and Phase 9 ready for continued execution.
 | 09-01 | 157s | 2 | 4 | 2 |
 | 09-02 | 87s | 2 | 2 | 2 |
 | 09-03 | 450s | 2 | 3 | 2 |
+| 09-04 | 580s | 2 | 3 | 1 |
 
 ## Session Info
 
-**Last session:** 2026-02-11T20:04:47.885Z
-**Stopped at:** Completed Phase 09 Plan 03 — Loyalty Service Layer
+**Last session:** 2026-02-11
+**Stopped at:** Completed Phase 09 Plan 04 — Loyalty CRUD API Routes
 
 ---
-*Last updated: 2026-02-11 after completing Phase 09 Plan 03*
+*Last updated: 2026-02-11 after completing Phase 09 Plan 04*
