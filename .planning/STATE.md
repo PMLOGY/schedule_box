@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 11 In Progress — AI Optimization (plans 01-04 of 05 complete)
+**Current focus:** Phase 11 Complete — AI Optimization (all 5 plans complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 11 of 15 — AI Optimization
-- **Status:** Phase 11 In Progress
-- **Current Plan:** 11-03 complete, 11-04 complete, 11-02 complete, 11-01 complete
-- **Plans Executed:** 64
+- **Status:** Phase 11 Complete
+- **Current Plan:** 11-05 complete, 11-04 complete, 11-03 complete, 11-02 complete, 11-01 complete
+- **Plans Executed:** 65
 
 ## What's Done
 
@@ -88,6 +88,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 11-02: AI Optimization Client Types & Fallbacks (2 tasks, 2 commits)
 - [x] Plan 11-03: Optimization Training Scripts (2 tasks, 2 commits)
 - [x] Plan 11-04: Optimization API Routes (2 tasks, 2 commits)
+- [x] Plan 11-05: Frontend Integration - Optimization Hooks & Dashboards (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -104,9 +105,9 @@ Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD A
 
 Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit breaker client, prediction endpoints, API routes & Docker integration)
 
-Phase 11: In Progress — Plans 11-01, 11-02, 11-03, 11-04 complete (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts)
+Phase 11: Complete -- All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Next: Phase 11 Plan 05 remaining
+Next: Phase 12 (Advanced Features)
 
 ## Decisions
 
@@ -382,20 +383,24 @@ Next: Phase 11 Plan 05 remaining
 - [Phase 11-04]: Optimization routes return 200 on AI failure (advisory, never blocking) unlike prediction routes (503)
 - [Phase 11-04]: RBAC mapped to existing permissions: BOOKINGS_READ, SERVICES_UPDATE, SETTINGS_MANAGE (services.write and settings.read don't exist)
 - [Phase 11-04]: Zod schemas in @schedulebox/shared for cross-package reuse (not inline like prediction routes)
+- [Phase 11-05]: Non-blocking upselling widget returns null while loading (never shows spinner, per research pitfall #6)
+- [Phase 11-05]: Price Check form approach avoids N+1 queries for per-service pricing dashboard
+- [Phase 11-05]: CompanyId defaults to 1 for capacity forecast (auth store UUID vs API int mismatch)
+- [Phase 11-05]: Consistent blue fallback info banners when AI returns fallback=true
 
 ## Blockers
 
-None — Phase 11 in progress.
+None — Phase 11 complete.
 
 ## Metrics
 
 | Metric | Target | Current |
 |--------|--------|---------|
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
-| Phases | 15 | 8 complete (Milestone 1 done, Milestone 2 in progress) |
+| Phases | 15 | 9 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
 | API Endpoints | 99 | ~86 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization) |
-| Frontend Components | 32+ | ~19 (design system + booking wizard + calendar + notifications + loyalty) |
+| Frontend Components | 32+ | ~22 (design system + booking wizard + calendar + notifications + loyalty + AI dashboards) |
 | Test Coverage | 80% | 0% |
 
 ## Performance Metrics
@@ -468,11 +473,12 @@ None — Phase 11 in progress.
 | 11-02 | 170s | 2 | 3 | 2 |
 | 11-03 | 262s | 2 | 6 | 2 |
 | 11-04 | 155s | 2 | 6 | 2 |
+| 11-05 | 287s | 2 | 5 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed 11-03-PLAN.md — Optimization Training Scripts
+**Stopped at:** Completed 11-05-PLAN.md — Frontend Integration (Phase 11 Complete)
 
 ---
-*Last updated: 2026-02-11 after completing Phase 11 Plan 03*
+*Last updated: 2026-02-11 after completing Phase 11 Plan 05*
