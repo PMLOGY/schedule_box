@@ -6,7 +6,7 @@
  * For Production (Phase 15): Integrated with scheduled job infrastructure (node-cron, Kubernetes CronJob)
  */
 
-import { sql, lt, eq } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 import { db, payments } from '@schedulebox/database';
 import { publishEvent } from '@schedulebox/events';
 import { createPaymentExpiredEvent } from '@schedulebox/events';
@@ -20,8 +20,7 @@ import { handlePaymentExpired } from './booking-payment-handlers';
  */
 export async function expirePendingPayments(timeoutMinutes?: number): Promise<number> {
   // Get timeout from parameter, env var, or default to 30 minutes
-  const timeout =
-    timeoutMinutes ?? parseInt(process.env.PAYMENT_TIMEOUT_MINUTES || '30', 10);
+  const timeout = timeoutMinutes ?? parseInt(process.env.PAYMENT_TIMEOUT_MINUTES || '30', 10);
 
   console.log(`[Payment Timeout] Checking for pending payments older than ${timeout} minutes`);
 
@@ -39,18 +38,14 @@ export async function expirePendingPayments(timeoutMinutes?: number): Promise<nu
         createdAt: payments.createdAt,
       })
       .from(payments)
-      .where(
-        sql`${payments.status} = 'pending' AND ${payments.createdAt} < ${cutoffTime}`,
-      );
+      .where(sql`${payments.status} = 'pending' AND ${payments.createdAt} < ${cutoffTime}`);
 
     if (expiredPayments.length === 0) {
       console.log('[Payment Timeout] No expired payments found');
       return 0;
     }
 
-    console.log(
-      `[Payment Timeout] Found ${expiredPayments.length} expired pending payments`,
-    );
+    console.log(`[Payment Timeout] Found ${expiredPayments.length} expired pending payments`);
 
     let successCount = 0;
 
@@ -116,10 +111,7 @@ export async function expirePendingPayments(timeoutMinutes?: number): Promise<nu
         successCount++;
         console.log(`[Payment Timeout] Expired payment ${payment.uuid}`);
       } catch (error) {
-        console.error(
-          `[Payment Timeout] Error processing payment ${payment.uuid}:`,
-          error,
-        );
+        console.error(`[Payment Timeout] Error processing payment ${payment.uuid}:`, error);
         // Continue with next payment
       }
     }

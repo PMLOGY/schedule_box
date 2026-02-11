@@ -21,54 +21,6 @@ import { NotFoundError } from '@schedulebox/shared';
 import { generateInvoiceNumber } from '../payments/service';
 
 // ============================================================================
-// TYPES
-// ============================================================================
-
-/**
- * Invoice data needed for PDF generation
- */
-interface InvoiceData {
-  invoice: {
-    id: number;
-    invoiceNumber: string;
-    amount: string;
-    taxAmount: string;
-    currency: string;
-    issuedAt: Date | null;
-    dueAt: Date | null;
-  };
-  payment: {
-    id: number;
-    gateway: string;
-    gatewayTransactionId: string | null;
-    amount: string;
-  };
-  booking: {
-    id: number;
-    startTime: Date;
-    price: string;
-  };
-  customer: {
-    name: string;
-    email: string;
-    phone: string | null;
-  };
-  service: {
-    name: string;
-  };
-  company: {
-    name: string;
-    email: string;
-    phone: string | null;
-    addressStreet: string | null;
-    addressCity: string | null;
-    addressZip: string | null;
-    addressCountry: string | null;
-    settings: Record<string, unknown>;
-  };
-}
-
-// ============================================================================
 // CREATE INVOICE FOR PAYMENT
 // ============================================================================
 
@@ -86,11 +38,7 @@ interface InvoiceData {
  * @returns Created invoice record
  * @throws NotFoundError if payment not found or doesn't belong to company
  */
-export async function createInvoiceForPayment(
-  paymentId: number,
-  companyId: number,
-  tx: Database,
-) {
+export async function createInvoiceForPayment(paymentId: number, companyId: number, tx: Database) {
   // Query payment with related booking, customer, and service details
   const [payment] = await tx
     .select({
@@ -137,7 +85,8 @@ export async function createInvoiceForPayment(
       status: 'issued' as const,
       issuedAt,
       dueAt,
-    } as any) // Drizzle type inference issue
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any) // Drizzle type inference issue consistent with existing patterns
     .returning();
 
   return invoice;
@@ -166,10 +115,7 @@ export async function createInvoiceForPayment(
  * @returns PDF as Buffer
  * @throws NotFoundError if invoice not found or doesn't belong to company
  */
-export async function generateInvoicePDF(
-  invoiceId: number,
-  companyId: number,
-): Promise<Buffer> {
+export async function generateInvoicePDF(invoiceId: number, _companyId: number): Promise<Buffer> {
   // Query invoice with all related data for PDF generation
   const [result] = await db
     .select({
@@ -246,10 +192,7 @@ export async function generateInvoicePDF(
   doc.on('data', (chunk) => chunks.push(chunk));
 
   // Header - Company information
-  doc
-    .fontSize(20)
-    .font('Helvetica-Bold')
-    .text(company.name, { align: 'left' });
+  doc.fontSize(20).font('Helvetica-Bold').text(company.name, { align: 'left' });
 
   doc.fontSize(10).font('Helvetica');
 
@@ -274,15 +217,9 @@ export async function generateInvoicePDF(
   doc.moveDown(2);
 
   // Invoice title and number
-  doc
-    .fontSize(24)
-    .font('Helvetica-Bold')
-    .text('FAKTURA', { align: 'center' });
+  doc.fontSize(24).font('Helvetica-Bold').text('FAKTURA', { align: 'center' });
 
-  doc
-    .fontSize(14)
-    .font('Helvetica')
-    .text(`Číslo: ${invoice.invoiceNumber}`, { align: 'center' });
+  doc.fontSize(14).font('Helvetica').text(`Číslo: ${invoice.invoiceNumber}`, { align: 'center' });
 
   doc.moveDown(2);
 
