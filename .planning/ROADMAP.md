@@ -224,6 +224,13 @@ Plans:
 
 **Depends on:** Phase 3, Phase 5
 
+**Plans:** 3 plans in 1 wave
+
+Plans:
+- [ ] 08-01-PLAN.md — Coupon CRUD and validation endpoint (percentage/fixed discounts, usage limits, service applicability)
+- [ ] 08-02-PLAN.md — Gift card CRUD, balance check, and atomic redemption with transaction log
+- [ ] 08-03-PLAN.md — Customer CSV import with PapaParse and GDPR anonymization endpoint
+
 **Success Criteria:**
 1. Owner can create and assign tags to customers
 2. Coupons apply correctly during booking (percentage and fixed discounts)
