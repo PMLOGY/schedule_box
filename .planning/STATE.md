@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 11 In Progress — AI Optimization (plans 01-02 of 05 complete)
+**Current focus:** Phase 11 In Progress — AI Optimization (plans 01-02, 04 of 05 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 11 of 15 — AI Optimization
 - **Status:** Phase 11 In Progress
-- **Current Plan:** 11-02 complete, 11-01 complete
-- **Plans Executed:** 62
+- **Current Plan:** 11-04 complete, 11-02 complete, 11-01 complete
+- **Plans Executed:** 63
 
 ## What's Done
 
@@ -86,6 +86,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 10-04: API Routes & Docker Integration (2 tasks, 2 commits)
 - [x] Plan 11-01: AI Optimization Models & Endpoints (2 tasks, 2 commits)
 - [x] Plan 11-02: AI Optimization Client Types & Fallbacks (2 tasks, 2 commits)
+- [x] Plan 11-04: Optimization API Routes (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -102,9 +103,9 @@ Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD A
 
 Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit breaker client, prediction endpoints, API routes & Docker integration)
 
-Phase 11: In Progress — Plans 11-01 and 11-02 complete (optimization models, endpoints, client types, fallbacks, circuit breaker)
+Phase 11: In Progress — Plans 11-01, 11-02, 11-04 complete (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes)
 
-Next: Phase 11 Plans 03-05 remaining
+Next: Phase 11 Plans 03, 05 remaining
 
 ## Decisions
 
@@ -374,6 +375,9 @@ Next: Phase 11 Plans 03-05 remaining
 - [Phase 11-02]: Upselling circuit breaker uses 2s timeout (vs 5s default) to avoid blocking booking wizard flow
 - [Phase 11-02]: Empty array fallback for recommendation/forecast endpoints (no misleading data when AI unavailable)
 - [Phase 11-02]: Midpoint price fallback for dynamic pricing (static pricing behavior as safe default)
+- [Phase 11-04]: Optimization routes return 200 on AI failure (advisory, never blocking) unlike prediction routes (503)
+- [Phase 11-04]: RBAC mapped to existing permissions: BOOKINGS_READ, SERVICES_UPDATE, SETTINGS_MANAGE (services.write and settings.read don't exist)
+- [Phase 11-04]: Zod schemas in @schedulebox/shared for cross-package reuse (not inline like prediction routes)
 
 ## Blockers
 
@@ -386,7 +390,7 @@ None — Phase 11 in progress.
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 8 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~82 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health) |
+| API Endpoints | 99 | ~86 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization) |
 | Frontend Components | 32+ | ~19 (design system + booking wizard + calendar + notifications + loyalty) |
 | Test Coverage | 80% | 0% |
 
@@ -458,11 +462,12 @@ None — Phase 11 in progress.
 | 10-04 | 136s | 2 | 6 | 2 |
 | 11-01 | 312s | 2 | 11 | 2 |
 | 11-02 | 170s | 2 | 3 | 2 |
+| 11-04 | 155s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-11
-**Stopped at:** Completed 11-01-PLAN.md — AI Optimization Models & Endpoints
+**Stopped at:** Completed 11-04-PLAN.md — Optimization API Routes
 
 ---
-*Last updated: 2026-02-11 after completing Phase 11 Plan 01*
+*Last updated: 2026-02-11 after completing Phase 11 Plan 04*
