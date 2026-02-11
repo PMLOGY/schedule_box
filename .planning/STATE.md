@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v1.0
 - **Phase:** 6 of 15 — Payment Integration
 - **Status:** In Progress
-- **Current Plan:** 06-05 (Next plan after 05-08)
-- **Plans Executed:** 38
+- **Current Plan:** 06-06 (Next plan after 06-05)
+- **Plans Executed:** 39
 
 ## What's Done
 
@@ -59,6 +59,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-02: Webhook Idempotency and Payment Service Foundation (2 tasks, 2 commits)
 - [x] Plan 06-03: Comgate Payment Gateway Integration (3 tasks, 3 commits)
 - [x] Plan 06-04: Czech QR Payment Generation (SPD Format) (2 tasks, 2 commits)
+- [x] Plan 06-05: SAGA Choreography and Payment Timeout (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -67,9 +68,9 @@ Phase 2: Complete ✅ — All schemas, RLS policies, functions, views, relations
 Phase 3: Complete ✅ — JWT/RBAC auth, 37 API routes, CRUD for all core entities
 Phase 4: In Progress — Plans 04-01, 04-02, 04-03 complete (Phase 4 Plan 04 pending)
 Phase 5: In Progress — Plans 05-01, 05-02, 05-03, 05-04, 05-05, 05-06, 05-08 complete (Booking CRUD, availability engine, booking wizard, and admin calendar ready)
-Phase 6: In Progress — Plans 06-01, 06-02, 06-03, 06-04 complete (Payment foundation + webhook idempotency + Comgate integration + QR payment ready)
+Phase 6: In Progress — Plans 06-01, 06-02, 06-03, 06-04, 06-05 complete (Payment foundation + webhook idempotency + Comgate integration + QR payment + SAGA choreography ready)
 
-Next: Phase 6 Plan 05 — Payment list and refund endpoints
+Next: Phase 6 Plan 06 — Payment list and refund endpoints
 
 ## Decisions
 
@@ -222,6 +223,9 @@ Next: Phase 6 Plan 05 — Payment list and refund endpoints
 - [Phase 06-04]: Variable symbol (booking ID zero-padded) serves as QR payment reference since no gateway transaction ID exists upfront
 - [Phase 06-04]: QR payment confirmation requires manual admin action (or future FIO Bank API integration) since no webhook exists
 - [Phase 06-04]: Company IBAN from company.settings.iban or COMPANY_DEFAULT_IBAN env var for development flexibility
+- [Phase 06-05]: SAGA handlers called synchronously from webhook for MVP (no RabbitMQ consumer infrastructure yet, Phase 7 will add async consumers with zero code changes)
+- [Phase 06-05]: Payment timeout triggered manually or by external cron (scheduled job infrastructure deferred to Phase 15)
+- [Phase 06-05]: Expired payments use 'failed' status with gatewayResponse metadata ('expired' not in CHECK constraint, using 'failed' with reason='payment_timeout')
 - [Phase 05-08]: Use standard FullCalendar views instead of resource timeline for MVP (premium license not needed)
 - [Phase 05-08]: Implement optimistic updates for drag-drop rescheduling with automatic rollback on error
 - [Phase 05-08]: Fetch bookings for visible calendar range +/- 7 days for performance optimization
@@ -281,12 +285,13 @@ None — Phase 4 in progress.
 | 06-02 | 341s | 2 | 4 | 2 |
 | 06-03 | 363s | 3 | 4 | 3 |
 | 06-04 | 235s | 2 | 2 | 2 |
+| 06-05 | 293s | 2 | 5 | 2 |
 | 05-08 | 699s | 2 | 10 | 2 |
 
 ## Session Info
 
-**Last session:** 2026-02-11T15:42:02.121Z
-**Stopped at:** Completed Plan 05-08 — Admin Booking Calendar
+**Last session:** 2026-02-11
+**Stopped at:** Completed Plan 06-05 — SAGA Choreography and Payment Timeout
 
 ---
 *Last updated: 2026-02-11 after completing Plan 06-03*
