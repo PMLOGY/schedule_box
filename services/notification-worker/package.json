@@ -13,6 +13,7 @@
     "handlebars": "^4.7.8",
     "twilio": "^5.3.5",
     "web-push": "^3.6.7",
+    "amqplib": "^0.10.4",
     "drizzle-orm": "^0.36.4",
     "@schedulebox/database": "workspace:*",
     "@schedulebox/events": "workspace:*"
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@types/nodemailer": "^6.4.16",
     "@types/web-push": "^3.6.3",
+    "@types/amqplib": "^0.10.5",
     "typescript": "^5.7.3",
     "tsx": "^4.19.2"
   }
