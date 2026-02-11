@@ -19,6 +19,10 @@ import {
 import { verifyComgateSignature } from '@/app/api/v1/payments/comgate/client';
 import { publishEvent } from '@schedulebox/events';
 import { createPaymentCompletedEvent, createPaymentFailedEvent } from '@schedulebox/events';
+import {
+  handlePaymentCompleted,
+  handlePaymentFailed,
+} from '@/app/api/v1/payments/saga/booking-payment-handlers';
 
 /**
  * POST /api/v1/webhooks/comgate
@@ -101,22 +105,30 @@ export async function POST(req: NextRequest) {
         gatewayResponse: payload,
       });
 
+      // Prepare event data
+      const completedEventData = {
+        paymentUuid: payment.uuid,
+        bookingUuid: booking.uuid,
+        companyId: payment.companyId,
+        amount: payment.amount,
+        currency: payment.currency || 'CZK',
+        gateway: 'comgate',
+        gatewayTransactionId: transId,
+        paidAt: new Date().toISOString(),
+      };
+
       // Publish payment.completed event
       try {
-        await publishEvent(
-          createPaymentCompletedEvent({
-            paymentUuid: payment.uuid,
-            bookingUuid: booking.uuid,
-            companyId: payment.companyId,
-            amount: payment.amount,
-            currency: payment.currency || 'CZK',
-            gateway: 'comgate',
-            gatewayTransactionId: transId,
-            paidAt: new Date().toISOString(),
-          }),
-        );
+        await publishEvent(createPaymentCompletedEvent(completedEventData));
       } catch (error) {
         console.error('Failed to publish payment.completed event:', error);
+      }
+
+      // Execute SAGA handler synchronously (MVP - no RabbitMQ consumer yet)
+      try {
+        await handlePaymentCompleted(completedEventData);
+      } catch (error) {
+        console.error('Failed to execute SAGA handler for payment.completed:', error);
       }
     } else if (status === 'CANCELLED') {
       // Payment cancelled by customer
@@ -124,19 +136,27 @@ export async function POST(req: NextRequest) {
         gatewayResponse: payload,
       });
 
+      // Prepare event data
+      const failedEventData = {
+        paymentUuid: payment.uuid,
+        bookingUuid: booking.uuid,
+        companyId: payment.companyId,
+        gateway: 'comgate',
+        reason: 'Payment cancelled by customer',
+      };
+
       // Publish payment.failed event
       try {
-        await publishEvent(
-          createPaymentFailedEvent({
-            paymentUuid: payment.uuid,
-            bookingUuid: booking.uuid,
-            companyId: payment.companyId,
-            gateway: 'comgate',
-            reason: 'Payment cancelled by customer',
-          }),
-        );
+        await publishEvent(createPaymentFailedEvent(failedEventData));
       } catch (error) {
         console.error('Failed to publish payment.failed event:', error);
+      }
+
+      // Execute SAGA handler synchronously (MVP - no RabbitMQ consumer yet)
+      try {
+        await handlePaymentFailed(failedEventData);
+      } catch (error) {
+        console.error('Failed to execute SAGA handler for payment.failed:', error);
       }
     } else if (status === 'AUTHORIZED') {
       // Payment authorized but not captured - treat as pending
