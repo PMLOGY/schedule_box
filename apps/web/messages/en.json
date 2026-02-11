@@ -18,7 +18,12 @@
     "no": "No",
     "noResults": "No results",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "page": "Page",
+    "entries": "entries"
   },
   "auth": {
     "login": {

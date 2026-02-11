@@ -18,7 +18,12 @@
     "no": "Nie",
     "noResults": "Žiadne výsledky",
     "error": "Chyba",
-    "success": "Úspech"
+    "success": "Úspech",
+    "showing": "Zobrazené",
+    "to": "do",
+    "of": "z",
+    "page": "Stránka",
+    "entries": "záznamov"
   },
   "auth": {
     "login": {

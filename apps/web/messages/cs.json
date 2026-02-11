@@ -18,7 +18,12 @@
     "no": "Ne",
     "noResults": "Žádné výsledky",
     "error": "Chyba",
-    "success": "Úspěch"
+    "success": "Úspěch",
+    "showing": "Zobrazeno",
+    "to": "do",
+    "of": "z",
+    "page": "Stránka",
+    "entries": "záznamů"
   },
   "auth": {
     "login": {
