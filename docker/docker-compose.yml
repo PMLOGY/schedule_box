@@ -85,6 +85,41 @@ services:
     command: pnpm --filter @schedulebox/web dev
     restart: unless-stopped
 
+  notification-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: schedulebox-notification-worker
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://schedulebox:schedulebox@postgres:5432/schedulebox
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - SMTP_HOST=${SMTP_HOST:-localhost}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@schedulebox.cz}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER:-}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ..:/app
+      - /app/node_modules
+    command: pnpm --filter @schedulebox/notification-worker start
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
