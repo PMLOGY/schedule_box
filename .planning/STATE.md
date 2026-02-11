@@ -64,6 +64,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 06-07: Payment List and Status Tracking Endpoints (2 tasks, 2 commits)
 - [x] Plan 07-01: Event Consumer Infrastructure and Shared Types (2 tasks, 2 commits)
 - [x] Plan 07-02: Notification Worker Microservice with BullMQ (2 tasks, 2 commits)
+- [x] Plan 08-01: Coupon CRUD and Validation API (2 tasks, 2 commits)
 - [x] Plan 08-02: Gift Card CRUD and Redemption API (2 tasks, 2 commits)
 - [x] Plan 08-03: CSV Import and GDPR Anonymization (2 tasks, 2 commits)
 
