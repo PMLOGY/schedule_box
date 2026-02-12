@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 12 of 15 — Advanced Features
-- **Status:** Phase 12 In Progress
-- **Current Plan:** 12-08 complete
-- **Plans Executed:** 71
+- **Phase:** 13 of 15 — Polish & Optimization
+- **Status:** Phase 13 In Progress
+- **Current Plan:** 13-02 complete
+- **Plans Executed:** 72
 
 ## What's Done
 
@@ -95,6 +95,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-06: Public Booking Pages (2 tasks, 2 commits)
 - [x] Plan 12-07: Embeddable JavaScript Booking Widget (2 tasks, 2 commits)
 - [x] Plan 12-08: Review Rating Sync Consumer (1 task, 1 commit)
+- [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -115,7 +116,9 @@ Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints,
 
 Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation, review rating sync consumer)
 
-Next: Phase 12 Plan 02 (Marketplace Listings Management) or Plan 05 (Marketplace Search)
+Phase 13: In Progress — Plan 13-02 complete (Complete Czech/Slovak/English translations with locale switcher and WCAG 2.1 AA accessibility foundations)
+
+Next: Phase 13 Plan 03 (Performance Optimization) or Plan 04 (Error Boundaries & Loading States)
 
 ## Decisions
 
@@ -425,6 +428,10 @@ Next: Phase 12 Plan 02 (Marketplace Listings Management) or Plan 05 (Marketplace
 - [Phase 12-07]: Middleware exclusion for /embed routes bypasses locale routing, locale passed as query param instead
 - [Phase 12-08]: NACK without requeue on error to prevent infinite retry loops on bad data in review rating sync
 - [Phase 12-08]: Skip marketplace rating update gracefully when company has no public listing
+- [Phase 13-02]: Text abbreviations (CS/SK/EN) instead of emoji flags for locale switcher (better accessibility)
+- [Phase 13-02]: Skip-link renders as first child in AuthGuard before all interactive elements (WCAG 2.1 compliance)
+- [Phase 13-02]: Locale switcher positioned between breadcrumbs and user menu in header (visual hierarchy)
+- [Phase 13-02]: tabIndex={-1} on main element allows programmatic focus from skip-link without adding to natural tab order
 
 ## Blockers
 
@@ -519,11 +526,12 @@ None — Phase 11 complete.
 | 12-06 | 369s | 2 | 5 | 2 |
 | 12-07 | 313s | 2 | 6 | 2 |
 | 12-08 | 89s | 1 | 2 | 1 |
+| 13-02 | 229s | 2 | 11 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 12-08-PLAN.md
+**Stopped at:** Completed 13-02-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-08 (Review Rating Sync Consumer)*
+*Last updated: 2026-02-12 after completing Phase 13-02 (i18n Expansion & Accessibility Foundations)*
