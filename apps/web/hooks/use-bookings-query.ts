@@ -5,7 +5,7 @@
  * Provides hooks for list view, calendar view, and single booking detail.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { Booking, BookingListQuery } from '@schedulebox/shared/types';
 import type { PaginatedResponse } from '@schedulebox/shared/types';
@@ -88,6 +88,7 @@ export function useBookingsForCalendar(dateFrom: string, dateTo: string, employe
       return events;
     },
     staleTime: 30_000, // 30 seconds
+    placeholderData: keepPreviousData,
   });
 }
 
