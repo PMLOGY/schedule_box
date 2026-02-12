@@ -1,0 +1,57 @@
+# OWASP ZAP Baseline Scan Configuration
+# Target: ScheduleBox Web Application (Staging)
+# Purpose: Comprehensive web application security testing with SaaS-specific false positive exclusions
+
+env:
+  contexts:
+    - name: ScheduleBox
+      urls:
+        - https://staging.schedulebox.cz
+      includePaths:
+        - 'https://staging.schedulebox.cz/.*'
+      excludePaths:
+        # Widget embedding has different CSP requirements (frame-ancestors *)
+        - 'https://staging.schedulebox.cz/embed/.*'
+        # Webhook endpoints expect specific payloads from external services
+        - 'https://staging.schedulebox.cz/api/v1/webhooks/.*'
+        # Internal monitoring endpoint (not public-facing)
+        - 'https://staging.schedulebox.cz/api/metrics'
+  parameters:
+    failOnError: true
+    progressToStdout: true
+
+jobs:
+  - type: passiveScan-config
+    parameters:
+      # Maximum alerts to raise (-1 for unlimited)
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  - type: passiveScan-config
+    rules:
+      # False positives for JWT-based SaaS applications
+
+      # Content Security Policy Header Not Set (10038)
+      # Reason: CSP configured differently per route (/embed has relaxed CSP)
+      - id: 10038
+        threshold: 'off'
+
+      # Cross-Domain JavaScript Source File Inclusion (10098)
+      # Reason: CDN usage is standard practice (fonts, analytics)
+      - id: 10098
+        threshold: 'off'
+
+      # Absence of Anti-CSRF Tokens (10202)
+      # Reason: JWT-based auth in Authorization header, not cookie sessions
+      - id: 10202
+        threshold: 'off'
+
+      # Proxy Disclosure (40025)
+      # Reason: Internal proxy headers normal in Kubernetes environment
+      - id: 40025
+        threshold: 'off'
+
+      # Server Leaks Information via X-Powered-By (10037)
+      # Reason: Next.js header is non-critical, lowered to MEDIUM
+      - id: 10037
+        threshold: 'medium'

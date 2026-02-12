@@ -1,0 +1,89 @@
+# OWASP ZAP API Scan Configuration
+# Target: ScheduleBox REST API (Staging)
+# Purpose: API-specific security testing (SQLi, XSS, IDOR, auth bypass)
+
+env:
+  contexts:
+    - name: ScheduleBox-API
+      urls:
+        - https://staging.schedulebox.cz/api/v1
+      includePaths:
+        - 'https://staging.schedulebox.cz/api/v1/.*'
+      excludePaths:
+        # Webhook endpoints handled in baseline scan
+        - 'https://staging.schedulebox.cz/api/v1/webhooks/.*'
+  parameters:
+    failOnError: true
+    progressToStdout: true
+
+jobs:
+  - type: passiveScan-config
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  - type: passiveScan-config
+    rules:
+      # API-specific false positive exclusions
+
+      # Anti-CSRF Tokens (10202)
+      # Reason: APIs use Authorization header (JWT), not cookie sessions
+      - id: 10202
+        threshold: 'off'
+
+      # Application Error Disclosure (90022)
+      # Reason: Structured error responses are intentional (consistent format)
+      - id: 90022
+        threshold: 'off'
+
+  - type: activeScan-config
+    parameters:
+      # Enable critical tests for API security
+      enablePassiveScan: true
+      enableTags: true
+
+  - type: activeScan-config
+    rules:
+      # SQL Injection (critical for Drizzle ORM queries)
+      - id: 40018
+        threshold: 'low'
+        strength: 'high'
+
+      # Cross Site Scripting (critical for user-generated content)
+      - id: 40012
+        threshold: 'low'
+        strength: 'high'
+      - id: 40014
+        threshold: 'low'
+        strength: 'high'
+      - id: 40016
+        threshold: 'low'
+        strength: 'high'
+      - id: 40017
+        threshold: 'low'
+        strength: 'high'
+
+      # Path Traversal (critical for file operations)
+      - id: 6
+        threshold: 'low'
+        strength: 'high'
+
+      # Remote OS Command Injection
+      - id: 90020
+        threshold: 'low'
+        strength: 'high'
+
+      # Server Side Request Forgery
+      - id: 40046
+        threshold: 'low'
+        strength: 'high'
+
+      # Authentication Bypass (critical for multi-tenant isolation)
+      - id: 10055
+        threshold: 'low'
+        strength: 'high'
+
+      # IDOR (critical for tenant data isolation via company_id)
+      - id: 10057
+        threshold: 'low'
+        strength: 'high'

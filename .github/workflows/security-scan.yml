@@ -1,0 +1,172 @@
+name: Security Scanning
+
+on:
+  # Manual trigger for ad-hoc security scans
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target URL for scanning'
+        required: false
+        default: 'https://staging.schedulebox.cz'
+        type: string
+
+  # Weekly scheduled scan (Monday 2am UTC)
+  schedule:
+    - cron: '0 2 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # Allow scheduled scans to run in parallel with manual
+
+jobs:
+  # =========================================
+  # Job 1: OWASP ZAP Baseline Scan
+  # =========================================
+  zap-baseline:
+    name: ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target || 'https://staging.schedulebox.cz' }}
+          rules_file_name: 'security/zap/zap-baseline.yaml'
+          cmd_options: '-a' # Include alpha rules
+          fail_action: true # Fail workflow on HIGH/CRITICAL findings
+          allow_issue_writing: true
+
+      - name: Upload ZAP Baseline Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: report_html.html
+          retention-days: 30
+
+      - name: Create GitHub Issue on Findings
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueTitle = `🔒 Security Alert: ZAP Baseline Scan Findings - ${new Date().toISOString().split('T')[0]}`;
+            const issueBody = `
+            ## ZAP Baseline Scan Results
+
+            **Scan Date:** ${new Date().toUTCString()}
+            **Target:** ${{ github.event.inputs.target || 'https://staging.schedulebox.cz' }}
+            **Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            HIGH or CRITICAL vulnerabilities were detected in the baseline scan.
+
+            ### Actions Required
+            1. Download the full HTML report from the workflow artifacts
+            2. Review all HIGH and CRITICAL findings
+            3. Create remediation tasks for each finding
+            4. Re-run scan after fixes deployed
+
+            ### Report
+            Download the full report from: [Workflow Artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            ---
+            *This issue was automatically created by the Security Scanning workflow.*
+            `;
+
+            // Check if similar issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['security', 'zap-baseline']
+            });
+
+            if (issues.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['security', 'zap-baseline', 'high-priority']
+              });
+            } else {
+              console.log('Similar security issue already exists, skipping creation.');
+            }
+
+  # =========================================
+  # Job 2: OWASP ZAP API Scan
+  # =========================================
+  zap-api-scan:
+    name: ZAP API Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.8.0
+        with:
+          target: ${{ github.event.inputs.target || 'https://staging.schedulebox.cz' }}/api/v1
+          rules_file_name: 'security/zap/zap-api-scan.yaml'
+          cmd_options: '-a' # Include alpha rules
+          fail_action: true # Fail workflow on HIGH/CRITICAL findings
+          allow_issue_writing: true
+
+      - name: Upload ZAP API Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-api-report
+          path: report_html.html
+          retention-days: 30
+
+  # =========================================
+  # Job 3: Dependency Security Audit
+  # =========================================
+  dependency-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: false # Fail on high/critical vulnerabilities
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1' # Fail on high/critical findings
+          ignore-unfixed: true # Only report fixable vulnerabilities
+
+      - name: Upload Trivy Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-filesystem-report
+          path: trivy-report.json
+          retention-days: 30
