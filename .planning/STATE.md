@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 12 of 15 — Advanced Features
 - **Status:** Phase 12 In Progress
-- **Current Plan:** 12-03 complete
-- **Plans Executed:** 67
+- **Current Plan:** 12-04 complete
+- **Plans Executed:** 68
 
 ## What's Done
 
@@ -91,6 +91,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 11-05: Frontend Integration - Optimization Hooks & Dashboards (2 tasks, 2 commits)
 - [x] Plan 12-01: Shared Validation and Types for Phase 12 (2 tasks, 2 commits)
 - [x] Plan 12-03: Review System API (2 tasks, 2 commits)
+- [x] Plan 12-04: Video Meeting Integration (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -109,9 +110,9 @@ Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit 
 
 Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Phase 12: In Progress — Plans 12-01, 12-03 complete (Shared validation types, review API with auto-moderation)
+Phase 12: In Progress — Plans 12-01, 12-03, 12-04 complete (Shared validation types, review API with auto-moderation, video meeting integration with Zoom/Google Meet/MS Teams)
 
-Next: Phase 12 Plan 04 (Video Meeting API)
+Next: Phase 12 Plan 05 (Marketplace Search and Discovery)
 
 ## Decisions
 
@@ -400,6 +401,10 @@ Next: Phase 12 Plan 04 (Video Meeting API)
 - [Phase 12-03]: Owner reply auto-approves pending reviews (isPublished=true) as implicit moderation approval
 - [Phase 12-03]: Customer identification chain: users.uuid → users.id → customers.userId → customers.id (two queries needed)
 - [Phase 12-03]: reviewIdParamSchema defined locally in route files (z.string().uuid()) following coupon pattern
+- [Phase 12-04]: Raw fetch() for all video providers instead of SDKs (avoids package bloat, full control over auth)
+- [Phase 12-04]: 55-minute token cache TTL with 5-minute safety buffer prevents race condition auth failures
+- [Phase 12-04]: Graceful degradation on provider deletion failure (logs error but still updates local status to cancelled)
+- [Phase 12-04]: Environment variable-only configuration for provider credentials (no hardcoded secrets, 12-factor app)
 - [Phase 12-05]: Status fields (iosStatus, androidStatus) are system-controlled only, not updatable via PUT endpoint
 - [Phase 12-05]: Build trigger is clean placeholder returning 202 Accepted with Phase 15 message, not fake build logic
 - [Phase 12-05]: GET returns null (not 404) when company has no white-label app configured - optional resource pattern
@@ -493,12 +498,13 @@ None — Phase 11 complete.
 | 11-05 | 287s | 2 | 5 | 2 |
 | 12-01 | 183s | 2 | 8 | 2 |
 | 12-03 | 473s | 2 | 3 | 2 |
+| 12-04 | 527s | 2 | 8 | 2 |
 | 12-05 | 315s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 03 — Review System API with auto-moderation
+**Stopped at:** Completed Phase 12 Plan 04 — Video Meeting Integration
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-03 (Review System API)*
+*Last updated: 2026-02-12 after completing Phase 12-04 (Video Meeting Integration)*
