@@ -1,0 +1,103 @@
+# Default values for ScheduleBox Helm chart
+
+global:
+  namespace: schedulebox
+  imagePullPolicy: IfNotPresent
+
+# Web application (Next.js frontend + API routes)
+web:
+  image:
+    repository: ghcr.io/schedulebox/schedulebox
+    tag: latest
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: LOG_LEVEL
+      value: info
+    - name: LOG_FORMAT
+      value: json
+  service:
+    port: 80
+    targetPort: 3000
+
+# AI service (Python FastAPI microservice)
+aiService:
+  image:
+    repository: ghcr.io/schedulebox/schedulebox-ai
+    tag: latest
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+  env:
+    - name: ENVIRONMENT
+      value: production
+    - name: AI_SERVICE_PORT
+      value: "8000"
+    - name: MODEL_DIR
+      value: /app/models
+  service:
+    port: 8000
+    targetPort: 8000
+
+# Notification worker (BullMQ + RabbitMQ consumer)
+notificationWorker:
+  image:
+    repository: ghcr.io/schedulebox/schedulebox
+    tag: latest
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: LOG_LEVEL
+      value: info
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: app.schedulebox.cz
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: schedulebox-tls
+      hosts:
+        - app.schedulebox.cz
+
+# Horizontal Pod Autoscaler
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  scaleDownStabilizationWindowSeconds: 300
+
+# Secrets (provide values via --set or external-secrets-operator)
+secrets:
+  databaseUrl: ""
+  redisUrl: ""
+  rabbitmqUrl: ""
+  jwtSecret: ""
+  jwtRefreshSecret: ""
+  sentryDsn: ""

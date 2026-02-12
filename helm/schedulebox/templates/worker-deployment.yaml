@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "schedulebox.fullname" . }}-worker
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "schedulebox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: notification-worker
+spec:
+  replicas: {{ .Values.notificationWorker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "schedulebox.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: notification-worker
+  template:
+    metadata:
+      labels:
+        {{- include "schedulebox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: notification-worker
+    spec:
+      containers:
+      - name: notification-worker
+        image: "{{ .Values.notificationWorker.image.repository }}:{{ .Values.notificationWorker.image.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        command: ["node", "services/notification-worker/src/index.js"]
+        livenessProbe:
+          exec:
+            command:
+            - node
+            - -e
+            - process.exit(0)
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.notificationWorker.resources | nindent 10 }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "schedulebox.fullname" . }}-config
+        - secretRef:
+            name: {{ include "schedulebox.fullname" . }}-secrets
+        env:
+        {{- range .Values.notificationWorker.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        # SMTP configuration (optional for development)
+        - name: SMTP_HOST
+          value: ""
+        - name: SMTP_PORT
+          value: "587"
+        - name: SMTP_USER
+          value: ""
+        - name: SMTP_PASS
+          value: ""
+        # Twilio configuration (optional for development)
+        - name: TWILIO_ACCOUNT_SID
+          value: ""
+        - name: TWILIO_AUTH_TOKEN
+          value: ""
+        - name: TWILIO_PHONE_NUMBER
+          value: ""
+        # VAPID configuration (optional for development)
+        - name: VAPID_PUBLIC_KEY
+          value: ""
+        - name: VAPID_PRIVATE_KEY
+          value: ""
+      terminationGracePeriodSeconds: 60

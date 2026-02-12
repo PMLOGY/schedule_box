@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "schedulebox.fullname" . }}-ai
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "schedulebox.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ai-service
+spec:
+  replicas: {{ .Values.aiService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "schedulebox.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ai-service
+  template:
+    metadata:
+      labels:
+        {{- include "schedulebox.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ai-service
+    spec:
+      containers:
+      - name: ai-service
+        image: "{{ .Values.aiService.image.repository }}:{{ .Values.aiService.image.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.aiService.service.targetPort }}
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          {{- toYaml .Values.aiService.resources | nindent 10 }}
+        env:
+        {{- range .Values.aiService.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "schedulebox.fullname" . }}-secrets
+              key: REDIS_URL
+        - name: SCHEDULEBOX_API_URL
+          value: "http://{{ include "schedulebox.fullname" . }}-web:{{ .Values.web.service.port }}"
+        volumeMounts:
+        - name: models
+          mountPath: /app/models
+      volumes:
+      - name: models
+        emptyDir: {}
+      terminationGracePeriodSeconds: 30

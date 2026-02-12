@@ -1,0 +1,56 @@
+# Bitnami PostgreSQL Helm Chart Values
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+
+# Architecture: standalone (single primary, no replication for MVP)
+architecture: standalone
+
+auth:
+  # Use existing secret (create manually or via external-secrets-operator)
+  existingSecret: "postgresql-credentials"
+  database: "schedulebox"
+  username: "schedulebox"
+
+# Primary node configuration
+primary:
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: ""  # Use cluster default storage class
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+# PostgreSQL configuration
+postgresqlConfiguration:
+  max_connections: "200"
+  shared_buffers: "256MB"
+  effective_cache_size: "1GB"
+  maintenance_work_mem: "64MB"
+  checkpoint_completion_target: "0.9"
+  wal_buffers: "16MB"
+  default_statistics_target: "100"
+  random_page_cost: "1.1"
+  effective_io_concurrency: "200"
+  work_mem: "2621kB"
+  min_wal_size: "1GB"
+  max_wal_size: "4GB"
+  max_worker_processes: "4"
+  max_parallel_workers_per_gather: "2"
+  max_parallel_workers: "4"
+  max_parallel_maintenance_workers: "2"
+
+# Metrics for monitoring
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi

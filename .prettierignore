@@ -7,3 +7,4 @@ pnpm-lock.yaml
 .planning
 docker
 k8s
+helm

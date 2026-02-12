@@ -1,0 +1,49 @@
+# Bitnami Redis Helm Chart Values
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/redis
+
+# Architecture: standalone (no sentinel for MVP)
+architecture: standalone
+
+auth:
+  # Use existing secret (create manually or via external-secrets-operator)
+  existingSecret: "redis-credentials"
+  existingSecretPasswordKey: "password"
+
+master:
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""  # Use cluster default storage class
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# Redis configuration
+commonConfiguration: |-
+  # Enable AOF persistence
+  appendonly yes
+  appendfsync everysec
+
+  # Memory management
+  maxmemory-policy allkeys-lru
+  maxmemory 256mb
+
+  # Performance
+  tcp-keepalive 300
+  timeout 0
+
+# Metrics for monitoring
+metrics:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi

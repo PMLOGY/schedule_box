@@ -1,0 +1,62 @@
+# Production environment overrides
+
+global:
+  namespace: schedulebox-production
+
+web:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: LOG_LEVEL
+      value: info
+    - name: LOG_FORMAT
+      value: json
+
+aiService:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 1Gi
+  env:
+    - name: ENVIRONMENT
+      value: production
+
+notificationWorker:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+ingress:
+  hosts:
+    - host: app.schedulebox.cz
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: schedulebox-production-tls
+      hosts:
+        - app.schedulebox.cz
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  scaleDownStabilizationWindowSeconds: 300
