@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-06 complete)
+**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-02 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 15 of 15 — DevOps & Launch (in progress)
-- **Status:** Plan 15-06 Complete — Beta Testing Playbook and Operational Documentation
-- **Current Plan:** 15-06 complete
-- **Plans Executed:** 82
+- **Status:** Plan 15-02 Complete — Monitoring Stack (Prometheus, Grafana, Alerting)
+- **Current Plan:** 15-02 complete
+- **Plans Executed:** 83
 
 ## What's Done
 
@@ -104,6 +104,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 14-04: Competitor Intelligence Pipeline (2 tasks, 2 commits)
 - [x] Plan 14-05: Phase 14 Integration Wiring (2 tasks, 1 commit - Task 1 already done by Wave 2 agents)
 - [x] Plan 15-01: Kubernetes Production Deployment Foundation (2 tasks, 2 commits)
+- [x] Plan 15-02: Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation (2 tasks, 3 commits)
 - [x] Plan 15-04: Load Testing with k6 (2 tasks, 2 commits)
 - [x] Plan 15-05: Security Audit - OWASP ZAP Scanning and Security Hardening (2 tasks, 2 commits)
 - [x] Plan 15-06: Beta Testing Playbook and Operational Documentation (2 tasks, 2 commits)
@@ -489,6 +490,11 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 14-05]: ${VAR:-default} syntax for Docker Compose env vars follows Phase 7-07 notification-worker pattern
 - [Phase 14-05]: OPENAI_API_KEY and GOOGLE_PLACES_API_KEY default to empty string for graceful feature degradation
 - [Phase 15-01]: Custom Helm chart over Kustomize for templating flexibility and values-based environment overrides- [Phase 15-01]: Bitnami Helm charts for stateful services instead of raw manifests for production-grade defaults- [Phase 15-01]: HPA with both CPU and Node.js event loop utilization metrics for accurate web service scaling- [Phase 15-01]: DNS ndots:2 config in pod spec to reduce external domain lookups (Node.js DNS caching pitfall)- [Phase 15-01]: Headless service for worker pods (no HTTP port, DNS-only for service discovery)- [Phase 15-01]: Atomic rollback flag on production deployments for automatic failure recovery- [Phase 15-01]: Separate staging/production workflows with different triggers (auto vs manual)- [Phase 15-01]: Image tag strategy - staging uses commit SHA, production uses release tag or manual input- [Phase 15-01]: Added helm/ to .prettierignore (Helm templates use Go template syntax incompatible with Prettier)
+- [Phase 15-02]: Custom Prometheus registry instead of default global registry to avoid conflicts with other libraries
+- [Phase 15-02]: Event loop utilization metric for HPA (better indicator than CPU alone for Node.js autoscaling)
+- [Phase 15-02]: kube-prometheus-stack Helm chart for complete observability (Prometheus + Grafana + Alertmanager)
+- [Phase 15-02]: Business metrics defined but instrumentation deferred to post-deployment (metrics populate when route handlers add increments)
+- [Phase 15-02]: Alerting thresholds align with research: p95<2s warning, p95<5s critical, error>5% critical, event loop>0.8 warning
 - [Phase 15-04]: k6 over JMeter/Gatling for load testing (modern JavaScript DSL, better GitHub Actions integration, lightweight)
 - [Phase 15-04]: Scenario-based distribution over single test (matches real-world traffic: 60% booking, 30% browsing, 10% admin)
 - [Phase 15-04]: Threshold validation in test definition for fail-fast on performance degradation (p95<2s, p99<5s, error<1%)
@@ -617,6 +623,7 @@ None — Phase 11 complete.
 | 14-04 | 391s | 2 | 5 | 2 |
 | 14-05 | 99s | 2 | 2 | 1 |
 | 15-01 | 335s | 2 | 21 | 2 |
+| 15-02 | 3494s | 2 | 10 | 3 |
 | 15-04 | 303s | 2 | 8 | 2 |
 | 15-05 | 252s | 2 | 6 | 2 |
 | 15-06 | 387s | 2 | 3 | 2 |
@@ -624,7 +631,7 @@ None — Phase 11 complete.
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 15-06-PLAN.md (Beta Testing Playbook and Operational Documentation)
+**Stopped at:** Completed 15-02-PLAN.md (Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 15-06 (Beta Testing Playbook and Operational Documentation)*
+*Last updated: 2026-02-12 after completing Phase 15-02 (Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation)*
