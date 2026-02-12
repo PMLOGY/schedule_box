@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Phase:** 12 of 15 — Advanced Features
 - **Status:** Phase 12 In Progress
 - **Current Plan:** 12-07 complete
-- **Plans Executed:** 69
+- **Plans Executed:** 70
 
 ## What's Done
 
@@ -92,6 +92,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-01: Shared Validation and Types for Phase 12 (2 tasks, 2 commits)
 - [x] Plan 12-03: Review System API (2 tasks, 2 commits)
 - [x] Plan 12-04: Video Meeting Integration (2 tasks, 2 commits)
+- [x] Plan 12-06: Public Booking Pages (2 tasks, 2 commits)
 - [x] Plan 12-07: Embeddable JavaScript Booking Widget (2 tasks, 2 commits)
 
 ## What's Next
@@ -111,9 +112,9 @@ Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit 
 
 Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-07 complete (Shared validation types, review API with auto-moderation, video meeting integration with Zoom/Google Meet/MS Teams, embeddable widget with iframe isolation)
+Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation)
 
-Next: Phase 12 Plan 08 (Marketplace Search and Discovery)
+Next: Phase 12 Plan 02 (Marketplace Listings Management) or Plan 05 (Marketplace Search)
 
 ## Decisions
 
@@ -410,6 +411,12 @@ Next: Phase 12 Plan 08 (Marketplace Search and Discovery)
 - [Phase 12-05]: Build trigger is clean placeholder returning 202 Accepted with Phase 15 message, not fake build logic
 - [Phase 12-05]: GET returns null (not 404) when company has no white-label app configured - optional resource pattern
 - [Phase 12-05]: UNIQUE constraint on company_id enforced at app level with 409 ConflictError before INSERT
+- [Phase 12-06]: Public API endpoints use createRouteHandler with requiresAuth: false for consistency
+- [Phase 12-06]: Customer names anonymized in reviews (first name + last initial) for privacy
+- [Phase 12-06]: Book button links to existing booking wizard with service UUID and company slug query params
+- [Phase 12-06]: JSON-LD structured data uses LocalBusiness schema for SEO optimization
+- [Phase 12-06]: Public layout is minimal (header + footer) without admin sidebar
+- [Phase 12-06]: Direct Drizzle queries in server component for zero HTTP overhead (not API calls)
 - [Phase 12-07]: Web Component wrapper with sandboxed iframe for maximum security isolation on third-party websites
 - [Phase 12-07]: Book buttons redirect to full public booking page (widget is service catalog only, not in-widget booking)
 - [Phase 12-07]: PostMessage API for resize and service selection only (minimal parent-iframe communication)
@@ -506,12 +513,13 @@ None — Phase 11 complete.
 | 12-03 | 473s | 2 | 3 | 2 |
 | 12-04 | 527s | 2 | 8 | 2 |
 | 12-05 | 315s | 1 | 2 | 1 |
+| 12-06 | 369s | 2 | 5 | 2 |
 | 12-07 | 313s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 07 — Embeddable JavaScript Booking Widget
+**Stopped at:** Completed Phase 12 Plan 06 — Public Booking Pages
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-07 (Embeddable JavaScript Booking Widget)*
+*Last updated: 2026-02-12 after completing Phase 12-06 (Public Booking Pages)*
