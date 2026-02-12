@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PeriodSelector } from '@/components/analytics/period-selector';
 import { KpiComparisonCards } from '@/components/analytics/kpi-comparison-cards';
+import { ExportToolbar } from '@/components/analytics/export-toolbar';
 import { useRevenueAnalytics } from '@/hooks/use-revenue-analytics';
 import { useBookingAnalytics, useAnalyticsOverview } from '@/hooks/use-booking-analytics';
 
@@ -51,12 +52,22 @@ export default function AnalyticsPage() {
   const { data: bookingData, isLoading: isLoadingBookings } = useBookingAnalytics(days);
   const { data: overview, isLoading: isLoadingOverview } = useAnalyticsOverview(days);
 
+  const isLoadingAny = isLoadingRevenue || isLoadingBookings;
+
   return (
     <div className="space-y-6">
-      {/* Header with period selector */}
+      {/* Header */}
+      <PageHeader title={t('title')} description={t('description')} />
+
+      {/* Controls: Period selector and Export toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <PageHeader title={t('title')} description={t('description')} />
         <PeriodSelector value={days} onChange={setDays} />
+        <ExportToolbar
+          revenueData={revenueData}
+          bookingData={bookingData}
+          days={days}
+          isLoading={isLoadingAny}
+        />
       </div>
 
       {/* KPI Comparison Cards */}
