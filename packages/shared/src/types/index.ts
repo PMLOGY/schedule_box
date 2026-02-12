@@ -75,3 +75,33 @@ export type {
   TierCreate,
   TierUpdate,
 } from './loyalty';
+
+// Marketplace types
+export type {
+  MarketplaceListingCreate,
+  MarketplaceListingUpdate,
+  MarketplaceSearchQuery,
+  MarketplaceListing,
+  PriceRange,
+  SortBy,
+} from './marketplace';
+
+// Review types
+export type { ReviewCreate, ReviewReply, ReviewListQuery, Review, ReviewStatus } from './review';
+
+// Video meeting types
+export type {
+  VideoMeetingCreate,
+  VideoMeetingListQuery,
+  VideoMeeting,
+  VideoProvider,
+  VideoMeetingStatus,
+} from './video';
+
+// White-label app types
+export type {
+  WhitelabelAppCreate,
+  WhitelabelAppUpdate,
+  WhitelabelApp,
+  WhitelabelBuildStatus,
+} from './whitelabel';
