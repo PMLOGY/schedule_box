@@ -461,6 +461,16 @@ Plans:
 
 **Depends on:** Phase 1-14
 
+**Plans:** 6 plans in 2 waves
+
+Plans:
+- [ ] 15-01-PLAN.md — Kubernetes Helm chart for all services (web, AI, worker) + Bitnami stateful values + deploy workflows [Wave 1]
+- [ ] 15-02-PLAN.md — Prometheus metrics instrumentation (prom-client, event loop, business counters) + kube-prometheus-stack values + Grafana dashboard [Wave 2]
+- [ ] 15-03-PLAN.md — OpenTelemetry distributed tracing + structured JSON logger + Jaeger Helm values [Wave 2]
+- [ ] 15-04-PLAN.md — k6 load test scenarios (booking flow, availability, mixed traffic, spike) + GitHub Actions workflow [Wave 1]
+- [ ] 15-05-PLAN.md — OWASP ZAP security scanning configs + security headers + GitHub Actions workflow [Wave 1]
+- [ ] 15-06-PLAN.md — Beta testing playbook + deployment runbook + environment variable reference [Wave 1]
+
 **Success Criteria:**
 1. Kubernetes cluster runs all services with auto-scaling
 2. Prometheus/Grafana dashboards show service metrics and alerts
@@ -492,4 +502,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-12 after Phase 14 planning complete*
+*Last updated: 2026-02-12 after Phase 15 planning complete*
