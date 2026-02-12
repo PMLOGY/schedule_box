@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 12 of 15 — Advanced Features
 - **Status:** Phase 12 In Progress
-- **Current Plan:** 12-01 complete
-- **Plans Executed:** 66
+- **Current Plan:** 12-03 complete
+- **Plans Executed:** 67
 
 ## What's Done
 
@@ -90,6 +90,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 11-04: Optimization API Routes (2 tasks, 2 commits)
 - [x] Plan 11-05: Frontend Integration - Optimization Hooks & Dashboards (2 tasks, 2 commits)
 - [x] Plan 12-01: Shared Validation and Types for Phase 12 (2 tasks, 2 commits)
+- [x] Plan 12-03: Review System API (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -108,9 +109,9 @@ Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit 
 
 Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Phase 12: In Progress — Plan 12-01 complete (Zod schemas and types for marketplace, reviews, video, whitelabel)
+Phase 12: In Progress — Plans 12-01, 12-03 complete (Shared validation types, review API with auto-moderation)
 
-Next: Phase 12 Plan 02 (API Routes for Advanced Features)
+Next: Phase 12 Plan 04 (Video Meeting API)
 
 ## Decisions
 
@@ -394,6 +395,11 @@ Next: Phase 12 Plan 02 (API Routes for Advanced Features)
 - [Phase 12-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (dual file pattern)
 - [Phase 12-01]: WhitelabelApp response type excludes SERIAL ID (UUID only, per API conventions)
 - [Phase 12-01]: PostgreSQL NUMERIC fields typed as string in response types (latitude, longitude, averageRating)
+- [Phase 12-03]: Auto-moderation criteria: rating <= 3 OR first-time reviewer OR comment < 20 chars sets isPublished=false
+- [Phase 12-03]: Review redirect routing: rating >= 4 gets 'google' redirect, <= 3 stays 'internal' (aligns with Phase 7-03 threshold)
+- [Phase 12-03]: Owner reply auto-approves pending reviews (isPublished=true) as implicit moderation approval
+- [Phase 12-03]: Customer identification chain: users.uuid → users.id → customers.userId → customers.id (two queries needed)
+- [Phase 12-03]: reviewIdParamSchema defined locally in route files (z.string().uuid()) following coupon pattern
 - [Phase 12-05]: Status fields (iosStatus, androidStatus) are system-controlled only, not updatable via PUT endpoint
 - [Phase 12-05]: Build trigger is clean placeholder returning 202 Accepted with Phase 15 message, not fake build logic
 - [Phase 12-05]: GET returns null (not 404) when company has no white-label app configured - optional resource pattern
@@ -486,12 +492,13 @@ None — Phase 11 complete.
 | 11-04 | 155s | 2 | 6 | 2 |
 | 11-05 | 287s | 2 | 5 | 2 |
 | 12-01 | 183s | 2 | 8 | 2 |
+| 12-03 | 473s | 2 | 3 | 2 |
 | 12-05 | 315s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 05 — White-label app management API
+**Stopped at:** Completed Phase 12 Plan 03 — Review System API with auto-moderation
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-05 (White-label App Management)*
+*Last updated: 2026-02-12 after completing Phase 12-03 (Review System API)*
