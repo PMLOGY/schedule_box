@@ -489,6 +489,12 @@ Next: Phase 15 (DevOps & Launch)
 
 None — Phase 11 complete.
 
+### Quick Tasks Completed
+
+| #   | Description | Date | Commit | Directory |
+| --- | ----------- | ---- | ------ | --------- |
+| 2 | Fix calendar bookings disappearing on navigation | 2026-02-12 | e8e1056 | [2-fix-calendar-bookings-disappearing-on-na](./quick/2-fix-calendar-bookings-disappearing-on-na/) |
+
 ## Metrics
 
 | Metric | Target | Current |
