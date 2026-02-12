@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 12 of 15 — Advanced Features
 - **Status:** Phase 12 In Progress
-- **Current Plan:** 12-07 complete
-- **Plans Executed:** 70
+- **Current Plan:** 12-08 complete
+- **Plans Executed:** 71
 
 ## What's Done
 
@@ -94,6 +94,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-04: Video Meeting Integration (2 tasks, 2 commits)
 - [x] Plan 12-06: Public Booking Pages (2 tasks, 2 commits)
 - [x] Plan 12-07: Embeddable JavaScript Booking Widget (2 tasks, 2 commits)
+- [x] Plan 12-08: Review Rating Sync Consumer (1 task, 1 commit)
 
 ## What's Next
 
@@ -112,7 +113,7 @@ Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit 
 
 Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation)
+Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation, review rating sync consumer)
 
 Next: Phase 12 Plan 02 (Marketplace Listings Management) or Plan 05 (Marketplace Search)
 
@@ -422,6 +423,8 @@ Next: Phase 12 Plan 02 (Marketplace Listings Management) or Plan 05 (Marketplace
 - [Phase 12-07]: PostMessage API for resize and service selection only (minimal parent-iframe communication)
 - [Phase 12-07]: CORS wildcard (*) on config API since widget must be embeddable from any domain
 - [Phase 12-07]: Middleware exclusion for /embed routes bypasses locale routing, locale passed as query param instead
+- [Phase 12-08]: NACK without requeue on error to prevent infinite retry loops on bad data in review rating sync
+- [Phase 12-08]: Skip marketplace rating update gracefully when company has no public listing
 
 ## Blockers
 
@@ -515,11 +518,12 @@ None — Phase 11 complete.
 | 12-05 | 315s | 1 | 2 | 1 |
 | 12-06 | 369s | 2 | 5 | 2 |
 | 12-07 | 313s | 2 | 6 | 2 |
+| 12-08 | 89s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 06 — Public Booking Pages
+**Stopped at:** Completed 12-08-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-06 (Public Booking Pages)*
+*Last updated: 2026-02-12 after completing Phase 12-08 (Review Rating Sync Consumer)*
