@@ -406,6 +406,14 @@ Plans:
 
 **Depends on:** Phase 1-12
 
+**Plans:** 4 plans in 2 waves
+
+Plans:
+- [ ] 13-01-PLAN.md — Analytics API routes + Recharts dashboard (revenue chart, booking stats chart, KPI comparison cards, period selector) [Wave 1]
+- [ ] 13-02-PLAN.md — i18n translation expansion (cs/sk/en analytics keys) + locale switcher + accessibility foundations (skip-link, landmarks) [Wave 1]
+- [ ] 13-03-PLAN.md — CSV/PDF export for revenue and booking reports (react-papaparse, @react-pdf/renderer) [Wave 2]
+- [ ] 13-04-PLAN.md — Performance optimization (code splitting, image formats, font loading) + accessibility audit fixes [Wave 2]
+
 **Success Criteria:**
 1. Analytics dashboard shows revenue trends, booking stats, and comparisons
 2. UI renders correctly in Czech, Slovak, and English
@@ -473,4 +481,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-12 after Phase 12 execution complete*
+*Last updated: 2026-02-12 after Phase 13 planning complete*
