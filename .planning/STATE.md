@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 14 of 15 — AI Voice Intelligence
 - **Status:** Phase 14 In Progress
-- **Current Plan:** 14-04 complete
-- **Plans Executed:** 78
+- **Current Plan:** 14-05 complete (Phase 14 fully complete)
+- **Plans Executed:** 79
 
 ## What's Done
 
@@ -102,6 +102,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 14-02: Voice Booking Pipeline (2 tasks, 2 commits)
 - [x] Plan 14-03: AI Follow-Up Email Generator (2 tasks, 2 commits)
 - [x] Plan 14-04: Competitor Intelligence Pipeline (2 tasks, 2 commits)
+- [x] Plan 14-05: Phase 14 Integration Wiring (2 tasks, 1 commit - Task 1 already done by Wave 2 agents)
 
 ## What's Next
 
@@ -124,7 +125,7 @@ Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complet
 
 Phase 13: In Progress — Plans 13-01, 13-02, 13-03, 13-04 complete (Analytics dashboard, i18n expansion, CSV/PDF export, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Phase 14: Complete ✅ — All 4 plans executed (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU, follow-up email generator with GPT-4o-mini, competitor intelligence with web scraping + Google Places API)
+Phase 14: Complete ✅ — All 5 plans executed (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU, follow-up email generator with GPT-4o-mini, competitor intelligence with web scraping + Google Places API, integration wiring with Docker Compose env vars)
 
 Next: Phase 15 (DevOps & Launch)
 
@@ -480,6 +481,9 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 14-04]: POST /competitor stores scrape results via Node.js Drizzle ORM (not Python direct DB access)
 - [Phase 14-04]: competitor_monitors table with CHECK constraint for frequency (daily/weekly/monthly)
 - [Phase 14-04]: Polite scraping pattern: 5s delay, proper User-Agent, 15s timeout per request
+- [Phase 14-05]: Task 1 (router registration) already completed by Wave 2 agents (14-02, 14-03, 14-04) -- verified and skipped
+- [Phase 14-05]: ${VAR:-default} syntax for Docker Compose env vars follows Phase 7-07 notification-worker pattern
+- [Phase 14-05]: OPENAI_API_KEY and GOOGLE_PLACES_API_KEY default to empty string for graceful feature degradation
 
 ## Blockers
 
@@ -582,11 +586,12 @@ None — Phase 11 complete.
 | 14-02 | 261s | 2 | 4 | 2 |
 | 14-03 | 278s | 2 | 4 | 2 |
 | 14-04 | 391s | 2 | 5 | 2 |
+| 14-05 | 99s | 2 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 14-04-PLAN.md
+**Stopped at:** Completed 14-05-PLAN.md (Phase 14 fully complete)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 14-04 (Competitor Intelligence Pipeline)*
+*Last updated: 2026-02-12 after completing Phase 14-05 (Phase 14 Integration Wiring)*
