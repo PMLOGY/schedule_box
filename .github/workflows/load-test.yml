@@ -1,0 +1,249 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Load test scenario to run'
+        required: true
+        type: choice
+        options:
+          - booking-flow
+          - availability-lookup
+          - api-mixed
+          - spike-test
+        default: 'api-mixed'
+      base_url:
+        description: 'Base URL for testing'
+        required: true
+        type: string
+        default: 'https://staging.schedulebox.cz'
+      duration_multiplier:
+        description: 'Duration multiplier (e.g., 0.5 for half-length test)'
+        required: false
+        type: string
+        default: '1'
+  schedule:
+    # Weekly regression testing on Sunday at 3am UTC
+    - cron: '0 3 * * 0'
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    # Note: GitHub Actions runners have 4 CPU cores and 16GB RAM
+    # Sufficient for up to ~1000 VUs with realistic think time
+    # For >1000 VU tests, consider k6 Cloud or dedicated test infrastructure
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Determine scenario
+        id: scenario
+        run: |
+          # For scheduled runs, default to api-mixed
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "scenario=api-mixed" >> $GITHUB_OUTPUT
+            echo "base_url=https://staging.schedulebox.cz" >> $GITHUB_OUTPUT
+          else
+            echo "scenario=${{ inputs.scenario }}" >> $GITHUB_OUTPUT
+            echo "base_url=${{ inputs.base_url }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run k6 load test
+        id: k6_run
+        run: |
+          k6 run \
+            --env BASE_URL=${{ steps.scenario.outputs.base_url }} \
+            --summary-export=summary.json \
+            --out json=results.json \
+            load-tests/scenarios/${{ steps.scenario.outputs.scenario }}.js
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results-${{ steps.scenario.outputs.scenario }}
+          path: |
+            summary.json
+            results.json
+          retention-days: 30
+
+      - name: Parse test results
+        id: parse_results
+        if: always()
+        run: |
+          if [ ! -f summary.json ]; then
+            echo "summary_text=No summary.json generated" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract key metrics from summary.json
+          p50=$(jq -r '.metrics.http_req_duration.values.p50 // 0' summary.json)
+          p95=$(jq -r '.metrics.http_req_duration.values.p95 // 0' summary.json)
+          p99=$(jq -r '.metrics.http_req_duration.values.p99 // 0' summary.json)
+          avg=$(jq -r '.metrics.http_req_duration.values.avg // 0' summary.json)
+          max=$(jq -r '.metrics.http_req_duration.values.max // 0' summary.json)
+
+          total_requests=$(jq -r '.metrics.http_reqs.values.count // 0' summary.json)
+          failed_requests=$(jq -r '.metrics.http_req_failed.values.passes // 0' summary.json)
+          error_rate=$(jq -r '.metrics.http_req_failed.values.rate // 0' summary.json)
+
+          checks_passed=$(jq -r '.metrics.checks.values.passes // 0' summary.json)
+          checks_failed=$(jq -r '.metrics.checks.values.fails // 0' summary.json)
+          check_rate=$(jq -r '.metrics.checks.values.rate // 0' summary.json)
+
+          vus_max=$(jq -r '.metrics.vus_max.values.max // 0' summary.json)
+
+          # Convert to milliseconds for readability
+          p50_ms=$(echo "$p50" | awk '{printf "%.0f", $1}')
+          p95_ms=$(echo "$p95" | awk '{printf "%.0f", $1}')
+          p99_ms=$(echo "$p99" | awk '{printf "%.0f", $1}')
+          avg_ms=$(echo "$avg" | awk '{printf "%.0f", $1}')
+          max_ms=$(echo "$max" | awk '{printf "%.0f", $1}')
+
+          error_pct=$(echo "$error_rate * 100" | bc -l | awk '{printf "%.2f", $1}')
+          check_pct=$(echo "$check_rate * 100" | bc -l | awk '{printf "%.2f", $1}')
+
+          # Create summary text
+          cat > summary.txt <<EOF
+          ## Load Test Results: ${{ steps.scenario.outputs.scenario }}
+
+          **Target:** ${{ steps.scenario.outputs.base_url }}
+          **Peak VUs:** ${vus_max}
+          **Total Requests:** ${total_requests}
+
+          ### Latency (Response Time)
+
+          | Metric | Value |
+          |--------|-------|
+          | Average | ${avg_ms}ms |
+          | Median (p50) | ${p50_ms}ms |
+          | p95 | ${p95_ms}ms |
+          | p99 | ${p99_ms}ms |
+          | Max | ${max_ms}ms |
+
+          ### Reliability
+
+          | Metric | Value |
+          |--------|-------|
+          | Error Rate | ${error_pct}% |
+          | Failed Requests | ${failed_requests} / ${total_requests} |
+          | Check Success Rate | ${check_pct}% |
+          | Checks Passed | ${checks_passed} |
+          | Checks Failed | ${checks_failed} |
+
+          ### Threshold Status
+
+          EOF
+
+          # Check thresholds based on scenario
+          if [ "${{ steps.scenario.outputs.scenario }}" = "availability-lookup" ]; then
+            # Tighter thresholds for read-heavy
+            if (( $(echo "$p95 < 1000" | bc -l) )); then
+              echo "- ✅ p95 < 1s: PASS (${p95_ms}ms)" >> summary.txt
+            else
+              echo "- ❌ p95 < 1s: FAIL (${p95_ms}ms)" >> summary.txt
+            fi
+            if (( $(echo "$p99 < 3000" | bc -l) )); then
+              echo "- ✅ p99 < 3s: PASS (${p99_ms}ms)" >> summary.txt
+            else
+              echo "- ❌ p99 < 3s: FAIL (${p99_ms}ms)" >> summary.txt
+            fi
+          elif [ "${{ steps.scenario.outputs.scenario }}" = "spike-test" ]; then
+            # Looser thresholds for spike
+            if (( $(echo "$p95 < 5000" | bc -l) )); then
+              echo "- ✅ p95 < 5s: PASS (${p95_ms}ms)" >> summary.txt
+            else
+              echo "- ❌ p95 < 5s: FAIL (${p95_ms}ms)" >> summary.txt
+            fi
+            if (( $(echo "$error_rate < 0.05" | bc -l) )); then
+              echo "- ✅ Error rate < 5%: PASS (${error_pct}%)" >> summary.txt
+            else
+              echo "- ❌ Error rate < 5%: FAIL (${error_pct}%)" >> summary.txt
+            fi
+          else
+            # Standard thresholds
+            if (( $(echo "$p95 < 2000" | bc -l) )); then
+              echo "- ✅ p95 < 2s: PASS (${p95_ms}ms)" >> summary.txt
+            else
+              echo "- ❌ p95 < 2s: FAIL (${p95_ms}ms)" >> summary.txt
+            fi
+            if (( $(echo "$p99 < 5000" | bc -l) )); then
+              echo "- ✅ p99 < 5s: PASS (${p99_ms}ms)" >> summary.txt
+            else
+              echo "- ❌ p99 < 5s: FAIL (${p99_ms}ms)" >> summary.txt
+            fi
+            if (( $(echo "$error_rate < 0.01" | bc -l) )); then
+              echo "- ✅ Error rate < 1%: PASS (${error_pct}%)" >> summary.txt
+            else
+              echo "- ❌ Error rate < 1%: FAIL (${error_pct}%)" >> summary.txt
+            fi
+          fi
+
+          # Save summary for next step
+          {
+            echo 'summary_text<<EOF'
+            cat summary.txt
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      - name: Write workflow summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<'EOF'
+          ${{ steps.parse_results.outputs.summary_text }}
+
+          ---
+
+          **Note:** For distributed testing with >1000 VUs, consider:
+          - [k6 Cloud](https://k6.io/cloud/) (SaaS offering)
+          - [k6 Operator](https://github.com/grafana/k6-operator) (Kubernetes-based distributed execution)
+          - Multiple test machines with load distribution
+
+          Full results available in workflow artifacts.
+          EOF
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `${{ steps.parse_results.outputs.summary_text }}`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Check test status
+        if: steps.k6_run.outcome == 'failure'
+        run: |
+          echo "Load test failed - thresholds breached"
+          exit 1
+
+  report:
+    needs: load-test
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: load-test-results-*
+          merge-multiple: true
+
+      - name: Generate final report
+        run: |
+          echo "Load test execution complete"
+          if [ -f summary.json ]; then
+            echo "Results summary:"
+            jq '.metrics | with_entries(select(.key | startswith("http_")))' summary.json
+          fi
