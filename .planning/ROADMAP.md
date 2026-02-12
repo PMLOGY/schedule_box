@@ -361,9 +361,11 @@ Plans:
 
 ---
 
-### Phase 12: Advanced Features
+### Phase 12: Advanced Features ✓
 
 **Goal:** Build marketplace, reviews, embeddable widget, public booking page, video conferencing, and white-label app framework for business growth and online services.
+
+**Status:** Complete (2026-02-12)
 
 **Segments:** ALL
 
@@ -371,24 +373,24 @@ Plans:
 
 **Depends on:** Phase 5, Phase 3
 
-**Plans:** 8 plans in 4 waves
+**Plans:** 8/8 complete
 
 Plans:
-- [ ] 12-01-PLAN.md — Zod schemas and TypeScript types for marketplace, reviews, video, whitelabel [Wave 1]
-- [ ] 12-02-PLAN.md — Marketplace API (public catalog with geo-search, listing detail, owner management) [Wave 2]
-- [ ] 12-03-PLAN.md — Review system API (create with auto-moderation, reply, list, detail, delete) [Wave 2]
-- [ ] 12-04-PLAN.md — Video conferencing provider abstraction + API routes (Zoom/Meet/Teams) [Wave 2]
-- [ ] 12-05-PLAN.md — White-label app CRUD API and build trigger [Wave 2]
-- [ ] 12-06-PLAN.md — Public booking page with company branding, SEO, and JSON-LD [Wave 3]
-- [ ] 12-07-PLAN.md — Embeddable booking widget (Web Component loader + sandboxed iframe) [Wave 3]
-- [ ] 12-08-PLAN.md — Review-to-marketplace rating sync consumer [Wave 4]
+- [x] 12-01-PLAN.md — Zod schemas and TypeScript types for marketplace, reviews, video, whitelabel [Wave 1]
+- [x] 12-02-PLAN.md — Marketplace API (public catalog with geo-search, listing detail, owner management) [Wave 2]
+- [x] 12-03-PLAN.md — Review system API (create with auto-moderation, reply, list, detail, delete) [Wave 2]
+- [x] 12-04-PLAN.md — Video conferencing provider abstraction + API routes (Zoom/Meet/Teams) [Wave 2]
+- [x] 12-05-PLAN.md — White-label app CRUD API and build trigger [Wave 2]
+- [x] 12-06-PLAN.md — Public booking page with company branding, SEO, and JSON-LD [Wave 3]
+- [x] 12-07-PLAN.md — Embeddable booking widget (Web Component loader + sandboxed iframe) [Wave 3]
+- [x] 12-08-PLAN.md — Review-to-marketplace rating sync consumer [Wave 4]
 
 **Success Criteria:**
-1. Marketplace search returns businesses by location and category
-2. JavaScript widget embeds on external website and completes booking flow
-3. Public booking page renders with company branding
-4. Video meeting link generates and attaches to booking (Zoom/Meet/Teams)
-5. Review submission works with star rating and text
+1. ~~Marketplace search returns businesses by location and category~~ ✓
+2. ~~JavaScript widget embeds on external website and completes booking flow~~ ✓
+3. ~~Public booking page renders with company branding~~ ✓
+4. ~~Video meeting link generates and attaches to booking (Zoom/Meet/Teams)~~ ✓
+5. ~~Review submission works with star rating and text~~ ✓
 
 ---
 
@@ -464,11 +466,11 @@ Plans:
 | 9 | Loyalty Program | Points + tiers + wallet cards | LOYAL-01..07 (7) | Phase 5, 7 |
 | 10 | AI Phase 1 ✓ | No-show + CLV + health score | AI1-01..05 (5) | Phase 5, 3 |
 | 11 | AI Phase 2 ✓ | Upselling + pricing + capacity | AI2-01..04 (4) | Phase 10 |
-| 12 | Advanced Features | Marketplace + widget + video | ADV-01..08 (8) | Phase 5, 3 |
+| 12 | Advanced Features ✓ | Marketplace + widget + video | ADV-01..08 (8) | Phase 5, 3 |
 | 13 | Polish | Analytics + i18n + a11y + perf | POL-01..05 (5) | Phase 1-12 |
 | 14 | AI Phase 3 | Voice booking + intelligence | AI3-01..03 (3) | Phase 10, 11 |
 | 15 | DevOps & Launch | K8s + monitoring + security | OPS-01..06 (6) | Phase 1-14 |
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-11 after Phase 11 execution complete*
+*Last updated: 2026-02-12 after Phase 12 execution complete*
