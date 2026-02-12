@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-02 complete)
+**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-03 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 15 of 15 — DevOps & Launch (in progress)
-- **Status:** Plan 15-02 Complete — Monitoring Stack (Prometheus, Grafana, Alerting)
-- **Current Plan:** 15-02 complete
-- **Plans Executed:** 83
+- **Status:** Plan 15-03 Complete — Distributed Tracing (OpenTelemetry, Jaeger, Structured Logging)
+- **Current Plan:** 15-03 complete
+- **Plans Executed:** 84
 
 ## What's Done
 
@@ -105,6 +105,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 14-05: Phase 14 Integration Wiring (2 tasks, 1 commit - Task 1 already done by Wave 2 agents)
 - [x] Plan 15-01: Kubernetes Production Deployment Foundation (2 tasks, 2 commits)
 - [x] Plan 15-02: Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation (2 tasks, 3 commits)
+- [x] Plan 15-03: Distributed Tracing - OpenTelemetry, Jaeger, Structured Logging (2 tasks, 2 commits)
 - [x] Plan 15-04: Load Testing with k6 (2 tasks, 2 commits)
 - [x] Plan 15-05: Security Audit - OWASP ZAP Scanning and Security Hardening (2 tasks, 2 commits)
 - [x] Plan 15-06: Beta Testing Playbook and Operational Documentation (2 tasks, 2 commits)
@@ -513,6 +514,14 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 15-06]: Graceful degradation pattern for optional credentials (SMTP, Twilio, OpenAI) allows dev environments without full third-party config
 - [Phase 15-05]: Weekly scheduled security scans (Monday 2am UTC) + manual trigger balances monitoring and CI/CD resource usage
 - [Phase 15-05]: Dual TypeScript (.ts) and ESM (.mjs) security headers modules for type safety and Next.js config compatibility
+- [Phase 15-03]: OTLP gRPC exporter over HTTP for better performance (uses port 4317 by default)
+- [Phase 15-03]: resourceFromAttributes() + defaultResource().merge() pattern for automatic host/process metadata
+- [Phase 15-03]: HTTP instrumentation ignores /health and /metrics endpoints to reduce trace noise
+- [Phase 15-03]: Winston over pino for structured logging (consistency with existing project patterns)
+- [Phase 15-03]: Graceful degradation for tracer initialization (logs warning on failure, doesn't crash app)
+- [Phase 15-03]: Badger storage for Jaeger MVP (embedded, no external dependencies) over Cassandra/ClickHouse
+- [Phase 15-03]: 7-day trace retention balances storage costs with debugging needs (168h TTL)
+- [Phase 15-03]: 100% sampling in staging, 10% in production (configurable via Helm --set override)
 
 ## Blockers
 
@@ -624,6 +633,7 @@ None — Phase 11 complete.
 | 14-05 | 99s | 2 | 2 | 1 |
 | 15-01 | 335s | 2 | 21 | 2 |
 | 15-02 | 3494s | 2 | 10 | 3 |
+| 15-03 | 1125s | 2 | 5 | 2 |
 | 15-04 | 303s | 2 | 8 | 2 |
 | 15-05 | 252s | 2 | 6 | 2 |
 | 15-06 | 387s | 2 | 3 | 2 |
@@ -631,7 +641,7 @@ None — Phase 11 complete.
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 15-02-PLAN.md (Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation)
+**Stopped at:** Completed 15-03-PLAN.md (Distributed Tracing - OpenTelemetry, Jaeger, Structured Logging)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 15-02 (Monitoring Stack - Prometheus, Grafana, Node.js Metrics Instrumentation)*
+*Last updated: 2026-02-12 after completing Phase 15-03 (Distributed Tracing - OpenTelemetry, Jaeger, Structured Logging)*
