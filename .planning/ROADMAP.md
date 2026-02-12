@@ -433,6 +433,15 @@ Plans:
 
 **Depends on:** Phase 10, Phase 11
 
+**Plans:** 5 plans in 3 waves
+
+Plans:
+- [ ] 14-01-PLAN.md — Shared foundation: OpenAI client, Pydantic schemas, Node.js types/fallbacks/circuit breaker, Zod schemas [Wave 1]
+- [ ] 14-02-PLAN.md — Voice booking pipeline: Whisper STT + GPT-4 NLU + Next.js proxy endpoint [Wave 2]
+- [ ] 14-03-PLAN.md — AI follow-up generator: prompt templates + GPT-4o-mini + token budget + rate limiting [Wave 2]
+- [ ] 14-04-PLAN.md — Competitor intelligence: web scraper + Google Places API + DB schema + API routes [Wave 2]
+- [ ] 14-05-PLAN.md — Integration wiring: register routers in FastAPI, Docker Compose, env documentation [Wave 3]
+
 **Success Criteria:**
 1. Voice booking transcribes speech, extracts intent, and creates booking
 2. AI generates personalized follow-up emails for inactive customers
@@ -481,4 +490,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-10*
-*Last updated: 2026-02-12 after Phase 13 planning complete*
+*Last updated: 2026-02-12 after Phase 14 planning complete*
