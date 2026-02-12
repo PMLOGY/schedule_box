@@ -52,6 +52,32 @@ export default tseslint.config(
   // Prettier must be last to override conflicting rules
   prettierConfig,
 
+  // Browser globals for widget embed script
+  {
+    files: ['apps/web/public/widget/**/*.js'],
+    languageOptions: {
+      globals: {
+        document: 'readonly',
+        window: 'readonly',
+        customElements: 'readonly',
+        HTMLElement: 'readonly',
+        MutationObserver: 'readonly',
+        fetch: 'readonly',
+      },
+    },
+  },
+
+  // Node.js globals for security config
+  {
+    files: ['security/**/*.mjs', 'security/**/*.js'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+      },
+    },
+  },
+
   // Global ignores
   {
     ignores: [
@@ -64,13 +90,13 @@ export default tseslint.config(
       'k8s/**',
       '.planning/**',
       '.claude/**',
-      '_fix_imports.cjs',
-      '_fix_imports.ps1',
-      '_test_*.ps1',
-      '_test_*.cjs',
-      '_test_*.mjs',
-      '_test_*.bat',
-      '_write_*.js',
+      'load-tests/**',
+      'helm/**',
+      '_*.cjs',
+      '_*.mjs',
+      '_*.ps1',
+      '_*.bat',
+      '_*.js',
       'nul',
     ],
   },
