@@ -69,6 +69,14 @@ services:
       - MODEL_DIR=/app/models
       - ALLOWED_ORIGINS=http://localhost:3000,http://app:3000
       - LOG_LEVEL=debug
+      # Phase 14: Voice booking, follow-up generation, competitor intelligence
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo}
+      - OPENAI_FOLLOWUP_MODEL=${OPENAI_FOLLOWUP_MODEL:-gpt-4o-mini}
+      - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY:-}
+      - MAX_AUDIO_SIZE_MB=${MAX_AUDIO_SIZE_MB:-10}
+      - MAX_FOLLOWUP_PER_DAY=${MAX_FOLLOWUP_PER_DAY:-50}
+      - MAX_COMPETITORS_PER_COMPANY=${MAX_COMPETITORS_PER_COMPANY:-5}
     depends_on:
       redis:
         condition: service_healthy
