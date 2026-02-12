@@ -16,14 +16,15 @@ import { db } from '../db/client';
 import { refreshTokens, rolePermissions, permissions, users, roles } from '@schedulebox/database';
 import { UnauthorizedError } from '@schedulebox/shared';
 
-// JWT Configuration
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  (process.env.NODE_ENV === 'production'
-    ? (() => {
-        throw new Error('JWT_SECRET must be set in production');
-      })()
-    : 'dev-secret-change-me');
+// JWT Configuration — lazy to avoid crash during next build
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET must be set in production');
+  }
+  return 'dev-secret-change-me';
+}
 
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY_DAYS = 30;
@@ -84,7 +85,7 @@ export async function generateTokenPair(
       permissions: permissionNames,
       mfa_verified: mfaVerified,
     } satisfies Omit<JWTPayload, 'iss' | 'aud' | 'exp' | 'iat'>,
-    JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: ACCESS_TOKEN_EXPIRY,
       issuer: 'schedulebox',
@@ -128,7 +129,7 @@ export async function verifyJWT(token: string): Promise<JWTPayload> {
     }
 
     // Verify token signature and claims
-    const decoded = jwt.verify(token, JWT_SECRET, {
+    const decoded = jwt.verify(token, getJwtSecret(), {
       issuer: 'schedulebox',
       audience: 'schedulebox-api',
     }) as JWTPayload;
