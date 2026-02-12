@@ -5,6 +5,7 @@
  * - analytics_events: Behavioral event tracking
  * - audit_logs: System audit trail (survives company deletion)
  * - competitor_data: Competitor intelligence scraping results
+ * - competitor_monitors: Admin-configurable competitor monitoring (Phase 14)
  */
 
 import {
@@ -15,6 +16,7 @@ import {
   text,
   timestamp,
   jsonb,
+  boolean,
   index,
   check,
 } from 'drizzle-orm/pg-core';
@@ -101,5 +103,33 @@ export const competitorData = pgTable(
     ),
     companyIdx: index('idx_competitor_company').on(table.companyId),
     typeIdx: index('idx_competitor_type').on(table.dataType),
+  }),
+);
+
+// ============================================================================
+// COMPETITOR_MONITORS TABLE (Phase 14)
+// ============================================================================
+
+export const competitorMonitors = pgTable(
+  'competitor_monitors',
+  {
+    id: serial('id').primaryKey(),
+    companyId: integer('company_id')
+      .notNull()
+      .references(() => companies.id, { onDelete: 'cascade' }),
+    competitorName: varchar('competitor_name', { length: 255 }).notNull(),
+    competitorUrl: varchar('competitor_url', { length: 500 }).notNull(),
+    scrapeFrequency: varchar('scrape_frequency', { length: 20 }).notNull().default('weekly'),
+    isActive: boolean('is_active').notNull().default(true),
+    lastScrapedAt: timestamp('last_scraped_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    frequencyCheck: check(
+      'competitor_monitors_frequency_check',
+      sql`${table.scrapeFrequency} IN ('daily', 'weekly', 'monthly')`,
+    ),
+    companyIdx: index('idx_competitor_monitors_company').on(table.companyId),
   }),
 );
