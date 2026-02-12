@@ -487,6 +487,11 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 14-05]: Task 1 (router registration) already completed by Wave 2 agents (14-02, 14-03, 14-04) -- verified and skipped
 - [Phase 14-05]: ${VAR:-default} syntax for Docker Compose env vars follows Phase 7-07 notification-worker pattern
 - [Phase 14-05]: OPENAI_API_KEY and GOOGLE_PLACES_API_KEY default to empty string for graceful feature degradation
+- [Phase 15-04]: k6 over JMeter/Gatling for load testing (modern JavaScript DSL, better GitHub Actions integration, lightweight)
+- [Phase 15-04]: Scenario-based distribution over single test (matches real-world traffic: 60% booking, 30% browsing, 10% admin)
+- [Phase 15-04]: Threshold validation in test definition for fail-fast on performance degradation (p95<2s, p99<5s, error<1%)
+- [Phase 15-04]: 50 test users rotated round-robin (sufficient for 1000 VUs with realistic think time, avoids DB bloat)
+- [Phase 15-04]: Manual trigger + weekly scheduled runs (on-demand testing for releases, automated regression detection)
 - [Phase 15-05]: OWASP ZAP false positive exclusions for JWT-based SaaS (disable CSRF token check 10202, CSP check 10038, proxy disclosure 40025)
 - [Phase 15-05]: CSP removes unsafe-eval from script-src in production mode (NODE_ENV check), keeps for development HMR
 - [Phase 15-05]: X-Frame-Options ALLOWALL for /embed routes (widget must be embeddable from any third-party website)
