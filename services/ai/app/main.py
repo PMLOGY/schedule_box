@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routers import health, optimization, predictions
+from .routers import competitor, followup, health, optimization, predictions, voice
 from .services.model_loader import load_models, cleanup_models
 from .services import feature_store
 
@@ -40,6 +40,9 @@ app.add_middleware(
 app.include_router(health.router, tags=["health"])
 app.include_router(predictions.router, prefix="/api/v1", tags=["predictions"])
 app.include_router(optimization.router, prefix="/api/v1", tags=["optimization"])
+app.include_router(voice.router, prefix="/api/v1", tags=["voice"])
+app.include_router(followup.router, prefix="/api/v1", tags=["followup"])
+app.include_router(competitor.router, prefix="/api/v1", tags=["competitor"])
 
 
 @app.on_event("startup")
