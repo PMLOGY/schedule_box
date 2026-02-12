@@ -487,6 +487,7 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 14-05]: Task 1 (router registration) already completed by Wave 2 agents (14-02, 14-03, 14-04) -- verified and skipped
 - [Phase 14-05]: ${VAR:-default} syntax for Docker Compose env vars follows Phase 7-07 notification-worker pattern
 - [Phase 14-05]: OPENAI_API_KEY and GOOGLE_PLACES_API_KEY default to empty string for graceful feature degradation
+- [Phase 15-01]: Custom Helm chart over Kustomize for templating flexibility and values-based environment overrides- [Phase 15-01]: Bitnami Helm charts for stateful services instead of raw manifests for production-grade defaults- [Phase 15-01]: HPA with both CPU and Node.js event loop utilization metrics for accurate web service scaling- [Phase 15-01]: DNS ndots:2 config in pod spec to reduce external domain lookups (Node.js DNS caching pitfall)- [Phase 15-01]: Headless service for worker pods (no HTTP port, DNS-only for service discovery)- [Phase 15-01]: Atomic rollback flag on production deployments for automatic failure recovery- [Phase 15-01]: Separate staging/production workflows with different triggers (auto vs manual)- [Phase 15-01]: Image tag strategy - staging uses commit SHA, production uses release tag or manual input- [Phase 15-01]: Added helm/ to .prettierignore (Helm templates use Go template syntax incompatible with Prettier)
 - [Phase 15-04]: k6 over JMeter/Gatling for load testing (modern JavaScript DSL, better GitHub Actions integration, lightweight)
 - [Phase 15-04]: Scenario-based distribution over single test (matches real-world traffic: 60% booking, 30% browsing, 10% admin)
 - [Phase 15-04]: Threshold validation in test definition for fail-fast on performance degradation (p95<2s, p99<5s, error<1%)
@@ -607,11 +608,12 @@ None — Phase 11 complete.
 | 14-04 | 391s | 2 | 5 | 2 |
 | 14-05 | 99s | 2 | 2 | 1 |
 | 15-04 | 303s | 2 | 8 | 2 |
+| 15-05 | 252s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 15-04-PLAN.md (Load Testing with k6)
+**Stopped at:** Completed 15-05-PLAN.md (Security Audit - OWASP ZAP + Security Headers)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 15-04 (Load Testing with k6)*
+*Last updated: 2026-02-12 after completing Phase 15-05 (Security Audit)*
