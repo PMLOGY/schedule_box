@@ -1,0 +1,99 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: schedulebox-alerts
+  namespace: production
+  labels:
+    app: schedulebox
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: schedulebox.http
+      interval: 30s
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            (
+              rate(http_requests_total{status_code=~"5.."}[5m])
+              /
+              rate(http_requests_total[5m])
+            ) > 0.05
+          for: 5m
+          labels:
+            severity: critical
+            team: devops
+          annotations:
+            summary: "High HTTP error rate detected"
+            description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+            runbook: "Check application logs and recent deployments. Verify external service availability."
+
+        - alert: HighLatency
+          expr: |
+            histogram_quantile(0.95,
+              rate(http_request_duration_seconds_bucket[5m])
+            ) > 2
+          for: 5m
+          labels:
+            severity: warning
+            team: devops
+          annotations:
+            summary: "High HTTP latency detected"
+            description: "p95 latency is {{ $value }}s (threshold: 2s)"
+            runbook: "Check database performance, external API calls, and resource utilization."
+
+        - alert: HighLatencyCritical
+          expr: |
+            histogram_quantile(0.95,
+              rate(http_request_duration_seconds_bucket[5m])
+            ) > 5
+          for: 2m
+          labels:
+            severity: critical
+            team: devops
+          annotations:
+            summary: "Critical HTTP latency detected"
+            description: "p95 latency is {{ $value }}s (threshold: 5s)"
+            runbook: "URGENT: Check for deadlocks, slow queries, or external service outages. Consider scaling."
+
+    - name: schedulebox.runtime
+      interval: 30s
+      rules:
+        - alert: EventLoopSaturated
+          expr: nodejs_eventloop_utilization > 0.8
+          for: 3m
+          labels:
+            severity: warning
+            team: devops
+          annotations:
+            summary: "Node.js event loop saturated"
+            description: "Event loop utilization is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+            runbook: "Check for CPU-intensive operations, blocking I/O, or infinite loops. Consider horizontal scaling."
+
+    - name: schedulebox.infrastructure
+      interval: 30s
+      rules:
+        - alert: PodCrashLooping
+          expr: |
+            increase(kube_pod_container_status_restarts_total{
+              namespace="production",
+              pod=~"schedulebox-.*"
+            }[1h]) > 3
+          for: 0m
+          labels:
+            severity: critical
+            team: devops
+          annotations:
+            summary: "Pod {{ $labels.pod }} is crash-looping"
+            description: "Pod has restarted {{ $value }} times in the last hour"
+            runbook: "Check pod logs with kubectl logs. Verify resource limits, OOM kills, and application errors."
+
+        - alert: DatabaseConnectionsHigh
+          expr: pg_connections_active > 8
+          for: 2m
+          labels:
+            severity: warning
+            team: devops
+          annotations:
+            summary: "Database connection pool near exhaustion"
+            description: "Active connections: {{ $value }}/10 (80% threshold)"
+            runbook: "Check for connection leaks, slow queries, or missing connection.release() calls."

@@ -1,0 +1,137 @@
+# kube-prometheus-stack Helm chart values
+# Chart: prometheus-community/kube-prometheus-stack
+# Documentation: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+
+# Prometheus server configuration
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+
+    # Additional scrape configs for ScheduleBox services
+    additionalScrapeConfigs:
+      - job_name: 'schedulebox-web'
+        scrape_interval: 15s
+        metrics_path: '/api/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - production
+        relabel_configs:
+          # Only scrape pods with labels app.kubernetes.io/name=schedulebox AND app.kubernetes.io/component=web
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+            action: keep
+            regex: schedulebox
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+            action: keep
+            regex: web
+          # Use pod IP for scraping
+          - source_labels: [__address__]
+            target_label: __address__
+            regex: ([^:]+)(?::\d+)?
+            replacement: $1:3000
+          # Add pod name as instance label
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: instance
+          # Add namespace label
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+
+      - job_name: 'schedulebox-ai'
+        scrape_interval: 15s
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - production
+        relabel_configs:
+          # Only scrape pods with labels app.kubernetes.io/name=schedulebox AND app.kubernetes.io/component=ai
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+            action: keep
+            regex: schedulebox
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+            action: keep
+            regex: ai
+          # Use pod IP for scraping
+          - source_labels: [__address__]
+            target_label: __address__
+            regex: ([^:]+)(?::\d+)?
+            replacement: $1:8000
+          # Add pod name as instance label
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: instance
+          # Add namespace label
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+
+# Grafana configuration
+grafana:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 10Gi
+
+  # Dashboard provisioning
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+
+  # Load dashboards from ConfigMap
+  dashboardsConfigMaps:
+    default: schedulebox-dashboards
+
+  # Admin credentials (override in production via secrets)
+  adminPassword: prom-operator
+
+# Alertmanager configuration
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+  config:
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      receiver: 'slack'
+
+    receivers:
+      - name: 'slack'
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+            channel: '#schedulebox-alerts'
+            title: '{{ .GroupLabels.alertname }}'
+            text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}'
+
+# Enable node exporter
+nodeExporter:
+  enabled: true
+
+# Enable kube-state-metrics
+kubeStateMetrics:
+  enabled: true
