@@ -108,3 +108,65 @@ class ReminderTimingRequest(BaseModel):
 
     customer_id: int
     notification_channel: Literal["email", "sms", "push"] = "email"
+
+
+# --- Voice booking request models (Phase 14) ---
+
+
+class VoiceProcessRequest(BaseModel):
+    """Metadata for voice processing (audio comes via UploadFile)."""
+
+    language: str = Field(default="cs", pattern="^(cs|sk|en)$")
+    company_id: int = Field(..., gt=0)
+
+
+# --- Follow-up request models (Phase 14) ---
+
+
+class FollowUpCustomerContext(BaseModel):
+    """Customer context for follow-up generation."""
+
+    customer_name: str
+    business_name: str
+    last_visit_date: Optional[str] = None
+    last_service: Optional[str] = None
+    total_visits: Optional[int] = None
+    total_spent: Optional[float] = None
+    health_score: Optional[int] = None
+    health_category: Optional[str] = None
+    preferred_services: Optional[str] = None
+    days_inactive: Optional[int] = None
+    recommended_service: Optional[str] = None
+    recommendation_reason: Optional[str] = None
+    loyalty_tier: Optional[str] = None
+
+
+class FollowUpRequest(BaseModel):
+    """Request for AI follow-up text generation."""
+
+    customer_id: int = Field(..., gt=0)
+    company_id: int = Field(..., gt=0)
+    type: Literal["post_visit", "re_engagement", "upsell", "birthday"]
+    customer_context: FollowUpCustomerContext
+
+
+# --- Competitor intelligence request models (Phase 14) ---
+
+
+class CompetitorScrapeRequest(BaseModel):
+    """Request to trigger competitor scraping."""
+
+    company_id: int = Field(..., gt=0)
+    competitor_name: str = Field(..., min_length=1, max_length=255)
+    competitor_url: str = Field(..., min_length=1, max_length=500)
+    data_types: list[Literal["pricing", "services", "reviews"]] = Field(
+        default=["pricing", "services"]
+    )
+
+
+class CompetitorDataRequest(BaseModel):
+    """Request for stored competitor data."""
+
+    company_id: int = Field(..., gt=0)
+    competitor_name: Optional[str] = None
+    data_type: Optional[Literal["pricing", "services", "reviews", "availability"]] = None

@@ -135,3 +135,73 @@ class ReminderTimingResponse(BaseModel):
     confidence: float
     model_version: str
     fallback: bool
+
+
+# --- Voice booking response models (Phase 14) ---
+
+
+class VoiceEntities(BaseModel):
+    """Extracted booking entities from voice input."""
+
+    service_name: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    employee_name: Optional[str] = None
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+
+
+class VoiceProcessResponse(BaseModel):
+    """Response from voice booking processing."""
+
+    transcript: Optional[str] = None
+    intent: Literal[
+        "create_booking", "cancel_booking", "check_availability", "unknown"
+    ]
+    entities: Optional[VoiceEntities] = None
+    confidence: float = 0.0
+    confirmation_needed: bool = False
+    error: Optional[str] = None
+    fallback: bool = False
+
+
+# --- Follow-up response models (Phase 14) ---
+
+
+class FollowUpResponse(BaseModel):
+    """Response from AI follow-up generation."""
+
+    subject: str = ""
+    body: str = ""
+    model: str = ""
+    tokens_used: int = 0
+    error: Optional[str] = None
+    fallback: bool = False
+
+
+# --- Competitor intelligence response models (Phase 14) ---
+
+
+class CompetitorScrapeResult(BaseModel):
+    """Result of a single competitor scrape."""
+
+    competitor_name: str
+    data_type: str
+    data: dict
+    scraped_at: str
+
+
+class CompetitorScrapeResponse(BaseModel):
+    """Response from competitor scraping trigger."""
+
+    results: list[CompetitorScrapeResult] = []
+    errors: list[str] = []
+    fallback: bool = False
+
+
+class CompetitorDataResponse(BaseModel):
+    """Response with stored competitor data."""
+
+    data: list[CompetitorScrapeResult] = []
+    total: int = 0
+    fallback: bool = False

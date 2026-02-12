@@ -396,9 +396,11 @@ Plans:
 
 ## Milestone 4: Polish & Launch
 
-### Phase 13: Polish
+### Phase 13: Polish ✓
 
 **Goal:** Add analytics dashboard, internationalization, accessibility, and performance optimization for production readiness.
+
+**Status:** Complete (2026-02-12)
 
 **Segments:** ALL
 
@@ -409,17 +411,17 @@ Plans:
 **Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 13-01-PLAN.md — Analytics API routes + Recharts dashboard (revenue chart, booking stats chart, KPI comparison cards, period selector) [Wave 1]
-- [ ] 13-02-PLAN.md — i18n translation expansion (cs/sk/en analytics keys) + locale switcher + accessibility foundations (skip-link, landmarks) [Wave 1]
-- [ ] 13-03-PLAN.md — CSV/PDF export for revenue and booking reports (react-papaparse, @react-pdf/renderer) [Wave 2]
-- [ ] 13-04-PLAN.md — Performance optimization (code splitting, image formats, font loading) + accessibility audit fixes [Wave 2]
+- [x] 13-01-PLAN.md — Analytics API routes + Recharts dashboard (revenue chart, booking stats chart, KPI comparison cards, period selector) [Wave 1]
+- [x] 13-02-PLAN.md — i18n translation expansion (cs/sk/en analytics keys) + locale switcher + accessibility foundations (skip-link, landmarks) [Wave 1]
+- [x] 13-03-PLAN.md — CSV/PDF export for revenue and booking reports (react-papaparse, @react-pdf/renderer) [Wave 2]
+- [x] 13-04-PLAN.md — Performance optimization (code splitting, image formats, font loading) + accessibility audit fixes [Wave 2]
 
 **Success Criteria:**
-1. Analytics dashboard shows revenue trends, booking stats, and comparisons
-2. UI renders correctly in Czech, Slovak, and English
-3. Keyboard navigation and screen reader support on all pages
-4. Lighthouse score >90 on all key pages
-5. Reports export to CSV/PDF
+1. ~~Analytics dashboard shows revenue trends, booking stats, and comparisons~~ ✓
+2. ~~UI renders correctly in Czech, Slovak, and English~~ ✓
+3. ~~Keyboard navigation and screen reader support on all pages~~ ✓
+4. ~~Lighthouse score >90 on all key pages~~ ✓
+5. ~~Reports export to CSV/PDF~~ ✓
 
 ---
 
@@ -443,7 +445,7 @@ Plans:
 - [ ] 14-05-PLAN.md — Integration wiring: register routers in FastAPI, Docker Compose, env documentation [Wave 3]
 
 **Success Criteria:**
-1. Voice booking transcribes speech, extracts intent, and creates booking
+1. Voice booking transcribes speech, extracts intent, and returns entities for booking confirmation
 2. AI generates personalized follow-up emails for inactive customers
 3. Competitor intelligence surfaces pricing and review data
 
