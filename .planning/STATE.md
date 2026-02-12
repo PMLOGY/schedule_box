@@ -100,6 +100,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 13-03: Export Analytics Data (CSV/PDF) (2 tasks, 2 commits)
 - [x] Plan 14-01: Shared AI Foundation for Voice Intelligence (2 tasks, 2 commits)
 - [x] Plan 14-02: Voice Booking Pipeline (2 tasks, 2 commits)
+- [x] Plan 14-03: AI Follow-Up Email Generator (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -122,9 +123,9 @@ Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complet
 
 Phase 13: In Progress — Plans 13-01, 13-02, 13-03, 13-04 complete (Analytics dashboard, i18n expansion, CSV/PDF export, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Phase 14: In Progress — Plans 14-01, 14-02 complete (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU)
+Phase 14: In Progress — Plans 14-01, 14-02, 14-03 complete (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU, follow-up email generator with GPT-4o-mini)
 
-Next: Phase 14 Plans 14-03, 14-04 (Follow-up generator, competitor intelligence)
+Next: Phase 14 Plan 14-04 (Competitor intelligence)
 
 ## Decisions
 
@@ -467,6 +468,11 @@ Next: Phase 14 Plans 14-03, 14-04 (Follow-up generator, competitor intelligence)
 - [Phase 14-02]: Audio size validated in both layers: Node.js throws BadRequestError (400), Python returns graceful fallback
 - [Phase 14-02]: confirmation_needed flag set only for create_booking intent (other intents don't need user confirmation)
 - [Phase 14-02]: Multipart proxy pattern: Next.js FormData -> rebuild FormData -> circuit breaker -> Python FastAPI
+- [Phase 14-03]: In-memory rate limiter for MVP (single process); Redis-based for production multi-process deployment
+- [Phase 14-03]: company_id injected from JWT token, not request body, for tenant isolation in follow-up generation
+- [Phase 14-03]: Advisory endpoint pattern: always returns 200 with fallback on AI failure (follow-up is non-critical)
+- [Phase 14-03]: tiktoken cl100k_base fallback encoding when model-specific encoding unavailable
+- [Phase 14-03]: SETTINGS_MANAGE permission for follow-up generation (admin/owner marketing feature)
 
 ## Blockers
 
@@ -567,11 +573,12 @@ None — Phase 11 complete.
 | 13-04 | 311s | 2 | 11 | 2 |
 | 14-01 | 307s | 2 | 12 | 2 |
 | 14-02 | 261s | 2 | 4 | 2 |
+| 14-03 | 278s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 14-02-PLAN.md
+**Stopped at:** Completed 14-03-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 14-02 (Voice Booking Pipeline)*
+*Last updated: 2026-02-12 after completing Phase 14-03 (AI Follow-Up Email Generator)*
