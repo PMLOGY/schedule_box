@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 14 Complete — AI Voice & Intelligence verified (12/12 must-haves, 20/20 artifacts)
+**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-05 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 14 of 15 — AI Voice Intelligence ✅
-- **Status:** Phase 14 Complete — Ready for Phase 15
-- **Current Plan:** All 14-xx plans complete
-- **Plans Executed:** 79
+- **Phase:** 15 of 15 — DevOps & Launch (in progress)
+- **Status:** Plan 15-05 Complete — Security Audit (OWASP ZAP + Security Headers)
+- **Current Plan:** 15-05 complete
+- **Plans Executed:** 81
 
 ## What's Done
 
@@ -103,6 +103,9 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 14-03: AI Follow-Up Email Generator (2 tasks, 2 commits)
 - [x] Plan 14-04: Competitor Intelligence Pipeline (2 tasks, 2 commits)
 - [x] Plan 14-05: Phase 14 Integration Wiring (2 tasks, 1 commit - Task 1 already done by Wave 2 agents)
+- [x] Plan 15-01: Kubernetes Production Deployment Foundation (2 tasks, 2 commits)
+- [x] Plan 15-04: Load Testing with k6 (2 tasks, 2 commits)
+- [x] Plan 15-05: Security Audit - OWASP ZAP Scanning and Security Hardening (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -484,6 +487,11 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 14-05]: Task 1 (router registration) already completed by Wave 2 agents (14-02, 14-03, 14-04) -- verified and skipped
 - [Phase 14-05]: ${VAR:-default} syntax for Docker Compose env vars follows Phase 7-07 notification-worker pattern
 - [Phase 14-05]: OPENAI_API_KEY and GOOGLE_PLACES_API_KEY default to empty string for graceful feature degradation
+- [Phase 15-05]: OWASP ZAP false positive exclusions for JWT-based SaaS (disable CSRF token check 10202, CSP check 10038, proxy disclosure 40025)
+- [Phase 15-05]: CSP removes unsafe-eval from script-src in production mode (NODE_ENV check), keeps for development HMR
+- [Phase 15-05]: X-Frame-Options ALLOWALL for /embed routes (widget must be embeddable from any third-party website)
+- [Phase 15-05]: Weekly scheduled security scans (Monday 2am UTC) + manual trigger balances monitoring and CI/CD resource usage
+- [Phase 15-05]: Dual TypeScript (.ts) and ESM (.mjs) security headers modules for type safety and Next.js config compatibility
 
 ## Blockers
 
@@ -593,11 +601,12 @@ None — Phase 11 complete.
 | 14-03 | 278s | 2 | 4 | 2 |
 | 14-04 | 391s | 2 | 5 | 2 |
 | 14-05 | 99s | 2 | 2 | 1 |
+| 15-04 | 303s | 2 | 8 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 14-05-PLAN.md (Phase 14 fully complete)
+**Stopped at:** Completed 15-04-PLAN.md (Load Testing with k6)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 14-05 (Phase 14 Integration Wiring)*
+*Last updated: 2026-02-12 after completing Phase 15-04 (Load Testing with k6)*
