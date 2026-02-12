@@ -11,6 +11,7 @@ dist/
 build/
 
 # Environment
+.env
 .env.local
 .env.*.local
 .env.development.local
@@ -44,6 +45,21 @@ docker/data/
 *.pickle
 __pycache__/
 *.pyc
+
+# Temp/debug scripts
+_*.cjs
+_*.mjs
+_*.ps1
+_*.bat
+_*.js
+!load-tests/**/*.js
+!security/**/*.js
+!security/**/*.mjs
+nul
+
+# Planning temp files
+*.backup
+*.tmp
 
 # Misc
 *.tsbuildinfo

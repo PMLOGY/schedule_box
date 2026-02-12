@@ -24,7 +24,10 @@
       "Bash(cat:*)",
       "Bash(git stash:*)",
       "Bash(npx next build:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(docker.exe ps:*)",
+      "Bash(pg_isready:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
