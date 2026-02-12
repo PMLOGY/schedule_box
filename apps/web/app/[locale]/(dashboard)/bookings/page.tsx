@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
 import { format } from 'date-fns';
+import { cs } from 'date-fns/locale';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,7 +63,7 @@ export default function BookingsPage() {
   };
 
   const formatDateTime = (dateString: string) => {
-    return format(new Date(dateString), 'PPP p');
+    return format(new Date(dateString), 'PPP p', { locale: cs });
   };
 
   const formatPrice = (price: string, currency: string) => {

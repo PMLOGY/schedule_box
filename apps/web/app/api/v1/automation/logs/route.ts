@@ -3,7 +3,7 @@
  * GET /api/v1/automation/logs - List automation execution logs
  */
 
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, count } from 'drizzle-orm';
 import { db, automationLogs, automationRules } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
@@ -72,13 +72,13 @@ export const GET = createRouteHandler({
         .offset(offset)
         .orderBy(desc(automationLogs.createdAt)),
       db
-        .select({ count: db.$count(automationLogs.id) })
+        .select({ count: count() })
         .from(automationLogs)
         .innerJoin(automationRules, eq(automationLogs.ruleId, automationRules.id))
         .where(and(...conditions)),
     ]);
 
-    const total = countResult[0]?.count ?? 0;
+    const total = Number(countResult[0]?.count ?? 0);
     const totalPages = Math.ceil(total / query.limit);
 
     // Flatten response

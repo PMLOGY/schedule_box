@@ -1,18 +1,7 @@
 import createMiddleware from 'next-intl/middleware';
+import { routing } from '@/lib/i18n/routing';
 
-export default createMiddleware({
-  // Supported locales
-  locales: ['cs', 'sk', 'en'],
-
-  // Default locale (Czech)
-  defaultLocale: 'cs',
-
-  // Don't add /cs prefix for default locale
-  localePrefix: 'as-needed',
-
-  // Don't auto-detect browser language — always start in Czech
-  localeDetection: false,
-});
+export default createMiddleware(routing);
 
 export const config = {
   // Match all pathnames except:

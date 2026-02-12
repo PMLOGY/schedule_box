@@ -89,7 +89,7 @@ export async function GET(
       .select({
         uuid: services.uuid,
         name: services.name,
-        duration: services.duration,
+        duration: services.durationMinutes,
         price: services.price,
         currency: services.currency,
       })

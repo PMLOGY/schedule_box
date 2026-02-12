@@ -5,10 +5,10 @@
  * Reads credentials from environment variables and instantiates the correct provider.
  */
 
-import { type VideoProvider, VideoProviderError } from './VideoProvider.interface.js';
-import { ZoomProvider } from './ZoomProvider.js';
-import { GoogleMeetProvider } from './GoogleMeetProvider.js';
-import { MSTeamsProvider } from './MSTeamsProvider.js';
+import { type VideoProvider, VideoProviderError } from './VideoProvider.interface';
+import { ZoomProvider } from './ZoomProvider';
+import { GoogleMeetProvider } from './GoogleMeetProvider';
+import { MSTeamsProvider } from './MSTeamsProvider';
 
 export type VideoProviderType = 'zoom' | 'google_meet' | 'ms_teams';
 
@@ -78,7 +78,7 @@ export function createVideoProvider(provider: VideoProviderType): VideoProvider 
 }
 
 // Re-export all interfaces and providers
-export * from './VideoProvider.interface.js';
-export { ZoomProvider } from './ZoomProvider.js';
-export { GoogleMeetProvider } from './GoogleMeetProvider.js';
-export { MSTeamsProvider } from './MSTeamsProvider.js';
+export * from './VideoProvider.interface';
+export { ZoomProvider } from './ZoomProvider';
+export { GoogleMeetProvider } from './GoogleMeetProvider';
+export { MSTeamsProvider } from './MSTeamsProvider';

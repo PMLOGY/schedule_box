@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,45 +33,29 @@ interface AutomationRule {
   createdAt: string;
 }
 
-const triggerLabels: Record<AutomationTriggerType, string> = {
-  booking_created: 'Rezervace vytvořena',
-  booking_confirmed: 'Rezervace potvrzena',
-  booking_completed: 'Rezervace dokončena',
-  booking_cancelled: 'Rezervace zrušena',
-  booking_no_show: 'Zákazník nedorazil',
-  payment_received: 'Platba přijata',
-  customer_created: 'Zákazník vytvořen',
-  review_received: 'Recenze přijata',
-};
-
-const actionLabels: Record<AutomationActionType, string> = {
-  send_email: 'Odeslat email',
-  send_sms: 'Odeslat SMS',
-  send_push: 'Odeslat push notifikaci',
-};
-
-function formatDelay(minutes: number): string {
-  if (minutes === 0) return 'Okamžitě';
-  if (minutes < 60) return `${minutes} min`;
-  if (minutes < 1440) return `${Math.floor(minutes / 60)} hod`;
-  return `${Math.floor(minutes / 1440)} dní`;
+function formatDelay(minutes: number, t: ReturnType<typeof useTranslations>): string {
+  if (minutes === 0) return t('delays.immediate');
+  if (minutes < 60) return t('delays.minutes', { value: minutes });
+  if (minutes < 1440) return t('delays.hours', { value: Math.floor(minutes / 60) });
+  return t('delays.days', { value: Math.floor(minutes / 1440) });
 }
 
 export default function AutomationPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations('automation');
 
   const { data: rules, isLoading } = useQuery({
     queryKey: ['automation-rules'],
     queryFn: async () => {
-      const response = await apiClient.get<{ data: AutomationRule[] }>('/api/v1/automation/rules');
+      const response = await apiClient.get<{ data: AutomationRule[] }>('/automation/rules');
       return response.data;
     },
   });
 
   const toggleMutation = useMutation({
     mutationFn: async (uuid: string) => {
-      await apiClient.post(`/api/v1/automation/rules/${uuid}/toggle`, {});
+      await apiClient.post(`/automation/rules/${uuid}/toggle`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
@@ -79,7 +64,7 @@ export default function AutomationPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (uuid: string) => {
-      await apiClient.delete(`/api/v1/automation/rules/${uuid}`);
+      await apiClient.delete(`/automation/rules/${uuid}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
@@ -91,7 +76,7 @@ export default function AutomationPage() {
   };
 
   const handleDelete = (uuid: string, name: string) => {
-    if (confirm(`Opravdu chcete smazat pravidlo "${name}"?`)) {
+    if (confirm(t('deleteConfirm', { name }))) {
       deleteMutation.mutate(uuid);
     }
   };
@@ -100,37 +85,33 @@ export default function AutomationPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Automatizace</h1>
-          <p className="text-muted-foreground">
-            Vytvářejte pravidla pro automatické odesílání notifikací
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" asChild>
             <Link href="/automation/logs">
               <History className="mr-2 h-4 w-4" />
-              Historie
+              {t('history')}
             </Link>
           </Button>
           <Button onClick={() => router.push('/automation/builder')}>
             <Plus className="mr-2 h-4 w-4" />
-            Nová automatizace
+            {t('newAutomation')}
           </Button>
         </div>
       </div>
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
-          <p className="text-muted-foreground">Načítání...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       ) : !rules || rules.length === 0 ? (
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center space-y-2">
             <Wand2 className="h-12 w-12 text-muted-foreground" />
-            <p className="text-lg font-medium">Zatím žádná pravidla automatizace</p>
-            <p className="text-sm text-muted-foreground">
-              Vytvořte první pravidlo pomocí tlačítka výše
-            </p>
+            <p className="text-lg font-medium">{t('empty')}</p>
+            <p className="text-sm text-muted-foreground">{t('emptyDescription')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -150,30 +131,30 @@ export default function AutomationPage() {
               <CardContent className="space-y-3">
                 <div>
                   <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">
-                    Trigger
+                    {t('trigger')}
                   </div>
                   <Badge variant="outline" className="font-normal">
-                    {triggerLabels[rule.triggerType]}
+                    {t(`triggers.${rule.triggerType}`)}
                   </Badge>
                 </div>
 
                 {rule.delayMinutes > 0 && (
                   <div>
                     <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">
-                      Zpoždění
+                      {t('delay')}
                     </div>
                     <Badge variant="outline" className="font-normal">
-                      {formatDelay(rule.delayMinutes)}
+                      {formatDelay(rule.delayMinutes, t)}
                     </Badge>
                   </div>
                 )}
 
                 <div>
                   <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">
-                    Akce
+                    {t('action')}
                   </div>
                   <Badge variant="outline" className="font-normal">
-                    {actionLabels[rule.actionType]}
+                    {t(`actions.${rule.actionType}`)}
                   </Badge>
                 </div>
 
@@ -185,7 +166,7 @@ export default function AutomationPage() {
                     className="flex-1"
                   >
                     <Edit className="mr-2 h-4 w-4" />
-                    Upravit
+                    {t('edit')}
                   </Button>
                   <Button
                     variant="outline"

@@ -10,7 +10,7 @@ import {
   type CreateMeetingParams,
   type VideoMeetingResult,
   VideoProviderError,
-} from './VideoProvider.interface.js';
+} from './VideoProvider.interface';
 
 interface ZoomAccessTokenResponse {
   access_token: string;

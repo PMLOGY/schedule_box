@@ -12,6 +12,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,8 +45,6 @@ interface Service {
   is_active: boolean;
 }
 
-const DAY_NAMES = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
-
 // ============================================================================
 // PRICE CHECK FORM
 // ============================================================================
@@ -53,6 +52,7 @@ const DAY_NAMES = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'P�
 function PriceCheckForm({
   services,
   onCheck,
+  t,
 }: {
   services: Service[];
   onCheck: (params: {
@@ -65,6 +65,7 @@ function PriceCheckForm({
     staticPrice: number;
     currency: string;
   }) => void;
+  t: ReturnType<typeof useTranslations<'ai.pricing'>>;
 }) {
   const [serviceId, setServiceId] = useState<string>('');
   const [hourOfDay, setHourOfDay] = useState(new Date().getHours());
@@ -98,10 +99,10 @@ function PriceCheckForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="pricing-service">Služba</Label>
+        <Label htmlFor="pricing-service">{t('service')}</Label>
         <Select value={serviceId} onValueChange={setServiceId}>
           <SelectTrigger id="pricing-service">
-            <SelectValue placeholder="Vyberte službu" />
+            <SelectValue placeholder={t('selectService')} />
           </SelectTrigger>
           <SelectContent>
             {services.map((service) => (
@@ -115,7 +116,9 @@ function PriceCheckForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="pricing-hour">Hodina dne ({hourOfDay}:00)</Label>
+          <Label htmlFor="pricing-hour">
+            {t('hourOfDay')} ({hourOfDay}:00)
+          </Label>
           <Input
             id="pricing-hour"
             type="range"
@@ -130,15 +133,15 @@ function PriceCheckForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pricing-day">Den v týdnu</Label>
+          <Label htmlFor="pricing-day">{t('dayOfWeek')}</Label>
           <Select value={dayOfWeek.toString()} onValueChange={(v) => setDayOfWeek(parseInt(v))}>
             <SelectTrigger id="pricing-day">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DAY_NAMES.map((name, idx) => (
+              {Array.from({ length: 7 }, (_, idx) => (
                 <SelectItem key={idx} value={idx.toString()}>
-                  {name}
+                  {t(`days.${idx}` as `days.${number}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -146,7 +149,9 @@ function PriceCheckForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pricing-util">Vytížení ({utilization} %)</Label>
+          <Label htmlFor="pricing-util">
+            {t('utilization')} ({utilization} %)
+          </Label>
           <Input
             id="pricing-util"
             type="range"
@@ -155,13 +160,13 @@ function PriceCheckForm({
             value={utilization}
             onChange={(e) => setUtilization(parseInt(e.target.value))}
           />
-          <p className="text-xs text-muted-foreground">Aktuální využití kapacity</p>
+          <p className="text-xs text-muted-foreground">{t('utilizationDescription')}</p>
         </div>
       </div>
 
       <Button type="submit" disabled={!serviceId}>
         <TrendingUp className="mr-2 h-4 w-4" />
-        Zkontrolovat cenu
+        {t('checkPrice')}
       </Button>
     </form>
   );
@@ -180,6 +185,7 @@ function PriceResult({
   utilization,
   staticPrice,
   currency,
+  t,
 }: {
   serviceId: number;
   priceMin: number;
@@ -189,6 +195,7 @@ function PriceResult({
   utilization: number;
   staticPrice: number;
   currency: string;
+  t: ReturnType<typeof useTranslations<'ai.pricing'>>;
 }) {
   const { data, isLoading, isError } = useDynamicPricing(serviceId, priceMin, priceMax, {
     hourOfDay,
@@ -214,9 +221,7 @@ function PriceResult({
       <Card className="border-destructive/50">
         <CardContent className="flex items-center gap-3 p-6">
           <AlertCircle className="h-5 w-5 text-destructive" />
-          <p className="text-sm text-destructive">
-            Nepodařilo se načíst cenová data. Zkuste to prosím znovu.
-          </p>
+          <p className="text-sm text-destructive">{t('errorMessage')}</p>
         </CardContent>
       </Card>
     );
@@ -232,9 +237,7 @@ function PriceResult({
       {data.fallback && (
         <div className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
           <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <p className="text-sm text-blue-700 dark:text-blue-300">
-            AI ceny nejsou k dispozici — zobrazují se statické ceny.
-          </p>
+          <p className="text-sm text-blue-700 dark:text-blue-300">{t('fallbackMessage')}</p>
         </div>
       )}
 
@@ -242,21 +245,21 @@ function PriceResult({
         <CardContent className="p-6">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             <div>
-              <p className="text-sm text-muted-foreground">Statická cena</p>
+              <p className="text-sm text-muted-foreground">{t('staticPrice')}</p>
               <p className="text-xl font-medium">
                 {staticPrice.toFixed(0)} {currency}
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Optimalizovaná cena</p>
+              <p className="text-sm text-muted-foreground">{t('optimizedPrice')}</p>
               <p className="text-2xl font-bold text-primary">
                 {data.optimal_price.toFixed(0)} {currency}
               </p>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Rozdíl</p>
+              <p className="text-sm text-muted-foreground">{t('difference')}</p>
               <p
                 className={`text-lg font-medium ${
                   isHigher
@@ -272,7 +275,7 @@ function PriceResult({
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Spolehlivost</p>
+              <p className="text-sm text-muted-foreground">{t('confidence')}</p>
               <div className="flex items-center gap-2">
                 <div className="h-2 flex-1 rounded-full bg-muted">
                   <div
@@ -289,7 +292,7 @@ function PriceResult({
                   variant="outline"
                   className="mt-1 text-xs text-orange-600 dark:text-orange-400"
                 >
-                  Omezeno
+                  {t('constrained')}
                 </Badge>
               )}
             </div>
@@ -305,6 +308,9 @@ function PriceResult({
 // ============================================================================
 
 export default function PricingDashboard() {
+  const t = useTranslations('ai.pricing');
+  const tAi = useTranslations('ai');
+
   const [checkParams, setCheckParams] = useState<{
     serviceId: number;
     priceMin: number;
@@ -327,7 +333,7 @@ export default function PricingDashboard() {
   if (isLoadingServices) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Dynamické ceny" />
+        <PageHeader title={t('title')} />
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-48" />
@@ -345,13 +351,11 @@ export default function PricingDashboard() {
   if (!services || services.length === 0) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Dynamické ceny" />
+        <PageHeader title={t('title')} />
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <BarChart3 className="h-12 w-12 text-muted-foreground" />
-            <p className="text-center text-muted-foreground">
-              Dynamické ceny budou k dispozici po nasbírání dostatečného množství dat o rezervacích.
-            </p>
+            <p className="text-center text-muted-foreground">{t('noServices')}</p>
           </CardContent>
         </Card>
       </div>
@@ -360,23 +364,20 @@ export default function PricingDashboard() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title="AI optimalizace"
-        description="AI optimalizace cen upravuje ceny služeb v rozmezí 30 % na základě poptávky, denní doby a vytížení kapacity."
-      />
+      <PageHeader title={tAi('title')} description={t('description')} />
 
       {/* AI Sub-navigation */}
       <div className="flex gap-3">
         <Button variant="default" size="sm" asChild>
           <Link href="/ai/pricing">
             <TrendingUp className="mr-2 h-4 w-4" />
-            Dynamické ceny
+            {t('title')}
           </Link>
         </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href="/ai/capacity">
             <CalendarDays className="mr-2 h-4 w-4" />
-            Predikce kapacity
+            {t('capacityLink')}
           </Link>
         </Button>
       </div>
@@ -386,20 +387,17 @@ export default function PricingDashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Kontrola ceny
+            {t('checkTitle')}
           </CardTitle>
-          <CardDescription>
-            Vyberte službu a nastavte kontextové parametry pro zobrazení AI-optimalizované ceny.
-            Ceny jsou omezeny na rozmezí 30 % od statické ceny.
-          </CardDescription>
+          <CardDescription>{t('checkDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <PriceCheckForm services={services} onCheck={setCheckParams} />
+          <PriceCheckForm services={services} onCheck={setCheckParams} t={t} />
         </CardContent>
       </Card>
 
       {/* Price Result */}
-      {checkParams && <PriceResult {...checkParams} />}
+      {checkParams && <PriceResult {...checkParams} t={t} />}
     </div>
   );
 }

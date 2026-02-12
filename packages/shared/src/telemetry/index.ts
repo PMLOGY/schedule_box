@@ -2,4 +2,4 @@
  * Telemetry barrel exports
  */
 
-export * from './tracer.js';
+export * from './tracer';

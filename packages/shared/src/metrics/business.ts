@@ -6,7 +6,7 @@
  */
 
 import { Counter, Histogram } from 'prom-client';
-import { register } from './index.js';
+import { register } from './index';
 
 // Booking metrics
 export const bookingsTotalCounter = new Counter({

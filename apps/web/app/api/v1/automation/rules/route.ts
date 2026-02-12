@@ -4,7 +4,7 @@
  * POST /api/v1/automation/rules - Create new automation rule
  */
 
-import { eq, and } from 'drizzle-orm';
+import { eq, and, count } from 'drizzle-orm';
 import { db, automationRules } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
@@ -54,12 +54,12 @@ export const GET = createRouteHandler({
         .offset(offset)
         .orderBy(automationRules.createdAt),
       db
-        .select({ count: db.$count(automationRules.id) })
+        .select({ count: count() })
         .from(automationRules)
         .where(and(...conditions)),
     ]);
 
-    const total = countResult[0]?.count ?? 0;
+    const total = Number(countResult[0]?.count ?? 0);
     const totalPages = Math.ceil(total / query.limit);
 
     return paginatedResponse(data, {

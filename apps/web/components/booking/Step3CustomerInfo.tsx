@@ -38,7 +38,7 @@ const customerSchema = z.object({
   customerEmail: z.string().email('Neplatný formát e-mailu').optional().or(z.literal('')),
   customerPhone: z
     .string()
-    .regex(/^\+?[0-9]{9,15}$/, 'Neplatný formát telefonu')
+    .regex(/^\+?[\d\s-]{9,18}$/, 'Neplatný formát telefonu')
     .optional()
     .or(z.literal('')),
   notes: z.string().max(1000).optional(),

@@ -104,7 +104,7 @@ export default function TemplateEditPage() {
     queryKey: ['notification-template', templateId],
     queryFn: async () => {
       const response = await apiClient.get<{ data: NotificationTemplate }>(
-        `/api/v1/notification-templates/${templateId}`,
+        `/notification-templates/${templateId}`,
       );
       const data = response.data;
       setTemplate(data);
@@ -114,7 +114,7 @@ export default function TemplateEditPage() {
 
   const updateMutation = useMutation({
     mutationFn: async (updates: Partial<NotificationTemplate>) => {
-      await apiClient.put(`/api/v1/notification-templates/${templateId}`, updates);
+      await apiClient.put(`/notification-templates/${templateId}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-template', templateId] });
@@ -124,7 +124,7 @@ export default function TemplateEditPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.delete(`/api/v1/notification-templates/${templateId}`);
+      await apiClient.delete(`/notification-templates/${templateId}`);
     },
     onSuccess: () => {
       router.push('/templates');

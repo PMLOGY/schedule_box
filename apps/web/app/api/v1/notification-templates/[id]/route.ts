@@ -109,8 +109,8 @@ export const PUT = createRouteHandler({
       return successResponse(updatedTemplate);
     } catch (error: unknown) {
       // Handle unique constraint violation
-      const dbError = error as { code?: string; constraint?: string };
-      if (dbError.code === '23505' && dbError.constraint?.includes('company_type_channel')) {
+      const dbError = error as { code?: string; constraint_name?: string };
+      if (dbError.code === '23505' && dbError.constraint_name?.includes('company_type_channel')) {
         throw new AppError(
           'DUPLICATE_RESOURCE',
           'A template with this type and channel already exists',

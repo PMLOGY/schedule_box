@@ -85,6 +85,7 @@
     "ai": "AI optimalizace",
     "marketing": "Marketing",
     "settings": "Nastavení",
+    "templates": "Šablony",
     "help": "Nápověda",
     "logout": "Odhlásit se"
   },
@@ -310,7 +311,14 @@
     "form": {
       "name": "Název",
       "duration": "Trvání (min)",
-      "price": "Cena (Kč)"
+      "price": "Cena (Kč)",
+      "category": "Kategorie",
+      "noCategory": "Bez kategorie",
+      "capacity": "Kapacita",
+      "onlineBooking": "Online rezervace",
+      "status": "Stav",
+      "newCategory": "Nová kategorie...",
+      "categoryName": "Název kategorie"
     },
     "createSuccess": "Služba byla vytvořena",
     "createError": "Nepodařilo se vytvořit službu",
@@ -338,7 +346,11 @@
       "name": "Jméno",
       "email": "E-mail",
       "phone": "Telefon",
-      "title": "Pozice"
+      "title": "Pozice",
+      "status": "Stav",
+      "services": "Přiřazené služby",
+      "noServicesAvailable": "Žádné dostupné služby",
+      "selectServices": "Klikněte pro přiřazení služeb"
     },
     "createSuccess": "Zaměstnanec byl vytvořen",
     "createError": "Nepodařilo se vytvořit zaměstnance",
@@ -455,9 +467,7 @@
     "editCouponTitle": "Upravit kupón",
     "editGiftCardTitle": "Upravit poukaz",
     "updateSuccess": "Úspěšně upraveno",
-    "updateError": "Nepodařilo se upravit",
-    "couponForm.isActive": "Aktivní",
-    "giftCardForm.isActive": "Aktivní"
+    "updateError": "Nepodařilo se upravit"
   },
   "settings": {
     "title": "Nastavení",
@@ -484,6 +494,140 @@
     },
     "closed": "Zavřeno",
     "noWorkingHours": "Pracovní doba není nastavena"
+  },
+  "notifications": {
+    "title": "Historie notifikací",
+    "description": "Přehled všech odeslaných notifikací a jejich doručení",
+    "templates": "Šablony",
+    "filters": "Filtry",
+    "filtersDescription": "Filtrování notifikací podle kanálu, stavu a data",
+    "channel": "Kanál",
+    "status": "Stav",
+    "dateFrom": "Od data",
+    "dateTo": "Do data",
+    "all": "Všechny",
+    "email": "Email",
+    "sms": "SMS",
+    "push": "Push notifikace",
+    "statusLabels": {
+      "pending": "Čeká",
+      "sent": "Odesláno",
+      "delivered": "Doručeno",
+      "failed": "Chyba",
+      "opened": "Otevřeno",
+      "clicked": "Kliknuto"
+    },
+    "columns": {
+      "channel": "Kanál",
+      "recipient": "Příjemce",
+      "subject": "Předmět",
+      "status": "Stav",
+      "sentAt": "Odesláno",
+      "createdAt": "Vytvořeno"
+    },
+    "loading": "Načítání...",
+    "empty": "Zatím žádné notifikace",
+    "emptyDescription": "Notifikace se zobrazí po odeslání prvního emailu, SMS nebo push notifikace",
+    "page": "Stránka {page} z {total} (celkem: {count})",
+    "previous": "Předchozí",
+    "next": "Další",
+    "create": "Nová notifikace",
+    "createTitle": "Nová notifikace",
+    "createDescription": "Vyplňte údaje a odešlete notifikaci",
+    "body": "Obsah zprávy",
+    "cancel": "Zrušit",
+    "creating": "Odesílání...",
+    "send": "Odeslat"
+  },
+  "automation": {
+    "title": "Automatizace",
+    "description": "Vytvářejte pravidla pro automatické odesílání notifikací",
+    "history": "Historie",
+    "newAutomation": "Nová automatizace",
+    "loading": "Načítání...",
+    "empty": "Zatím žádná pravidla automatizace",
+    "emptyDescription": "Vytvořte první pravidlo pomocí tlačítka výše",
+    "trigger": "Trigger",
+    "delay": "Zpoždění",
+    "action": "Akce",
+    "edit": "Upravit",
+    "deleteConfirm": "Opravdu chcete smazat pravidlo \"{name}\"?",
+    "triggers": {
+      "booking_created": "Rezervace vytvořena",
+      "booking_confirmed": "Rezervace potvrzena",
+      "booking_completed": "Rezervace dokončena",
+      "booking_cancelled": "Rezervace zrušena",
+      "booking_no_show": "Zákazník nedorazil",
+      "payment_received": "Platba přijata",
+      "customer_created": "Zákazník vytvořen",
+      "review_received": "Recenze přijata"
+    },
+    "actions": {
+      "send_email": "Odeslat email",
+      "send_sms": "Odeslat SMS",
+      "send_push": "Odeslat push notifikaci"
+    },
+    "delays": {
+      "immediate": "Okamžitě",
+      "minutes": "{value} min",
+      "hours": "{value} hod",
+      "days": "{value} dní"
+    }
+  },
+  "ai": {
+    "title": "AI optimalizace",
+    "pricing": {
+      "title": "Dynamické ceny",
+      "description": "AI optimalizace cen upravuje ceny služeb v rozmezí 30 % na základě poptávky, denní doby a vytížení kapacity.",
+      "capacityLink": "Predikce kapacity",
+      "checkTitle": "Kontrola ceny",
+      "checkDescription": "Vyberte službu a nastavte kontextové parametry pro zobrazení AI-optimalizované ceny. Ceny jsou omezeny na rozmezí 30 % od statické ceny.",
+      "service": "Služba",
+      "selectService": "Vyberte službu",
+      "hourOfDay": "Hodina dne",
+      "dayOfWeek": "Den v týdnu",
+      "utilization": "Vytížení",
+      "utilizationDescription": "Aktuální využití kapacity",
+      "checkPrice": "Zkontrolovat cenu",
+      "staticPrice": "Statická cena",
+      "optimizedPrice": "Optimalizovaná cena",
+      "difference": "Rozdíl",
+      "confidence": "Spolehlivost",
+      "constrained": "Omezeno",
+      "fallbackMessage": "AI ceny nejsou k dispozici — zobrazují se statické ceny.",
+      "errorMessage": "Nepodařilo se načíst cenová data. Zkuste to prosím znovu.",
+      "noServices": "Dynamické ceny budou k dispozici po nasbírání dostatečného množství dat o rezervacích.",
+      "days": {
+        "0": "Neděle",
+        "1": "Pondělí",
+        "2": "Úterý",
+        "3": "Středa",
+        "4": "Čtvrtek",
+        "5": "Pátek",
+        "6": "Sobota"
+      }
+    },
+    "capacity": {
+      "title": "Predikce kapacity",
+      "description": "AI predikce poptávky zobrazuje předpokládané objemy rezervací a návrhy na optimalizaci rozvrhu na příštích 7 dní.",
+      "pricingLink": "Dynamické ceny",
+      "forecastTitle": "Predikce na 7 dní",
+      "forecastDescription": "Předpokládané objemy rezervací a úrovně vytížení",
+      "predictedBookings": "předpokládané rezervace",
+      "suggestionsTitle": "Návrhy na úpravu rozvrhu",
+      "suggestionsDescription": "AI doporučení pro úpravy rozvrhu na základě predikce poptávky",
+      "noSuggestions": "Žádné změny v rozvrhu nejsou pro příštích 7 dní doporučeny.",
+      "fallbackMessage": "AI predikce není k dispozici — je potřeba minimálně 12 týdnů dat o rezervacích.",
+      "noData": "Predikce kapacity bude k dispozici po nasbírání dostatečného množství dat o rezervacích.",
+      "errorMessage": "Nepodařilo se načíst predikci kapacity. Zkuste to prosím později.",
+      "utilization": { "low": "nízké", "medium": "střední", "high": "vysoké" },
+      "priority": { "low": "nízká", "medium": "střední", "high": "vysoká" },
+      "suggestionTypes": {
+        "extend_hours": "prodloužit hodiny",
+        "reduce_hours": "zkrátit hodiny",
+        "add_employee": "přidat zaměstnance"
+      }
+    }
   },
   "errors": {
     "generic": "Něco se pokazilo",

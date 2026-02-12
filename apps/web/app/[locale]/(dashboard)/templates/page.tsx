@@ -23,11 +23,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Mail, MessageSquare, Bell, Plus, Edit, Trash2 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
-import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 type NotificationChannel = 'email' | 'sms' | 'push';
 type NotificationTemplateType =
@@ -53,6 +52,14 @@ interface NotificationTemplate {
   updatedAt: string;
 }
 
+interface TemplateForm {
+  type: NotificationTemplateType;
+  channel: NotificationChannel;
+  subject: string;
+  bodyTemplate: string;
+  isActive: boolean;
+}
+
 const channelIcons = {
   email: Mail,
   sms: MessageSquare,
@@ -72,54 +79,209 @@ const typeLabels: Record<NotificationTemplateType, string> = {
   custom: 'Vlastní',
 };
 
+const defaultForm: TemplateForm = {
+  type: 'booking_confirmation',
+  channel: 'email',
+  subject: '',
+  bodyTemplate: '',
+  isActive: true,
+};
+
+function TemplateFormDialog({
+  open,
+  onOpenChange,
+  form,
+  setForm,
+  onSubmit,
+  isPending,
+  title,
+  description,
+  submitLabel,
+  pendingLabel,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  form: TemplateForm;
+  setForm: (form: TemplateForm) => void;
+  onSubmit: () => void;
+  isPending: boolean;
+  title: string;
+  description: string;
+  submitLabel: string;
+  pendingLabel: string;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="type">Typ šablony</Label>
+            <Select
+              value={form.type}
+              onValueChange={(value) =>
+                setForm({ ...form, type: value as NotificationTemplateType })
+              }
+            >
+              <SelectTrigger id="type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(typeLabels) as NotificationTemplateType[]).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {typeLabels[type]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Kanál</Label>
+            <div className="mt-2 flex gap-4">
+              {(['email', 'sms', 'push'] as NotificationChannel[]).map((channel) => {
+                const Icon = channelIcons[channel];
+                return (
+                  <label
+                    key={channel}
+                    className={`flex cursor-pointer items-center gap-2 rounded-md border-2 p-3 transition-colors ${
+                      form.channel === channel ? 'border-primary bg-primary/5' : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="channel"
+                      value={channel}
+                      checked={form.channel === channel}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          channel: e.target.value as NotificationChannel,
+                        })
+                      }
+                      className="sr-only"
+                    />
+                    <Icon className="h-5 w-5" />
+                    <span className="font-medium capitalize">{channel}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {(form.channel === 'email' || form.channel === 'push') && (
+            <div>
+              <Label htmlFor="subject">Předmět</Label>
+              <Input
+                id="subject"
+                value={form.subject}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                placeholder="Např. Potvrzení rezervace"
+              />
+            </div>
+          )}
+
+          <div>
+            <Label htmlFor="bodyTemplate">Obsah šablony</Label>
+            <Textarea
+              id="bodyTemplate"
+              value={form.bodyTemplate}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setForm({ ...form, bodyTemplate: e.target.value })
+              }
+              placeholder="Použijte proměnné: {{customer_name}}, {{service_name}}, {{booking_date}}, atd."
+              rows={8}
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div>
+            <Label>Stav</Label>
+            <div className="mt-2 flex rounded-md border">
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 rounded-l-md px-4 py-2 text-sm font-medium transition-colors',
+                  form.isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:bg-muted',
+                )}
+                onClick={() => setForm({ ...form, isActive: true })}
+              >
+                Aktivní
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  'flex-1 rounded-r-md px-4 py-2 text-sm font-medium transition-colors',
+                  !form.isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:bg-muted',
+                )}
+                onClick={() => setForm({ ...form, isActive: false })}
+              >
+                Neaktivní
+              </button>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Zrušit
+          </Button>
+          <Button onClick={onSubmit} disabled={isPending}>
+            {isPending ? pendingLabel : submitLabel}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function TemplatesPage() {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newTemplate, setNewTemplate] = useState<{
-    type: NotificationTemplateType;
-    channel: NotificationChannel;
-    subject: string;
-    bodyTemplate: string;
-    isActive: boolean;
-  }>({
-    type: 'booking_confirmation',
-    channel: 'email',
-    subject: '',
-    bodyTemplate: '',
-    isActive: true,
-  });
+  const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
+  const [createForm, setCreateForm] = useState<TemplateForm>({ ...defaultForm });
+  const [editForm, setEditForm] = useState<TemplateForm>({ ...defaultForm });
 
   const { data: templates, isLoading } = useQuery({
     queryKey: ['notification-templates'],
     queryFn: async () => {
       const response = await apiClient.get<{ data: NotificationTemplate[] }>(
-        '/api/v1/notification-templates',
+        '/notification-templates',
       );
       return response.data;
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: async (template: typeof newTemplate) => {
-      await apiClient.post('/api/v1/notification-templates', template);
+    mutationFn: async (template: TemplateForm) => {
+      await apiClient.post('/notification-templates', template);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
       setIsCreateOpen(false);
-      setNewTemplate({
-        type: 'booking_confirmation',
-        channel: 'email',
-        subject: '',
-        bodyTemplate: '',
-        isActive: true,
-      });
+      setCreateForm({ ...defaultForm });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: TemplateForm }) => {
+      await apiClient.put(`/notification-templates/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
+      setEditingTemplate(null);
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiClient.delete(`/api/v1/notification-templates/${id}`);
+      await apiClient.delete(`/notification-templates/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-templates'] });
@@ -127,11 +289,24 @@ export default function TemplatesPage() {
   });
 
   const handleCreate = () => {
-    createMutation.mutate(newTemplate);
+    createMutation.mutate(createForm);
   };
 
-  const handleEdit = (id: number) => {
-    router.push(`/templates/${id}`);
+  const handleEdit = (template: NotificationTemplate) => {
+    setEditForm({
+      type: template.type,
+      channel: template.channel,
+      subject: template.subject || '',
+      bodyTemplate: template.bodyTemplate,
+      isActive: template.isActive,
+    });
+    setEditingTemplate(template);
+  };
+
+  const handleUpdate = () => {
+    if (editingTemplate) {
+      updateMutation.mutate({ id: editingTemplate.id, data: editForm });
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -154,118 +329,38 @@ export default function TemplatesPage() {
               Nová šablona
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Vytvořit novou šablonu</DialogTitle>
-              <DialogDescription>
-                Vytvořte šablonu pro email, SMS nebo push notifikaci
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="type">Typ šablony</Label>
-                <Select
-                  value={newTemplate.type}
-                  onValueChange={(value) =>
-                    setNewTemplate({ ...newTemplate, type: value as NotificationTemplateType })
-                  }
-                >
-                  <SelectTrigger id="type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(Object.keys(typeLabels) as NotificationTemplateType[]).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {typeLabels[type]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Kanál</Label>
-                <div className="mt-2 flex gap-4">
-                  {(['email', 'sms', 'push'] as NotificationChannel[]).map((channel) => {
-                    const Icon = channelIcons[channel];
-                    return (
-                      <label
-                        key={channel}
-                        className={`flex cursor-pointer items-center gap-2 rounded-md border-2 p-3 transition-colors ${
-                          newTemplate.channel === channel
-                            ? 'border-primary bg-primary/5'
-                            : 'border-gray-300'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="channel"
-                          value={channel}
-                          checked={newTemplate.channel === channel}
-                          onChange={(e) =>
-                            setNewTemplate({
-                              ...newTemplate,
-                              channel: e.target.value as NotificationChannel,
-                            })
-                          }
-                          className="sr-only"
-                        />
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium capitalize">{channel}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {(newTemplate.channel === 'email' || newTemplate.channel === 'push') && (
-                <div>
-                  <Label htmlFor="subject">Předmět</Label>
-                  <Input
-                    id="subject"
-                    value={newTemplate.subject}
-                    onChange={(e) => setNewTemplate({ ...newTemplate, subject: e.target.value })}
-                    placeholder="Např. Potvrzení rezervace"
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="bodyTemplate">Obsah šablony</Label>
-                <Textarea
-                  id="bodyTemplate"
-                  value={newTemplate.bodyTemplate}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setNewTemplate({ ...newTemplate, bodyTemplate: e.target.value })
-                  }
-                  placeholder="Použijte proměnné: {{customer_name}}, {{service_name}}, {{booking_date}}, atd."
-                  rows={8}
-                  className="font-mono text-sm"
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Label htmlFor="isActive">Aktivní</Label>
-                <Switch
-                  id="isActive"
-                  checked={newTemplate.isActive}
-                  onCheckedChange={(checked: boolean) =>
-                    setNewTemplate({ ...newTemplate, isActive: checked })
-                  }
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-                Zrušit
-              </Button>
-              <Button onClick={handleCreate} disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Vytváření...' : 'Vytvořit'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
         </Dialog>
       </div>
+
+      {/* Create dialog */}
+      <TemplateFormDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        form={createForm}
+        setForm={setCreateForm}
+        onSubmit={handleCreate}
+        isPending={createMutation.isPending}
+        title="Vytvořit novou šablonu"
+        description="Vytvořte šablonu pro email, SMS nebo push notifikaci"
+        submitLabel="Vytvořit"
+        pendingLabel="Vytváření..."
+      />
+
+      {/* Edit dialog */}
+      <TemplateFormDialog
+        open={editingTemplate !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingTemplate(null);
+        }}
+        form={editForm}
+        setForm={setEditForm}
+        onSubmit={handleUpdate}
+        isPending={updateMutation.isPending}
+        title="Upravit šablonu"
+        description="Upravte šablonu notifikace"
+        submitLabel="Uložit"
+        pendingLabel="Ukládání..."
+      />
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
@@ -311,7 +406,7 @@ export default function TemplatesPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEdit(template.id)}
+                      onClick={() => handleEdit(template)}
                       className="flex-1"
                     >
                       <Edit className="mr-2 h-4 w-4" />

@@ -4,7 +4,7 @@
  * POST /api/v1/notification-templates - Create new template
  */
 
-import { eq, and } from 'drizzle-orm';
+import { eq, and, count } from 'drizzle-orm';
 import { db, notificationTemplates } from '@schedulebox/database';
 import { AppError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
@@ -64,12 +64,12 @@ export const GET = createRouteHandler({
         .offset(offset)
         .orderBy(notificationTemplates.createdAt),
       db
-        .select({ count: db.$count(notificationTemplates.id) })
+        .select({ count: count() })
         .from(notificationTemplates)
         .where(and(...conditions)),
     ]);
 
-    const total = countResult[0]?.count ?? 0;
+    const total = Number(countResult[0]?.count ?? 0);
     const totalPages = Math.ceil(total / query.limit);
 
     return paginatedResponse(data, {
@@ -120,9 +120,9 @@ export const POST = createRouteHandler({
         typeof error === 'object' &&
         'code' in error &&
         error.code === '23505' &&
-        'constraint' in error &&
-        typeof error.constraint === 'string' &&
-        error.constraint.includes('company_type_channel')
+        'constraint_name' in error &&
+        typeof error.constraint_name === 'string' &&
+        error.constraint_name.includes('company_type_channel')
       ) {
         throw new AppError(
           'DUPLICATE_RESOURCE',

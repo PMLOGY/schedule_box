@@ -1,28 +1,23 @@
 /**
- * Notifications List Endpoint
- * GET /api/v1/notifications - List notifications with filtering
+ * Notifications List and Create Endpoints
+ * GET  /api/v1/notifications - List notifications with filtering
+ * POST /api/v1/notifications - Create a new notification
  */
 
-import { eq, and, gte, lte, desc } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, count } from 'drizzle-orm';
 import { db, notifications } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
-import { paginatedResponse } from '@/lib/utils/response';
+import { paginatedResponse, successResponse } from '@/lib/utils/response';
 import { notificationListQuerySchema, type NotificationListQuery } from '@schedulebox/shared';
+import { publishEvent, createNotificationSendRequestedEvent } from '@schedulebox/events';
+import { z } from 'zod';
 
 /**
  * GET /api/v1/notifications
  * List notifications for company with filters
- *
- * Supports filtering by:
- * - channel (email/sms/push)
- * - status (pending/sent/delivered/failed/opened/clicked)
- * - customerId (integer)
- * - dateFrom/dateTo (ISO date strings)
- *
- * Results are paginated and ordered by createdAt DESC
  */
 export const GET = createRouteHandler({
   requiresAuth: true,
@@ -69,12 +64,12 @@ export const GET = createRouteHandler({
         .offset(offset)
         .orderBy(desc(notifications.createdAt)),
       db
-        .select({ count: db.$count(notifications.id) })
+        .select({ count: count() })
         .from(notifications)
         .where(and(...conditions)),
     ]);
 
-    const total = countResult[0]?.count ?? 0;
+    const total = Number(countResult[0]?.count ?? 0);
     const totalPages = Math.ceil(total / query.limit);
 
     return paginatedResponse(data, {
@@ -83,5 +78,57 @@ export const GET = createRouteHandler({
       total,
       total_pages: totalPages,
     });
+  },
+});
+
+/**
+ * Schema for creating a notification
+ */
+const notificationCreateSchema = z.object({
+  channel: z.enum(['email', 'sms', 'push']),
+  recipient: z.string().min(1).max(255),
+  subject: z.string().max(255).optional(),
+  body: z.string().min(1),
+});
+
+/**
+ * POST /api/v1/notifications
+ * Create a new notification (status: pending)
+ */
+export const POST = createRouteHandler({
+  bodySchema: notificationCreateSchema,
+  requiresAuth: true,
+  requiredPermissions: [PERMISSIONS.SETTINGS_MANAGE],
+  handler: async ({ body, user }) => {
+    const userSub = user?.sub ?? '';
+    const { companyId } = await findCompanyId(userSub);
+
+    const [notification] = await db
+      .insert(notifications)
+      .values({
+        companyId,
+        channel: body.channel,
+        recipient: body.recipient,
+        subject: body.subject,
+        body: body.body,
+        status: 'pending',
+      })
+      .returning();
+
+    // Publish event to RabbitMQ for the notification worker to pick up and send
+    publishEvent(
+      createNotificationSendRequestedEvent({
+        notificationId: notification.id,
+        companyId,
+        channel: body.channel,
+        recipient: body.recipient,
+        subject: body.subject,
+        body: body.body,
+      }),
+    ).catch((err) => {
+      console.error('[Notifications] Failed to publish send_requested event:', err);
+    });
+
+    return successResponse(notification, 201);
   },
 });

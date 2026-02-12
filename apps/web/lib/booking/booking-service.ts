@@ -8,7 +8,7 @@
  * 3. btree_gist exclusion constraint as safety net (database-level enforcement)
  */
 
-import { eq, and, isNull, or, gte, lte, lt, gt, sql } from 'drizzle-orm';
+import { eq, and, isNull, or, gte, lt, gt, sql } from 'drizzle-orm';
 import {
   db,
   bookings,
@@ -389,7 +389,7 @@ export async function listBookings(
   }
 
   if (date_to) {
-    conditions.push(lte(bookings.startTime, new Date(date_to)));
+    conditions.push(lt(bookings.startTime, new Date(date_to)));
   }
 
   if (source) {

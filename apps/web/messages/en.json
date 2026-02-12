@@ -85,6 +85,7 @@
     "ai": "AI Optimization",
     "marketing": "Marketing",
     "settings": "Settings",
+    "templates": "Templates",
     "help": "Help",
     "logout": "Logout"
   },
@@ -310,7 +311,14 @@
     "form": {
       "name": "Name",
       "duration": "Duration (min)",
-      "price": "Price (CZK)"
+      "price": "Price (CZK)",
+      "category": "Category",
+      "noCategory": "No category",
+      "capacity": "Capacity",
+      "onlineBooking": "Online Booking",
+      "status": "Status",
+      "newCategory": "New category...",
+      "categoryName": "Category name"
     },
     "createSuccess": "Service created",
     "createError": "Failed to create service",
@@ -338,7 +346,11 @@
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
-      "title": "Title"
+      "title": "Title",
+      "status": "Status",
+      "services": "Assigned services",
+      "noServicesAvailable": "No services available",
+      "selectServices": "Click to assign services"
     },
     "createSuccess": "Employee created",
     "createError": "Failed to create employee",
@@ -455,9 +467,7 @@
     "editCouponTitle": "Edit Coupon",
     "editGiftCardTitle": "Edit Gift Card",
     "updateSuccess": "Updated successfully",
-    "updateError": "Failed to update",
-    "couponForm.isActive": "Active",
-    "giftCardForm.isActive": "Active"
+    "updateError": "Failed to update"
   },
   "settings": {
     "title": "Settings",
@@ -484,6 +494,140 @@
     },
     "closed": "Closed",
     "noWorkingHours": "Working hours not configured"
+  },
+  "notifications": {
+    "title": "Notification History",
+    "description": "Overview of all sent notifications and their delivery status",
+    "templates": "Templates",
+    "filters": "Filters",
+    "filtersDescription": "Filter notifications by channel, status and date",
+    "channel": "Channel",
+    "status": "Status",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "all": "All",
+    "email": "Email",
+    "sms": "SMS",
+    "push": "Push notifications",
+    "statusLabels": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "failed": "Failed",
+      "opened": "Opened",
+      "clicked": "Clicked"
+    },
+    "columns": {
+      "channel": "Channel",
+      "recipient": "Recipient",
+      "subject": "Subject",
+      "status": "Status",
+      "sentAt": "Sent",
+      "createdAt": "Created"
+    },
+    "loading": "Loading...",
+    "empty": "No notifications yet",
+    "emptyDescription": "Notifications will appear after the first email, SMS or push notification is sent",
+    "page": "Page {page} of {total} (total: {count})",
+    "previous": "Previous",
+    "next": "Next",
+    "create": "New notification",
+    "createTitle": "New notification",
+    "createDescription": "Fill in the details and send a notification",
+    "body": "Message body",
+    "cancel": "Cancel",
+    "creating": "Sending...",
+    "send": "Send"
+  },
+  "automation": {
+    "title": "Automation",
+    "description": "Create rules for automatic notification sending",
+    "history": "History",
+    "newAutomation": "New Automation",
+    "loading": "Loading...",
+    "empty": "No automation rules yet",
+    "emptyDescription": "Create your first rule using the button above",
+    "trigger": "Trigger",
+    "delay": "Delay",
+    "action": "Action",
+    "edit": "Edit",
+    "deleteConfirm": "Are you sure you want to delete rule \"{name}\"?",
+    "triggers": {
+      "booking_created": "Booking created",
+      "booking_confirmed": "Booking confirmed",
+      "booking_completed": "Booking completed",
+      "booking_cancelled": "Booking cancelled",
+      "booking_no_show": "Customer no show",
+      "payment_received": "Payment received",
+      "customer_created": "Customer created",
+      "review_received": "Review received"
+    },
+    "actions": {
+      "send_email": "Send email",
+      "send_sms": "Send SMS",
+      "send_push": "Send push notification"
+    },
+    "delays": {
+      "immediate": "Immediately",
+      "minutes": "{value} min",
+      "hours": "{value} hrs",
+      "days": "{value} days"
+    }
+  },
+  "ai": {
+    "title": "AI Optimization",
+    "pricing": {
+      "title": "Dynamic Pricing",
+      "description": "AI price optimization adjusts service prices within a 30% range based on demand, time of day and capacity utilization.",
+      "capacityLink": "Capacity Forecast",
+      "checkTitle": "Price Check",
+      "checkDescription": "Select a service and set context parameters to see the AI-optimized price. Prices are constrained to a 30% range from the static price.",
+      "service": "Service",
+      "selectService": "Select a service",
+      "hourOfDay": "Hour of day",
+      "dayOfWeek": "Day of week",
+      "utilization": "Utilization",
+      "utilizationDescription": "Current capacity utilization",
+      "checkPrice": "Check Price",
+      "staticPrice": "Static Price",
+      "optimizedPrice": "Optimized Price",
+      "difference": "Difference",
+      "confidence": "Confidence",
+      "constrained": "Constrained",
+      "fallbackMessage": "AI pricing is not available — showing static prices.",
+      "errorMessage": "Failed to load pricing data. Please try again.",
+      "noServices": "Dynamic pricing will be available after collecting enough booking data.",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    },
+    "capacity": {
+      "title": "Capacity Forecast",
+      "description": "AI demand prediction shows expected booking volumes and schedule optimization suggestions for the next 7 days.",
+      "pricingLink": "Dynamic Pricing",
+      "forecastTitle": "7-Day Forecast",
+      "forecastDescription": "Expected booking volumes and utilization levels",
+      "predictedBookings": "predicted bookings",
+      "suggestionsTitle": "Schedule Adjustment Suggestions",
+      "suggestionsDescription": "AI recommendations for schedule adjustments based on demand prediction",
+      "noSuggestions": "No schedule changes are recommended for the next 7 days.",
+      "fallbackMessage": "AI prediction is not available — at least 12 weeks of booking data is needed.",
+      "noData": "Capacity forecast will be available after collecting enough booking data.",
+      "errorMessage": "Failed to load capacity forecast. Please try again later.",
+      "utilization": { "low": "low", "medium": "medium", "high": "high" },
+      "priority": { "low": "low", "medium": "medium", "high": "high" },
+      "suggestionTypes": {
+        "extend_hours": "extend hours",
+        "reduce_hours": "reduce hours",
+        "add_employee": "add employee"
+      }
+    }
   },
   "errors": {
     "generic": "Something went wrong",

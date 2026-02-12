@@ -7,7 +7,7 @@
 
 import { performance } from 'node:perf_hooks';
 import { Gauge } from 'prom-client';
-import { register } from './index.js';
+import { register } from './index';
 
 // Event loop utilization gauge (0-1 float)
 const eventLoopUtilization = new Gauge({

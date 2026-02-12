@@ -67,10 +67,12 @@ export { createReviewCreatedEvent } from './events/review';
 
 // Notification domain events
 export type {
+  NotificationSendRequestedPayload,
   NotificationSentPayload,
   NotificationFailedPayload,
   NotificationOpenedPayload,
   NotificationClickedPayload,
+  NotificationSendRequestedEvent,
   NotificationSentEvent,
   NotificationFailedEvent,
   NotificationOpenedEvent,
@@ -78,6 +80,7 @@ export type {
 } from './events/notification';
 
 export {
+  createNotificationSendRequestedEvent,
   createNotificationSentEvent,
   createNotificationFailedEvent,
   createNotificationOpenedEvent,

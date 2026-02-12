@@ -85,6 +85,7 @@
     "ai": "AI optimalizácia",
     "marketing": "Marketing",
     "settings": "Nastavenia",
+    "templates": "Šablóny",
     "help": "Nápoveda",
     "logout": "Odhlásiť sa"
   },
@@ -111,6 +112,136 @@
     "month": "Mesiac",
     "noEvents": "Žiadne udalosti",
     "allEmployees": "Všetci zamestnanci"
+  },
+  "booking": {
+    "title": "Rezervácie",
+    "new": { "title": "Nová rezervácia" },
+    "status": {
+      "pending": "Čaká na potvrdenie",
+      "confirmed": "Potvrdené",
+      "completed": "Dokončené",
+      "cancelled": "Zrušené",
+      "no_show": "Nedostavil sa"
+    },
+    "detail": {
+      "bookingId": "ID rezervácie",
+      "customer": "Zákazník",
+      "service": "Služba",
+      "employee": "Zamestnanec",
+      "dateTime": "Dátum a čas",
+      "price": "Cena",
+      "discount": "Zľava",
+      "notes": "Poznámky",
+      "customerNotes": "Poznámky zákazníka",
+      "internalNotes": "Interné poznámky",
+      "metadata": "Metadáta",
+      "createdAt": "Vytvorené",
+      "source": "Zdroj",
+      "cancelledAt": "Zrušené",
+      "cancellationReason": "Dôvod zrušenia",
+      "minutes": "minút",
+      "notFound": "Rezervácia nebola nájdená",
+      "actions": {
+        "confirm": {
+          "button": "Potvrdiť rezerváciu",
+          "success": "Rezervácia potvrdená",
+          "error": "Nepodarilo sa potvrdiť rezerváciu"
+        },
+        "cancel": {
+          "button": "Zrušiť rezerváciu",
+          "success": "Rezervácia zrušená",
+          "error": "Nepodarilo sa zrušiť rezerváciu"
+        },
+        "complete": {
+          "button": "Označiť ako dokončené",
+          "success": "Rezervácia označená ako dokončená",
+          "error": "Nepodarilo sa dokončiť rezerváciu"
+        },
+        "noShow": {
+          "button": "Označiť ako nedostavil sa",
+          "success": "Rezervácia označená ako nedostavil sa",
+          "error": "Nepodarilo sa označiť rezerváciu"
+        }
+      }
+    },
+    "list": {
+      "title": "Zoznam rezervácií",
+      "filters": {
+        "status": "Stav",
+        "allStatuses": "Všetky stavy",
+        "dateRange": "Rozsah dátumov",
+        "employee": "Zamestnanec",
+        "allEmployees": "Všetci zamestnanci",
+        "service": "Služba",
+        "allServices": "Všetky služby",
+        "search": "Hľadať zákazníka..."
+      },
+      "columns": {
+        "dateTime": "Dátum a čas",
+        "customer": "Zákazník",
+        "service": "Služba",
+        "employee": "Zamestnanec",
+        "status": "Stav",
+        "price": "Cena",
+        "actions": "Akcie"
+      },
+      "noBookings": "Žiadne rezervácie"
+    },
+    "wizard": {
+      "steps": {
+        "service": "Služba",
+        "datetime": "Dátum a čas",
+        "customer": "Zákazník",
+        "confirm": "Potvrdenie"
+      },
+      "step1": {
+        "title": "Vyberte službu",
+        "selectService": "Vyberte službu",
+        "duration": "Trvanie",
+        "price": "Cena",
+        "minutes": "minút",
+        "noServices": "Žiadne aktívne služby",
+        "preferredEmployee": "Preferovaný zamestnanec",
+        "anyEmployee": "Ktokoľvek"
+      },
+      "step2": {
+        "title": "Vyberte dátum a čas",
+        "selectDate": "Vyberte dátum",
+        "availableSlots": "Dostupné časy",
+        "noSlotsAvailable": "Pre vybraný dátum nie sú dostupné žiadne termíny",
+        "loading": "Načítavanie dostupnosti..."
+      },
+      "step3": {
+        "title": "Informácie o zákazníkovi",
+        "existingCustomer": "Existujúci zákazník",
+        "newCustomer": "Nový zákazník",
+        "searchCustomer": "Hľadať zákazníka...",
+        "noCustomersFound": "Žiadny zákazník nebol nájdený",
+        "name": "Meno",
+        "email": "E-mail",
+        "phone": "Telefón",
+        "notes": "Poznámky",
+        "validation": {
+          "nameRequired": "Meno je povinné",
+          "nameMin": "Meno musí mať aspoň 2 znaky",
+          "emailInvalid": "Neplatný formát e-mailu",
+          "phoneInvalid": "Neplatný formát telefónu"
+        }
+      },
+      "step4": {
+        "title": "Potvrdenie rezervácie",
+        "summary": "Súhrn rezervácie",
+        "service": "Služba",
+        "datetime": "Dátum a čas",
+        "employee": "Zamestnanec",
+        "customer": "Zákazník",
+        "notes": "Poznámky",
+        "confirmBooking": "Potvrdiť rezerváciu",
+        "slotTaken": "Tento termín už nie je dostupný. Prosím vyberte iný.",
+        "bookingSuccess": "Rezervácia bola úspešne vytvorená",
+        "bookingError": "Chyba pri vytváraní rezervácie"
+      }
+    }
   },
   "table": {
     "noData": "Žiadne údaje",
@@ -178,7 +309,14 @@
     "form": {
       "name": "Názov",
       "duration": "Trvanie (min)",
-      "price": "Cena (Kč)"
+      "price": "Cena (Kč)",
+      "category": "Kategória",
+      "noCategory": "Bez kategórie",
+      "capacity": "Kapacita",
+      "onlineBooking": "Online rezervácia",
+      "status": "Stav",
+      "newCategory": "Nová kategória...",
+      "categoryName": "Názov kategórie"
     },
     "createSuccess": "Služba bola vytvorená",
     "createError": "Nepodarilo sa vytvoriť službu",
@@ -206,7 +344,11 @@
       "name": "Meno",
       "email": "E-mail",
       "phone": "Telefón",
-      "title": "Pozícia"
+      "title": "Pozícia",
+      "status": "Stav",
+      "services": "Priradené služby",
+      "noServicesAvailable": "Žiadne dostupné služby",
+      "selectServices": "Kliknite pre priradenie služieb"
     },
     "createSuccess": "Zamestnanec bol vytvorený",
     "createError": "Nepodarilo sa vytvoriť zamestnanca",
@@ -323,9 +465,7 @@
     "editCouponTitle": "Upraviť kupón",
     "editGiftCardTitle": "Upraviť poukaz",
     "updateSuccess": "Úspešne upravené",
-    "updateError": "Nepodarilo sa upraviť",
-    "couponForm.isActive": "Aktívny",
-    "giftCardForm.isActive": "Aktívny"
+    "updateError": "Nepodarilo sa upraviť"
   },
   "settings": {
     "title": "Nastavenia",
@@ -352,6 +492,140 @@
     },
     "closed": "Zatvorené",
     "noWorkingHours": "Pracovná doba nie je nastavená"
+  },
+  "notifications": {
+    "title": "História notifikácií",
+    "description": "Prehľad všetkých odoslaných notifikácií a ich doručenia",
+    "templates": "Šablóny",
+    "filters": "Filtre",
+    "filtersDescription": "Filtrovanie notifikácií podľa kanálu, stavu a dátumu",
+    "channel": "Kanál",
+    "status": "Stav",
+    "dateFrom": "Od dátumu",
+    "dateTo": "Do dátumu",
+    "all": "Všetky",
+    "email": "Email",
+    "sms": "SMS",
+    "push": "Push notifikácie",
+    "statusLabels": {
+      "pending": "Čaká",
+      "sent": "Odoslané",
+      "delivered": "Doručené",
+      "failed": "Chyba",
+      "opened": "Otvorené",
+      "clicked": "Kliknuté"
+    },
+    "columns": {
+      "channel": "Kanál",
+      "recipient": "Príjemca",
+      "subject": "Predmet",
+      "status": "Stav",
+      "sentAt": "Odoslané",
+      "createdAt": "Vytvorené"
+    },
+    "loading": "Načítavanie...",
+    "empty": "Zatiaľ žiadne notifikácie",
+    "emptyDescription": "Notifikácie sa zobrazia po odoslaní prvého emailu, SMS alebo push notifikácie",
+    "page": "Stránka {page} z {total} (celkom: {count})",
+    "previous": "Predchádzajúci",
+    "next": "Ďalší",
+    "create": "Nová notifikácia",
+    "createTitle": "Nová notifikácia",
+    "createDescription": "Vyplňte údaje a odošlite notifikáciu",
+    "body": "Obsah správy",
+    "cancel": "Zrušiť",
+    "creating": "Odosielanie...",
+    "send": "Odoslať"
+  },
+  "automation": {
+    "title": "Automatizácia",
+    "description": "Vytvárajte pravidlá pre automatické odosielanie notifikácií",
+    "history": "História",
+    "newAutomation": "Nová automatizácia",
+    "loading": "Načítavanie...",
+    "empty": "Zatiaľ žiadne pravidlá automatizácie",
+    "emptyDescription": "Vytvorte prvé pravidlo pomocou tlačidla vyššie",
+    "trigger": "Trigger",
+    "delay": "Oneskorenie",
+    "action": "Akcia",
+    "edit": "Upraviť",
+    "deleteConfirm": "Naozaj chcete zmazať pravidlo \"{name}\"?",
+    "triggers": {
+      "booking_created": "Rezervácia vytvorená",
+      "booking_confirmed": "Rezervácia potvrdená",
+      "booking_completed": "Rezervácia dokončená",
+      "booking_cancelled": "Rezervácia zrušená",
+      "booking_no_show": "Zákazník sa nedostavil",
+      "payment_received": "Platba prijatá",
+      "customer_created": "Zákazník vytvorený",
+      "review_received": "Recenzia prijatá"
+    },
+    "actions": {
+      "send_email": "Odoslať email",
+      "send_sms": "Odoslať SMS",
+      "send_push": "Odoslať push notifikáciu"
+    },
+    "delays": {
+      "immediate": "Okamžite",
+      "minutes": "{value} min",
+      "hours": "{value} hod",
+      "days": "{value} dní"
+    }
+  },
+  "ai": {
+    "title": "AI optimalizácia",
+    "pricing": {
+      "title": "Dynamické ceny",
+      "description": "AI optimalizácia cien upravuje ceny služieb v rozmedzí 30 % na základe dopytu, dennej doby a vyťaženia kapacity.",
+      "capacityLink": "Predikcia kapacity",
+      "checkTitle": "Kontrola ceny",
+      "checkDescription": "Vyberte službu a nastavte kontextové parametre pre zobrazenie AI-optimalizovanej ceny. Ceny sú obmedzené na rozmedzie 30 % od statickej ceny.",
+      "service": "Služba",
+      "selectService": "Vyberte službu",
+      "hourOfDay": "Hodina dňa",
+      "dayOfWeek": "Deň v týždni",
+      "utilization": "Vyťaženie",
+      "utilizationDescription": "Aktuálne využitie kapacity",
+      "checkPrice": "Skontrolovať cenu",
+      "staticPrice": "Statická cena",
+      "optimizedPrice": "Optimalizovaná cena",
+      "difference": "Rozdiel",
+      "confidence": "Spoľahlivosť",
+      "constrained": "Obmedzené",
+      "fallbackMessage": "AI ceny nie sú k dispozícii — zobrazujú sa statické ceny.",
+      "errorMessage": "Nepodarilo sa načítať cenové dáta. Skúste to prosím znovu.",
+      "noServices": "Dynamické ceny budú k dispozícii po nazbieraní dostatočného množstva dát o rezerváciách.",
+      "days": {
+        "0": "Nedeľa",
+        "1": "Pondelok",
+        "2": "Utorok",
+        "3": "Streda",
+        "4": "Štvrtok",
+        "5": "Piatok",
+        "6": "Sobota"
+      }
+    },
+    "capacity": {
+      "title": "Predikcia kapacity",
+      "description": "AI predikcia dopytu zobrazuje predpokladané objemy rezervácií a návrhy na optimalizáciu rozvrhu na ďalších 7 dní.",
+      "pricingLink": "Dynamické ceny",
+      "forecastTitle": "Predikcia na 7 dní",
+      "forecastDescription": "Predpokladané objemy rezervácií a úrovne vyťaženia",
+      "predictedBookings": "predpokladané rezervácie",
+      "suggestionsTitle": "Návrhy na úpravu rozvrhu",
+      "suggestionsDescription": "AI odporúčania pre úpravy rozvrhu na základe predikcie dopytu",
+      "noSuggestions": "Žiadne zmeny v rozvrhu nie sú pre ďalších 7 dní odporúčané.",
+      "fallbackMessage": "AI predikcia nie je k dispozícii — je potreba minimálne 12 týždňov dát o rezerváciách.",
+      "noData": "Predikcia kapacity bude k dispozícii po nazbieraní dostatočného množstva dát o rezerváciách.",
+      "errorMessage": "Nepodarilo sa načítať predikciu kapacity. Skúste to prosím neskôr.",
+      "utilization": { "low": "nízke", "medium": "stredné", "high": "vysoké" },
+      "priority": { "low": "nízka", "medium": "stredná", "high": "vysoká" },
+      "suggestionTypes": {
+        "extend_hours": "predĺžiť hodiny",
+        "reduce_hours": "skrátiť hodiny",
+        "add_employee": "pridať zamestnanca"
+      }
+    }
   },
   "errors": {
     "generic": "Niečo sa pokazilo",

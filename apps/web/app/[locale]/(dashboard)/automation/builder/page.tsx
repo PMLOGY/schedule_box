@@ -85,9 +85,7 @@ export default function AutomationBuilderPage() {
     queryKey: ['automation-rule', ruleId],
     queryFn: async () => {
       if (!ruleId) return null;
-      const response = await apiClient.get<{ data: AutomationRule }>(
-        `/api/v1/automation/rules/${ruleId}`,
-      );
+      const response = await apiClient.get<{ data: AutomationRule }>(`/automation/rules/${ruleId}`);
       return response.data;
     },
     enabled: !!ruleId,
@@ -296,9 +294,9 @@ export default function AutomationBuilderPage() {
       delayMinutes: number;
     }) => {
       if (ruleId) {
-        await apiClient.put(`/api/v1/automation/rules/${ruleId}`, data);
+        await apiClient.put(`/automation/rules/${ruleId}`, data);
       } else {
-        await apiClient.post('/api/v1/automation/rules', data);
+        await apiClient.post('/automation/rules', data);
       }
     },
     onSuccess: () => {

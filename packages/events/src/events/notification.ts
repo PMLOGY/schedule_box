@@ -91,11 +91,50 @@ export interface NotificationClickedPayload {
   clickedAt: string;
 }
 
+/**
+ * Notification send requested payload
+ * Emitted when a user manually creates a notification to be sent
+ */
+export interface NotificationSendRequestedPayload {
+  /** Notification DB ID */
+  notificationId: number;
+
+  /** Company/tenant ID */
+  companyId: number;
+
+  /** Channel (email, sms, push) */
+  channel: string;
+
+  /** Recipient address */
+  recipient: string;
+
+  /** Subject (email/push) */
+  subject?: string;
+
+  /** Body content */
+  body: string;
+}
+
 // Type aliases for CloudEvents
+export type NotificationSendRequestedEvent = CloudEvent<NotificationSendRequestedPayload>;
 export type NotificationSentEvent = CloudEvent<NotificationSentPayload>;
 export type NotificationFailedEvent = CloudEvent<NotificationFailedPayload>;
 export type NotificationOpenedEvent = CloudEvent<NotificationOpenedPayload>;
 export type NotificationClickedEvent = CloudEvent<NotificationClickedPayload>;
+
+/**
+ * Create a notification send requested event
+ */
+export function createNotificationSendRequestedEvent(
+  data: NotificationSendRequestedPayload,
+): NotificationSendRequestedEvent {
+  return createCloudEvent(
+    `${EVENT_TYPE_PREFIX}.send_requested`,
+    'api',
+    data,
+    data.notificationId.toString(),
+  );
+}
 
 /**
  * Create a notification sent event

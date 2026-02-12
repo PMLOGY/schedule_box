@@ -11,7 +11,7 @@ import {
   type CreateMeetingParams,
   type VideoMeetingResult,
   VideoProviderError,
-} from './VideoProvider.interface.js';
+} from './VideoProvider.interface';
 
 interface GoogleAccessTokenResponse {
   access_token: string;

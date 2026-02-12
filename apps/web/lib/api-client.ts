@@ -86,6 +86,11 @@ class ApiClient {
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
+    // Handle 204 No Content (e.g., DELETE responses)
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
     const json = await response.json();
 
     if (!response.ok) {
