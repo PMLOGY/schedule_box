@@ -105,3 +105,11 @@ export type {
   WhitelabelApp,
   WhitelabelBuildStatus,
 } from './whitelabel';
+
+// AI Voice Intelligence types (Phase 14)
+export type {
+  VoiceBookingInput,
+  FollowUpRequestInput,
+  CompetitorScrapeInput,
+  CompetitorQueryInput,
+} from './ai-voice-intelligence';

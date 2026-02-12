@@ -179,3 +179,98 @@ export interface ReminderTimingResponse {
   model_version: string;
   fallback: boolean;
 }
+
+// ============================================================================
+// Voice Booking Types (Phase 14)
+// ============================================================================
+
+export interface VoiceEntities {
+  service_name: string | null;
+  date: string | null;
+  time: string | null;
+  employee_name: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+}
+
+export interface VoiceProcessResponse {
+  transcript: string | null;
+  intent: 'create_booking' | 'cancel_booking' | 'check_availability' | 'unknown';
+  entities: VoiceEntities | null;
+  confidence: number;
+  confirmation_needed: boolean;
+  error: string | null;
+  fallback: boolean;
+}
+
+// ============================================================================
+// Follow-Up Generator Types (Phase 14)
+// ============================================================================
+
+export interface FollowUpCustomerContext {
+  customer_name: string;
+  business_name: string;
+  last_visit_date?: string;
+  last_service?: string;
+  total_visits?: number;
+  total_spent?: number;
+  health_score?: number;
+  health_category?: string;
+  preferred_services?: string;
+  days_inactive?: number;
+  recommended_service?: string;
+  recommendation_reason?: string;
+  loyalty_tier?: string;
+}
+
+export interface FollowUpRequest {
+  customer_id: number;
+  company_id: number;
+  type: 'post_visit' | 're_engagement' | 'upsell' | 'birthday';
+  customer_context: FollowUpCustomerContext;
+}
+
+export interface FollowUpResponse {
+  subject: string;
+  body: string;
+  model: string;
+  tokens_used: number;
+  error: string | null;
+  fallback: boolean;
+}
+
+// ============================================================================
+// Competitor Intelligence Types (Phase 14)
+// ============================================================================
+
+export interface CompetitorScrapeRequest {
+  company_id: number;
+  competitor_name: string;
+  competitor_url: string;
+  data_types?: ('pricing' | 'services' | 'reviews')[];
+}
+
+export interface CompetitorScrapeResult {
+  competitor_name: string;
+  data_type: string;
+  data: Record<string, unknown>;
+  scraped_at: string;
+}
+
+export interface CompetitorScrapeResponse {
+  results: CompetitorScrapeResult[];
+  errors: string[];
+  fallback: boolean;
+}
+
+export interface CompetitorDataRequest {
+  company_id: number;
+  competitor_name?: string;
+  data_type?: 'pricing' | 'services' | 'reviews' | 'availability';
+}
+
+export interface CompetitorDataResponse {
+  data: CompetitorScrapeResult[];
+  total: number;
+  fallback: boolean;
+}

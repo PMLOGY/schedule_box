@@ -6,8 +6,14 @@ import type {
   CapacityForecastResponse,
   CLVPredictionRequest,
   CLVPredictionResponse,
+  CompetitorDataRequest,
+  CompetitorDataResponse,
+  CompetitorScrapeRequest,
+  CompetitorScrapeResponse,
   DynamicPricingRequest,
   DynamicPricingResponse,
+  FollowUpRequest,
+  FollowUpResponse,
   HealthScorePredictionRequest,
   HealthScoreResponse,
   NoShowPredictionRequest,
@@ -16,6 +22,7 @@ import type {
   ReminderTimingResponse,
   UpsellRequest,
   UpsellResponse,
+  VoiceProcessResponse,
 } from './types';
 
 /**
@@ -122,6 +129,55 @@ export function getReminderTimingFallback(request: ReminderTimingRequest): Remin
     expected_open_rate: 0.0,
     confidence: 0.0,
     model_version: 'fallback',
+    fallback: true,
+  };
+}
+
+// ============================================================================
+// Phase 14 Fallback Functions
+// ============================================================================
+
+/** Fallback for voice processing. Returns unknown intent with no transcript. */
+export function getVoiceProcessFallback(): VoiceProcessResponse {
+  return {
+    transcript: null,
+    intent: 'unknown',
+    entities: null,
+    confidence: 0.0,
+    confirmation_needed: false,
+    error: 'ai_service_unavailable',
+    fallback: true,
+  };
+}
+
+/** Fallback for follow-up generation. Returns empty subject/body. */
+export function getFollowUpFallback(_request: FollowUpRequest): FollowUpResponse {
+  return {
+    subject: '',
+    body: '',
+    model: 'fallback',
+    tokens_used: 0,
+    error: 'ai_service_unavailable',
+    fallback: true,
+  };
+}
+
+/** Fallback for competitor scrape trigger. Returns empty results. */
+export function getCompetitorScrapeFallback(
+  _request: CompetitorScrapeRequest,
+): CompetitorScrapeResponse {
+  return {
+    results: [],
+    errors: ['ai_service_unavailable'],
+    fallback: true,
+  };
+}
+
+/** Fallback for competitor data retrieval. Returns empty data. */
+export function getCompetitorDataFallback(_request: CompetitorDataRequest): CompetitorDataResponse {
+  return {
+    data: [],
+    total: 0,
     fallback: true,
   };
 }

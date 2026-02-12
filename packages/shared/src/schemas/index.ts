@@ -102,3 +102,11 @@ export {
   whitelabelAppUpdateSchema,
   whitelabelBuildStatusEnum,
 } from './whitelabel';
+
+// AI Voice Intelligence schemas (Phase 14)
+export {
+  voiceBookingSchema,
+  followUpRequestSchema,
+  competitorScrapeRequestSchema,
+  competitorQuerySchema,
+} from './ai-voice-intelligence';
