@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 13 of 15 — Polish & Optimization
 - **Status:** Phase 13 In Progress
-- **Current Plan:** 13-01 complete
-- **Plans Executed:** 73
+- **Current Plan:** 13-04 complete
+- **Plans Executed:** 74
 
 ## What's Done
 
@@ -97,6 +97,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-08: Review Rating Sync Consumer (1 task, 1 commit)
 - [x] Plan 13-01: Analytics Dashboard with Interactive Charts (2 tasks, 2 commits)
 - [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
+- [x] Plan 13-04: Performance & Accessibility Optimization (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -117,9 +118,9 @@ Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints,
 
 Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation, review rating sync consumer)
 
-Phase 13: In Progress — Plan 13-02 complete (Complete Czech/Slovak/English translations with locale switcher and WCAG 2.1 AA accessibility foundations)
+Phase 13: In Progress — Plans 13-01, 13-02, 13-04 complete (Analytics dashboard, i18n expansion, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Next: Phase 13 Plan 03 (Performance Optimization) or Plan 04 (Error Boundaries & Loading States)
+Next: Phase 13 Plan 03 or Plan 05 (Error Boundaries & Loading States or final polish tasks)
 
 ## Decisions
 
@@ -438,6 +439,13 @@ Next: Phase 13 Plan 03 (Performance Optimization) or Plan 04 (Error Boundaries &
 - [Phase 13-02]: Skip-link renders as first child in AuthGuard before all interactive elements (WCAG 2.1 compliance)
 - [Phase 13-02]: Locale switcher positioned between breadcrumbs and user menu in header (visual hierarchy)
 - [Phase 13-02]: tabIndex={-1} on main element allows programmatic focus from skip-link without adding to natural tab order
+- [Phase 13-04]: Dynamic imports for FullCalendar (~200KB) and React Flow (~150KB) to reduce main bundle size
+- [Phase 13-04]: Inter font display:swap for better LCP (text visible during font load)
+- [Phase 13-04]: AVIF/WebP image formats in Next.js config for bandwidth optimization
+- [Phase 13-04]: modularizeImports for lucide-react tree-shaking to reduce icon bundle size
+- [Phase 13-04]: role="alert" and aria-live="assertive" on FormMessage for screen reader error announcements
+- [Phase 13-04]: aria-current="page" on active navigation links for assistive technology context
+- [Phase 13-04]: Comprehensive ARIA labels on all icon-only buttons (sidebar toggle, calendar navigation, user menu)
 
 ## Blockers
 
@@ -534,11 +542,12 @@ None — Phase 11 complete.
 | 12-08 | 89s | 1 | 2 | 1 |
 | 13-01 | 518s | 2 | 14 | 2 |
 | 13-02 | 229s | 2 | 11 | 2 |
+| 13-04 | 311s | 2 | 11 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 13-01-PLAN.md
+**Stopped at:** Completed 13-04-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 13-01 (Analytics Dashboard with Interactive Charts)*
+*Last updated: 2026-02-12 after completing Phase 13-04 (Performance & Accessibility Optimization)*
