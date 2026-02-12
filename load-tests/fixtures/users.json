@@ -1,0 +1,302 @@
+[
+  {
+    "email": "loadtest-1@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 1",
+    "phone": "+420600000001"
+  },
+  {
+    "email": "loadtest-2@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 2",
+    "phone": "+420600000002"
+  },
+  {
+    "email": "loadtest-3@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 3",
+    "phone": "+420600000003"
+  },
+  {
+    "email": "loadtest-4@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 4",
+    "phone": "+420600000004"
+  },
+  {
+    "email": "loadtest-5@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 5",
+    "phone": "+420600000005"
+  },
+  {
+    "email": "loadtest-6@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 6",
+    "phone": "+420600000006"
+  },
+  {
+    "email": "loadtest-7@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 7",
+    "phone": "+420600000007"
+  },
+  {
+    "email": "loadtest-8@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 8",
+    "phone": "+420600000008"
+  },
+  {
+    "email": "loadtest-9@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 9",
+    "phone": "+420600000009"
+  },
+  {
+    "email": "loadtest-10@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 10",
+    "phone": "+420600000010"
+  },
+  {
+    "email": "loadtest-11@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 11",
+    "phone": "+420600000011"
+  },
+  {
+    "email": "loadtest-12@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 12",
+    "phone": "+420600000012"
+  },
+  {
+    "email": "loadtest-13@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 13",
+    "phone": "+420600000013"
+  },
+  {
+    "email": "loadtest-14@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 14",
+    "phone": "+420600000014"
+  },
+  {
+    "email": "loadtest-15@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 15",
+    "phone": "+420600000015"
+  },
+  {
+    "email": "loadtest-16@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 16",
+    "phone": "+420600000016"
+  },
+  {
+    "email": "loadtest-17@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 17",
+    "phone": "+420600000017"
+  },
+  {
+    "email": "loadtest-18@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 18",
+    "phone": "+420600000018"
+  },
+  {
+    "email": "loadtest-19@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 19",
+    "phone": "+420600000019"
+  },
+  {
+    "email": "loadtest-20@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 20",
+    "phone": "+420600000020"
+  },
+  {
+    "email": "loadtest-21@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 21",
+    "phone": "+420600000021"
+  },
+  {
+    "email": "loadtest-22@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 22",
+    "phone": "+420600000022"
+  },
+  {
+    "email": "loadtest-23@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 23",
+    "phone": "+420600000023"
+  },
+  {
+    "email": "loadtest-24@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 24",
+    "phone": "+420600000024"
+  },
+  {
+    "email": "loadtest-25@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 25",
+    "phone": "+420600000025"
+  },
+  {
+    "email": "loadtest-26@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 26",
+    "phone": "+420600000026"
+  },
+  {
+    "email": "loadtest-27@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 27",
+    "phone": "+420600000027"
+  },
+  {
+    "email": "loadtest-28@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 28",
+    "phone": "+420600000028"
+  },
+  {
+    "email": "loadtest-29@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 29",
+    "phone": "+420600000029"
+  },
+  {
+    "email": "loadtest-30@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 30",
+    "phone": "+420600000030"
+  },
+  {
+    "email": "loadtest-31@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 31",
+    "phone": "+420600000031"
+  },
+  {
+    "email": "loadtest-32@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 32",
+    "phone": "+420600000032"
+  },
+  {
+    "email": "loadtest-33@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 33",
+    "phone": "+420600000033"
+  },
+  {
+    "email": "loadtest-34@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 34",
+    "phone": "+420600000034"
+  },
+  {
+    "email": "loadtest-35@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 35",
+    "phone": "+420600000035"
+  },
+  {
+    "email": "loadtest-36@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 36",
+    "phone": "+420600000036"
+  },
+  {
+    "email": "loadtest-37@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 37",
+    "phone": "+420600000037"
+  },
+  {
+    "email": "loadtest-38@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 38",
+    "phone": "+420600000038"
+  },
+  {
+    "email": "loadtest-39@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 39",
+    "phone": "+420600000039"
+  },
+  {
+    "email": "loadtest-40@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 40",
+    "phone": "+420600000040"
+  },
+  {
+    "email": "loadtest-41@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 41",
+    "phone": "+420600000041"
+  },
+  {
+    "email": "loadtest-42@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 42",
+    "phone": "+420600000042"
+  },
+  {
+    "email": "loadtest-43@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 43",
+    "phone": "+420600000043"
+  },
+  {
+    "email": "loadtest-44@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 44",
+    "phone": "+420600000044"
+  },
+  {
+    "email": "loadtest-45@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 45",
+    "phone": "+420600000045"
+  },
+  {
+    "email": "loadtest-46@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 46",
+    "phone": "+420600000046"
+  },
+  {
+    "email": "loadtest-47@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 47",
+    "phone": "+420600000047"
+  },
+  {
+    "email": "loadtest-48@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 48",
+    "phone": "+420600000048"
+  },
+  {
+    "email": "loadtest-49@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 49",
+    "phone": "+420600000049"
+  },
+  {
+    "email": "loadtest-50@schedulebox.cz",
+    "password": "LoadTest123!@#",
+    "name": "Load Test User 50",
+    "phone": "+420600000050"
+  }
+]
