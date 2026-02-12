@@ -37,7 +37,7 @@ export function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-3 outline-none">
+      <DropdownMenuTrigger className="flex items-center gap-3 outline-none" aria-label="User menu">
         <Avatar>
           <AvatarFallback>{getInitials(user.firstName + ' ' + user.lastName)}</AvatarFallback>
         </Avatar>

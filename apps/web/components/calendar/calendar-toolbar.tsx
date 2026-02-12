@@ -72,13 +72,13 @@ export function CalendarToolbar() {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-1">
-        <Button variant="outline" size="icon" onClick={handlePrev}>
+        <Button variant="outline" size="icon" onClick={handlePrev} aria-label="Previous period">
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <Button variant="outline" onClick={handleToday}>
           {t('today')}
         </Button>
-        <Button variant="outline" size="icon" onClick={handleNext}>
+        <Button variant="outline" size="icon" onClick={handleNext} aria-label="Next period">
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

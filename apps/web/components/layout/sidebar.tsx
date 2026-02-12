@@ -37,7 +37,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-2">
+      <nav className="flex-1 space-y-1 p-2" aria-label="Main navigation">
         <TooltipProvider>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -75,7 +75,14 @@ export function Sidebar() {
 
       {/* Toggle button */}
       <div className="border-t p-2">
-        <Button variant="ghost" size="sm" onClick={toggleSidebar} className="w-full justify-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleSidebar}
+          className="w-full justify-center"
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!sidebarCollapsed}
+        >
           {sidebarCollapsed ? (
             <ChevronRight className="h-4 w-4" />
           ) : (

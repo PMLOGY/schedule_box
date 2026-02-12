@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <AuthGuard>
       <SkipLink />
       <div className="flex h-screen">
-        <aside role="navigation" aria-label="Main navigation">
+        <aside aria-label="Dashboard sidebar">
           <Sidebar />
         </aside>
         <div className="flex flex-1 flex-col overflow-hidden">

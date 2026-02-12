@@ -23,7 +23,7 @@ export function Breadcrumbs() {
   });
 
   return (
-    <nav className="flex items-center space-x-2 text-sm">
+    <nav className="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
       {breadcrumbs.map((crumb, index) => {
         const isLast = index === breadcrumbs.length - 1;
 

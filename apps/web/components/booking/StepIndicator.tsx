@@ -17,7 +17,14 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
   const t = useTranslations();
 
   return (
-    <div className="w-full py-6">
+    <div
+      className="w-full py-6"
+      role="progressbar"
+      aria-valuenow={currentStep}
+      aria-valuemin={1}
+      aria-valuemax={4}
+      aria-label={`Step ${currentStep} of 4`}
+    >
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const stepNumber = (index + 1) as 1 | 2 | 3 | 4;
