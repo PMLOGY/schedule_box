@@ -6,7 +6,7 @@
  * No authentication required (public endpoint).
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db, companies, marketplaceListings, services } from '@schedulebox/database';
 import { eq, and, isNull } from 'drizzle-orm';
 
@@ -30,7 +30,7 @@ interface WidgetConfigResponse {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string } },
 ): Promise<NextResponse> {
   try {
     const { slug } = params;
@@ -45,7 +45,7 @@ export async function GET(
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
           },
-        }
+        },
       );
     }
 
@@ -71,7 +71,7 @@ export async function GET(
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
           },
-        }
+        },
       );
     }
 
@@ -98,15 +98,15 @@ export async function GET(
         and(
           eq(services.companyId, company.id),
           eq(services.isActive, true),
-          isNull(services.deletedAt)
-        )
+          isNull(services.deletedAt),
+        ),
       )
       .orderBy(services.name);
 
     // Extract branding from company settings
-    const settings = (company.settings as any) || {};
-    const primaryColor = settings.primaryColor || '#3B82F6'; // Default ScheduleBox blue
-    const secondaryColor = settings.secondaryColor || '#22C55E'; // Default green
+    const settings = (company.settings as Record<string, unknown>) || {};
+    const primaryColor = (settings.primaryColor as string) || '#3B82F6'; // Default ScheduleBox blue
+    const secondaryColor = (settings.secondaryColor as string) || '#22C55E'; // Default green
     const logo = listing?.images?.[0] || null;
 
     // Build response
@@ -123,7 +123,7 @@ export async function GET(
         price: service.price || '0',
         currency: service.currency || 'CZK',
       })),
-      locale: settings.defaultLocale || 'cs',
+      locale: (settings.defaultLocale as string) || 'cs',
     };
 
     return NextResponse.json(config, {
@@ -146,7 +146,7 @@ export async function GET(
           'Access-Control-Allow-Methods': 'GET, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
-      }
+      },
     );
   }
 }
@@ -162,6 +162,6 @@ export async function OPTIONS(): Promise<NextResponse> {
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
-    }
+    },
   );
 }
