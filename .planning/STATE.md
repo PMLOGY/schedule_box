@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 14 of 15 — AI Voice Intelligence
 - **Status:** Phase 14 In Progress
-- **Current Plan:** 14-01 complete
-- **Plans Executed:** 75
+- **Current Plan:** 14-03 complete
+- **Plans Executed:** 77
 
 ## What's Done
 
@@ -99,6 +99,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
 - [x] Plan 13-03: Export Analytics Data (CSV/PDF) (2 tasks, 2 commits)
 - [x] Plan 14-01: Shared AI Foundation for Voice Intelligence (2 tasks, 2 commits)
+- [x] Plan 14-02: Voice Booking Pipeline (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -121,9 +122,9 @@ Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complet
 
 Phase 13: In Progress — Plans 13-01, 13-02, 13-03, 13-04 complete (Analytics dashboard, i18n expansion, CSV/PDF export, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Phase 14: In Progress — Plan 14-01 complete (Shared AI foundation: OpenAI client, Pydantic/TypeScript types, circuit breaker client, Zod schemas)
+Phase 14: In Progress — Plans 14-01, 14-02 complete (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU)
 
-Next: Phase 14 Plans 14-02, 14-03, 14-04 (Voice booking, follow-up generator, competitor intelligence)
+Next: Phase 14 Plans 14-03, 14-04 (Follow-up generator, competitor intelligence)
 
 ## Decisions
 
@@ -461,6 +462,11 @@ Next: Phase 14 Plans 14-02, 14-03, 14-04 (Voice booking, follow-up generator, co
 - [Phase 14-01]: getVoiceProcessFallback takes no arguments (FormData not useful for fallback)
 - [Phase 14-01]: Czech context hint prompt for Whisper transcription accuracy improvement
 - [Phase 14-01]: Multipart circuit breaker passes FormData without Content-Type header for auto-boundary
+- [Phase 14-02]: VoiceProcessor instantiated per-request (stateless, no shared state needed)
+- [Phase 14-02]: Voice route uses BOOKINGS_READ permission (same as upselling, accessible during booking flow)
+- [Phase 14-02]: Audio size validated in both layers: Node.js throws BadRequestError (400), Python returns graceful fallback
+- [Phase 14-02]: confirmation_needed flag set only for create_booking intent (other intents don't need user confirmation)
+- [Phase 14-02]: Multipart proxy pattern: Next.js FormData -> rebuild FormData -> circuit breaker -> Python FastAPI
 
 ## Blockers
 
@@ -473,7 +479,7 @@ None — Phase 11 complete.
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 9 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~90 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization + white-label apps) |
+| API Endpoints | 99 | ~92 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization + white-label apps + voice) |
 | Frontend Components | 32+ | ~22 (design system + booking wizard + calendar + notifications + loyalty + AI dashboards) |
 | Test Coverage | 80% | 0% |
 
@@ -560,11 +566,12 @@ None — Phase 11 complete.
 | 13-03 | 377s | 2 | 8 | 2 |
 | 13-04 | 311s | 2 | 11 | 2 |
 | 14-01 | 307s | 2 | 12 | 2 |
+| 14-02 | 261s | 2 | 4 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 14-01-PLAN.md
+**Stopped at:** Completed 14-02-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 14-01 (Shared AI Foundation for Voice Intelligence)*
+*Last updated: 2026-02-12 after completing Phase 14-02 (Voice Booking Pipeline)*
