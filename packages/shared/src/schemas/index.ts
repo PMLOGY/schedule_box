@@ -75,3 +75,30 @@ export {
   capacityForecastRequestSchema,
   reminderTimingRequestSchema,
 } from './ai-optimization';
+
+// Marketplace schemas
+export {
+  marketplaceListingCreateSchema,
+  marketplaceListingUpdateSchema,
+  marketplaceSearchQuerySchema,
+  priceRangeEnum,
+  sortByEnum,
+} from './marketplace';
+
+// Review schemas
+export {
+  reviewCreateSchema,
+  reviewReplySchema,
+  reviewListQuerySchema,
+  reviewStatusEnum,
+} from './review';
+
+// Video meeting schemas
+export { videoMeetingCreateSchema, videoMeetingListQuerySchema, videoProviderEnum } from './video';
+
+// White-label app schemas
+export {
+  whitelabelAppCreateSchema,
+  whitelabelAppUpdateSchema,
+  whitelabelBuildStatusEnum,
+} from './whitelabel';
