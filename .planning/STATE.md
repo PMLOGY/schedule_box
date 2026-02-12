@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 13 of 15 — Polish & Optimization
 - **Status:** Phase 13 In Progress
-- **Current Plan:** 13-04 complete
+- **Current Plan:** 13-03 complete
 - **Plans Executed:** 74
 
 ## What's Done
@@ -97,7 +97,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-08: Review Rating Sync Consumer (1 task, 1 commit)
 - [x] Plan 13-01: Analytics Dashboard with Interactive Charts (2 tasks, 2 commits)
 - [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
-- [x] Plan 13-04: Performance & Accessibility Optimization (2 tasks, 2 commits)
+- [x] Plan 13-03: Export Analytics Data (CSV/PDF) (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -439,6 +439,11 @@ Next: Phase 13 Plan 03 or Plan 05 (Error Boundaries & Loading States or final po
 - [Phase 13-02]: Skip-link renders as first child in AuthGuard before all interactive elements (WCAG 2.1 compliance)
 - [Phase 13-02]: Locale switcher positioned between breadcrumbs and user menu in header (visual hierarchy)
 - [Phase 13-02]: tabIndex={-1} on main element allows programmatic focus from skip-link without adding to natural tab order
+- [Phase 13-03]: BOM prefix (\uFEFF) for CSV exports ensures Czech diacritics render correctly in Excel
+- [Phase 13-03]: Server-side PDF generation via @react-pdf/renderer for professional reports with ScheduleBox branding
+- [Phase 13-03]: Client-side CSV generation for instant download without server round-trip
+- [Phase 13-03]: Buffer to Uint8Array conversion for NextResponse compatibility with binary PDF data
+- [Phase 13-03]: Czech locale formatting throughout (dd.MM.yyyy dates, space thousands separator for currency)
 - [Phase 13-04]: Dynamic imports for FullCalendar (~200KB) and React Flow (~150KB) to reduce main bundle size
 - [Phase 13-04]: Inter font display:swap for better LCP (text visible during font load)
 - [Phase 13-04]: AVIF/WebP image formats in Next.js config for bandwidth optimization
@@ -542,12 +547,13 @@ None — Phase 11 complete.
 | 12-08 | 89s | 1 | 2 | 1 |
 | 13-01 | 518s | 2 | 14 | 2 |
 | 13-02 | 229s | 2 | 11 | 2 |
+| 13-03 | 377s | 2 | 8 | 2 |
 | 13-04 | 311s | 2 | 11 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 13-04-PLAN.md
+**Stopped at:** Completed 13-03-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 13-04 (Performance & Accessibility Optimization)*
+*Last updated: 2026-02-12 after completing Phase 13-03 (Export Analytics Data CSV/PDF)*
