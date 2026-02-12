@@ -8,6 +8,7 @@ import type { Queue } from 'bullmq';
 import { setupBookingConsumer } from './booking-consumer.js';
 import { setupPaymentConsumer } from './payment-consumer.js';
 import { setupReviewConsumer } from './review-consumer.js';
+import { setupReviewRatingSyncConsumer } from './review-rating-sync.js';
 
 /**
  * BullMQ queues interface
@@ -34,6 +35,9 @@ export async function startConsumers(channel: Channel, queues: Queues): Promise<
 
   // Start review consumer (handles review.created with smart routing)
   await setupReviewConsumer(channel, queues);
+
+  // Start review rating sync consumer (handles review.created for marketplace rating updates)
+  await setupReviewRatingSyncConsumer(channel);
 
   console.log('[Consumer Orchestrator] All consumers started successfully');
 }
