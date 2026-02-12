@@ -1,0 +1,112 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy'
+        required: true
+        default: 'latest'
+        type: string
+  release:
+    types: [published]
+
+# Prevent parallel deploys to same environment
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Production Environment
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://app.schedulebox.cz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: image-tag
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: '3.14.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Add Bitnami Helm repository
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+
+      - name: Deploy PostgreSQL
+        run: |
+          helm upgrade --install postgresql bitnami/postgresql \
+            --namespace schedulebox-production \
+            --create-namespace \
+            --values k8s/stateful/postgres-values.yaml \
+            --atomic \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy Redis
+        run: |
+          helm upgrade --install redis bitnami/redis \
+            --namespace schedulebox-production \
+            --create-namespace \
+            --values k8s/stateful/redis-values.yaml \
+            --atomic \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy RabbitMQ
+        run: |
+          helm upgrade --install rabbitmq bitnami/rabbitmq \
+            --namespace schedulebox-production \
+            --create-namespace \
+            --values k8s/stateful/rabbitmq-values.yaml \
+            --atomic \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy ScheduleBox application
+        run: |
+          helm upgrade --install schedulebox ./helm/schedulebox \
+            --namespace schedulebox-production \
+            --create-namespace \
+            --values helm/schedulebox/values-production.yaml \
+            --set web.image.tag=${{ steps.image-tag.outputs.tag }} \
+            --set aiService.image.tag=${{ steps.image-tag.outputs.tag }} \
+            --set notificationWorker.image.tag=${{ steps.image-tag.outputs.tag }} \
+            --atomic \
+            --wait \
+            --timeout 5m
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/schedulebox-web \
+            -n schedulebox-production \
+            --timeout=120s
+
+      - name: Output deployed version
+        run: |
+          echo "Deployed version: ${{ steps.image-tag.outputs.tag }}"
+          echo "Environment: production"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "Triggered by: ${{ github.event_name }}"

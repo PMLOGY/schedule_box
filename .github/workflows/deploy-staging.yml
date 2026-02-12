@@ -1,0 +1,90 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+
+# Prevent parallel deploys to same environment
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Staging Environment
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.schedulebox.cz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: '3.14.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
+
+      - name: Add Bitnami Helm repository
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+
+      - name: Deploy PostgreSQL
+        run: |
+          helm upgrade --install postgresql bitnami/postgresql \
+            --namespace schedulebox-staging \
+            --create-namespace \
+            --values k8s/stateful/postgres-values.yaml \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy Redis
+        run: |
+          helm upgrade --install redis bitnami/redis \
+            --namespace schedulebox-staging \
+            --create-namespace \
+            --values k8s/stateful/redis-values.yaml \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy RabbitMQ
+        run: |
+          helm upgrade --install rabbitmq bitnami/rabbitmq \
+            --namespace schedulebox-staging \
+            --create-namespace \
+            --values k8s/stateful/rabbitmq-values.yaml \
+            --wait \
+            --timeout 5m
+
+      - name: Deploy ScheduleBox application
+        run: |
+          helm upgrade --install schedulebox ./helm/schedulebox \
+            --namespace schedulebox-staging \
+            --create-namespace \
+            --values helm/schedulebox/values-staging.yaml \
+            --set web.image.tag=${{ github.sha }} \
+            --set aiService.image.tag=${{ github.sha }} \
+            --set notificationWorker.image.tag=${{ github.sha }} \
+            --wait \
+            --timeout 5m
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/schedulebox-web \
+            -n schedulebox-staging \
+            --timeout=120s
+
+      - name: Output deployed version
+        run: |
+          echo "Deployed version: ${{ github.sha }}"
+          echo "Environment: staging"
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
