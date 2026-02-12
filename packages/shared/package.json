@@ -21,6 +21,10 @@
     "./utils": {
       "types": "./src/utils/index.ts",
       "default": "./src/utils/index.ts"
+    },
+    "./video-providers": {
+      "types": "./src/video-providers/index.ts",
+      "default": "./src/video-providers/index.ts"
     }
   },
   "scripts": {
