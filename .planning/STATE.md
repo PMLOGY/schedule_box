@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 13 of 15 — Polish & Optimization
-- **Status:** Phase 13 In Progress
-- **Current Plan:** 13-03 complete
-- **Plans Executed:** 74
+- **Phase:** 14 of 15 — AI Voice Intelligence
+- **Status:** Phase 14 In Progress
+- **Current Plan:** 14-01 complete
+- **Plans Executed:** 75
 
 ## What's Done
 
@@ -98,6 +98,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 13-01: Analytics Dashboard with Interactive Charts (2 tasks, 2 commits)
 - [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
 - [x] Plan 13-03: Export Analytics Data (CSV/PDF) (2 tasks, 2 commits)
+- [x] Plan 14-01: Shared AI Foundation for Voice Intelligence (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -118,9 +119,11 @@ Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints,
 
 Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complete (Shared validation types, review API with auto-moderation, video meeting integration, public booking pages with SEO, embeddable widget with iframe isolation, review rating sync consumer)
 
-Phase 13: In Progress — Plans 13-01, 13-02, 13-04 complete (Analytics dashboard, i18n expansion, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
+Phase 13: In Progress — Plans 13-01, 13-02, 13-03, 13-04 complete (Analytics dashboard, i18n expansion, CSV/PDF export, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Next: Phase 13 Plan 03 or Plan 05 (Error Boundaries & Loading States or final polish tasks)
+Phase 14: In Progress — Plan 14-01 complete (Shared AI foundation: OpenAI client, Pydantic/TypeScript types, circuit breaker client, Zod schemas)
+
+Next: Phase 14 Plans 14-02, 14-03, 14-04 (Voice booking, follow-up generator, competitor intelligence)
 
 ## Decisions
 
@@ -451,6 +454,13 @@ Next: Phase 13 Plan 03 or Plan 05 (Error Boundaries & Loading States or final po
 - [Phase 13-04]: role="alert" and aria-live="assertive" on FormMessage for screen reader error announcements
 - [Phase 13-04]: aria-current="page" on active navigation links for assistive technology context
 - [Phase 13-04]: Comprehensive ARIA labels on all icon-only buttons (sidebar toggle, calendar navigation, user menu)
+- [Phase 14-01]: OpenAI async singleton pattern matches existing model_loader.py global _client pattern
+- [Phase 14-01]: GPT-4 Structured Outputs with strict JSON schema for deterministic intent extraction (temperature=0.1)
+- [Phase 14-01]: gpt-4o-mini for follow-up text (cost-effective), gpt-4-turbo for NLU (accuracy critical)
+- [Phase 14-01]: Voice circuit breaker 15s timeout (Whisper + GPT-4 pipeline), scraper 30s timeout
+- [Phase 14-01]: getVoiceProcessFallback takes no arguments (FormData not useful for fallback)
+- [Phase 14-01]: Czech context hint prompt for Whisper transcription accuracy improvement
+- [Phase 14-01]: Multipart circuit breaker passes FormData without Content-Type header for auto-boundary
 
 ## Blockers
 
@@ -549,11 +559,12 @@ None — Phase 11 complete.
 | 13-02 | 229s | 2 | 11 | 2 |
 | 13-03 | 377s | 2 | 8 | 2 |
 | 13-04 | 311s | 2 | 11 | 2 |
+| 14-01 | 307s | 2 | 12 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 13-03-PLAN.md
+**Stopped at:** Completed 14-01-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 13-03 (Export Analytics Data CSV/PDF)*
+*Last updated: 2026-02-12 after completing Phase 14-01 (Shared AI Foundation for Voice Intelligence)*
