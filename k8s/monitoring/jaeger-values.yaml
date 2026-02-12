@@ -1,0 +1,200 @@
+# Jaeger Helm Chart Values
+# Chart: jaegertracing/jaeger
+# Docs: https://github.com/jaegertracing/helm-charts
+#
+# Deployment: All-in-One Mode (for MVP/Staging)
+# - Collector, Query, and Storage in a single pod
+# - Suitable for trace volumes < 10k spans/second
+# - Upgrade to distributed deployment for production HA
+#
+# Installation:
+#   helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+#   helm repo update
+#   helm install jaeger jaegertracing/jaeger \
+#     --namespace monitoring --create-namespace \
+#     --values k8s/monitoring/jaeger-values.yaml
+#
+# Access Jaeger UI:
+#   kubectl port-forward svc/jaeger-query 16686:16686 -n monitoring
+#   Then open: http://localhost:16686
+#
+# Application Configuration:
+#   Set OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-collector.monitoring:4317
+#   in your app deployment to send traces to Jaeger collector
+#
+# Production Upgrade:
+#   When trace volume exceeds 10k spans/second or you need HA:
+#   - Switch to distributed mode (separate collector/query/storage)
+#   - Use external storage (Cassandra or ClickHouse)
+#   - Scale collectors horizontally
+
+# All-in-One deployment mode
+allInOne:
+  enabled: true
+
+  # Resource limits
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  # Ingress for Jaeger UI
+  ingress:
+    enabled: true
+    pathType: Prefix
+    # Host should be configured per environment via --set flag
+    # Example: --set allInOne.ingress.hosts[0]=jaeger.staging.schedulebox.cz
+    hosts:
+      - jaeger.local
+    # Path to Jaeger UI
+    path: /
+    # Uncomment for TLS termination:
+    # tls:
+    #   - secretName: jaeger-tls
+    #     hosts:
+    #       - jaeger.staging.schedulebox.cz
+
+# Storage configuration
+storage:
+  type: badger
+  badger:
+    # Ephemeral storage (data lost on pod restart)
+    # For production, use persistent volume
+    ephemeral: false
+    persistence:
+      enabled: true
+      # Size of PersistentVolumeClaim
+      size: 20Gi
+      # Storage class - use cluster default if not specified
+      # Example: --set storage.badger.persistence.storageClass=fast-ssd
+      # storageClass: ""
+
+# OTLP receiver configuration (OpenTelemetry Protocol)
+collector:
+  enabled: false # Disabled because allInOne includes collector
+
+  # OTLP gRPC receiver port (used by OpenTelemetry SDK)
+  otlpGrpc:
+    enabled: true
+    port: 4317
+
+  # OTLP HTTP receiver port (alternative to gRPC)
+  otlpHttp:
+    enabled: true
+    port: 4318
+
+  # Sampling strategy
+  # - 100% in staging for full trace visibility during development
+  # - 10% in production to reduce storage costs (override per environment)
+  sampling:
+    strategies: |
+      {
+        "default_strategy": {
+          "type": "probabilistic",
+          "param": 1.0
+        }
+      }
+
+# Query service configuration (Jaeger UI)
+query:
+  enabled: false # Disabled because allInOne includes query
+  service:
+    type: ClusterIP
+    port: 16686
+
+# Agent configuration
+agent:
+  enabled: false # Not needed with OTLP collector
+
+# Elasticsearch storage (disabled, using badger)
+elasticsearch:
+  enabled: false
+
+# Cassandra storage (disabled, using badger)
+cassandra:
+  enabled: false
+
+# Kafka ingester (disabled, not needed for MVP)
+ingester:
+  enabled: false
+
+# Spark dependencies job (disabled, not needed for MVP)
+spark:
+  enabled: false
+
+# Hotrod example app (disabled)
+hotrod:
+  enabled: false
+
+# Badger maintenance configuration
+# Automatically purge traces older than retention period
+provisionDataStore:
+  cassandra: false
+  elasticsearch: false
+
+# Jaeger configuration
+# Documentation: https://www.jaegertracing.io/docs/latest/deployment/
+jaeger:
+  # Set log level (debug, info, warn, error)
+  logLevel: info
+
+  # Trace retention in Badger storage
+  # 168h = 7 days (per research recommendation for MVP)
+  # Increase for production if needed (30d, 90d)
+  storage:
+    options:
+      badger:
+        ephemeral: false
+        directory-key: /badger/key
+        directory-value: /badger/data
+        # Maintenance: purge traces older than 7 days
+        ttl: 168h
+
+# Service type for all services
+service:
+  type: ClusterIP
+
+# Security context (non-root user)
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
+
+---
+# Notes for production deployment:
+#
+# 1. Distributed Mode:
+#    Set allInOne.enabled: false
+#    Enable collector, query, ingester separately
+#    Example:
+#      collector:
+#        enabled: true
+#        replicaCount: 3
+#      query:
+#        enabled: true
+#        replicaCount: 2
+#
+# 2. External Storage:
+#    Replace Badger with Cassandra or ClickHouse
+#    Example (Elasticsearch):
+#      storage:
+#        type: elasticsearch
+#      elasticsearch:
+#        enabled: true
+#        replicas: 3
+#
+# 3. Sampling Strategy:
+#    Override sampling per environment:
+#      --set collector.sampling.strategies='{"default_strategy":{"type":"probabilistic","param":0.1}}'
+#    10% sampling = 0.1, 100% = 1.0
+#
+# 4. High Availability:
+#    Increase replica counts:
+#      --set collector.replicaCount=3
+#      --set query.replicaCount=2
+#
+# 5. TLS/Authentication:
+#    Enable ingress TLS and OAuth2 proxy for UI access control
