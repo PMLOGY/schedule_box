@@ -51,11 +51,11 @@ export default function BookingCalendar() {
   const employeeFilter =
     selectedEmployeeIds.length > 0 ? selectedEmployeeIds.map(Number) : undefined;
 
-  const { data: events, isLoading } = useBookingsForCalendar(
-    dateRange.from,
-    dateRange.to,
-    employeeFilter,
-  );
+  const {
+    data: events,
+    isFetching,
+    isPlaceholderData,
+  } = useBookingsForCalendar(dateRange.from, dateRange.to, employeeFilter);
 
   // Filter out cancelled bookings if showCancelled is false
   const filteredEvents = useMemo(() => {
@@ -127,17 +127,19 @@ export default function BookingCalendar() {
     setSelectedBookingId(null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[600px] rounded-lg border bg-card">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="rounded-lg border bg-card p-4">
+      <div
+        className={`relative rounded-lg border bg-card p-4 ${isPlaceholderData ? 'opacity-75' : ''}`}
+      >
+        {isFetching && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-2 rounded-md bg-background/80 px-2 py-1">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            {isPlaceholderData && (
+              <span className="text-xs text-muted-foreground">Updating...</span>
+            )}
+          </div>
+        )}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
