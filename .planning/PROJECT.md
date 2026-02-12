@@ -20,25 +20,65 @@ Freemium with 4 tiers:
 | AI-Powered | 2,990 Kc/mo | All AI, API access, white-label |
 
 ## Architecture
-- **19 microservices** communicating via RabbitMQ events
-- **47 database tables** with Row Level Security
-- **99 API endpoints** (130+ operations)
-- **32+ frontend components**
-- **7 AI/ML models**
+- **3 services** (Next.js web, Python AI, Node.js notification worker)
+- **49 database tables** with Row Level Security (Drizzle ORM)
+- **~94 API endpoints** (REST, Next.js API Routes)
+- **16 shadcn/ui components** + booking wizard + calendar + automation builder
+- **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Status
-- Documentation: 100% complete (v13.0 FINAL)
-- Implementation: 0% — starting from scratch
-- Development approach: 4 parallel agent segments
+## Current State
+- **v1.0 shipped:** 2026-02-12
+- **Codebase:** ~62,000 LOC (50k TypeScript, 6k Python, 5k YAML/JSON)
+- **322 commits** across 15 phases, 101 plans
+- **Production-ready:** Kubernetes Helm charts, Prometheus/Grafana monitoring, OpenTelemetry tracing
+- **Test coverage:** 0% (unit/integration tests not yet written)
+
+## Requirements
+
+### Validated
+- ✓ INFRA-01..05 — Monorepo, Docker, CI/CD, tooling, health checks — v1.0
+- ✓ DB-01..07 — 49 tables, migrations, RLS, seed data, double-booking, soft delete, audit logs — v1.0
+- ✓ AUTH-01..09 — Registration, JWT, refresh rotation, password reset, email verify, MFA, OAuth2 scaffold, RBAC, API keys — v1.0
+- ✓ CORE-01..11 — Customer, service, employee, resource CRUD, working hours, company settings — v1.0
+- ✓ UI-01..09 — Design system, state management, i18n, auth pages, app shell, dashboard, calendar — v1.0
+- ✓ BOOK-01..10 — Availability engine, booking flow, double-booking prevention, status transitions, calendar — v1.0
+- ✓ PAY-01..07 — Comgate, QR payments, SAGA, invoice PDF, refunds — v1.0
+- ✓ NOTIF-01..10 — Email/SMS/push, templates, automation builder, reminders — v1.0
+- ✓ CRM-01..07 — Tags, coupons, gift cards, CSV import, GDPR — v1.0
+- ✓ LOYAL-01..07 — Points, tiers, rewards, Apple/Google Wallet passes — v1.0
+- ✓ AI1-01..05 — No-show predictor, CLV, health score, circuit breaker fallback — v1.0
+- ✓ AI2-01..04 — Upselling, dynamic pricing, capacity optimization, smart reminders — v1.0
+- ✓ ADV-01..08 — Marketplace, reviews, widget, public booking, video, white-label — v1.0
+- ✓ POL-01..05 — Analytics, i18n, accessibility, performance, export — v1.0
+- ✓ AI3-01..03 — Voice booking, follow-up generator, competitor intelligence — v1.0
+- ✓ OPS-01..06 — Kubernetes, monitoring, tracing, load testing, security audit, beta playbook — v1.0
+
+### Active
+(None — all v1 requirements shipped. Define new requirements with `/gsd:new-milestone`)
+
+### Out of Scope
+- Mobile native app — web-first approach, PWA works well
+- Video chat integration — uses external providers (Zoom/Meet/Teams)
+- Offline mode — real-time booking is core value
+- Multi-language AI models — Czech/Slovak only for v1
+- Real payment processing — gateway integration ready, needs live credentials
 
 ## Key Decisions
-1. Next.js 14 monorepo with standalone microservices for AI/notifications
-2. Drizzle ORM (not Prisma) — better SQL control, migration flexibility
-3. RabbitMQ (not Kafka) — simpler for our scale, sufficient throughput
-4. Cloudflare R2 (not AWS S3) — cost-effective, S3-compatible
-5. PostgreSQL full-text search (not Elasticsearch) — simpler, sufficient for v1
-6. Choreography SAGA pattern (not orchestration) — event-driven, decoupled
+1. Next.js 14 monorepo with standalone microservices for AI/notifications — ✓ Good
+2. Drizzle ORM (not Prisma) — better SQL control, migration flexibility — ✓ Good
+3. RabbitMQ (not Kafka) — simpler for our scale, sufficient throughput — ✓ Good
+4. Cloudflare R2 (not AWS S3) — cost-effective, S3-compatible — Pending (not yet used)
+5. PostgreSQL full-text search (not Elasticsearch) — simpler, sufficient for v1 — ✓ Good
+6. Choreography SAGA pattern (not orchestration) — event-driven, decoupled — ✓ Good
+7. prom-client custom registry — avoids global conflicts with other libraries — ✓ Good
+8. Opossum circuit breaker — prevents cascading failures from AI timeouts — ✓ Good
+9. Bitnami Helm charts for stateful services — production-grade defaults — ✓ Good
+10. k6 over JMeter/Gatling — modern JS DSL, better CI integration — ✓ Good
 
 ## Team
 - Multi-agent development with Claude Code
 - 4 parallel segments: Database, Backend, Frontend, DevOps
+
+---
+
+_Last updated: 2026-02-12 after v1.0 milestone_
