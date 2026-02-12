@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 14 of 15 — AI Voice Intelligence
 - **Status:** Phase 14 In Progress
-- **Current Plan:** 14-03 complete
-- **Plans Executed:** 77
+- **Current Plan:** 14-04 complete
+- **Plans Executed:** 78
 
 ## What's Done
 
@@ -101,6 +101,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 14-01: Shared AI Foundation for Voice Intelligence (2 tasks, 2 commits)
 - [x] Plan 14-02: Voice Booking Pipeline (2 tasks, 2 commits)
 - [x] Plan 14-03: AI Follow-Up Email Generator (2 tasks, 2 commits)
+- [x] Plan 14-04: Competitor Intelligence Pipeline (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -123,9 +124,9 @@ Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-06, 12-07, 12-08 complet
 
 Phase 13: In Progress — Plans 13-01, 13-02, 13-03, 13-04 complete (Analytics dashboard, i18n expansion, CSV/PDF export, performance optimization with code splitting, WCAG 2.1 AA accessibility compliance)
 
-Phase 14: In Progress — Plans 14-01, 14-02, 14-03 complete (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU, follow-up email generator with GPT-4o-mini)
+Phase 14: Complete ✅ — All 4 plans executed (Shared AI foundation, voice booking pipeline with Whisper STT + GPT-4 NLU, follow-up email generator with GPT-4o-mini, competitor intelligence with web scraping + Google Places API)
 
-Next: Phase 14 Plan 14-04 (Competitor intelligence)
+Next: Phase 15 (DevOps & Launch)
 
 ## Decisions
 
@@ -473,6 +474,12 @@ Next: Phase 14 Plan 14-04 (Competitor intelligence)
 - [Phase 14-03]: Advisory endpoint pattern: always returns 200 with fallback on AI failure (follow-up is non-critical)
 - [Phase 14-03]: tiktoken cl100k_base fallback encoding when model-specific encoding unavailable
 - [Phase 14-03]: SETTINGS_MANAGE permission for follow-up generation (admin/owner marketing feature)
+- [Phase 14-04]: httpx over aiohttp for competitor scraping (already in requirements, fewer dependencies)
+- [Phase 14-04]: Google Places API for review aggregation (GDPR-safe, ToS compliant, aggregate data only)
+- [Phase 14-04]: Single website request serves both pricing and services data types (avoids duplicate HTTP calls)
+- [Phase 14-04]: POST /competitor stores scrape results via Node.js Drizzle ORM (not Python direct DB access)
+- [Phase 14-04]: competitor_monitors table with CHECK constraint for frequency (daily/weekly/monthly)
+- [Phase 14-04]: Polite scraping pattern: 5s delay, proper User-Agent, 15s timeout per request
 
 ## Blockers
 
@@ -484,8 +491,8 @@ None — Phase 11 complete.
 |--------|--------|---------|
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 9 complete (Milestone 1 done, Milestone 2 in progress) |
-| DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~92 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization + white-label apps + voice) |
+| DB Tables | 47 | 49 (47 original + processed_webhooks + competitor_monitors) |
+| API Endpoints | 99 | ~94 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization + white-label apps + voice + follow-up + competitor) |
 | Frontend Components | 32+ | ~22 (design system + booking wizard + calendar + notifications + loyalty + AI dashboards) |
 | Test Coverage | 80% | 0% |
 
@@ -574,11 +581,12 @@ None — Phase 11 complete.
 | 14-01 | 307s | 2 | 12 | 2 |
 | 14-02 | 261s | 2 | 4 | 2 |
 | 14-03 | 278s | 2 | 4 | 2 |
+| 14-04 | 391s | 2 | 5 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 14-03-PLAN.md
+**Stopped at:** Completed 14-04-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 14-03 (AI Follow-Up Email Generator)*
+*Last updated: 2026-02-12 after completing Phase 14-04 (Competitor Intelligence Pipeline)*
