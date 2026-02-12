@@ -253,6 +253,238 @@
     "to": "to",
     "entries": "entries"
   },
+  "customers": {
+    "title": "Customers",
+    "search": "Search customer...",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "totalBookings": "Bookings",
+      "totalSpent": "Total Spent",
+      "healthScore": "Score",
+      "status": "Status"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "noCustomers": "No customers",
+    "add": "Add Customer",
+    "addTitle": "New Customer",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "notes": "Notes"
+    },
+    "createSuccess": "Customer created",
+    "createError": "Failed to create customer",
+    "editTitle": "Edit Customer",
+    "updateSuccess": "Customer updated",
+    "updateError": "Failed to update customer"
+  },
+  "services": {
+    "title": "Services",
+    "columns": {
+      "name": "Name",
+      "category": "Category",
+      "duration": "Duration",
+      "price": "Price",
+      "capacity": "Capacity",
+      "onlineBooking": "Online Booking",
+      "status": "Status"
+    },
+    "filters": {
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "yes": "Yes",
+    "no": "No",
+    "minutes": "min",
+    "noServices": "No services",
+    "uncategorized": "Uncategorized",
+    "add": "Add Service",
+    "addTitle": "New Service",
+    "form": {
+      "name": "Name",
+      "duration": "Duration (min)",
+      "price": "Price (CZK)"
+    },
+    "createSuccess": "Service created",
+    "createError": "Failed to create service",
+    "editTitle": "Edit Service",
+    "updateSuccess": "Service updated",
+    "updateError": "Failed to update service"
+  },
+  "employees": {
+    "title": "Employees",
+    "columns": {
+      "name": "Name",
+      "title": "Title",
+      "email": "Email",
+      "phone": "Phone",
+      "services": "Services",
+      "status": "Status"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "servicesCount": "{count} services",
+    "noEmployees": "No employees",
+    "add": "Add Employee",
+    "addTitle": "New Employee",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "title": "Title"
+    },
+    "createSuccess": "Employee created",
+    "createError": "Failed to create employee",
+    "editTitle": "Edit Employee",
+    "updateSuccess": "Employee updated",
+    "updateError": "Failed to update employee"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "description": "Key metrics overview",
+    "totalBookings": "Total Bookings",
+    "totalRevenue": "Total Revenue",
+    "totalCustomers": "Total Customers",
+    "avgHealthScore": "Avg. Customer Score",
+    "noData": "No data yet",
+    "revenue": {
+      "title": "Revenue",
+      "chartTitle": "Revenue Trends",
+      "chartDescription": "Chart showing daily revenue from completed bookings",
+      "total": "Total Revenue",
+      "average": "Average Revenue Per Day",
+      "change": "vs previous period"
+    },
+    "bookings": {
+      "title": "Booking Statistics",
+      "chartTitle": "Bookings Overview",
+      "chartDescription": "Chart showing completed, cancelled, and no-show bookings",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "noShow": "No Show",
+      "total": "Total"
+    },
+    "kpi": {
+      "totalBookings": "Total Bookings",
+      "totalRevenue": "Total Revenue",
+      "avgRevenuePerDay": "Avg. Revenue/Day",
+      "noShowRate": "No-Show Rate"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "pdf": "Export PDF",
+      "downloading": "Downloading...",
+      "success": "Export downloaded successfully",
+      "error": "Error exporting data"
+    },
+    "period": {
+      "last7days": "Last 7 Days",
+      "last30days": "Last 30 Days",
+      "last90days": "Last 90 Days",
+      "label": "Period"
+    },
+    "reports": {
+      "title": "Reports",
+      "revenue": "Revenue Report",
+      "bookings": "Bookings Report",
+      "generate": "Generate Report",
+      "dateFrom": "Date From",
+      "dateTo": "Date To"
+    }
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content",
+    "selectLanguage": "Select language",
+    "closeDialog": "Close dialog",
+    "openMenu": "Open menu",
+    "chartNavigation": "Use arrow keys to navigate the chart"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "coupons": "Coupons",
+    "giftCards": "Gift Cards",
+    "couponColumns": {
+      "code": "Code",
+      "description": "Description",
+      "discount": "Discount",
+      "usage": "Usage",
+      "validUntil": "Valid Until",
+      "status": "Status"
+    },
+    "giftCardColumns": {
+      "code": "Code",
+      "recipient": "Recipient",
+      "balance": "Balance",
+      "initialBalance": "Initial Balance",
+      "validUntil": "Valid Until",
+      "status": "Status"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "noCoupons": "No coupons",
+    "noGiftCards": "No gift cards",
+    "unlimited": "Unlimited",
+    "percentage": "{value}%",
+    "fixed": "{value} CZK",
+    "addCoupon": "Add Coupon",
+    "addCouponTitle": "New Coupon",
+    "addGiftCard": "Add Gift Card",
+    "addGiftCardTitle": "New Gift Card",
+    "couponForm": {
+      "code": "Code",
+      "description": "Description",
+      "discountType": "Discount Type",
+      "discountValue": "Discount Value",
+      "percentage": "Percentage",
+      "fixedAmount": "Fixed Amount"
+    },
+    "giftCardForm": {
+      "initialBalance": "Initial Balance (CZK)",
+      "recipientName": "Recipient Name",
+      "recipientEmail": "Recipient Email"
+    },
+    "createSuccess": "Created successfully",
+    "createError": "Failed to create",
+    "editCouponTitle": "Edit Coupon",
+    "editGiftCardTitle": "Edit Gift Card",
+    "updateSuccess": "Updated successfully",
+    "updateError": "Failed to update",
+    "couponForm.isActive": "Active",
+    "giftCardForm.isActive": "Active"
+  },
+  "settings": {
+    "title": "Settings",
+    "companyProfile": "Company Profile",
+    "workingHours": "Working Hours",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "address": "Address",
+      "currency": "Currency",
+      "timezone": "Timezone",
+      "plan": "Plan"
+    },
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "closed": "Closed",
+    "noWorkingHours": "Working hours not configured"
+  },
   "errors": {
     "generic": "Something went wrong",
     "notFound": "Page not found",

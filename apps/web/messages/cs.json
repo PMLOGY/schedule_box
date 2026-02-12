@@ -253,6 +253,238 @@
     "to": "až",
     "entries": "záznamů"
   },
+  "customers": {
+    "title": "Zákazníci",
+    "search": "Hledat zákazníka...",
+    "columns": {
+      "name": "Jméno",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "totalBookings": "Rezervace",
+      "totalSpent": "Celková útrata",
+      "healthScore": "Skóre",
+      "status": "Stav"
+    },
+    "active": "Aktivní",
+    "inactive": "Neaktivní",
+    "noCustomers": "Žádní zákazníci",
+    "add": "Přidat zákazníka",
+    "addTitle": "Nový zákazník",
+    "form": {
+      "name": "Jméno",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "notes": "Poznámky"
+    },
+    "createSuccess": "Zákazník byl vytvořen",
+    "createError": "Nepodařilo se vytvořit zákazníka",
+    "editTitle": "Upravit zákazníka",
+    "updateSuccess": "Zákazník byl upraven",
+    "updateError": "Nepodařilo se upravit zákazníka"
+  },
+  "services": {
+    "title": "Služby",
+    "columns": {
+      "name": "Název",
+      "category": "Kategorie",
+      "duration": "Trvání",
+      "price": "Cena",
+      "capacity": "Kapacita",
+      "onlineBooking": "Online rezervace",
+      "status": "Stav"
+    },
+    "filters": {
+      "allStatuses": "Všechny stavy",
+      "active": "Aktivní",
+      "inactive": "Neaktivní"
+    },
+    "active": "Aktivní",
+    "inactive": "Neaktivní",
+    "yes": "Ano",
+    "no": "Ne",
+    "minutes": "min",
+    "noServices": "Žádné služby",
+    "uncategorized": "Bez kategorie",
+    "add": "Přidat službu",
+    "addTitle": "Nová služba",
+    "form": {
+      "name": "Název",
+      "duration": "Trvání (min)",
+      "price": "Cena (Kč)"
+    },
+    "createSuccess": "Služba byla vytvořena",
+    "createError": "Nepodařilo se vytvořit službu",
+    "editTitle": "Upravit službu",
+    "updateSuccess": "Služba byla upravena",
+    "updateError": "Nepodařilo se upravit službu"
+  },
+  "employees": {
+    "title": "Zaměstnanci",
+    "columns": {
+      "name": "Jméno",
+      "title": "Pozice",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "services": "Služby",
+      "status": "Stav"
+    },
+    "active": "Aktivní",
+    "inactive": "Neaktivní",
+    "servicesCount": "{count} služeb",
+    "noEmployees": "Žádní zaměstnanci",
+    "add": "Přidat zaměstnance",
+    "addTitle": "Nový zaměstnanec",
+    "form": {
+      "name": "Jméno",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "title": "Pozice"
+    },
+    "createSuccess": "Zaměstnanec byl vytvořen",
+    "createError": "Nepodařilo se vytvořit zaměstnance",
+    "editTitle": "Upravit zaměstnance",
+    "updateSuccess": "Zaměstnanec byl upraven",
+    "updateError": "Nepodařilo se upravit zaměstnance"
+  },
+  "analytics": {
+    "title": "Analytika",
+    "description": "Přehled klíčových metrik",
+    "totalBookings": "Celkem rezervací",
+    "totalRevenue": "Celkové tržby",
+    "totalCustomers": "Celkem zákazníků",
+    "avgHealthScore": "Prům. skóre zákazníků",
+    "noData": "Zatím žádná data",
+    "revenue": {
+      "title": "Tržby",
+      "chartTitle": "Vývoj tržeb",
+      "chartDescription": "Graf zobrazující denní tržby z dokončených rezervací",
+      "total": "Celkové tržby",
+      "average": "Průměrné tržby za den",
+      "change": "oproti předchozímu období"
+    },
+    "bookings": {
+      "title": "Statistika rezervací",
+      "chartTitle": "Přehled rezervací",
+      "chartDescription": "Graf zobrazující počet dokončených, zrušených a nedostavených se rezervací",
+      "completed": "Dokončeno",
+      "cancelled": "Zrušeno",
+      "noShow": "Nedostavil se",
+      "total": "Celkem"
+    },
+    "kpi": {
+      "totalBookings": "Celkem rezervací",
+      "totalRevenue": "Celkové tržby",
+      "avgRevenuePerDay": "Prům. tržby/den",
+      "noShowRate": "Míra nedostavení"
+    },
+    "export": {
+      "csv": "Exportovat CSV",
+      "pdf": "Exportovat PDF",
+      "downloading": "Stahování...",
+      "success": "Export byl úspěšně stažen",
+      "error": "Chyba při exportu dat"
+    },
+    "period": {
+      "last7days": "Posledních 7 dní",
+      "last30days": "Posledních 30 dní",
+      "last90days": "Posledních 90 dní",
+      "label": "Období"
+    },
+    "reports": {
+      "title": "Reporty",
+      "revenue": "Report tržeb",
+      "bookings": "Report rezervací",
+      "generate": "Vygenerovat report",
+      "dateFrom": "Datum od",
+      "dateTo": "Datum do"
+    }
+  },
+  "accessibility": {
+    "skipToContent": "Přeskočit na obsah",
+    "selectLanguage": "Vybrat jazyk",
+    "closeDialog": "Zavřít dialog",
+    "openMenu": "Otevřít menu",
+    "chartNavigation": "Použijte klávesy šipek pro navigaci v grafu"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "coupons": "Kupóny",
+    "giftCards": "Dárkové poukazy",
+    "couponColumns": {
+      "code": "Kód",
+      "description": "Popis",
+      "discount": "Sleva",
+      "usage": "Využití",
+      "validUntil": "Platnost do",
+      "status": "Stav"
+    },
+    "giftCardColumns": {
+      "code": "Kód",
+      "recipient": "Příjemce",
+      "balance": "Zůstatek",
+      "initialBalance": "Počáteční zůstatek",
+      "validUntil": "Platnost do",
+      "status": "Stav"
+    },
+    "active": "Aktivní",
+    "inactive": "Neaktivní",
+    "noCoupons": "Žádné kupóny",
+    "noGiftCards": "Žádné dárkové poukazy",
+    "unlimited": "Neomezeno",
+    "percentage": "{value} %",
+    "fixed": "{value} Kč",
+    "addCoupon": "Přidat kupón",
+    "addCouponTitle": "Nový kupón",
+    "addGiftCard": "Přidat poukaz",
+    "addGiftCardTitle": "Nový dárkový poukaz",
+    "couponForm": {
+      "code": "Kód",
+      "description": "Popis",
+      "discountType": "Typ slevy",
+      "discountValue": "Hodnota slevy",
+      "percentage": "Procenta",
+      "fixedAmount": "Pevná částka"
+    },
+    "giftCardForm": {
+      "initialBalance": "Počáteční zůstatek (Kč)",
+      "recipientName": "Jméno příjemce",
+      "recipientEmail": "E-mail příjemce"
+    },
+    "createSuccess": "Úspěšně vytvořeno",
+    "createError": "Nepodařilo se vytvořit",
+    "editCouponTitle": "Upravit kupón",
+    "editGiftCardTitle": "Upravit poukaz",
+    "updateSuccess": "Úspěšně upraveno",
+    "updateError": "Nepodařilo se upravit",
+    "couponForm.isActive": "Aktivní",
+    "giftCardForm.isActive": "Aktivní"
+  },
+  "settings": {
+    "title": "Nastavení",
+    "companyProfile": "Profil společnosti",
+    "workingHours": "Pracovní doba",
+    "fields": {
+      "name": "Název",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "website": "Web",
+      "address": "Adresa",
+      "currency": "Měna",
+      "timezone": "Časové pásmo",
+      "plan": "Tarif"
+    },
+    "days": {
+      "0": "Neděle",
+      "1": "Pondělí",
+      "2": "Úterý",
+      "3": "Středa",
+      "4": "Čtvrtek",
+      "5": "Pátek",
+      "6": "Sobota"
+    },
+    "closed": "Zavřeno",
+    "noWorkingHours": "Pracovní doba není nastavena"
+  },
   "errors": {
     "generic": "Něco se pokazilo",
     "notFound": "Stránka nenalezena",
