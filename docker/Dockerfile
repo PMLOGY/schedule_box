@@ -60,6 +60,11 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
+# Remove unused package managers to reduce attack surface
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+    /opt/yarn* /usr/local/bin/yarn /usr/local/bin/yarnpkg
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
