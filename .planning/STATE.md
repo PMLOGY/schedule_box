@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 12 of 15 — Advanced Features
 - **Status:** Phase 12 In Progress
-- **Current Plan:** 12-04 complete
-- **Plans Executed:** 68
+- **Current Plan:** 12-07 complete
+- **Plans Executed:** 69
 
 ## What's Done
 
@@ -92,6 +92,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-01: Shared Validation and Types for Phase 12 (2 tasks, 2 commits)
 - [x] Plan 12-03: Review System API (2 tasks, 2 commits)
 - [x] Plan 12-04: Video Meeting Integration (2 tasks, 2 commits)
+- [x] Plan 12-07: Embeddable JavaScript Booking Widget (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -110,9 +111,9 @@ Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit 
 
 Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Phase 12: In Progress — Plans 12-01, 12-03, 12-04 complete (Shared validation types, review API with auto-moderation, video meeting integration with Zoom/Google Meet/MS Teams)
+Phase 12: In Progress — Plans 12-01, 12-03, 12-04, 12-07 complete (Shared validation types, review API with auto-moderation, video meeting integration with Zoom/Google Meet/MS Teams, embeddable widget with iframe isolation)
 
-Next: Phase 12 Plan 05 (Marketplace Search and Discovery)
+Next: Phase 12 Plan 08 (Marketplace Search and Discovery)
 
 ## Decisions
 
@@ -409,6 +410,11 @@ Next: Phase 12 Plan 05 (Marketplace Search and Discovery)
 - [Phase 12-05]: Build trigger is clean placeholder returning 202 Accepted with Phase 15 message, not fake build logic
 - [Phase 12-05]: GET returns null (not 404) when company has no white-label app configured - optional resource pattern
 - [Phase 12-05]: UNIQUE constraint on company_id enforced at app level with 409 ConflictError before INSERT
+- [Phase 12-07]: Web Component wrapper with sandboxed iframe for maximum security isolation on third-party websites
+- [Phase 12-07]: Book buttons redirect to full public booking page (widget is service catalog only, not in-widget booking)
+- [Phase 12-07]: PostMessage API for resize and service selection only (minimal parent-iframe communication)
+- [Phase 12-07]: CORS wildcard (*) on config API since widget must be embeddable from any domain
+- [Phase 12-07]: Middleware exclusion for /embed routes bypasses locale routing, locale passed as query param instead
 
 ## Blockers
 
@@ -500,11 +506,12 @@ None — Phase 11 complete.
 | 12-03 | 473s | 2 | 3 | 2 |
 | 12-04 | 527s | 2 | 8 | 2 |
 | 12-05 | 315s | 1 | 2 | 1 |
+| 12-07 | 313s | 2 | 6 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 04 — Video Meeting Integration
+**Stopped at:** Completed Phase 12 Plan 07 — Embeddable JavaScript Booking Widget
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-04 (Video Meeting Integration)*
+*Last updated: 2026-02-12 after completing Phase 12-07 (Embeddable JavaScript Booking Widget)*
