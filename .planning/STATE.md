@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 13 of 15 — Polish & Optimization
 - **Status:** Phase 13 In Progress
-- **Current Plan:** 13-02 complete
-- **Plans Executed:** 72
+- **Current Plan:** 13-01 complete
+- **Plans Executed:** 73
 
 ## What's Done
 
@@ -95,6 +95,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 12-06: Public Booking Pages (2 tasks, 2 commits)
 - [x] Plan 12-07: Embeddable JavaScript Booking Widget (2 tasks, 2 commits)
 - [x] Plan 12-08: Review Rating Sync Consumer (1 task, 1 commit)
+- [x] Plan 13-01: Analytics Dashboard with Interactive Charts (2 tasks, 2 commits)
 - [x] Plan 13-02: i18n Expansion & Accessibility Foundations (2 tasks, 2 commits)
 
 ## What's Next
@@ -428,6 +429,11 @@ Next: Phase 13 Plan 03 (Performance Optimization) or Plan 04 (Error Boundaries &
 - [Phase 12-07]: Middleware exclusion for /embed routes bypasses locale routing, locale passed as query param instead
 - [Phase 12-08]: NACK without requeue on error to prevent infinite retry loops on bad data in review rating sync
 - [Phase 12-08]: Skip marketplace rating update gracefully when company has no public listing
+- [Phase 13-01]: Dynamic chart imports with ssr: false to prevent Recharts SSR hydration errors
+- [Phase 13-01]: ChartContainer wrapper with ARIA labels for WCAG 2.1 AA compliance (Recharts accessibilityLayer alone insufficient)
+- [Phase 13-01]: Period-over-period comparison calculated in backend /analytics/overview endpoint (not frontend)
+- [Phase 13-01]: 5-minute stale time for analytics queries (analytics data changes infrequently, reduce API calls)
+- [Phase 13-01]: Custom tooltip components for Czech locale formatting (Recharts default tooltips lack i18n support)
 - [Phase 13-02]: Text abbreviations (CS/SK/EN) instead of emoji flags for locale switcher (better accessibility)
 - [Phase 13-02]: Skip-link renders as first child in AuthGuard before all interactive elements (WCAG 2.1 compliance)
 - [Phase 13-02]: Locale switcher positioned between breadcrumbs and user menu in header (visual hierarchy)
@@ -526,12 +532,13 @@ None — Phase 11 complete.
 | 12-06 | 369s | 2 | 5 | 2 |
 | 12-07 | 313s | 2 | 6 | 2 |
 | 12-08 | 89s | 1 | 2 | 1 |
+| 13-01 | 518s | 2 | 14 | 2 |
 | 13-02 | 229s | 2 | 11 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed 13-02-PLAN.md
+**Stopped at:** Completed 13-01-PLAN.md
 
 ---
-*Last updated: 2026-02-12 after completing Phase 13-02 (i18n Expansion & Accessibility Foundations)*
+*Last updated: 2026-02-12 after completing Phase 13-01 (Analytics Dashboard with Interactive Charts)*
