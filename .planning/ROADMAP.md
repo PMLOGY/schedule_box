@@ -425,9 +425,9 @@ Plans:
 
 ---
 
-### Phase 14: AI Phase 3 — Voice & Intelligence
+### ~~Phase 14: AI Phase 3 — Voice & Intelligence~~ ✅ (2026-02-12)
 
-**Goal:** Add voice booking, AI follow-up generator, and competitor intelligence for the AI-Powered tier.
+**Goal:** ~~Add voice booking, AI follow-up generator, and competitor intelligence for the AI-Powered tier.~~ ✓
 
 **Segments:** BACKEND (Voice/AI APIs), FRONTEND (Voice UI)
 
@@ -435,19 +435,19 @@ Plans:
 
 **Depends on:** Phase 10, Phase 11
 
-**Plans:** 5 plans in 3 waves
+**Plans:** 5 plans in 3 waves — all complete
 
 Plans:
-- [ ] 14-01-PLAN.md — Shared foundation: OpenAI client, Pydantic schemas, Node.js types/fallbacks/circuit breaker, Zod schemas [Wave 1]
-- [ ] 14-02-PLAN.md — Voice booking pipeline: Whisper STT + GPT-4 NLU + Next.js proxy endpoint [Wave 2]
-- [ ] 14-03-PLAN.md — AI follow-up generator: prompt templates + GPT-4o-mini + token budget + rate limiting [Wave 2]
-- [ ] 14-04-PLAN.md — Competitor intelligence: web scraper + Google Places API + DB schema + API routes [Wave 2]
-- [ ] 14-05-PLAN.md — Integration wiring: register routers in FastAPI, Docker Compose, env documentation [Wave 3]
+- [x] 14-01-PLAN.md — Shared foundation: OpenAI client, Pydantic schemas, Node.js types/fallbacks/circuit breaker, Zod schemas [Wave 1]
+- [x] 14-02-PLAN.md — Voice booking pipeline: Whisper STT + GPT-4 NLU + Next.js proxy endpoint [Wave 2]
+- [x] 14-03-PLAN.md — AI follow-up generator: prompt templates + GPT-4o-mini + token budget + rate limiting [Wave 2]
+- [x] 14-04-PLAN.md — Competitor intelligence: web scraper + Google Places API + DB schema + API routes [Wave 2]
+- [x] 14-05-PLAN.md — Integration wiring: register routers in FastAPI, Docker Compose, env documentation [Wave 3]
 
 **Success Criteria:**
-1. Voice booking transcribes speech, extracts intent, and returns entities for booking confirmation
-2. AI generates personalized follow-up emails for inactive customers
-3. Competitor intelligence surfaces pricing and review data
+1. ~~Voice booking transcribes speech, extracts intent, and returns entities for booking confirmation~~ ✓
+2. ~~AI generates personalized follow-up emails for inactive customers~~ ✓
+3. ~~Competitor intelligence surfaces pricing and review data~~ ✓
 
 ---
 

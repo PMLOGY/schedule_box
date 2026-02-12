@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 6 UAT Complete — Payment Integration verified (12/12 tests pass, 8 fixes applied)
+**Current focus:** Phase 14 Complete — AI Voice & Intelligence verified (12/12 must-haves, 20/20 artifacts)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 14 of 15 — AI Voice Intelligence
-- **Status:** Phase 14 In Progress
-- **Current Plan:** 14-05 complete (Phase 14 fully complete)
+- **Phase:** 14 of 15 — AI Voice Intelligence ✅
+- **Status:** Phase 14 Complete — Ready for Phase 15
+- **Current Plan:** All 14-xx plans complete
 - **Plans Executed:** 79
 
 ## What's Done
