@@ -394,6 +394,10 @@ Next: Phase 12 Plan 02 (API Routes for Advanced Features)
 - [Phase 12-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (dual file pattern)
 - [Phase 12-01]: WhitelabelApp response type excludes SERIAL ID (UUID only, per API conventions)
 - [Phase 12-01]: PostgreSQL NUMERIC fields typed as string in response types (latitude, longitude, averageRating)
+- [Phase 12-05]: Status fields (iosStatus, androidStatus) are system-controlled only, not updatable via PUT endpoint
+- [Phase 12-05]: Build trigger is clean placeholder returning 202 Accepted with Phase 15 message, not fake build logic
+- [Phase 12-05]: GET returns null (not 404) when company has no white-label app configured - optional resource pattern
+- [Phase 12-05]: UNIQUE constraint on company_id enforced at app level with 409 ConflictError before INSERT
 
 ## Blockers
 
@@ -406,7 +410,7 @@ None — Phase 11 complete.
 | Requirements | 103 | ~62 implemented (infra + database + auth + core + booking + payment + CRM) |
 | Phases | 15 | 9 complete (Milestone 1 done, Milestone 2 in progress) |
 | DB Tables | 47 | 48 (47 original + processed_webhooks) |
-| API Endpoints | 99 | ~86 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization) |
+| API Endpoints | 99 | ~90 (auth, customers, services, employees, resources, bookings, availability, payments, invoices, coupons, gift cards, import, anonymize, loyalty, wallet, AI predictions + health + optimization + white-label apps) |
 | Frontend Components | 32+ | ~22 (design system + booking wizard + calendar + notifications + loyalty + AI dashboards) |
 | Test Coverage | 80% | 0% |
 
@@ -482,11 +486,12 @@ None — Phase 11 complete.
 | 11-04 | 155s | 2 | 6 | 2 |
 | 11-05 | 287s | 2 | 5 | 2 |
 | 12-01 | 183s | 2 | 8 | 2 |
+| 12-05 | 315s | 1 | 2 | 1 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Completed Phase 12 Plan 01 — Shared validation and types for marketplace, reviews, video, whitelabel
+**Stopped at:** Completed Phase 12 Plan 05 — White-label app management API
 
 ---
-*Last updated: 2026-02-12 after completing Phase 12-01 (Shared Validation and Types)*
+*Last updated: 2026-02-12 after completing Phase 12-05 (White-label App Management)*
