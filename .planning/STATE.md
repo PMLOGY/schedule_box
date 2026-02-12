@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-05 complete)
+**Current focus:** Phase 15 In Progress — DevOps & Launch (plan 15-06 complete)
 
 ## Position
 
 - **Milestone:** v2.0 (in progress)
 - **Phase:** 15 of 15 — DevOps & Launch (in progress)
-- **Status:** Plan 15-05 Complete — Security Audit (OWASP ZAP + Security Headers)
-- **Current Plan:** 15-05 complete
-- **Plans Executed:** 81
+- **Status:** Plan 15-06 Complete — Beta Testing Playbook and Operational Documentation
+- **Current Plan:** 15-06 complete
+- **Plans Executed:** 82
 
 ## What's Done
 
@@ -106,6 +106,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 15-01: Kubernetes Production Deployment Foundation (2 tasks, 2 commits)
 - [x] Plan 15-04: Load Testing with k6 (2 tasks, 2 commits)
 - [x] Plan 15-05: Security Audit - OWASP ZAP Scanning and Security Hardening (2 tasks, 2 commits)
+- [x] Plan 15-06: Beta Testing Playbook and Operational Documentation (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -496,6 +497,14 @@ Next: Phase 15 (DevOps & Launch)
 - [Phase 15-05]: OWASP ZAP false positive exclusions for JWT-based SaaS (disable CSRF token check 10202, CSP check 10038, proxy disclosure 40025)
 - [Phase 15-05]: CSP removes unsafe-eval from script-src in production mode (NODE_ENV check), keeps for development HMR
 - [Phase 15-05]: X-Frame-Options ALLOWALL for /embed routes (widget must be embeddable from any third-party website)
+- [Phase 15-06]: Beta testing program targets 3 personas (beauty salon, fitness/wellness, medical practice) representing Czech/Slovak SMB market segments
+- [Phase 15-06]: 4-week structured feedback schedule with specific survey questions per week (onboarding, first bookings, payments, retrospective)
+- [Phase 15-06]: Success criteria set at NPS >= 7 for beta (not 30-40 industry standard) combined with 2+ paid conversions for revenue validation
+- [Phase 15-06]: Staggered cohort approach (3→6→6 testers) to manage support load and iterate on feedback from Cohort 1 before scaling
+- [Phase 15-06]: Fresh cluster deployment uses Helm for application, Bitnami charts for stateful services (PostgreSQL, Redis, RabbitMQ)
+- [Phase 15-06]: Rollback procedures include 3 levels (Helm rollback for full release, emergency image rollback for speed, DB migration rollback for destructive changes)
+- [Phase 15-06]: Environment variable validation on startup for fail-fast error detection (prevents runtime errors hours after deployment)
+- [Phase 15-06]: Graceful degradation pattern for optional credentials (SMTP, Twilio, OpenAI) allows dev environments without full third-party config
 - [Phase 15-05]: Weekly scheduled security scans (Monday 2am UTC) + manual trigger balances monitoring and CI/CD resource usage
 - [Phase 15-05]: Dual TypeScript (.ts) and ESM (.mjs) security headers modules for type safety and Next.js config compatibility
 
@@ -610,11 +619,12 @@ None — Phase 11 complete.
 | 15-01 | 335s | 2 | 21 | 2 |
 | 15-04 | 303s | 2 | 8 | 2 |
 | 15-05 | 252s | 2 | 6 | 2 |
+| 15-06 | 387s | 2 | 3 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at: Completed 15-01-PLAN.md (Kubernetes Production Deployment Foundation)
+**Stopped at:** Completed 15-06-PLAN.md (Beta Testing Playbook and Operational Documentation)
 
 ---
-*Last updated: 2026-02-12 after completing Phase 15-01 (Kubernetes Production Deployment Foundation)*
+*Last updated: 2026-02-12 after completing Phase 15-06 (Beta Testing Playbook and Operational Documentation)*
