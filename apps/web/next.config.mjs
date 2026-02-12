@@ -1,4 +1,8 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import {
+  securityHeaders,
+  embedSecurityHeaders,
+} from '../../security/headers/security-headers.mjs';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
@@ -24,6 +28,20 @@ const nextConfig = {
   },
   experimental: {
     // Enable server actions for future phases
+  },
+  async headers() {
+    return [
+      {
+        // Apply security headers to all routes
+        source: '/(.*)',
+        headers: securityHeaders,
+      },
+      {
+        // Relaxed CSP for embed widget routes (must be embeddable from any domain)
+        source: '/embed/:path*',
+        headers: embedSecurityHeaders,
+      },
+    ];
   },
 };
 
