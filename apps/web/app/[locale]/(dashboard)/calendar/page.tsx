@@ -1,12 +1,21 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { CalendarToolbar } from '@/components/calendar/calendar-toolbar';
 import { Button } from '@/components/ui/button';
-import BookingCalendar from '@/components/booking/BookingCalendar';
+
+const BookingCalendar = dynamic(() => import('@/components/booking/BookingCalendar'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-[600px] rounded-lg border bg-card">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  ),
+});
 
 export default function CalendarPage() {
   const t = useTranslations('calendar');

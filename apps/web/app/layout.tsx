@@ -5,7 +5,12 @@ import { Toaster } from 'sonner';
 import { Providers } from './providers';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin', 'latin-ext'] });
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: {
@@ -20,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} font-sans`}>
         <Providers>
           {children}
           <Toaster />

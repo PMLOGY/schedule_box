@@ -1,17 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  ReactFlow,
   type Node,
   type Edge,
   addEdge,
   useNodesState,
   useEdgesState,
-  Controls,
-  Background,
   type Connection,
   BackgroundVariant,
 } from '@xyflow/react';
@@ -19,8 +17,25 @@ import '@xyflow/react/dist/style.css';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
+
+const ReactFlow = dynamic(() => import('@xyflow/react').then((mod) => mod.ReactFlow), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  ),
+});
+
+const Controls = dynamic(() => import('@xyflow/react').then((mod) => mod.Controls), {
+  ssr: false,
+});
+
+const Background = dynamic(() => import('@xyflow/react').then((mod) => mod.Background), {
+  ssr: false,
+});
 
 import TriggerNode, {
   type TriggerNodeData,
