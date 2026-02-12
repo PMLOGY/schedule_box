@@ -10,10 +10,10 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Position
 
 - **Milestone:** v2.0 (in progress)
-- **Phase:** 11 of 15 — AI Optimization
-- **Status:** Phase 11 Complete
-- **Current Plan:** 11-05 complete, 11-04 complete, 11-03 complete, 11-02 complete, 11-01 complete
-- **Plans Executed:** 65
+- **Phase:** 12 of 15 — Advanced Features
+- **Status:** Phase 12 In Progress
+- **Current Plan:** 12-01 complete
+- **Plans Executed:** 66
 
 ## What's Done
 
@@ -89,6 +89,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 - [x] Plan 11-03: Optimization Training Scripts (2 tasks, 2 commits)
 - [x] Plan 11-04: Optimization API Routes (2 tasks, 2 commits)
 - [x] Plan 11-05: Frontend Integration - Optimization Hooks & Dashboards (2 tasks, 2 commits)
+- [x] Plan 12-01: Shared Validation and Types for Phase 12 (2 tasks, 2 commits)
 
 ## What's Next
 
@@ -105,9 +106,11 @@ Phase 9: Complete ✅ — All 8 plans executed (schemas, events, engines, CRUD A
 
 Phase 10: Complete ✅ — All 4 plans executed (AI service foundation, circuit breaker client, prediction endpoints, API routes & Docker integration)
 
-Phase 11: Complete -- All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
+Phase 11: Complete ✅ — All 5 plans executed (optimization models, endpoints, client types, fallbacks, circuit breaker, API routes, training scripts, frontend hooks, upselling widget, pricing/capacity dashboards)
 
-Next: Phase 12 (Advanced Features)
+Phase 12: In Progress — Plan 12-01 complete (Zod schemas and types for marketplace, reviews, video, whitelabel)
+
+Next: Phase 12 Plan 02 (API Routes for Advanced Features)
 
 ## Decisions
 
@@ -387,6 +390,10 @@ Next: Phase 12 (Advanced Features)
 - [Phase 11-05]: Price Check form approach avoids N+1 queries for per-service pricing dashboard
 - [Phase 11-05]: CompanyId defaults to 1 for capacity forecast (auth store UUID vs API int mismatch)
 - [Phase 11-05]: Consistent blue fallback info banners when AI returns fallback=true
+- [Phase 12-01]: z.coerce.number() for query parameters enables automatic string-to-number conversion (following Phase 5 pattern)
+- [Phase 12-01]: Schema-only exports from schemas/ files prevent TS2308 module conflicts (dual file pattern)
+- [Phase 12-01]: WhitelabelApp response type excludes SERIAL ID (UUID only, per API conventions)
+- [Phase 12-01]: PostgreSQL NUMERIC fields typed as string in response types (latitude, longitude, averageRating)
 
 ## Blockers
 
@@ -474,11 +481,12 @@ None — Phase 11 complete.
 | 11-03 | 262s | 2 | 6 | 2 |
 | 11-04 | 155s | 2 | 6 | 2 |
 | 11-05 | 287s | 2 | 5 | 2 |
+| 12-01 | 183s | 2 | 8 | 2 |
 
 ## Session Info
 
 **Last session:** 2026-02-12
-**Stopped at:** Phase 6 UAT complete — 12/12 tests pass, 8 bug fixes applied
+**Stopped at:** Completed Phase 12 Plan 01 — Shared validation and types for marketplace, reviews, video, whitelabel
 
 ---
-*Last updated: 2026-02-12 after completing Phase 6 UAT (12/12 pass)*
+*Last updated: 2026-02-12 after completing Phase 12-01 (Shared Validation and Types)*
