@@ -15,7 +15,6 @@ const nextConfig = {
     '@schedulebox/events',
     '@schedulebox/database',
   ],
-  serverExternalPackages: ['pdfkit', '@react-pdf/renderer'],
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -27,7 +26,7 @@ const nextConfig = {
     },
   },
   experimental: {
-    // Enable server actions for future phases
+    serverComponentsExternalPackages: ['pdfkit', '@react-pdf/renderer'],
   },
   async headers() {
     return [
