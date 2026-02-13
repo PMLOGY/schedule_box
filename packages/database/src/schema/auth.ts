@@ -81,7 +81,7 @@ export const companies = pgTable(
       'busy_appearance_percent_check',
       sql`${table.busyAppearancePercent} BETWEEN 0 AND 50`,
     ),
-    slugIdx: index('idx_companies_slug').on(table.slug),
+    // idx_companies_slug removed: covered by companies_slug_unique
     subscriptionIdx: index('idx_companies_subscription').on(table.subscriptionPlan),
   }),
 );
@@ -212,7 +212,7 @@ export const refreshTokens = pgTable(
   },
   (table) => ({
     userIdx: index('idx_refresh_tokens_user').on(table.userId),
-    hashIdx: index('idx_refresh_tokens_hash').on(table.tokenHash),
+    // idx_refresh_tokens_hash removed: covered by refresh_tokens_token_hash_unique
   }),
 );
 
@@ -240,6 +240,6 @@ export const apiKeys = pgTable(
   },
   (table) => ({
     companyIdx: index('idx_api_keys_company').on(table.companyId),
-    hashIdx: index('idx_api_keys_hash').on(table.keyHash),
+    // idx_api_keys_hash removed: covered by api_keys_key_hash_unique
   }),
 );

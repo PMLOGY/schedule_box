@@ -57,8 +57,7 @@ export const coupons = pgTable(
       sql`${table.discountType} IN ('percentage', 'fixed')`,
     ),
     discountValueCheck: check('coupons_discount_value_check', sql`${table.discountValue} > 0`),
-    companyIdx: index('idx_coupons_company').on(table.companyId),
-    companyCodeIdx: index('idx_coupons_code').on(table.companyId, table.code),
+    // idx_coupons_company and idx_coupons_code removed: covered by coupons_company_id_code_unique
   }),
 );
 
@@ -76,7 +75,7 @@ export const couponUsage = pgTable(
     customerId: integer('customer_id')
       .notNull()
       .references(() => customers.id, { onDelete: 'cascade' }),
-    bookingId: integer('booking_id').notNull(), // FK will be added when bookings table exists
+    bookingId: integer('booking_id').notNull(),
     discountApplied: numeric('discount_applied', { precision: 10, scale: 2 }).notNull(),
     usedAt: timestamp('used_at', { withTimezone: true }).defaultNow(),
   },

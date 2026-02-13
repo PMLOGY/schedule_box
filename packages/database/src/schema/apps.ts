@@ -13,7 +13,6 @@ import {
   varchar,
   timestamp,
   jsonb,
-  index,
   check,
   unique,
 } from 'drizzle-orm/pg-core';
@@ -56,6 +55,6 @@ export const whitelabelApps = pgTable(
       sql`${table.androidStatus} IN ('draft', 'building', 'submitted', 'published', 'rejected')`,
     ),
     companyUnique: unique('whitelabel_apps_company_unique').on(table.companyId),
-    companyIdx: index('idx_whitelabel_company').on(table.companyId),
+    // idx_whitelabel_company removed: covered by whitelabel_apps_company_unique
   }),
 );

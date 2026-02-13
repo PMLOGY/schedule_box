@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Drizzle Relations
  *
  * Defines relationships between tables for query builder and nested queries.
@@ -12,6 +12,7 @@ import {
   roles,
   permissions,
   rolePermissions,
+  passwordHistory,
   refreshTokens,
   apiKeys,
 } from './auth';
@@ -23,7 +24,13 @@ import { bookings, bookingResources, availabilitySlots } from './bookings';
 import { payments, invoices } from './payments';
 import { coupons, couponUsage } from './coupons';
 import { giftCards, giftCardTransactions } from './gift-cards';
-import { loyaltyPrograms, loyaltyTiers, loyaltyCards, loyaltyTransactions } from './loyalty';
+import {
+  loyaltyPrograms,
+  loyaltyTiers,
+  loyaltyCards,
+  loyaltyTransactions,
+  rewards,
+} from './loyalty';
 import { notifications, notificationTemplates } from './notifications';
 import { reviews } from './reviews';
 import { aiPredictions } from './ai';
@@ -31,7 +38,8 @@ import { marketplaceListings } from './marketplace';
 import { videoMeetings } from './video';
 import { whitelabelApps } from './apps';
 import { automationRules, automationLogs } from './automation';
-import { auditLogs, analyticsEvents } from './analytics';
+import { auditLogs, analyticsEvents, competitorData, competitorMonitors } from './analytics';
+import { processedWebhooks } from './webhooks';
 
 // ============================================================================
 // COMPANIES RELATIONS
@@ -59,9 +67,15 @@ export const companiesRelations = relations(companies, ({ many }) => ({
   apps: many(whitelabelApps),
   automations: many(automationRules),
   analytics: many(analyticsEvents),
+  auditLogs: many(auditLogs),
+  aiPredictions: many(aiPredictions),
+  videoMeetings: many(videoMeetings),
+  competitorData: many(competitorData),
+  competitorMonitors: many(competitorMonitors),
   apiKeys: many(apiKeys),
   tags: many(tags),
   workingHours: many(workingHours),
+  workingHoursOverrides: many(workingHoursOverrides),
 }));
 
 // ============================================================================
@@ -78,6 +92,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     references: [roles.id],
   }),
   refreshTokens: many(refreshTokens),
+  passwordHistory: many(passwordHistory),
   customers: many(customers),
   employees: many(employees),
 }));
@@ -107,12 +122,19 @@ export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => 
 }));
 
 // ============================================================================
-// REFRESH TOKENS & API KEYS RELATIONS
+// REFRESH TOKENS, PASSWORD HISTORY & API KEYS RELATIONS
 // ============================================================================
 
 export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
   user: one(users, {
     fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
+}));
+
+export const passwordHistoryRelations = relations(passwordHistory, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordHistory.userId],
     references: [users.id],
   }),
 }));
@@ -143,6 +165,8 @@ export const customersRelations = relations(customers, ({ one, many }) => ({
   loyaltyCards: many(loyaltyCards),
   customerTags: many(customerTags),
   giftCards: many(giftCards),
+  notifications: many(notifications),
+  couponUsage: many(couponUsage),
 }));
 
 export const tagsRelations = relations(tags, ({ one, many }) => ({
@@ -186,6 +210,7 @@ export const servicesRelations = relations(services, ({ one, many }) => ({
     references: [serviceCategories.id],
   }),
   employeeServices: many(employeeServices),
+  serviceResources: many(serviceResources),
   bookings: many(bookings),
   reviews: many(reviews),
 }));
@@ -234,6 +259,10 @@ export const workingHoursRelations = relations(workingHours, ({ one }) => ({
 }));
 
 export const workingHoursOverridesRelations = relations(workingHoursOverrides, ({ one }) => ({
+  company: one(companies, {
+    fields: [workingHoursOverrides.companyId],
+    references: [companies.id],
+  }),
   employee: one(employees, {
     fields: [workingHoursOverrides.employeeId],
     references: [employees.id],
@@ -266,6 +295,10 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
 }));
 
 export const serviceResourcesRelations = relations(serviceResources, ({ one }) => ({
+  service: one(services, {
+    fields: [serviceResources.serviceId],
+    references: [services.id],
+  }),
   resource: one(resources, {
     fields: [serviceResources.resourceId],
     references: [resources.id],
@@ -293,13 +326,26 @@ export const bookingsRelations = relations(bookings, ({ one, many }) => ({
     fields: [bookings.employeeId],
     references: [employees.id],
   }),
-  bookingResources: many(bookingResources),
-  payments: many(payments),
-  reviews: many(reviews),
+  coupon: one(coupons, {
+    fields: [bookings.couponId],
+    references: [coupons.id],
+  }),
+  giftCard: one(giftCards, {
+    fields: [bookings.giftCardId],
+    references: [giftCards.id],
+  }),
   videoMeeting: one(videoMeetings, {
     fields: [bookings.videoMeetingId],
     references: [videoMeetings.id],
   }),
+  bookingResources: many(bookingResources),
+  payments: many(payments),
+  reviews: many(reviews),
+  notifications: many(notifications),
+  couponUsage: many(couponUsage),
+  loyaltyTransactions: many(loyaltyTransactions),
+  giftCardTransactions: many(giftCardTransactions),
+  automationLogs: many(automationLogs),
 }));
 
 export const bookingResourcesRelations = relations(bookingResources, ({ one }) => ({
@@ -369,12 +415,21 @@ export const couponsRelations = relations(coupons, ({ one, many }) => ({
     references: [companies.id],
   }),
   couponUsage: many(couponUsage),
+  bookings: many(bookings),
 }));
 
 export const couponUsageRelations = relations(couponUsage, ({ one }) => ({
   coupon: one(coupons, {
     fields: [couponUsage.couponId],
     references: [coupons.id],
+  }),
+  customer: one(customers, {
+    fields: [couponUsage.customerId],
+    references: [customers.id],
+  }),
+  booking: one(bookings, {
+    fields: [couponUsage.bookingId],
+    references: [bookings.id],
   }),
 }));
 
@@ -392,12 +447,17 @@ export const giftCardsRelations = relations(giftCards, ({ one, many }) => ({
     references: [customers.id],
   }),
   giftCardTransactions: many(giftCardTransactions),
+  bookings: many(bookings),
 }));
 
 export const giftCardTransactionsRelations = relations(giftCardTransactions, ({ one }) => ({
   giftCard: one(giftCards, {
     fields: [giftCardTransactions.giftCardId],
     references: [giftCards.id],
+  }),
+  booking: one(bookings, {
+    fields: [giftCardTransactions.bookingId],
+    references: [bookings.id],
   }),
 }));
 
@@ -412,13 +472,15 @@ export const loyaltyProgramsRelations = relations(loyaltyPrograms, ({ one, many 
   }),
   loyaltyTiers: many(loyaltyTiers),
   loyaltyCards: many(loyaltyCards),
+  rewards: many(rewards),
 }));
 
-export const loyaltyTiersRelations = relations(loyaltyTiers, ({ one }) => ({
+export const loyaltyTiersRelations = relations(loyaltyTiers, ({ one, many }) => ({
   program: one(loyaltyPrograms, {
     fields: [loyaltyTiers.programId],
     references: [loyaltyPrograms.id],
   }),
+  loyaltyCards: many(loyaltyCards),
 }));
 
 export const loyaltyCardsRelations = relations(loyaltyCards, ({ one, many }) => ({
@@ -442,6 +504,21 @@ export const loyaltyTransactionsRelations = relations(loyaltyTransactions, ({ on
     fields: [loyaltyTransactions.cardId],
     references: [loyaltyCards.id],
   }),
+  booking: one(bookings, {
+    fields: [loyaltyTransactions.bookingId],
+    references: [bookings.id],
+  }),
+}));
+
+export const rewardsRelations = relations(rewards, ({ one }) => ({
+  program: one(loyaltyPrograms, {
+    fields: [rewards.programId],
+    references: [loyaltyPrograms.id],
+  }),
+  applicableService: one(services, {
+    fields: [rewards.applicableServiceId],
+    references: [services.id],
+  }),
 }));
 
 // ============================================================================
@@ -452,6 +529,14 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   company: one(companies, {
     fields: [notifications.companyId],
     references: [companies.id],
+  }),
+  customer: one(customers, {
+    fields: [notifications.customerId],
+    references: [customers.id],
+  }),
+  booking: one(bookings, {
+    fields: [notifications.bookingId],
+    references: [bookings.id],
   }),
   template: one(notificationTemplates, {
     fields: [notifications.templateId],
@@ -522,8 +607,15 @@ export const marketplaceListingsRelations = relations(marketplaceListings, ({ on
 // VIDEO MEETINGS RELATIONS
 // ============================================================================
 
-export const videoMeetingsRelations = relations(videoMeetings, ({ many }) => ({
-  bookings: many(bookings),
+export const videoMeetingsRelations = relations(videoMeetings, ({ one }) => ({
+  company: one(companies, {
+    fields: [videoMeetings.companyId],
+    references: [companies.id],
+  }),
+  booking: one(bookings, {
+    fields: [videoMeetings.bookingId],
+    references: [bookings.id],
+  }),
 }));
 
 // ============================================================================
@@ -554,6 +646,14 @@ export const automationLogsRelations = relations(automationLogs, ({ one }) => ({
     fields: [automationLogs.ruleId],
     references: [automationRules.id],
   }),
+  customer: one(customers, {
+    fields: [automationLogs.customerId],
+    references: [customers.id],
+  }),
+  booking: one(bookings, {
+    fields: [automationLogs.bookingId],
+    references: [bookings.id],
+  }),
 }));
 
 // ============================================================================
@@ -571,5 +671,30 @@ export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => 
   company: one(companies, {
     fields: [analyticsEvents.companyId],
     references: [companies.id],
+  }),
+}));
+
+export const competitorDataRelations = relations(competitorData, ({ one }) => ({
+  company: one(companies, {
+    fields: [competitorData.companyId],
+    references: [companies.id],
+  }),
+}));
+
+export const competitorMonitorsRelations = relations(competitorMonitors, ({ one }) => ({
+  company: one(companies, {
+    fields: [competitorMonitors.companyId],
+    references: [companies.id],
+  }),
+}));
+
+// ============================================================================
+// WEBHOOKS RELATIONS
+// ============================================================================
+
+export const processedWebhooksRelations = relations(processedWebhooks, ({ one }) => ({
+  payment: one(payments, {
+    fields: [processedWebhooks.paymentId],
+    references: [payments.id],
   }),
 }));

@@ -24,9 +24,6 @@ import { customers } from './customers';
 import { services } from './services';
 import { employees } from './employees';
 
-// Note: bookings table reference uses deferred FK pattern
-// (parallel plan 02-04/02-05 may not be complete yet)
-
 // ============================================================================
 // REVIEWS TABLE
 // ============================================================================
@@ -42,7 +39,7 @@ export const reviews = pgTable(
     customerId: integer('customer_id')
       .notNull()
       .references(() => customers.id, { onDelete: 'cascade' }),
-    bookingId: integer('booking_id'), // Deferred FK - bookings table in parallel plan
+    bookingId: integer('booking_id'),
     serviceId: integer('service_id').references(() => services.id, { onDelete: 'set null' }),
     employeeId: integer('employee_id').references(() => employees.id, { onDelete: 'set null' }),
     rating: smallint('rating').notNull(),

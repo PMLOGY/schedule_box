@@ -55,7 +55,7 @@ export const loyaltyPrograms = pgTable(
       'loyalty_programs_type_check',
       sql`${table.type} IN ('points', 'stamps', 'tiers')`,
     ),
-    companyIdx: index('idx_loyalty_programs_company').on(table.companyId),
+    // idx_loyalty_programs_company removed: covered by loyalty_programs_company_id_unique
   }),
 );
 
@@ -128,7 +128,7 @@ export const loyaltyTransactions = pgTable(
     cardId: integer('card_id')
       .notNull()
       .references(() => loyaltyCards.id, { onDelete: 'cascade' }),
-    bookingId: integer('booking_id'), // FK will be added when bookings table exists
+    bookingId: integer('booking_id'),
     type: varchar('type', { length: 20 }).notNull(),
     points: integer('points').notNull(),
     balanceAfter: integer('balance_after').notNull(),

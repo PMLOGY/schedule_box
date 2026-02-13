@@ -19,9 +19,6 @@ import {
 import { sql } from 'drizzle-orm';
 import { companies } from './auth';
 
-// Note: bookings table reference uses deferred FK pattern
-// (parallel plan 02-04/02-05 may not be complete yet)
-
 // ============================================================================
 // VIDEO_MEETINGS TABLE
 // ============================================================================
@@ -34,7 +31,7 @@ export const videoMeetings = pgTable(
     companyId: integer('company_id')
       .notNull()
       .references(() => companies.id, { onDelete: 'cascade' }),
-    bookingId: integer('booking_id').notNull(), // Deferred FK - bookings table in parallel plan
+    bookingId: integer('booking_id').notNull(),
     provider: varchar('provider', { length: 20 }).notNull(),
     meetingUrl: varchar('meeting_url', { length: 500 }).notNull(),
     meetingId: varchar('meeting_id', { length: 255 }),

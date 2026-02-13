@@ -10,10 +10,12 @@ BEGIN
         total_spent = COALESCE((SELECT SUM(price - discount_amount) FROM bookings WHERE customer_id = COALESCE(NEW.customer_id, OLD.customer_id) AND status = 'completed'), 0),
         last_visit_at = (SELECT MAX(end_time) FROM bookings WHERE customer_id = COALESCE(NEW.customer_id, OLD.customer_id) AND status = 'completed')
     WHERE id = COALESCE(NEW.customer_id, OLD.customer_id);
-    RETURN NEW;
+    RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 
+-- Idempotent: drop before create
+DROP TRIGGER IF EXISTS trg_booking_customer_metrics ON bookings;
 CREATE TRIGGER trg_booking_customer_metrics
 AFTER INSERT OR UPDATE OR DELETE ON bookings
 FOR EACH ROW EXECUTE FUNCTION update_customer_metrics();

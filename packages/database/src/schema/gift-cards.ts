@@ -60,7 +60,7 @@ export const giftCards = pgTable(
       sql`${table.currentBalance} >= 0`,
     ),
     companyIdx: index('idx_gift_cards_company').on(table.companyId),
-    codeIdx: index('idx_gift_cards_code').on(table.code),
+    // idx_gift_cards_code removed: covered by gift_cards_code_unique
   }),
 );
 
@@ -75,7 +75,7 @@ export const giftCardTransactions = pgTable(
     giftCardId: integer('gift_card_id')
       .notNull()
       .references(() => giftCards.id, { onDelete: 'cascade' }),
-    bookingId: integer('booking_id'), // FK will be added when bookings table exists
+    bookingId: integer('booking_id'),
     type: varchar('type', { length: 20 }).notNull(),
     amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
     balanceAfter: numeric('balance_after', { precision: 10, scale: 2 }).notNull(),

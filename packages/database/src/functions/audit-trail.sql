@@ -10,8 +10,8 @@ DECLARE
     v_new_values JSONB;
 BEGIN
     -- Read session variables (set by application layer)
-    v_company_id := current_setting('app.company_id', TRUE)::INTEGER;
-    v_user_id := current_setting('app.user_id', TRUE)::INTEGER;
+    v_company_id := NULLIF(current_setting('app.company_id', TRUE), '')::INTEGER;
+    v_user_id := NULLIF(current_setting('app.user_id', TRUE), '')::INTEGER;
 
     -- Prepare old/new values based on operation
     IF (TG_OP = 'DELETE') THEN
@@ -55,23 +55,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Apply audit trail trigger to critical tables
+-- Apply audit trail trigger to critical tables (idempotent: drop before create)
+DROP TRIGGER IF EXISTS trg_bookings_audit ON bookings;
 CREATE TRIGGER trg_bookings_audit
 AFTER INSERT OR UPDATE OR DELETE ON bookings
 FOR EACH ROW EXECUTE FUNCTION audit_log_changes();
 
+DROP TRIGGER IF EXISTS trg_customers_audit ON customers;
 CREATE TRIGGER trg_customers_audit
 AFTER INSERT OR UPDATE OR DELETE ON customers
 FOR EACH ROW EXECUTE FUNCTION audit_log_changes();
 
+DROP TRIGGER IF EXISTS trg_services_audit ON services;
 CREATE TRIGGER trg_services_audit
 AFTER INSERT OR UPDATE OR DELETE ON services
 FOR EACH ROW EXECUTE FUNCTION audit_log_changes();
 
+DROP TRIGGER IF EXISTS trg_employees_audit ON employees;
 CREATE TRIGGER trg_employees_audit
 AFTER INSERT OR UPDATE OR DELETE ON employees
 FOR EACH ROW EXECUTE FUNCTION audit_log_changes();
 
+DROP TRIGGER IF EXISTS trg_payments_audit ON payments;
 CREATE TRIGGER trg_payments_audit
 AFTER INSERT OR UPDATE OR DELETE ON payments
 FOR EACH ROW EXECUTE FUNCTION audit_log_changes();

@@ -2,9 +2,14 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import { config } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load environment variables
-config();
+config({ path: resolve(__dirname, '../../../../.env') });
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -20,7 +25,7 @@ async function runMigrations() {
   console.log('Running migrations...');
 
   try {
-    await migrate(db, { migrationsFolder: './src/migrations' });
+    await migrate(db, { migrationsFolder: resolve(__dirname, 'migrations') });
     console.log('Migrations complete');
   } catch (error) {
     console.error('Migration failed:', error);

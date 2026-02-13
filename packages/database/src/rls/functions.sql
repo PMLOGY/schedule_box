@@ -25,7 +25,7 @@ $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 -- Get user role from session variable
 CREATE OR REPLACE FUNCTION current_user_role() RETURNS TEXT AS $$
 BEGIN
-  RETURN current_setting('app.user_role', true);
+  RETURN NULLIF(current_setting('app.user_role', true), '');
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 

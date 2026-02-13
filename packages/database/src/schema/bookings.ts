@@ -30,6 +30,9 @@ import { customers } from './customers';
 import { services } from './services';
 import { employees } from './employees';
 import { resources } from './resources';
+import { coupons } from './coupons';
+import { giftCards } from './gift-cards';
+import { videoMeetings } from './video';
 
 // ============================================================================
 // BOOKINGS TABLE
@@ -66,11 +69,11 @@ export const bookings = pgTable(
     price: numeric('price', { precision: 10, scale: 2 }).notNull(),
     currency: varchar('currency', { length: 3 }).default('CZK'),
     discountAmount: numeric('discount_amount', { precision: 10, scale: 2 }).default('0'),
-    // FK columns without constraints (constraints deferred to plan 02-09)
-    couponId: integer('coupon_id'),
-    giftCardId: integer('gift_card_id'),
-    // Video
-    videoMeetingId: integer('video_meeting_id'),
+    couponId: integer('coupon_id').references(() => coupons.id, { onDelete: 'set null' }),
+    giftCardId: integer('gift_card_id').references(() => giftCards.id, { onDelete: 'set null' }),
+    videoMeetingId: integer('video_meeting_id').references(() => videoMeetings.id, {
+      onDelete: 'set null',
+    }),
     // AI
     noShowProbability: real('no_show_probability'),
     // Cancellation

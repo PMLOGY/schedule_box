@@ -42,7 +42,8 @@ async function seed() {
   console.log('🌱 Starting database seed...\n');
 
   // Dynamic import so dotenv config() runs first
-  const { db, migrationClient } = await import('../db');
+  const { db, getMigrationClient } = await import('../db');
+  const migrationClient = getMigrationClient();
   const schema = await import('../schema/index');
 
   try {
@@ -89,7 +90,7 @@ async function seed() {
 
     console.log(`   ✅ Created 4 roles\n`);
 
-    // Create all 23 permissions matching RBAC PERMISSIONS constant (dot notation)
+    // Create all 25 permissions matching RBAC PERMISSIONS constant (dot notation)
     const permissions = [
       { name: 'bookings.create', description: 'Create bookings' },
       { name: 'bookings.read', description: 'Read bookings' },
@@ -705,7 +706,7 @@ async function seed() {
 
     for (const booking of completedBookings) {
       const amount = Math.max(
-        0,
+        0.01,
         parseFloat(booking.price) - parseFloat(booking.discountAmount || '0'),
       ).toFixed(2);
 

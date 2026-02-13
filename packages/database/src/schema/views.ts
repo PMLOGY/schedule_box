@@ -128,13 +128,13 @@ export const customerMetrics = pgView('v_customer_metrics').as((qb) => {
           FROM bookings b
           WHERE b.customer_id = ${customers.id}
             AND b.deleted_at IS NULL
-        )) > 90 THEN 'at_risk'
+        )) > 180 THEN 'dormant'
         WHEN EXTRACT(DAY FROM NOW() - (
           SELECT MAX(b.start_time)
           FROM bookings b
           WHERE b.customer_id = ${customers.id}
             AND b.deleted_at IS NULL
-        )) > 180 THEN 'dormant'
+        )) > 90 THEN 'at_risk'
         ELSE 'active'
       END`.as('status'),
     })

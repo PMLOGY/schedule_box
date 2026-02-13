@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Apply SQL Files Script
  *
  * Executes raw SQL files (RLS policies, triggers, constraints, functions)
@@ -13,10 +13,13 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { migrationClient } from './db';
+import { config } from 'dotenv';
+import { resolve } from 'node:path';
 
+// Load .env before any DB imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+config({ path: resolve(__dirname, '../../../../.env') });
 
 interface SqlFile {
   name: string;
@@ -96,13 +99,17 @@ const SQL_FILES: SqlFile[] = [
  * preventing a partially-configured database.
  */
 async function applySql(): Promise<void> {
-  console.log('🚀 Applying SQL files to database (in single transaction)...\n');
+  // Dynamic import after dotenv is loaded
+  const { getMigrationClient } = await import('./db');
+  const client = getMigrationClient();
 
-  await migrationClient.begin(async (tx) => {
+  console.log('Applying SQL files to database (in single transaction)...\n');
+
+  await client.begin(async (tx) => {
     let successCount = 0;
 
     for (const sqlFile of SQL_FILES) {
-      console.log(`📄 ${sqlFile.name}`);
+      console.log(`  ${sqlFile.name}`);
       console.log(`   ${sqlFile.description}`);
 
       // Read SQL file
@@ -111,25 +118,22 @@ async function applySql(): Promise<void> {
       // Execute SQL within the transaction — any failure rolls back everything
       await tx.unsafe(sqlContent);
 
-      console.log(`   ✅ Applied successfully\n`);
+      console.log(`   Applied successfully\n`);
       successCount++;
     }
 
     // Summary (only reached if all succeeded — otherwise transaction is rolled back)
-    console.log('═'.repeat(60));
-    console.log(`✅ Success: ${successCount}/${SQL_FILES.length} (committed)`);
-    console.log('═'.repeat(60));
-    console.log('\n🎉 All SQL files applied successfully!');
+    console.log('='.repeat(60));
+    console.log(`Success: ${successCount}/${SQL_FILES.length} (committed)`);
+    console.log('='.repeat(60));
+    console.log('\nAll SQL files applied successfully!');
   });
+
+  await client.end();
 }
 
 // Run the script
-applySql()
-  .catch((error) => {
-    console.error('❌ Fatal error:', error);
-    process.exit(1);
-  })
-  .finally(async () => {
-    // Close the migration client
-    await migrationClient.end();
-  });
+applySql().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});

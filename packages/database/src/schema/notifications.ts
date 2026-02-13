@@ -23,9 +23,6 @@ import { sql } from 'drizzle-orm';
 import { companies } from './auth';
 import { customers } from './customers';
 
-// Note: bookings table reference uses deferred FK pattern
-// (parallel plan 02-04/02-05 may not be complete yet)
-
 // ============================================================================
 // NOTIFICATION_TEMPLATES TABLE
 // ============================================================================
@@ -75,7 +72,7 @@ export const notifications = pgTable(
       .notNull()
       .references(() => companies.id, { onDelete: 'cascade' }),
     customerId: integer('customer_id').references(() => customers.id, { onDelete: 'set null' }),
-    bookingId: integer('booking_id'), // Deferred FK - bookings table in parallel plan
+    bookingId: integer('booking_id'),
     templateId: integer('template_id').references(() => notificationTemplates.id, {
       onDelete: 'set null',
     }),

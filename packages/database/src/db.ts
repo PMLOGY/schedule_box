@@ -2,17 +2,16 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema/index';
 
-const DATABASE_URL = process.env.DATABASE_URL;
-
 // Lazy connection - don't crash at import time (allows Next.js build without DB)
 let _migrationClient: ReturnType<typeof postgres> | null = null;
 let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
 function getConnectionUrl(): string {
-  if (!DATABASE_URL) {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
     throw new Error('DATABASE_URL environment variable is required');
   }
-  return DATABASE_URL;
+  return url;
 }
 
 // Migration client - single connection for transactional migrations
@@ -22,11 +21,6 @@ export function getMigrationClient() {
   }
   return _migrationClient;
 }
-
-/** @deprecated Use getMigrationClient() instead */
-export const migrationClient = DATABASE_URL
-  ? postgres(DATABASE_URL, { max: 1 })
-  : (null as unknown as ReturnType<typeof postgres>);
 
 // Query client - connection pool for application queries
 function createDb() {
