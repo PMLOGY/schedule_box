@@ -4,14 +4,10 @@ Follow-up email generation router.
 Generates personalized Czech follow-up emails using GPT-4o-mini.
 Includes per-company daily rate limiting (50/day) and token budget enforcement.
 
-Rate limiting uses in-memory state (single process). For production
-multi-process deployment, replace with Redis-based rate limiting.
+Rate limiting uses Redis INCR + EXPIRE for atomic multi-process safety.
 """
 
-import datetime
-import json
 import logging
-from collections import defaultdict
 
 from fastapi import APIRouter
 
@@ -24,41 +20,42 @@ from ..services.followup_prompts import (
     check_token_budget,
 )
 from ..services.openai_client import generate_followup_text
+from ..services.feature_store import get_redis_client
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/followup", tags=["followup"])
 
 
-# =============================================================================
-# In-memory rate limiter (per company, per day)
-# For production multi-process deployment, use Redis-based rate limiting.
-# =============================================================================
-
-_rate_limits: dict[str, int] = defaultdict(int)
-_rate_limit_day: str = ""
-
-
-def _check_rate_limit(company_id: int) -> bool:
+async def _check_rate_limit(company_id: int) -> bool:
     """
-    Check if company has exceeded daily follow-up limit.
+    Check if company has exceeded daily follow-up limit using Redis.
 
-    Resets counters at midnight (date change). Returns False if
-    company has exceeded MAX_FOLLOWUP_PER_DAY (default: 50).
+    Uses atomic INCR + EXPIRE to safely handle concurrent requests
+    across multiple Uvicorn workers. Falls back to allowing requests
+    if Redis is unavailable (fail-open for availability).
     """
-    global _rate_limits, _rate_limit_day
+    try:
+        client = await get_redis_client()
+        if client is None:
+            # Redis unavailable — fail open (allow request)
+            logger.warning("Redis unavailable for rate limiting, allowing request")
+            return True
 
-    today = datetime.date.today().isoformat()
-    if _rate_limit_day != today:
-        _rate_limits.clear()
-        _rate_limit_day = today
+        key = f"ratelimit:followup:{company_id}"
+        count = await client.incr(key)
 
-    key = str(company_id)
-    if _rate_limits[key] >= settings.MAX_FOLLOWUP_PER_DAY:
-        return False
+        # Set expiry on first increment (start of new window)
+        if count == 1:
+            await client.expire(key, 86400)  # 24 hours
 
-    _rate_limits[key] += 1
-    return True
+        if count > settings.MAX_FOLLOWUP_PER_DAY:
+            return False
+
+        return True
+    except Exception as e:
+        logger.warning(f"Rate limit check failed: {e}, allowing request")
+        return True
 
 
 @router.post("/generate", response_model=FollowUpResponse)
@@ -77,7 +74,7 @@ async def generate_followup(request: FollowUpRequest) -> FollowUpResponse:
     - birthday: Birthday congratulation with special offer
     """
     # Rate limit check
-    if not _check_rate_limit(request.company_id):
+    if not await _check_rate_limit(request.company_id):
         logger.warning(
             f"Rate limit exceeded for company {request.company_id} "
             f"({settings.MAX_FOLLOWUP_PER_DAY}/day)"

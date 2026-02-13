@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
     LOG_LEVEL: str = "info"
 
+    # Internal API key for service-to-service auth (set in production)
+    AI_SERVICE_API_KEY: str = ""  # Empty = skip auth (development only)
+
     # OpenAI settings (Phase 14 - Voice/Follow-up features)
     OPENAI_API_KEY: str = ""  # Required for voice/follow-up features
     OPENAI_MODEL: str = "gpt-4-turbo"  # Default model for NLU

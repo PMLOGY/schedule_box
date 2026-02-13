@@ -23,16 +23,26 @@ spec:
         image: "{{ .Values.notificationWorker.image.repository }}:{{ .Values.notificationWorker.image.tag }}"
         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command: ["node", "services/notification-worker/src/index.js"]
+        ports:
+        - name: health
+          containerPort: 3001
+          protocol: TCP
         livenessProbe:
-          exec:
-            command:
-            - node
-            - -e
-            - process.exit(0)
+          httpGet:
+            path: /health
+            port: health
           initialDelaySeconds: 30
           periodSeconds: 15
           timeoutSeconds: 5
           failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: health
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 2
         resources:
           {{- toYaml .Values.notificationWorker.resources | nindent 10 }}
         envFrom:
@@ -45,7 +55,9 @@ spec:
         - name: {{ .name }}
           value: {{ .value | quote }}
         {{- end }}
-        # SMTP configuration (optional for development)
+        - name: HEALTH_PORT
+          value: "3001"
+        # SMTP configuration (from secrets in production)
         - name: SMTP_HOST
           value: ""
         - name: SMTP_PORT
@@ -54,14 +66,14 @@ spec:
           value: ""
         - name: SMTP_PASS
           value: ""
-        # Twilio configuration (optional for development)
+        # Twilio configuration (from secrets in production)
         - name: TWILIO_ACCOUNT_SID
           value: ""
         - name: TWILIO_AUTH_TOKEN
           value: ""
         - name: TWILIO_PHONE_NUMBER
           value: ""
-        # VAPID configuration (optional for development)
+        # VAPID configuration (from secrets in production)
         - name: VAPID_PUBLIC_KEY
           value: ""
         - name: VAPID_PRIVATE_KEY

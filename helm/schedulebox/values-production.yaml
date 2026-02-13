@@ -37,11 +37,20 @@ notificationWorker:
   replicaCount: 2
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 256Mi
     limits:
       cpu: 500m
-      memory: 256Mi
+      memory: 512Mi
+
+# Use external-secrets-operator in production
+externalSecrets:
+  enabled: true
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: schedulebox-secret-store
+    kind: ClusterSecretStore
+  remoteKeyPrefix: "schedulebox/production"
 
 ingress:
   hosts:

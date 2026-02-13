@@ -1,6 +1,7 @@
 /**
  * RabbitMQ CloudEvent publisher
- * Fire-and-forget semantics for MVP (reliable delivery in Phase 7)
+ * Publishes events with retry logic and exponential backoff.
+ * Throws on failure so callers can handle event delivery errors.
  */
 
 import * as amqp from 'amqplib/callback_api.js';
@@ -13,6 +14,10 @@ let channel: amqp.Channel | null = null;
 
 const EXCHANGE_NAME = 'schedulebox.events';
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://schedulebox:schedulebox@localhost:5672';
+
+/** Publisher configuration */
+const PUBLISH_RETRY_ATTEMPTS = 3;
+const PUBLISH_RETRY_BASE_DELAY_MS = 500;
 
 /**
  * Get or create RabbitMQ channel
@@ -111,40 +116,103 @@ function deriveRoutingKey(eventType: string): string {
 }
 
 /**
- * Publish a CloudEvent to RabbitMQ
- * Fire-and-forget: logs errors but does not throw (MVP behavior)
+ * Sleep helper for retry backoff
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Validate CloudEvent envelope structure at runtime.
+ * Catches malformed events before they reach RabbitMQ.
+ */
+function validateCloudEvent<T>(event: CloudEvent<T>): string | null {
+  if (!event) return 'Event is null or undefined';
+  if (event.specversion !== '1.0') return `Invalid specversion: ${event.specversion}`;
+  if (!event.type || typeof event.type !== 'string') return 'Missing or invalid event type';
+  if (!event.source || typeof event.source !== 'string') return 'Missing or invalid event source';
+  if (!event.id || typeof event.id !== 'string') return 'Missing or invalid event id';
+  if (!event.time || typeof event.time !== 'string') return 'Missing or invalid event time';
+  if (event.data === undefined || event.data === null) return 'Missing event data payload';
+
+  // Warn if domain events are missing companyId for tenant isolation
+  const data = event.data as Record<string, unknown>;
+  if (typeof data === 'object' && !('companyId' in data)) {
+    console.warn(`[RabbitMQ] Event ${event.type} missing companyId in payload`);
+  }
+
+  return null;
+}
+
+/**
+ * Publish a CloudEvent to RabbitMQ with retry logic.
+ *
+ * Validates the event envelope, then retries up to PUBLISH_RETRY_ATTEMPTS
+ * times with exponential backoff. Throws on failure after all retries are
+ * exhausted so callers can handle event delivery errors.
  *
  * @param event CloudEvent to publish
+ * @throws Error if event is invalid or publishing fails after all retry attempts
  */
 export async function publishEvent<T>(event: CloudEvent<T>): Promise<void> {
-  try {
-    const ch = await getChannel();
-    const routingKey = deriveRoutingKey(event.type);
-
-    // Serialize event to JSON
-    const message = Buffer.from(JSON.stringify(event));
-
-    // Publish with CloudEvents headers
-    const published = ch.publish(EXCHANGE_NAME, routingKey, message, {
-      contentType: 'application/json',
-      persistent: true, // Survive broker restart
-      messageId: event.id,
-      timestamp: Date.now(),
-      headers: {
-        specversion: event.specversion,
-        type: event.type,
-        source: event.source,
-      },
-    });
-
-    if (!published) {
-      console.warn(`[RabbitMQ] Message buffered (flow control): ${event.type}`);
-    }
-  } catch (error) {
-    // Fire-and-forget: log but don't throw (MVP)
-    // In Phase 7, this will use persistent queue with retry
-    console.error('[RabbitMQ] Failed to publish event:', event.type, error);
+  // Validate event envelope before attempting to publish
+  const validationError = validateCloudEvent(event);
+  if (validationError) {
+    const msg = `[RabbitMQ] Invalid event rejected: ${validationError}`;
+    console.error(msg, event?.type);
+    throw new Error(msg);
   }
+
+  let lastError: Error | undefined;
+
+  for (let attempt = 1; attempt <= PUBLISH_RETRY_ATTEMPTS; attempt++) {
+    try {
+      const ch = await getChannel();
+      const routingKey = deriveRoutingKey(event.type);
+
+      // Serialize event to JSON
+      const message = Buffer.from(JSON.stringify(event));
+
+      // Publish with CloudEvents headers
+      const published = ch.publish(EXCHANGE_NAME, routingKey, message, {
+        contentType: 'application/json',
+        persistent: true, // Survive broker restart
+        messageId: event.id,
+        timestamp: Date.now(),
+        headers: {
+          specversion: event.specversion,
+          type: event.type,
+          source: event.source,
+        },
+      });
+
+      if (!published) {
+        console.warn(`[RabbitMQ] Message buffered (flow control): ${event.type}`);
+        // Channel buffer is full but message is queued internally — not a failure
+      }
+
+      return; // Success
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Reset channel so next attempt reconnects
+      channel = null;
+
+      if (attempt < PUBLISH_RETRY_ATTEMPTS) {
+        const delay = PUBLISH_RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+        console.warn(
+          `[RabbitMQ] Publish attempt ${attempt}/${PUBLISH_RETRY_ATTEMPTS} failed for ${event.type}, retrying in ${delay}ms:`,
+          error,
+        );
+        await sleep(delay);
+      }
+    }
+  }
+
+  // All retries exhausted — throw so caller can handle
+  const errorMsg = `[RabbitMQ] Failed to publish event ${event.type} after ${PUBLISH_RETRY_ATTEMPTS} attempts`;
+  console.error(errorMsg, lastError);
+  throw new Error(`${errorMsg}: ${lastError?.message}`);
 }
 
 /**

@@ -93,7 +93,7 @@ hpa:
   targetCPUUtilizationPercentage: 70
   scaleDownStabilizationWindowSeconds: 300
 
-# Secrets (provide values via --set or external-secrets-operator)
+# Secrets (provide values via --set for dev, use externalSecrets for production)
 secrets:
   databaseUrl: ""
   redisUrl: ""
@@ -101,3 +101,14 @@ secrets:
   jwtSecret: ""
   jwtRefreshSecret: ""
   sentryDsn: ""
+
+# External Secrets Operator integration (recommended for production)
+# When enabled, secrets are fetched from an external provider (AWS SSM, Vault, etc.)
+# instead of being passed through Helm values.
+externalSecrets:
+  enabled: false
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: ""
+    kind: ClusterSecretStore
+  remoteKeyPrefix: "schedulebox/production"

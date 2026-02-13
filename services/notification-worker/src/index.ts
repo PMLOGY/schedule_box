@@ -1,9 +1,10 @@
 /**
  * Notification Worker Entrypoint
- * Starts BullMQ workers, RabbitMQ consumers, and schedulers for notifications
+ * Starts BullMQ workers, RabbitMQ consumers, schedulers, and health server
  */
 
 import { type Worker } from 'bullmq';
+import type { Server } from 'node:http';
 import * as amqplib from 'amqplib';
 import type { Channel } from 'amqplib';
 import { createEmailWorker } from './jobs/email-job.js';
@@ -13,6 +14,7 @@ import { emailQueue, smsQueue, pushQueue, QUEUE_NAMES } from './queues.js';
 import { startConsumers } from './consumers/index.js';
 import { startSchedulers, type SchedulerResources } from './schedulers/index.js';
 import { config } from './config.js';
+import { startHealthServer, healthState } from './health.js';
 
 // Worker instances
 let emailWorker: Worker | null = null;
@@ -27,10 +29,16 @@ let rabbitChannel: Channel | null = null;
 // Scheduler resources
 let schedulerResources: SchedulerResources | null = null;
 
+// Health server
+let healthServer: Server | null = null;
+
 /**
  * Start all notification workers, consumers, and schedulers
  */
 async function startWorkers() {
+  // Start health server first so probes respond during startup
+  healthServer = startHealthServer();
+
   const redisConnection = {
     host: config.redis.host,
     port: config.redis.port,
@@ -48,6 +56,9 @@ async function startWorkers() {
 
   // 3. Start schedulers (reminder scheduler + automation engine)
   schedulerResources = await startSchedulers({ emailQueue, smsQueue, pushQueue }, redisConnection);
+
+  // Mark as ready for Kubernetes readiness probe
+  healthState.ready = true;
 
   console.log('[Notification Worker] Started successfully');
   console.log(`[Notification Worker] Queue names:`, QUEUE_NAMES);
@@ -98,6 +109,10 @@ async function startRabbitMQConsumers(): Promise<void> {
 async function shutdown(signal: string) {
   console.log(`[Notification Worker] Received ${signal}, shutting down gracefully...`);
 
+  // Mark as not alive so liveness probe fails and K8s stops sending traffic
+  healthState.alive = false;
+  healthState.ready = false;
+
   try {
     // 1. Close RabbitMQ channel and connection
     if (rabbitChannel) {
@@ -136,6 +151,12 @@ async function shutdown(signal: string) {
     await smsQueue.close();
     await pushQueue.close();
     console.log('[Notification Worker] All queues closed');
+
+    // 5. Close health server
+    if (healthServer) {
+      healthServer.close();
+      console.log('[Notification Worker] Health server closed');
+    }
 
     console.log('[Notification Worker] Shutdown complete');
     process.exit(0);
