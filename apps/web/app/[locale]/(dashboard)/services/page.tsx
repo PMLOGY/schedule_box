@@ -38,6 +38,7 @@ import {
   useCreateServiceCategory,
   type Service,
 } from '@/hooks/use-services-query';
+import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 interface ServiceFormData {
   name: string;
@@ -86,12 +87,7 @@ export default function ServicesPage() {
   const updateMutation = useUpdateService();
   const createCategoryMutation = useCreateServiceCategory();
 
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat('cs', {
-      style: 'currency',
-      currency: 'CZK',
-    }).format(parseFloat(price || '0'));
-  };
+  const { formatCurrency: formatPrice } = useCurrencyFormat();
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;

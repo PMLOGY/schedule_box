@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 interface PeriodStats {
   totalBookings: number;
@@ -42,15 +43,9 @@ interface KpiComparisonCardsProps {
 export function KpiComparisonCards({ overview }: KpiComparisonCardsProps) {
   const t = useTranslations('analytics.kpi');
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('cs', {
-      style: 'currency',
-      currency: 'CZK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const { formatCurrency: formatCurrencyRaw } = useCurrencyFormat();
+  const formatCurrency = (value: number) =>
+    formatCurrencyRaw(value, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
   // Format percentage change
   const formatPercentage = (value: number) => {

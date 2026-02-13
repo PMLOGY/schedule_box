@@ -42,6 +42,7 @@ import {
   type Coupon,
   type GiftCard,
 } from '@/hooks/use-marketing-query';
+import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 export default function MarketingPage() {
   const t = useTranslations('marketing');
@@ -97,12 +98,7 @@ export default function MarketingPage() {
     return format(new Date(dateStr), 'dd.MM.yyyy');
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('cs', {
-      style: 'currency',
-      currency: 'CZK',
-    }).format(value);
-  };
+  const { formatCurrency } = useCurrencyFormat();
 
   const formatDiscount = (type: string, value: number) => {
     if (type === 'percentage') return `${value} %`;

@@ -31,6 +31,7 @@ import {
   useUpdateCustomer,
   type Customer,
 } from '@/hooks/use-customers-query';
+import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 export default function CustomersPage() {
   const t = useTranslations('customers');
@@ -58,13 +59,7 @@ export default function CustomersPage() {
 
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
-
-  const formatCurrency = (value: string) => {
-    return new Intl.NumberFormat('cs', {
-      style: 'currency',
-      currency: 'CZK',
-    }).format(parseFloat(value || '0'));
-  };
+  const { formatCurrency } = useCurrencyFormat();
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;

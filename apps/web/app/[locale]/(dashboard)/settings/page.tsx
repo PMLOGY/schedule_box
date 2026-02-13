@@ -9,6 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import {
   useCompanySettingsQuery,
@@ -18,6 +25,39 @@ import {
   type CompanyUpdateData,
   type WorkingHourInput,
 } from '@/hooks/use-settings-query';
+
+// Currency options relevant for CZ/SK market
+const CURRENCY_OPTIONS = [
+  { value: 'CZK', label: 'CZK — Koruna česká' },
+  { value: 'EUR', label: 'EUR — Euro' },
+  { value: 'USD', label: 'USD — US Dollar' },
+  { value: 'GBP', label: 'GBP — British Pound' },
+  { value: 'PLN', label: 'PLN — Złoty' },
+  { value: 'HUF', label: 'HUF — Forint' },
+  { value: 'CHF', label: 'CHF — Swiss Franc' },
+];
+
+// Timezone options relevant for European market
+const TIMEZONE_OPTIONS = [
+  { value: 'Europe/Prague', label: 'Europe/Prague (CET/CEST)' },
+  { value: 'Europe/Bratislava', label: 'Europe/Bratislava (CET/CEST)' },
+  { value: 'Europe/Berlin', label: 'Europe/Berlin (CET/CEST)' },
+  { value: 'Europe/Vienna', label: 'Europe/Vienna (CET/CEST)' },
+  { value: 'Europe/Warsaw', label: 'Europe/Warsaw (CET/CEST)' },
+  { value: 'Europe/Budapest', label: 'Europe/Budapest (CET/CEST)' },
+  { value: 'Europe/Zurich', label: 'Europe/Zurich (CET/CEST)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT/BST)' },
+  { value: 'Europe/Paris', label: 'Europe/Paris (CET/CEST)' },
+  { value: 'Europe/Amsterdam', label: 'Europe/Amsterdam (CET/CEST)' },
+  { value: 'Europe/Rome', label: 'Europe/Rome (CET/CEST)' },
+  { value: 'Europe/Madrid', label: 'Europe/Madrid (CET/CEST)' },
+  { value: 'Europe/Athens', label: 'Europe/Athens (EET/EEST)' },
+  { value: 'Europe/Helsinki', label: 'Europe/Helsinki (EET/EEST)' },
+  { value: 'Europe/Bucharest', label: 'Europe/Bucharest (EET/EEST)' },
+  { value: 'US/Eastern', label: 'US/Eastern (EST/EDT)' },
+  { value: 'US/Central', label: 'US/Central (CST/CDT)' },
+  { value: 'US/Pacific', label: 'US/Pacific (PST/PDT)' },
+];
 
 // ============================================================================
 // COMPANY PROFILE FORM
@@ -189,23 +229,40 @@ function CompanyProfileCard() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company-currency">{t('fields.currency')}</Label>
-                <Input
-                  id="company-currency"
+                <Label>{t('fields.currency')}</Label>
+                <Select
                   value={form.currency || ''}
-                  onChange={(e) => updateField('currency', e.target.value)}
-                  maxLength={3}
-                  placeholder="CZK"
-                />
+                  onValueChange={(value) => updateField('currency', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('fields.currency')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company-timezone">{t('fields.timezone')}</Label>
-                <Input
-                  id="company-timezone"
+                <Label>{t('fields.timezone')}</Label>
+                <Select
                   value={form.timezone || ''}
-                  onChange={(e) => updateField('timezone', e.target.value)}
-                  placeholder="Europe/Prague"
-                />
+                  onValueChange={(value) => updateField('timezone', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('fields.timezone')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMEZONE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="mt-6 flex gap-2 justify-end">
