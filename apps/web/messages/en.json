@@ -95,6 +95,8 @@
     "logs": "Logs",
     "builder": "Builder",
     "help": "Help",
+    "myAccount": "My Account",
+    "profile": "Profile",
     "logout": "Logout"
   },
   "dashboard": {
@@ -535,6 +537,38 @@
     "saveError": "Failed to save settings",
     "saving": "Saving...",
     "currencyWarning": "Changing the currency only affects how values are displayed. Service prices and existing payments will not be converted automatically."
+  },
+  "profile": {
+    "title": "User Profile",
+    "description": "Manage your personal information and account security",
+    "backToSettings": "Back to settings",
+    "personalInfo": "Personal Information",
+    "personalInfoDescription": "Edit your name, phone, and other contact details",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "memberSince": "Member Since"
+    },
+    "emailReadonly": "Email cannot be changed",
+    "saveSuccess": "Profile saved successfully",
+    "saveError": "Failed to save profile",
+    "saving": "Saving...",
+    "security": "Security",
+    "securityDescription": "Change your password and manage two-factor authentication",
+    "changePassword": "Change Password",
+    "changePasswordDescription": "Enter your current password and a new password to change it",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "passwordMismatch": "Passwords do not match",
+    "passwordChangeSuccess": "Password changed successfully. You will be logged out.",
+    "passwordChangeError": "Failed to change password",
+    "changingPassword": "Changing password...",
+    "mfaStatus": "Two-Factor Authentication",
+    "mfaEnabled": "Enabled",
+    "mfaDisabled": "Disabled"
   },
   "notifications": {
     "title": "Notification History",

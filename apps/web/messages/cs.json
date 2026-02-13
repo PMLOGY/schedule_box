@@ -95,6 +95,8 @@
     "logs": "Protokoly",
     "builder": "Editor",
     "help": "Nápověda",
+    "myAccount": "Můj účet",
+    "profile": "Profil",
     "logout": "Odhlásit se"
   },
   "dashboard": {
@@ -535,6 +537,38 @@
     "saveError": "Nepodařilo se uložit nastavení",
     "saving": "Ukládání...",
     "currencyWarning": "Změna měny ovlivní pouze zobrazení. Ceny služeb a existující platby se automaticky nepřepočítají."
+  },
+  "profile": {
+    "title": "Profil uživatele",
+    "description": "Správa osobních údajů a zabezpečení účtu",
+    "backToSettings": "Zpět na nastavení",
+    "personalInfo": "Osobní údaje",
+    "personalInfoDescription": "Upravte své jméno, telefon a další kontaktní informace",
+    "fields": {
+      "name": "Jméno",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "role": "Role",
+      "memberSince": "Registrován od"
+    },
+    "emailReadonly": "E-mail nelze změnit",
+    "saveSuccess": "Profil úspěšně uložen",
+    "saveError": "Nepodařilo se uložit profil",
+    "saving": "Ukládání...",
+    "security": "Zabezpečení",
+    "securityDescription": "Změna hesla a nastavení dvoufaktorového ověření",
+    "changePassword": "Změnit heslo",
+    "changePasswordDescription": "Zadejte aktuální heslo a nové heslo pro změnu",
+    "currentPassword": "Aktuální heslo",
+    "newPassword": "Nové heslo",
+    "confirmPassword": "Potvrzení nového hesla",
+    "passwordMismatch": "Hesla se neshodují",
+    "passwordChangeSuccess": "Heslo úspěšně změněno. Budete odhlášeni.",
+    "passwordChangeError": "Nepodařilo se změnit heslo",
+    "changingPassword": "Měním heslo...",
+    "mfaStatus": "Dvoufaktorové ověření",
+    "mfaEnabled": "Aktivní",
+    "mfaDisabled": "Neaktivní"
   },
   "notifications": {
     "title": "Historie notifikací",
