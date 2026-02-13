@@ -5,6 +5,7 @@
 
 import * as amqp from 'amqplib/callback_api.js';
 import type { CloudEvent } from './types';
+import { validateCloudEvent } from './publisher';
 
 const EXCHANGE_NAME = 'schedulebox.events';
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://schedulebox:schedulebox@localhost:5672';
@@ -241,6 +242,17 @@ export async function consumeMessages<T>(
                       let event: CloudEvent<T>;
                       try {
                         event = JSON.parse(msg.content.toString()) as CloudEvent<T>;
+
+                        // Validate CloudEvent envelope
+                        const validationError = validateCloudEvent(event);
+                        if (validationError) {
+                          console.error(
+                            `[RabbitMQ Consumer] Invalid CloudEvent in "${options.queueName}": ${validationError}, sending to DLQ`,
+                          );
+                          sendToDlx(channel, msg, `invalid_cloudevent: ${validationError}`, 0);
+                          channel.ack(msg);
+                          return;
+                        }
                       } catch (parseError) {
                         // Poison pill — unparseable message, send directly to DLX
                         console.error(
@@ -273,7 +285,7 @@ export async function consumeMessages<T>(
                             [RETRY_COUNT_HEADER]: retryCount + 1,
                           };
 
-                          channel.publish('', queueInfo.queue, msg.content, {
+                          channel.publish(exchangeName, msg.fields.routingKey, msg.content, {
                             ...msg.properties,
                             headers: updatedHeaders,
                           });

@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/followup", tags=["followup"])
 
+# In-memory fallback counters when Redis is unavailable
+# Format: {company_id: count}
+_fallback_counts: dict[int, int] = {}
+
 
 async def _check_rate_limit(company_id: int) -> bool:
     """
@@ -38,8 +42,11 @@ async def _check_rate_limit(company_id: int) -> bool:
     try:
         client = await get_redis_client()
         if client is None:
-            # Redis unavailable — fail open (allow request)
-            logger.warning("Redis unavailable for rate limiting, allowing request")
+            # Redis unavailable — use in-memory fallback (degraded but not open)
+            logger.warning("Redis unavailable for rate limiting, using in-memory fallback")
+            _fallback_counts[company_id] = _fallback_counts.get(company_id, 0) + 1
+            if _fallback_counts[company_id] > settings.MAX_FOLLOWUP_PER_DAY:
+                return False
             return True
 
         key = f"ratelimit:followup:{company_id}"
@@ -54,7 +61,11 @@ async def _check_rate_limit(company_id: int) -> bool:
 
         return True
     except Exception as e:
-        logger.warning(f"Rate limit check failed: {e}, allowing request")
+        # Redis error — use in-memory fallback (degraded but not open)
+        logger.warning(f"Rate limit check failed: {e}, using in-memory fallback")
+        _fallback_counts[company_id] = _fallback_counts.get(company_id, 0) + 1
+        if _fallback_counts[company_id] > settings.MAX_FOLLOWUP_PER_DAY:
+            return False
         return True
 
 

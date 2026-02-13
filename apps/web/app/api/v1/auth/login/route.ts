@@ -42,8 +42,9 @@ export async function POST(req: NextRequest) {
     const isLocked = await redis.get(lockoutKey);
     if (isLocked) {
       const ttl = await redis.ttl(lockoutKey);
+      const minutes = ttl > 0 ? Math.ceil(ttl / 60) : 15; // Fallback to full lockout if TTL unavailable
       throw new UnauthorizedError(
-        `Account temporarily locked due to too many failed attempts. Try again in ${Math.ceil(ttl / 60)} minutes.`,
+        `Account temporarily locked due to too many failed attempts. Try again in ${minutes} minutes.`,
       );
     }
 

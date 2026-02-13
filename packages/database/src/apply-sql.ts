@@ -112,14 +112,20 @@ async function applySql(): Promise<void> {
       console.log(`  ${sqlFile.name}`);
       console.log(`   ${sqlFile.description}`);
 
-      // Read SQL file
-      const sqlContent = readFileSync(sqlFile.path, 'utf-8');
+      try {
+        // Read SQL file
+        const sqlContent = readFileSync(sqlFile.path, 'utf-8');
 
-      // Execute SQL within the transaction — any failure rolls back everything
-      await tx.unsafe(sqlContent);
+        // Execute SQL within the transaction — any failure rolls back everything
+        await tx.unsafe(sqlContent);
 
-      console.log(`   Applied successfully\n`);
-      successCount++;
+        console.log(`   Applied successfully\n`);
+        successCount++;
+      } catch (error) {
+        console.error(`   FAILED: ${sqlFile.name} (${sqlFile.path})`);
+        console.error(`   Error: ${error instanceof Error ? error.message : String(error)}\n`);
+        throw error; // Re-throw to trigger transaction rollback
+      }
     }
 
     // Summary (only reached if all succeeded — otherwise transaction is rolled back)

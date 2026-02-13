@@ -126,7 +126,7 @@ function sleep(ms: number): Promise<void> {
  * Validate CloudEvent envelope structure at runtime.
  * Catches malformed events before they reach RabbitMQ.
  */
-function validateCloudEvent<T>(event: CloudEvent<T>): string | null {
+export function validateCloudEvent<T>(event: CloudEvent<T>): string | null {
   if (!event) return 'Event is null or undefined';
   if (event.specversion !== '1.0') return `Invalid specversion: ${event.specversion}`;
   if (!event.type || typeof event.type !== 'string') return 'Missing or invalid event type';

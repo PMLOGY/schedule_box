@@ -7,7 +7,13 @@
 export type { CloudEvent, EventMetadata, DomainEvent } from './types';
 
 // Publisher and utilities
-export { publishEvent, createCloudEvent, closeConnection, createEventPublisher } from './publisher';
+export {
+  publishEvent,
+  createCloudEvent,
+  closeConnection,
+  createEventPublisher,
+  validateCloudEvent,
+} from './publisher';
 
 // Consumer helper
 export type { ConsumerConnection, ConsumeOptions } from './consumer';
