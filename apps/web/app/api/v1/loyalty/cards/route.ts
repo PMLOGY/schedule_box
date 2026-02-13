@@ -6,7 +6,7 @@
 
 import { eq, and } from 'drizzle-orm';
 import { db, loyaltyCards, loyaltyPrograms, loyaltyTiers, customers } from '@schedulebox/database';
-import { NotFoundError } from '@schedulebox/shared';
+import { NotFoundError, InternalError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { findCompanyId } from '@/lib/db/tenant-scope';
@@ -14,6 +14,8 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { createdResponse, paginatedResponse } from '@/lib/utils/response';
 import { loyaltyCardCreateSchema, loyaltyCardListQuerySchema } from '@schedulebox/shared';
 import crypto from 'crypto';
+
+const MAX_CARD_NUMBER_RETRIES = 10;
 
 /**
  * Generate a unique card number in format SB-XXXX-XXXX-XXXX
@@ -185,44 +187,68 @@ export const POST = createRouteHandler({
       .orderBy(loyaltyTiers.minPoints)
       .limit(1);
 
-    // Generate unique card number
-    let cardNumber = generateCardNumber();
-    // Ensure uniqueness (very unlikely collision, but check anyway)
-    let attempts = 0;
-    while (attempts < 5) {
-      const [existing] = await db
-        .select({ id: loyaltyCards.id })
-        .from(loyaltyCards)
-        .where(eq(loyaltyCards.cardNumber, cardNumber))
-        .limit(1);
-
-      if (!existing) break;
-      cardNumber = generateCardNumber();
-      attempts++;
+    // Generate unique card number with retry on UNIQUE constraint violation
+    let card:
+      | {
+          id: number;
+          uuid: string;
+          cardNumber: string;
+          pointsBalance: number | null;
+          stampsBalance: number | null;
+          isActive: boolean | null;
+          createdAt: Date;
+          updatedAt: Date;
+          customerId: number;
+          programId: number;
+          tierId: number | null;
+          applePassUrl: string | null;
+          googlePassUrl: string | null;
+        }
+      | undefined;
+    for (let attempt = 0; attempt < MAX_CARD_NUMBER_RETRIES; attempt++) {
+      const cardNumber = generateCardNumber();
+      try {
+        const [inserted] = await db
+          .insert(loyaltyCards)
+          .values({
+            programId: program.id,
+            customerId: customer.id,
+            cardNumber,
+            pointsBalance: 0,
+            stampsBalance: 0,
+            tierId: defaultTier?.id ?? null,
+            isActive: true,
+          })
+          .returning({
+            id: loyaltyCards.id,
+            uuid: loyaltyCards.uuid,
+            cardNumber: loyaltyCards.cardNumber,
+            pointsBalance: loyaltyCards.pointsBalance,
+            stampsBalance: loyaltyCards.stampsBalance,
+            isActive: loyaltyCards.isActive,
+            createdAt: loyaltyCards.createdAt,
+            updatedAt: loyaltyCards.updatedAt,
+            customerId: loyaltyCards.customerId,
+            programId: loyaltyCards.programId,
+            tierId: loyaltyCards.tierId,
+            applePassUrl: loyaltyCards.applePassUrl,
+            googlePassUrl: loyaltyCards.googlePassUrl,
+          });
+        card = inserted;
+        break;
+      } catch (error: unknown) {
+        // Retry only on unique constraint violation (PostgreSQL error code 23505)
+        const pgError = error as { code?: string };
+        if (pgError.code === '23505' && attempt < MAX_CARD_NUMBER_RETRIES - 1) {
+          continue;
+        }
+        throw error;
+      }
     }
 
-    // Create card
-    const [card] = await db
-      .insert(loyaltyCards)
-      .values({
-        programId: program.id,
-        customerId: customer.id,
-        cardNumber,
-        pointsBalance: 0,
-        stampsBalance: 0,
-        tierId: defaultTier?.id ?? null,
-        isActive: true,
-      })
-      .returning({
-        id: loyaltyCards.id,
-        uuid: loyaltyCards.uuid,
-        cardNumber: loyaltyCards.cardNumber,
-        pointsBalance: loyaltyCards.pointsBalance,
-        stampsBalance: loyaltyCards.stampsBalance,
-        isActive: loyaltyCards.isActive,
-        createdAt: loyaltyCards.createdAt,
-        updatedAt: loyaltyCards.updatedAt,
-      });
+    if (!card) {
+      throw new InternalError('Failed to generate unique card number after maximum retries');
+    }
 
     // TODO: Publish LoyaltyCardCreatedEvent via RabbitMQ
     // Event publishing added in Phase 9 Plan 5

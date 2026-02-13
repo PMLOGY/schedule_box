@@ -10,6 +10,7 @@ import { type z } from 'zod';
 import { authenticateRequest } from './auth';
 import { checkPermissions } from './rbac';
 import { validateBody, validateParams } from './validate';
+import { checkRateLimit, type RateLimitConfig, RATE_LIMITS } from './rate-limit';
 import { handleRouteError } from '../utils/errors';
 import { type JWTPayload } from '../auth/jwt';
 
@@ -52,6 +53,18 @@ export interface RouteHandlerOptions<TBody = undefined, TParams = undefined> {
   requiredPermissions?: string[];
 
   /**
+   * Rate limit configuration for this route
+   * Defaults to RATE_LIMITS.API for authenticated routes, RATE_LIMITS.PUBLIC for unauthenticated
+   * Set to false to disable rate limiting
+   */
+  rateLimit?: RateLimitConfig | false;
+
+  /**
+   * Custom rate limit key prefix (e.g., 'auth:login' for endpoint-specific limits)
+   */
+  rateLimitKeyPrefix?: string;
+
+  /**
    * Route handler implementation
    * Receives validated context and returns NextResponse
    */
@@ -90,6 +103,8 @@ export function createRouteHandler<TBody = undefined, TParams = undefined>(
     paramsSchema,
     requiresAuth = true,
     requiredPermissions = [],
+    rateLimit,
+    rateLimitKeyPrefix,
     handler,
   } = options;
 
@@ -101,6 +116,13 @@ export function createRouteHandler<TBody = undefined, TParams = undefined>(
       let user: JWTPayload | undefined;
       let body: TBody | undefined;
       let params: TParams | undefined;
+
+      // 0. Rate limiting (before any expensive operations)
+      if (rateLimit !== false) {
+        const config = rateLimit ?? (requiresAuth ? RATE_LIMITS.API : RATE_LIMITS.PUBLIC);
+        const prefix = rateLimitKeyPrefix ?? (requiresAuth ? 'api' : 'public');
+        await checkRateLimit(req, config, prefix);
+      }
 
       // 1. Authentication
       if (requiresAuth) {

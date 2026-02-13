@@ -75,7 +75,14 @@ const SQL_FILES: SqlFile[] = [
     description: 'Auto-log changes to critical tables in audit_logs',
   },
 
-  // 3. RLS policies (must come after helper functions)
+  // 3. Composite indexes for query performance
+  {
+    name: 'Composite Indexes',
+    path: join(__dirname, 'functions', 'composite-indexes.sql'),
+    description: 'Composite indexes for common query patterns (IF NOT EXISTS)',
+  },
+
+  // 4. RLS policies (must come after helper functions)
   {
     name: 'Row Level Security Policies',
     path: join(__dirname, 'rls', 'policies.sql'),
@@ -84,50 +91,36 @@ const SQL_FILES: SqlFile[] = [
 ];
 
 /**
- * Apply all SQL files to the database
+ * Apply all SQL files to the database within a single transaction.
+ * If any file fails, the entire set of changes is rolled back,
+ * preventing a partially-configured database.
  */
 async function applySql(): Promise<void> {
-  console.log('🚀 Applying SQL files to database...\n');
+  console.log('🚀 Applying SQL files to database (in single transaction)...\n');
 
-  let successCount = 0;
-  let failureCount = 0;
+  await migrationClient.begin(async (tx) => {
+    let successCount = 0;
 
-  for (const sqlFile of SQL_FILES) {
-    try {
+    for (const sqlFile of SQL_FILES) {
       console.log(`📄 ${sqlFile.name}`);
       console.log(`   ${sqlFile.description}`);
 
       // Read SQL file
-      const sql = readFileSync(sqlFile.path, 'utf-8');
+      const sqlContent = readFileSync(sqlFile.path, 'utf-8');
 
-      // Execute SQL (using unsafe for raw SQL execution)
-      await migrationClient.unsafe(sql);
+      // Execute SQL within the transaction — any failure rolls back everything
+      await tx.unsafe(sqlContent);
 
       console.log(`   ✅ Applied successfully\n`);
       successCount++;
-    } catch (error) {
-      console.error(
-        `   ❌ Failed to apply: ${error instanceof Error ? error.message : String(error)}\n`,
-      );
-      failureCount++;
     }
-  }
 
-  // Summary
-  console.log('═'.repeat(60));
-  console.log(`✅ Success: ${successCount}/${SQL_FILES.length}`);
-  if (failureCount > 0) {
-    console.log(`❌ Failures: ${failureCount}/${SQL_FILES.length}`);
-  }
-  console.log('═'.repeat(60));
-
-  // Exit with error code if any failures
-  if (failureCount > 0) {
-    console.error('\n⚠️  Some SQL files failed to apply. Check errors above.');
-    process.exit(1);
-  }
-
-  console.log('\n🎉 All SQL files applied successfully!');
+    // Summary (only reached if all succeeded — otherwise transaction is rolled back)
+    console.log('═'.repeat(60));
+    console.log(`✅ Success: ${successCount}/${SQL_FILES.length} (committed)`);
+    console.log('═'.repeat(60));
+    console.log('\n🎉 All SQL files applied successfully!');
+  });
 }
 
 // Run the script

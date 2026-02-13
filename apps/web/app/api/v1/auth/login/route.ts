@@ -20,14 +20,32 @@ import { generateTokenPair } from '@/lib/auth/jwt';
 import { redis } from '@/lib/redis/client';
 import { loginSchema } from '@/validations/auth';
 import { validateBody } from '@/lib/middleware/validate';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/middleware/rate-limit';
 import { handleRouteError } from '@/lib/utils/errors';
 import { successResponse } from '@/lib/utils/response';
 import { UnauthorizedError } from '@schedulebox/shared';
 
+const LOGIN_LOCKOUT_THRESHOLD = 5; // Lock after 5 failed attempts
+const LOGIN_LOCKOUT_SECONDS = 900; // 15-minute lockout
+const MFA_MAX_ATTEMPTS = 3; // Max MFA attempts per token
+
 export async function POST(req: NextRequest) {
   try {
+    // 0. Rate limit login attempts (10 per 15 minutes per IP)
+    await checkRateLimit(req, RATE_LIMITS.AUTH_SENSITIVE, 'auth:login');
+
     // 1. Validate request body
     const input = await validateBody(loginSchema, req);
+
+    // 1.5. Check account lockout before expensive password verification
+    const lockoutKey = `login_lockout:${input.email}`;
+    const isLocked = await redis.get(lockoutKey);
+    if (isLocked) {
+      const ttl = await redis.ttl(lockoutKey);
+      throw new UnauthorizedError(
+        `Account temporarily locked due to too many failed attempts. Try again in ${Math.ceil(ttl / 60)} minutes.`,
+      );
+    }
 
     // 2. Find user with role name and company UUID (JOIN roles and companies)
     const [userRecord] = await db
@@ -69,9 +87,24 @@ export async function POST(req: NextRequest) {
     // 4. Verify password
     const isValidPassword = await verifyPassword(userRecord.passwordHash, input.password);
     if (!isValidPassword) {
-      // TODO: Increment failed_login_count, lock account after 5 failures
+      // Increment failed login counter and lock after threshold
+      const failKey = `login_failures:${input.email}`;
+      const failures = await redis.incr(failKey);
+      if (failures === 1) {
+        await redis.expire(failKey, LOGIN_LOCKOUT_SECONDS);
+      }
+      if (failures >= LOGIN_LOCKOUT_THRESHOLD) {
+        await redis.setex(lockoutKey, LOGIN_LOCKOUT_SECONDS, '1');
+        await redis.del(failKey);
+        throw new UnauthorizedError(
+          'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
+        );
+      }
       throw new UnauthorizedError('Invalid email or password');
     }
+
+    // Clear failed login counter on successful password verification
+    await redis.del(`login_failures:${input.email}`);
 
     // 5. Handle MFA flow
     if (userRecord.mfaEnabled) {
@@ -86,11 +119,24 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // MFA code provided → verify TOTP
-      // NOTE: Plan 03-05 will create lib/auth/mfa.ts with verifyMFACode() helper.
-      // For now, inline otplib usage is correct and self-contained.
+      // MFA code provided → verify TOTP with attempt limiting
       if (!userRecord.mfaSecret) {
         throw new UnauthorizedError('MFA is enabled but secret is missing');
+      }
+
+      // Check MFA attempt counter (max 3 per token)
+      const mfaAttemptKey = `mfa_attempts:${input.mfa_token}`;
+      const mfaAttempts = await redis.incr(mfaAttemptKey);
+      if (mfaAttempts === 1) {
+        await redis.expire(mfaAttemptKey, 300); // Same TTL as MFA token
+      }
+      if (mfaAttempts > MFA_MAX_ATTEMPTS) {
+        // Expire the MFA token to force re-authentication
+        if (input.mfa_token) {
+          await redis.del(`mfa:${input.mfa_token}`);
+        }
+        await redis.del(mfaAttemptKey);
+        throw new UnauthorizedError('Too many MFA attempts. Please log in again.');
       }
 
       const isValidMFA = await verifyTOTP({
@@ -101,6 +147,9 @@ export async function POST(req: NextRequest) {
       if (!isValidMFA) {
         throw new UnauthorizedError('Invalid MFA code');
       }
+
+      // Clean up MFA attempt counter on success
+      await redis.del(mfaAttemptKey);
     }
 
     // 6. Generate JWT token pair

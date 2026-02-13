@@ -58,11 +58,12 @@ export const GET = createRouteHandler({
       baseConditions.push(eq(payments.gateway, gateway));
     }
     if (date_from) {
-      baseConditions.push(gte(payments.createdAt, new Date(date_from)));
+      // Use UTC to match TIMESTAMPTZ stored in the database
+      baseConditions.push(gte(payments.createdAt, new Date(date_from + 'T00:00:00.000Z')));
     }
     if (date_to) {
-      const endOfDay = new Date(date_to);
-      endOfDay.setHours(23, 59, 59, 999);
+      // Use UTC to match TIMESTAMPTZ stored in the database
+      const endOfDay = new Date(date_to + 'T23:59:59.999Z');
       baseConditions.push(lte(payments.createdAt, endOfDay));
     }
     if (booking_id) {

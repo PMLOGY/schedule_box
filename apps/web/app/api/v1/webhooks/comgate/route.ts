@@ -173,8 +173,13 @@ export async function POST(req: NextRequest) {
     // 11. Return 200 immediately (Comgate expects response within 5 seconds)
     return NextResponse.json({ message: 'Webhook processed' }, { status: 200 });
   } catch (error) {
-    // Log error but return 200 to prevent Comgate retry loops
-    console.error('Error processing Comgate webhook:', error);
-    return NextResponse.json({ message: 'Internal error' }, { status: 200 });
+    // Return 500 so Comgate will retry the webhook delivery.
+    // Previously returned 200 which silently swallowed failures —
+    // the customer would never get their payment status updated.
+    console.error(
+      '[Comgate Webhook] Processing error:',
+      error instanceof Error ? error.message : error,
+    );
+    return NextResponse.json({ message: 'Internal error' }, { status: 500 });
   }
 }

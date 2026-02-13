@@ -43,6 +43,7 @@ export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
   mfa_code: z.string().length(6).optional(),
+  mfa_token: z.string().min(1).optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
