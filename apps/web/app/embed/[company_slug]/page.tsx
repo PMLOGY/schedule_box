@@ -10,14 +10,16 @@ import { eq, and, isNull } from 'drizzle-orm';
 import { WidgetContent } from './widget-content';
 
 interface EmbedPageProps {
-  params: { company_slug: string };
-  searchParams: { theme?: string; locale?: string };
+  params: Promise<{ company_slug: string }>;
+  searchParams: Promise<{ theme?: string; locale?: string; parent_origin?: string }>;
 }
 
 export default async function EmbedPage({ params, searchParams }: EmbedPageProps) {
-  const { company_slug } = params;
-  const theme = searchParams.theme || 'light';
-  const locale = searchParams.locale || 'cs';
+  const { company_slug } = await params;
+  const resolvedSearchParams = await searchParams;
+  const theme = resolvedSearchParams.theme || 'light';
+  const locale = resolvedSearchParams.locale || 'cs';
+  const parentOrigin = resolvedSearchParams.parent_origin || null;
 
   // Fetch company
   const [company] = await db
@@ -104,6 +106,7 @@ export default async function EmbedPage({ params, searchParams }: EmbedPageProps
       }))}
       locale={locale}
       theme={theme}
+      parentOrigin={parentOrigin}
     />
   );
 }

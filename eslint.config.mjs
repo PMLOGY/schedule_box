@@ -98,6 +98,7 @@ export default tseslint.config(
       '_*.bat',
       '_*.js',
       'nul',
+      '**/next-env.d.ts',
     ],
   },
 );

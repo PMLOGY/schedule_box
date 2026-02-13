@@ -32,20 +32,50 @@ interface WidgetContentProps {
   services: Service[];
   locale: string;
   theme: string;
+  parentOrigin: string | null;
 }
 
-export function WidgetContent({ company, services, locale }: WidgetContentProps) {
+export function WidgetContent({ company, services, locale, parentOrigin }: WidgetContentProps) {
+  // Resolve the target origin for postMessage:
+  // 1. Prefer explicit parent_origin passed via query param from embed.js
+  // 2. Fall back to document.referrer origin
+  // 3. Never fall back to '*' — refuse to send if origin is unknown
+  const resolveTargetOrigin = (): string | null => {
+    if (parentOrigin) {
+      try {
+        // Validate it's a proper origin (protocol + host)
+        const url = new URL(parentOrigin);
+        return url.origin;
+      } catch {
+        // Invalid URL, ignore
+      }
+    }
+    if (typeof document !== 'undefined' && document.referrer) {
+      try {
+        const url = new URL(document.referrer);
+        return url.origin;
+      } catch {
+        // Invalid referrer, ignore
+      }
+    }
+    return null;
+  };
+
+  const targetOrigin = resolveTargetOrigin();
+
+  const postMessageToParent = (data: Record<string, unknown>) => {
+    if (!targetOrigin) return;
+    window.parent.postMessage(data, targetOrigin);
+  };
+
   useEffect(() => {
     // Send resize event after initial render
     const sendResize = () => {
       const height = document.body.scrollHeight;
-      window.parent.postMessage(
-        {
-          type: 'RESIZE',
-          height,
-        },
-        '*',
-      );
+      postMessageToParent({
+        type: 'RESIZE',
+        height,
+      });
     };
 
     // Send initial resize
@@ -62,17 +92,14 @@ export function WidgetContent({ company, services, locale }: WidgetContentProps)
 
   const handleBookService = (service: Service) => {
     // Send service selection event to parent
-    window.parent.postMessage(
-      {
-        type: 'SERVICE_SELECTED',
-        service: {
-          uuid: service.uuid,
-          name: service.name,
-          price: service.price,
-        },
+    postMessageToParent({
+      type: 'SERVICE_SELECTED',
+      service: {
+        uuid: service.uuid,
+        name: service.name,
+        price: service.price,
       },
-      '*',
-    );
+    });
 
     // Open full booking page in new tab
     const bookingUrl = `/${locale}/${company.slug}?service=${service.uuid}`;

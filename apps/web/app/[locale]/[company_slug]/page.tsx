@@ -19,10 +19,10 @@ import Link from 'next/link';
 // ============================================================================
 
 interface PageProps {
-  params: {
+  params: Promise<{
     locale: string;
     company_slug: string;
-  };
+  }>;
 }
 
 // ============================================================================
@@ -30,7 +30,7 @@ interface PageProps {
 // ============================================================================
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const slug = params.company_slug;
+  const { company_slug: slug, locale } = await params;
 
   // Fetch company data for SEO
   const company = await db.query.companies.findFirst({
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         listing?.images?.[0] || company.logoUrl
           ? [listing?.images?.[0] || company.logoUrl].filter((img): img is string => !!img)
           : [],
-      url: `https://schedulebox.cz/${params.locale}/${slug}`,
+      url: `https://schedulebox.cz/${locale}/${slug}`,
     },
     alternates: {
       canonical: `https://schedulebox.cz/${slug}`,
@@ -91,7 +91,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // ============================================================================
 
 export default async function PublicBookingPage({ params }: PageProps) {
-  const slug = params.company_slug;
+  const { company_slug: slug, locale } = await params;
 
   // Fetch company data
   const company = await db.query.companies.findFirst({
@@ -268,9 +268,7 @@ export default async function PublicBookingPage({ params }: PageProps) {
                       </span>
                     </div>
                   </div>
-                  <Link
-                    href={`/${params.locale}/bookings/new?service=${service.uuid}&company=${slug}`}
-                  >
+                  <Link href={`/${locale}/bookings/new?service=${service.uuid}&company=${slug}`}>
                     <Button className="w-full">Rezervovat</Button>
                   </Link>
                 </CardContent>

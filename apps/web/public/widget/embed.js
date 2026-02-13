@@ -103,7 +103,7 @@
 
       // Create iframe
       const iframe = document.createElement('iframe');
-      const iframeSrc = `${baseUrl}/embed/${companySlug}?theme=${encodeURIComponent(theme)}&locale=${encodeURIComponent(locale)}`;
+      const iframeSrc = `${baseUrl}/embed/${companySlug}?theme=${encodeURIComponent(theme)}&locale=${encodeURIComponent(locale)}&parent_origin=${encodeURIComponent(window.location.origin)}`;
       iframe.src = iframeSrc;
       iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
       iframe.setAttribute('allow', 'payment');

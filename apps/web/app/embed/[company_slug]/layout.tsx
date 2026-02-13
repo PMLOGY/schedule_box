@@ -18,15 +18,16 @@ export const metadata: Metadata = {
 
 interface EmbedLayoutProps {
   children: React.ReactNode;
-  params: { company_slug: string };
-  searchParams: { theme?: string; locale?: string };
+  params: Promise<{ company_slug: string }>;
+  searchParams: Promise<{ theme?: string; locale?: string }>;
 }
 
-export default function EmbedLayout({ children, searchParams }: EmbedLayoutProps) {
-  const theme = searchParams.theme || 'light';
+export default async function EmbedLayout({ children, searchParams }: EmbedLayoutProps) {
+  const resolvedSearchParams = await searchParams;
+  const theme = resolvedSearchParams.theme || 'light';
 
   return (
-    <html lang={searchParams.locale || 'cs'} className={theme === 'dark' ? 'dark' : ''}>
+    <html lang={resolvedSearchParams.locale || 'cs'} className={theme === 'dark' ? 'dark' : ''}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
