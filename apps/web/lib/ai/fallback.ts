@@ -90,15 +90,69 @@ export function getUpsellFallback(_request: UpsellRequest): UpsellResponse {
 
 /**
  * Fallback for dynamic pricing.
- * Returns midpoint of min/max range (static pricing behavior).
+ * Simulates rule-based dynamic pricing when the AI service is unavailable:
+ * - High utilization → higher price (supply/demand)
+ * - Peak hours (10-12, 15-17) → higher price
+ * - Weekend (Sat) → higher price, off-peak (Mon-Wed) → lower price
+ * - Clamped to the [price_min, price_max] range
  */
 export function getDynamicPricingFallback(request: DynamicPricingRequest): DynamicPricingResponse {
+  const basePrice = request.base_price ?? (request.price_min + request.price_max) / 2;
+  const utilization = request.utilization ?? 0.5;
+  const hour = request.hour_of_day ?? 12;
+  const day = request.day_of_week ?? 3;
+
+  // Utilization factor: low utilization → discount, high → premium
+  // 0% utilization → -12%, 50% → 0%, 100% → +15%
+  const utilizationFactor = (utilization - 0.5) * 0.3;
+
+  // Hour-of-day factor: peak hours get a premium
+  let hourFactor = 0;
+  if (hour >= 10 && hour <= 12)
+    hourFactor = 0.06; // Late morning peak
+  else if (hour >= 15 && hour <= 17)
+    hourFactor = 0.08; // Afternoon peak
+  else if (hour >= 9 && hour <= 9)
+    hourFactor = 0.02; // Opening — slight premium
+  else if (hour < 9 || hour >= 18) hourFactor = -0.08; // Off-hours — discount
+
+  // Day-of-week factor
+  let dayFactor = 0;
+  if (day === 6)
+    dayFactor = 0.1; // Saturday premium
+  else if (day === 5)
+    dayFactor = 0.05; // Friday premium
+  else if (day === 0)
+    dayFactor = -0.05; // Sunday discount
+  else if (day <= 2) dayFactor = -0.04; // Mon-Tue discount
+
+  // Combine factors
+  const totalAdjustment = 1 + utilizationFactor + hourFactor + dayFactor;
+  let optimalPrice = basePrice * totalAdjustment;
+
+  // Clamp to allowed range
+  let constrained = false;
+  if (optimalPrice < request.price_min) {
+    optimalPrice = request.price_min;
+    constrained = true;
+  } else if (optimalPrice > request.price_max) {
+    optimalPrice = request.price_max;
+    constrained = true;
+  }
+
+  // Round to whole number (Czech pricing convention)
+  optimalPrice = Math.round(optimalPrice);
+
+  // Confidence: higher when inputs are in well-understood ranges
+  const confidence =
+    0.62 + Math.abs(utilizationFactor) * 0.3 + (hour >= 9 && hour <= 17 ? 0.08 : 0);
+
   return {
     service_id: request.service_id,
-    optimal_price: (request.price_min + request.price_max) / 2,
-    confidence: 0.0,
-    constrained: false,
-    model_version: 'fallback',
+    optimal_price: optimalPrice,
+    confidence: Math.min(confidence, 0.95),
+    constrained,
+    model_version: 'rule-based-v1',
     fallback: true,
   };
 }

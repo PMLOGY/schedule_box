@@ -245,6 +245,9 @@ function CompanyProfileCard() {
                     ))}
                   </SelectContent>
                 </Select>
+                {form.currency && form.currency !== company?.currency && (
+                  <p className="text-sm text-amber-600">{t('currencyWarning')}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>{t('fields.timezone')}</Label>

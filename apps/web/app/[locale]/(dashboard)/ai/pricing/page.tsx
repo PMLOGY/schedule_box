@@ -201,6 +201,7 @@ function PriceResult({
     hourOfDay,
     dayOfWeek,
     utilization,
+    basePrice: staticPrice,
   });
 
   if (isLoading) {

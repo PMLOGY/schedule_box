@@ -16,6 +16,7 @@
     "db:migrate": "tsx src/migrate.ts",
     "db:apply-sql": "tsx src/apply-sql.ts",
     "db:seed": "tsx src/seeds/development.ts",
+    "db:seed:historical": "tsx src/seeds/historical-data.ts",
     "db:setup": "pnpm db:migrate && pnpm db:apply-sql && pnpm db:seed",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",

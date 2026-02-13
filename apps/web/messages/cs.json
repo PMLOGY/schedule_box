@@ -533,7 +533,8 @@
     "endTime": "Do",
     "saveSuccess": "Nastavení úspěšně uloženo",
     "saveError": "Nepodařilo se uložit nastavení",
-    "saving": "Ukládání..."
+    "saving": "Ukládání...",
+    "currencyWarning": "Změna měny ovlivní pouze zobrazení. Ceny služeb a existující platby se automaticky nepřepočítají."
   },
   "notifications": {
     "title": "Historie notifikací",

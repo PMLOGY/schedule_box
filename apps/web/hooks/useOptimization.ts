@@ -75,8 +75,8 @@ export const optimizationKeys = {
   all: ['ai', 'optimization'] as const,
   upselling: (serviceId: number | null) =>
     [...optimizationKeys.all, 'upselling', serviceId] as const,
-  pricing: (serviceId: number, hourOfDay?: number, dayOfWeek?: number) =>
-    [...optimizationKeys.all, 'pricing', serviceId, hourOfDay, dayOfWeek] as const,
+  pricing: (serviceId: number, hourOfDay?: number, dayOfWeek?: number, utilization?: number) =>
+    [...optimizationKeys.all, 'pricing', serviceId, hourOfDay, dayOfWeek, utilization] as const,
   capacity: (companyId: number, daysAhead: number) =>
     [...optimizationKeys.all, 'capacity', companyId, daysAhead] as const,
   reminderTiming: (customerId: number, channel: string) =>
@@ -130,7 +130,7 @@ export function useDynamicPricing(
   const utilization = options?.utilization ?? 0.5;
 
   return useQuery<DynamicPricingResponse>({
-    queryKey: optimizationKeys.pricing(serviceId, hourOfDay, dayOfWeek),
+    queryKey: optimizationKeys.pricing(serviceId, hourOfDay, dayOfWeek, utilization),
     queryFn: async () => {
       return apiClient.post<DynamicPricingResponse>('/ai/optimization/pricing', {
         service_id: serviceId,

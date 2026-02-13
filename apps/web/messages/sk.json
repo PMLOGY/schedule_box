@@ -531,7 +531,8 @@
     "endTime": "Do",
     "saveSuccess": "Nastavenia úspešne uložené",
     "saveError": "Nepodarilo sa uložiť nastavenia",
-    "saving": "Ukladanie..."
+    "saving": "Ukladanie...",
+    "currencyWarning": "Zmena meny ovplyvní iba zobrazenie. Ceny služieb a existujúce platby sa automaticky neprepočítajú."
   },
   "notifications": {
     "title": "História notifikácií",

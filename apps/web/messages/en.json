@@ -533,7 +533,8 @@
     "endTime": "To",
     "saveSuccess": "Settings saved successfully",
     "saveError": "Failed to save settings",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "currencyWarning": "Changing the currency only affects how values are displayed. Service prices and existing payments will not be converted automatically."
   },
   "notifications": {
     "title": "Notification History",
