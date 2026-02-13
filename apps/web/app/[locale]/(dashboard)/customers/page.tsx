@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Plus, Search } from 'lucide-react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -73,10 +75,12 @@ export default function CustomersPage() {
         phone: formData.phone || undefined,
         notes: formData.notes || undefined,
       });
+      toast.success(t('createSuccess'));
       setDialogOpen(false);
       setFormData({ name: '', email: '', phone: '', notes: '' });
-    } catch {
-      // Error handled by mutation state
+    } catch (error) {
+      const apiError = error as { message?: string };
+      toast.error(apiError.message || t('createError'));
     }
   };
 
@@ -105,10 +109,12 @@ export default function CustomersPage() {
         phone: editFormData.phone || undefined,
         notes: editFormData.notes || undefined,
       });
+      toast.success(t('updateSuccess'));
       setEditDialogOpen(false);
       setEditingCustomer(null);
-    } catch {
-      // Error handled by mutation state
+    } catch (error) {
+      const apiError = error as { message?: string };
+      toast.error(apiError.message || t('updateError'));
     }
   };
 
@@ -229,56 +235,59 @@ export default function CustomersPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('addTitle')}</DialogTitle>
+            <DialogDescription>{t('addDescription')}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">{t('form.name')} *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-              />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleCreate();
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">{t('form.name')} *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">{t('form.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">{t('form.phone')}</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="notes">{t('form.notes')}</Label>
+                <Input
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">{t('form.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">{t('form.phone')}</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="notes">{t('form.notes')}</Label>
-              <Input
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
-              />
-            </div>
-            {createMutation.isError && (
-              <p className="text-sm text-destructive">{t('createError')}</p>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              {tCommon('cancel')}
-            </Button>
-            <Button
-              onClick={handleCreate}
-              disabled={!formData.name.trim() || createMutation.isPending}
-            >
-              {createMutation.isPending ? tCommon('loading') : tCommon('create')}
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                {tCommon('cancel')}
+              </Button>
+              <Button type="submit" disabled={!formData.name.trim() || createMutation.isPending}>
+                {createMutation.isPending ? tCommon('loading') : tCommon('create')}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
@@ -287,56 +296,62 @@ export default function CustomersPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('editTitle')}</DialogTitle>
+            <DialogDescription>{t('editDescription')}</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-name">{t('form.name')} *</Label>
-              <Input
-                id="edit-name"
-                value={editFormData.name}
-                onChange={(e) => setEditFormData((prev) => ({ ...prev, name: e.target.value }))}
-              />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUpdate();
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-name">{t('form.name')} *</Label>
+                <Input
+                  id="edit-name"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData((prev) => ({ ...prev, name: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-email">{t('form.email')}</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editFormData.email}
+                  onChange={(e) => setEditFormData((prev) => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-phone">{t('form.phone')}</Label>
+                <Input
+                  id="edit-phone"
+                  value={editFormData.phone}
+                  onChange={(e) => setEditFormData((prev) => ({ ...prev, phone: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-notes">{t('form.notes')}</Label>
+                <Input
+                  id="edit-notes"
+                  value={editFormData.notes}
+                  onChange={(e) => setEditFormData((prev) => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-email">{t('form.email')}</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={editFormData.email}
-                onChange={(e) => setEditFormData((prev) => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-phone">{t('form.phone')}</Label>
-              <Input
-                id="edit-phone"
-                value={editFormData.phone}
-                onChange={(e) => setEditFormData((prev) => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-notes">{t('form.notes')}</Label>
-              <Input
-                id="edit-notes"
-                value={editFormData.notes}
-                onChange={(e) => setEditFormData((prev) => ({ ...prev, notes: e.target.value }))}
-              />
-            </div>
-            {updateMutation.isError && (
-              <p className="text-sm text-destructive">{t('updateError')}</p>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              {tCommon('cancel')}
-            </Button>
-            <Button
-              onClick={handleUpdate}
-              disabled={!editFormData.name.trim() || updateMutation.isPending}
-            >
-              {updateMutation.isPending ? tCommon('loading') : tCommon('save')}
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
+                {tCommon('cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!editFormData.name.trim() || updateMutation.isPending}
+              >
+                {updateMutation.isPending ? tCommon('loading') : tCommon('save')}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

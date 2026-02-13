@@ -83,6 +83,7 @@ export const loyaltyCardListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   customer_id: z.string().uuid().optional(),
+  search: z.string().max(100).optional(),
 });
 
 // ============================================================================
@@ -140,7 +141,10 @@ export const tierCreateSchema = z.object({
   name: z.string().min(1).max(100),
   min_points: z.number().int().min(0),
   benefits: z.record(z.unknown()).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).default('#3B82F6'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .default('#3B82F6'),
   sort_order: z.number().int().min(0).default(0),
 });
 
@@ -151,7 +155,10 @@ export const tierUpdateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   min_points: z.number().int().min(0).optional(),
   benefits: z.record(z.unknown()).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
   sort_order: z.number().int().min(0).optional(),
 });
 

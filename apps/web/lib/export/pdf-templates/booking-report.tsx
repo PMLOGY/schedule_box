@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { getPdfTranslations, formatPdfDate } from './pdf-config';
 
 interface BookingReportProps {
   data: Array<{
@@ -16,13 +17,13 @@ interface BookingReportProps {
     noShows: number;
     total: number;
   };
+  locale?: string;
 }
 
-// Create styles
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
     fontSize: 10,
   },
   header: {
@@ -125,65 +126,56 @@ const styles = StyleSheet.create({
   },
 });
 
-/**
- * Formats date to Czech format (dd.MM.yyyy)
- */
-function formatDate(date: string): string {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-export function BookingReport({ data, period, totals }: BookingReportProps) {
-  const generatedDate = new Date().toLocaleDateString('cs-CZ');
+export function BookingReport({ data, period, totals, locale = 'cs' }: BookingReportProps) {
+  const t = getPdfTranslations(locale);
+  const generatedDate = formatPdfDate(new Date().toISOString(), locale);
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>ScheduleBox - Report rezervací</Text>
-          <Text style={styles.subtitle}>Období: {period}</Text>
-          <Text style={styles.subtitle}>Vygenerováno: {generatedDate}</Text>
+          <Text style={styles.title}>{t.bookingsTitle}</Text>
+          <Text style={styles.subtitle}>
+            {t.period}: {period}
+          </Text>
+          <Text style={styles.subtitle}>
+            {t.generated}: {generatedDate}
+          </Text>
         </View>
 
-        {/* Summary Section */}
         <View style={styles.summarySection}>
-          <Text style={styles.summaryTitle}>Souhrn</Text>
+          <Text style={styles.summaryTitle}>{t.summary}</Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Dokončené</Text>
+              <Text style={styles.summaryLabel}>{t.completed}</Text>
               <Text style={styles.summaryValue}>{totals.completed}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Zrušené</Text>
+              <Text style={styles.summaryLabel}>{t.cancelled}</Text>
               <Text style={styles.summaryValue}>{totals.cancelled}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>No-shows</Text>
+              <Text style={styles.summaryLabel}>{t.noShows}</Text>
               <Text style={styles.summaryValue}>{totals.noShows}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Celkem</Text>
+              <Text style={styles.summaryLabel}>{t.total}</Text>
               <Text style={styles.summaryValue}>{totals.total}</Text>
             </View>
           </View>
         </View>
 
-        {/* Data Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={styles.colDate}>Datum</Text>
-            <Text style={styles.colCompleted}>Dokončené</Text>
-            <Text style={styles.colCancelled}>Zrušené</Text>
-            <Text style={styles.colNoShows}>No-shows</Text>
-            <Text style={styles.colTotal}>Celkem</Text>
+            <Text style={styles.colDate}>{t.date}</Text>
+            <Text style={styles.colCompleted}>{t.completed}</Text>
+            <Text style={styles.colCancelled}>{t.cancelled}</Text>
+            <Text style={styles.colNoShows}>{t.noShows}</Text>
+            <Text style={styles.colTotal}>{t.total}</Text>
           </View>
           {data.map((row, index) => (
             <View key={row.date} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-              <Text style={styles.colDate}>{formatDate(row.date)}</Text>
+              <Text style={styles.colDate}>{formatPdfDate(row.date, locale)}</Text>
               <Text style={styles.colCompleted}>{row.completed}</Text>
               <Text style={styles.colCancelled}>{row.cancelled}</Text>
               <Text style={styles.colNoShows}>{row.noShows}</Text>
@@ -192,11 +184,10 @@ export function BookingReport({ data, period, totals }: BookingReportProps) {
           ))}
         </View>
 
-        {/* Footer */}
         <View style={styles.footer}>
-          <Text>Vygenerováno automaticky systémem ScheduleBox</Text>
+          <Text>{t.footer}</Text>
           <Text
-            render={({ pageNumber, totalPages }) => `Strana ${pageNumber} z ${totalPages}`}
+            render={({ pageNumber, totalPages }) => `${t.page} ${pageNumber} ${t.of} ${totalPages}`}
             fixed
           />
         </View>

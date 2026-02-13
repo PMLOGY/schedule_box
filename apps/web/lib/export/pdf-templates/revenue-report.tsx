@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { getPdfTranslations, formatPdfCurrency, formatPdfDate } from './pdf-config';
 
 interface RevenueReportProps {
   data: Array<{ date: string; revenue: number; bookings: number }>;
@@ -9,13 +10,14 @@ interface RevenueReportProps {
     totalBookings: number;
     avgRevenue: number;
   };
+  locale?: string;
+  currency?: string;
 }
 
-// Create styles
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
     fontSize: 10,
   },
   header: {
@@ -110,82 +112,72 @@ const styles = StyleSheet.create({
   },
 });
 
-/**
- * Formats number with Czech locale (space thousands separator, comma decimal)
- */
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('cs-CZ', {
-    style: 'currency',
-    currency: 'CZK',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-/**
- * Formats date to Czech format (dd.MM.yyyy)
- */
-function formatDate(date: string): string {
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-export function RevenueReport({ data, period, totals }: RevenueReportProps) {
-  const generatedDate = new Date().toLocaleDateString('cs-CZ');
+export function RevenueReport({
+  data,
+  period,
+  totals,
+  locale = 'cs',
+  currency = 'CZK',
+}: RevenueReportProps) {
+  const t = getPdfTranslations(locale);
+  const generatedDate = formatPdfDate(new Date().toISOString(), locale);
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>ScheduleBox - Report tržeb</Text>
-          <Text style={styles.subtitle}>Období: {period}</Text>
-          <Text style={styles.subtitle}>Vygenerováno: {generatedDate}</Text>
+          <Text style={styles.title}>{t.revenueTitle}</Text>
+          <Text style={styles.subtitle}>
+            {t.period}: {period}
+          </Text>
+          <Text style={styles.subtitle}>
+            {t.generated}: {generatedDate}
+          </Text>
         </View>
 
-        {/* Summary Section */}
         <View style={styles.summarySection}>
-          <Text style={styles.summaryTitle}>Souhrn</Text>
+          <Text style={styles.summaryTitle}>{t.summary}</Text>
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Celkové tržby</Text>
-              <Text style={styles.summaryValue}>{formatCurrency(totals.totalRevenue)}</Text>
+              <Text style={styles.summaryLabel}>{t.totalRevenue}</Text>
+              <Text style={styles.summaryValue}>
+                {formatPdfCurrency(totals.totalRevenue, currency, locale)}
+              </Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Počet rezervací</Text>
+              <Text style={styles.summaryLabel}>{t.bookingCount}</Text>
               <Text style={styles.summaryValue}>{totals.totalBookings}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Průměr na den</Text>
-              <Text style={styles.summaryValue}>{formatCurrency(totals.avgRevenue)}</Text>
+              <Text style={styles.summaryLabel}>{t.avgPerDay}</Text>
+              <Text style={styles.summaryValue}>
+                {formatPdfCurrency(totals.avgRevenue, currency, locale)}
+              </Text>
             </View>
           </View>
         </View>
 
-        {/* Data Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={styles.colDate}>Datum</Text>
-            <Text style={styles.colRevenue}>Tržby (CZK)</Text>
-            <Text style={styles.colBookings}>Rezervace</Text>
+            <Text style={styles.colDate}>{t.date}</Text>
+            <Text style={styles.colRevenue}>{t.revenue}</Text>
+            <Text style={styles.colBookings}>{t.bookings}</Text>
           </View>
           {data.map((row, index) => (
             <View key={row.date} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-              <Text style={styles.colDate}>{formatDate(row.date)}</Text>
-              <Text style={styles.colRevenue}>{formatCurrency(row.revenue)}</Text>
+              <Text style={styles.colDate}>{formatPdfDate(row.date, locale)}</Text>
+              <Text style={styles.colRevenue}>
+                {formatPdfCurrency(row.revenue, currency, locale)}
+              </Text>
               <Text style={styles.colBookings}>{row.bookings}</Text>
             </View>
           ))}
         </View>
 
-        {/* Footer */}
         <View style={styles.footer}>
-          <Text>Vygenerováno automaticky systémem ScheduleBox</Text>
+          <Text>{t.footer}</Text>
           <Text
-            render={({ pageNumber, totalPages }) => `Strana ${pageNumber} z ${totalPages}`}
+            render={({ pageNumber, totalPages }) => `${t.page} ${pageNumber} ${t.of} ${totalPages}`}
             fixed
           />
         </View>

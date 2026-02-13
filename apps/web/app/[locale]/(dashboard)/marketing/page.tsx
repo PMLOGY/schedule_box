@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -125,12 +126,13 @@ export default function MarketingPage() {
   };
 
   const handleCreateGiftCard = async () => {
-    if (!giftCardForm.initial_balance) return;
+    const balance = parseFloat(giftCardForm.initial_balance);
+    if (!giftCardForm.initial_balance || !Number.isFinite(balance) || balance <= 0) return;
     try {
       await createGiftCard.mutateAsync({
-        initial_balance: parseFloat(giftCardForm.initial_balance),
-        recipient_name: giftCardForm.recipient_name || undefined,
-        recipient_email: giftCardForm.recipient_email || undefined,
+        initial_balance: balance,
+        recipient_name: giftCardForm.recipient_name.trim() || undefined,
+        recipient_email: giftCardForm.recipient_email.trim() || undefined,
       });
       setGiftCardDialogOpen(false);
       setGiftCardForm({ initial_balance: '', recipient_name: '', recipient_email: '' });
@@ -334,6 +336,7 @@ export default function MarketingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('addCouponTitle')}</DialogTitle>
+            <DialogDescription>{t('addCouponDescription')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -407,6 +410,7 @@ export default function MarketingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('addGiftCardTitle')}</DialogTitle>
+            <DialogDescription>{t('addGiftCardDescription')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -466,6 +470,7 @@ export default function MarketingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('editCouponTitle')}</DialogTitle>
+            <DialogDescription>{t('editCouponDescription')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -557,6 +562,7 @@ export default function MarketingPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('editGiftCardTitle')}</DialogTitle>
+            <DialogDescription>{t('editGiftCardDescription')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">

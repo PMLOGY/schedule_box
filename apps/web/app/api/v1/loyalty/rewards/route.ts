@@ -4,7 +4,7 @@
  * POST /api/v1/loyalty/rewards - Create a new reward
  */
 
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db, loyaltyPrograms, rewards, services } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
@@ -29,6 +29,11 @@ export const GET = createRouteHandler({
     const isActiveParam = req.nextUrl.searchParams.get('is_active');
     const isActiveFilter =
       isActiveParam === 'true' ? true : isActiveParam === 'false' ? false : undefined;
+    const page = Math.max(1, parseInt(req.nextUrl.searchParams.get('page') ?? '1', 10));
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(req.nextUrl.searchParams.get('limit') ?? '20', 10)),
+    );
 
     // Get company's program
     const [program] = await db
@@ -47,7 +52,17 @@ export const GET = createRouteHandler({
       conditions.push(eq(rewards.isActive, isActiveFilter));
     }
 
-    // Fetch rewards
+    const whereClause = conditions.length > 1 ? and(...conditions) : conditions[0];
+
+    // Count total
+    const [{ count: totalCount }] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(rewards)
+      .where(whereClause);
+
+    const total = Number(totalCount) || 0;
+
+    // Fetch rewards with pagination
     const rewardsList = await db
       .select({
         id: rewards.id,
@@ -64,7 +79,10 @@ export const GET = createRouteHandler({
         updatedAt: rewards.updatedAt,
       })
       .from(rewards)
-      .where(conditions.length > 1 ? and(...conditions) : conditions[0]);
+      .where(whereClause)
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .orderBy(rewards.createdAt);
 
     // Convert numeric fields to numbers
     const formattedRewards = rewardsList.map((reward) => ({
@@ -72,7 +90,15 @@ export const GET = createRouteHandler({
       rewardValue: reward.rewardValue ? Number(reward.rewardValue) : null,
     }));
 
-    return successResponse(formattedRewards);
+    return successResponse({
+      data: formattedRewards,
+      meta: {
+        page,
+        limit,
+        total,
+        total_pages: Math.ceil(total / limit),
+      },
+    });
   },
 });
 

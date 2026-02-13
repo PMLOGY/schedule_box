@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +26,12 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader } from '@/components/shared/page-header';
-import { useLoyaltyCard, useTransactions, useAddPoints } from '@/hooks/use-loyalty-queries';
+import {
+  useLoyaltyCard,
+  useTransactions,
+  useAddPoints,
+  useLoyaltyProgram,
+} from '@/hooks/use-loyalty-queries';
 import { useLoyaltyStore } from '@/stores/loyalty.store';
 import {
   CreditCard,
@@ -37,22 +43,6 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
-import type { TransactionType } from '@schedulebox/shared/types';
-
-// ============================================================================
-// TRANSACTION TYPE BADGES
-// ============================================================================
-
-const transactionTypeConfig: Record<
-  TransactionType,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
-> = {
-  earn: { label: 'Získání', variant: 'default' },
-  redeem: { label: 'Uplatnění', variant: 'destructive' },
-  adjust: { label: 'Úprava', variant: 'outline' },
-  expire: { label: 'Expirace', variant: 'secondary' },
-  stamp: { label: 'Razítko', variant: 'default' },
-};
 
 // ============================================================================
 // PROGRESS BAR
@@ -62,6 +52,7 @@ function TierProgressBar({
   currentPoints,
   currentTierName,
   nextTier,
+  t,
 }: {
   currentPoints: number;
   currentTierName: string | null;
@@ -70,15 +61,16 @@ function TierProgressBar({
     minPoints: number;
     pointsNeeded: number;
   } | null;
+  t: ReturnType<typeof useTranslations<'loyaltyCardDetail'>>;
 }) {
   if (!nextTier) {
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">
-            {currentTierName ?? 'Žádná úroveň'} - Dosažena maximální úroveň
+            {t('maxTierReached', { tierName: currentTierName ?? t('noTier') })}
           </span>
-          <span className="font-medium">{currentPoints.toLocaleString()} b.</span>
+          <span className="font-medium">{currentPoints.toLocaleString()}</span>
         </div>
         <div className="h-3 w-full rounded-full bg-secondary">
           <div className="h-3 rounded-full bg-primary" style={{ width: '100%' }} />
@@ -96,9 +88,11 @@ function TierProgressBar({
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">
-          {currentTierName ?? 'Žádná úroveň'} &rarr; {nextTier.name}
+          {currentTierName ?? t('noTier')} &rarr; {nextTier.name}
         </span>
-        <span className="font-medium">{nextTier.pointsNeeded.toLocaleString()} bodů potřeba</span>
+        <span className="font-medium">
+          {t('pointsNeeded', { points: nextTier.pointsNeeded.toLocaleString() })}
+        </span>
       </div>
       <div className="h-3 w-full rounded-full bg-secondary">
         <div
@@ -107,8 +101,11 @@ function TierProgressBar({
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        {(nextTier.minPoints - nextTier.pointsNeeded).toLocaleString()} /{' '}
-        {nextTier.minPoints.toLocaleString()} bodů do úrovně {nextTier.name}
+        {t('pointsToTier', {
+          current: (nextTier.minPoints - nextTier.pointsNeeded).toLocaleString(),
+          target: nextTier.minPoints.toLocaleString(),
+          tierName: nextTier.name,
+        })}
       </p>
     </div>
   );
@@ -122,10 +119,12 @@ function AddPointsDialog({
   open,
   onOpenChange,
   cardId,
+  t,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   cardId: string;
+  t: ReturnType<typeof useTranslations<'loyaltyCardDetail'>>;
 }) {
   const [points, setPoints] = useState(10);
   const [description, setDescription] = useState('');
@@ -155,12 +154,12 @@ function AddPointsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Přidat body</DialogTitle>
-          <DialogDescription>Manuálně přidejte body na tuto věrnostní kartu.</DialogDescription>
+          <DialogTitle>{t('addPointsDialog.title')}</DialogTitle>
+          <DialogDescription>{t('addPointsDialog.description')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="add-points">Body</Label>
+            <Label htmlFor="add-points">{t('addPointsDialog.points')}</Label>
             <Input
               id="add-points"
               type="number"
@@ -173,22 +172,25 @@ function AddPointsDialog({
 
           <div className="space-y-2">
             <Label htmlFor="add-description">
-              Popis <span className="text-muted-foreground">(volitelné)</span>
+              {t('addPointsDialog.descriptionLabel')}{' '}
+              <span className="text-muted-foreground">
+                {t('addPointsDialog.descriptionOptional')}
+              </span>
             </Label>
             <Input
               id="add-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="např. Manuální bonus"
+              placeholder={t('addPointsDialog.descriptionPlaceholder')}
             />
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Zrušit
+              {t('addPointsDialog.cancel')}
             </Button>
             <Button type="submit" disabled={addPoints.isPending || points < 1}>
-              {addPoints.isPending ? 'Přidávání...' : 'Přidat body'}
+              {addPoints.isPending ? t('addPointsDialog.adding') : t('addPointsDialog.add')}
             </Button>
           </DialogFooter>
         </form>
@@ -202,10 +204,14 @@ function AddPointsDialog({
 // ============================================================================
 
 export default function LoyaltyCardDetailPage() {
+  const t = useTranslations('loyaltyCardDetail');
+  const locale = useLocale();
   const params = useParams();
   const cardId = params.id as string;
 
   const { data: card, isLoading: cardLoading, error: cardError } = useLoyaltyCard(cardId);
+  const { data: program } = useLoyaltyProgram();
+  const isStamps = program?.type === 'stamps';
 
   const [txPage, setTxPage] = useState(1);
   const txLimit = 20;
@@ -240,16 +246,14 @@ export default function LoyaltyCardDetailPage() {
         <Button variant="ghost" asChild>
           <Link href="/loyalty/cards">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zpět na karty
+            {t('backToCards')}
           </Link>
         </Button>
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center">
             <CreditCard className="h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-lg font-medium">Karta nenalezena</p>
-            <p className="text-sm text-muted-foreground">
-              Tato věrnostní karta neexistuje nebo byla odstraněna.
-            </p>
+            <p className="mt-4 text-lg font-medium">{t('cardNotFound')}</p>
+            <p className="text-sm text-muted-foreground">{t('cardNotFoundDescription')}</p>
           </CardContent>
         </Card>
       </div>
@@ -262,17 +266,17 @@ export default function LoyaltyCardDetailPage() {
       <Button variant="ghost" asChild>
         <Link href="/loyalty/cards">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zpět na karty
+          {t('backToCards')}
         </Link>
       </Button>
 
       <PageHeader
-        title={`Karta: ${card.cardNumber}`}
+        title={t('cardTitle', { cardNumber: card.cardNumber })}
         description={`${card.customer.name}${card.customer.email ? ` - ${card.customer.email}` : ''}`}
         actions={
           <Button onClick={openAddPointsDialog}>
             <Plus className="mr-2 h-4 w-4" />
-            Přidat body
+            {t('addPoints')}
           </Button>
         }
       />
@@ -281,16 +285,20 @@ export default function LoyaltyCardDetailPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Stav bodů</CardDescription>
+            <CardDescription>{isStamps ? t('stampsBalance') : t('pointsBalance')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{card.pointsBalance.toLocaleString()}</p>
+            <p className="text-3xl font-bold">
+              {isStamps
+                ? (card.stampsBalance ?? 0).toLocaleString()
+                : card.pointsBalance.toLocaleString()}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Aktuální úroveň</CardDescription>
+            <CardDescription>{t('currentTier')}</CardDescription>
           </CardHeader>
           <CardContent>
             {card.currentTier ? (
@@ -304,18 +312,18 @@ export default function LoyaltyCardDetailPage() {
                 {card.currentTier.name}
               </Badge>
             ) : (
-              <p className="text-lg text-muted-foreground">Žádná úroveň</p>
+              <p className="text-lg text-muted-foreground">{t('noTier')}</p>
             )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Členem od</CardDescription>
+            <CardDescription>{t('memberSince')}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-medium">
-              {new Date(card.createdAt).toLocaleDateString('cs-CZ')}
+              {new Date(card.createdAt).toLocaleDateString(locale)}
             </p>
           </CardContent>
         </Card>
@@ -326,7 +334,7 @@ export default function LoyaltyCardDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Postup v úrovních
+            {t('tierProgress')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -334,6 +342,7 @@ export default function LoyaltyCardDetailPage() {
             currentPoints={card.pointsBalance}
             currentTierName={card.currentTier?.name ?? null}
             nextTier={card.nextTier}
+            t={t}
           />
         </CardContent>
       </Card>
@@ -343,15 +352,15 @@ export default function LoyaltyCardDetailPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="h-5 w-5" />
-            Digitální peněženka
+            {t('digitalWallet')}
           </CardTitle>
-          <CardDescription>Přidejte tuto věrnostní kartu do digitální peněženky</CardDescription>
+          <CardDescription>{t('digitalWalletDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <Button variant="outline" asChild>
               <a href={`/api/v1/loyalty/cards/${cardId}/apple-pass`} download>
-                Přidat do Apple Wallet
+                {t('addToAppleWallet')}
               </a>
             </Button>
             <Button variant="outline" asChild>
@@ -360,7 +369,7 @@ export default function LoyaltyCardDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Přidat do Google Wallet
+                {t('addToGoogleWallet')}
               </a>
             </Button>
           </div>
@@ -370,8 +379,8 @@ export default function LoyaltyCardDetailPage() {
       {/* Transaction History */}
       <Card>
         <CardHeader>
-          <CardTitle>Historie transakcí</CardTitle>
-          <CardDescription>Všechny bodové transakce pro tuto kartu</CardDescription>
+          <CardTitle>{t('transactionHistory')}</CardTitle>
+          <CardDescription>{t('transactionHistoryDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {txLoading ? (
@@ -382,35 +391,44 @@ export default function LoyaltyCardDetailPage() {
             </div>
           ) : transactions.length === 0 ? (
             <div className="flex h-48 flex-col items-center justify-center space-y-2">
-              <p className="text-lg font-medium">Zatím žádné transakce</p>
-              <p className="text-sm text-muted-foreground">
-                Body se zde zobrazí, jakmile budou získány nebo uplatněny
-              </p>
+              <p className="text-lg font-medium">{t('noTransactions')}</p>
+              <p className="text-sm text-muted-foreground">{t('noTransactionsDescription')}</p>
             </div>
           ) : (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Datum</TableHead>
-                    <TableHead>Typ</TableHead>
-                    <TableHead>Body</TableHead>
-                    <TableHead>Zůstatek po</TableHead>
-                    <TableHead>Popis</TableHead>
+                    <TableHead>{t('columns.date')}</TableHead>
+                    <TableHead>{t('columns.type')}</TableHead>
+                    <TableHead>{t('columns.points')}</TableHead>
+                    <TableHead>{t('columns.balanceAfter')}</TableHead>
+                    <TableHead>{t('columns.description')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {transactions.map((tx) => {
-                    const config = transactionTypeConfig[tx.type];
                     const isPositive =
                       tx.type === 'earn' ||
                       tx.type === 'stamp' ||
                       (tx.type === 'adjust' && tx.points > 0);
                     return (
                       <TableRow key={tx.id}>
-                        <TableCell>{new Date(tx.createdAt).toLocaleString('cs-CZ')}</TableCell>
+                        <TableCell>{new Date(tx.createdAt).toLocaleString(locale)}</TableCell>
                         <TableCell>
-                          <Badge variant={config.variant}>{config.label}</Badge>
+                          <Badge
+                            variant={
+                              tx.type === 'redeem'
+                                ? 'destructive'
+                                : tx.type === 'expire'
+                                  ? 'secondary'
+                                  : tx.type === 'adjust'
+                                    ? 'outline'
+                                    : 'default'
+                            }
+                          >
+                            {t(`transactionTypes.${tx.type}` as const)}
+                          </Badge>
                         </TableCell>
                         <TableCell
                           className={
@@ -433,8 +451,11 @@ export default function LoyaltyCardDetailPage() {
               {txPagination && txPagination.total_pages > 1 && (
                 <div className="flex items-center justify-between border-t px-6 py-4">
                   <p className="text-sm text-muted-foreground">
-                    Stránka {txPagination.page} z {txPagination.total_pages} (celkem{' '}
-                    {txPagination.total})
+                    {t('page', {
+                      page: txPagination.page,
+                      totalPages: txPagination.total_pages,
+                      total: txPagination.total,
+                    })}
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -444,7 +465,7 @@ export default function LoyaltyCardDetailPage() {
                       disabled={txPagination.page === 1}
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Předchozí
+                      {t('previous')}
                     </Button>
                     <Button
                       variant="outline"
@@ -452,7 +473,7 @@ export default function LoyaltyCardDetailPage() {
                       onClick={() => setTxPage((p) => p + 1)}
                       disabled={txPagination.page === txPagination.total_pages}
                     >
-                      Další
+                      {t('next')}
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -470,6 +491,7 @@ export default function LoyaltyCardDetailPage() {
           if (!open) closeAddPointsDialog();
         }}
         cardId={cardId}
+        t={t}
       />
     </div>
   );

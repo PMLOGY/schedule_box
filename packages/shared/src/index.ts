@@ -4,5 +4,6 @@ export * from './utils/index';
 export * from './schemas/index';
 export * from './errors/index';
 export * from './metrics/index';
-export * from './telemetry/index';
-export * from './logger/index';
+// Telemetry and logger are heavy (OpenTelemetry SDK) — import directly:
+//   import { tracer } from '@schedulebox/shared/telemetry';
+//   import { logger } from '@schedulebox/shared/logger';

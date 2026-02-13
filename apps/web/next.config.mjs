@@ -37,6 +37,10 @@ const nextConfig = {
     'passkit-generator',
     'drizzle-orm',
     '@schedulebox/database',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/api',
+    '@opentelemetry/instrumentation',
+    'require-in-the-middle',
   ],
   async headers() {
     return [

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -33,9 +33,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MessageSquare, Bell, ChevronLeft, ChevronRight, FileText, Plus } from 'lucide-react';
+import {
+  Mail,
+  MessageSquare,
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Plus,
+  FileCode,
+} from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
-import { Link } from '@/lib/i18n/navigation';
+import { Link, useRouter, usePathname } from '@/lib/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 
 type NotificationChannel = 'email' | 'sms' | 'push';
 type NotificationStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'opened' | 'clicked';
@@ -79,6 +89,15 @@ interface NotificationForm {
   body: string;
 }
 
+interface NotificationTemplate {
+  id: number;
+  type: string;
+  channel: NotificationChannel;
+  subject: string | null;
+  bodyTemplate: string;
+  isActive: boolean;
+}
+
 const defaultForm: NotificationForm = {
   channel: 'email',
   recipient: '',
@@ -91,6 +110,9 @@ export default function NotificationsPage() {
   const locale = useLocale();
   const dateLocale = localeMap[locale] ?? 'en-US';
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [channel, setChannel] = useState<string>('all');
   const [status, setStatus] = useState<string>('all');
@@ -101,6 +123,45 @@ export default function NotificationsPage() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [form, setForm] = useState<NotificationForm>({ ...defaultForm });
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('none');
+
+  // Fetch available templates for the template picker
+  const { data: templates } = useQuery({
+    queryKey: ['notification-templates'],
+    queryFn: async () => {
+      const response = await apiClient.get<{ data: NotificationTemplate[] }>(
+        '/notification-templates',
+      );
+      return response.data;
+    },
+  });
+
+  const activeTemplates = useMemo(
+    () => templates?.filter((tpl) => tpl.isActive) ?? [],
+    [templates],
+  );
+
+  // Handle ?template_id=X query param from templates page "Use" button
+  const templateIdParam = searchParams.get('template_id');
+  const templateAppliedRef = useRef(false);
+
+  useEffect(() => {
+    if (!templateIdParam || activeTemplates.length === 0 || templateAppliedRef.current) return;
+
+    const tpl = activeTemplates.find((t) => t.id === parseInt(templateIdParam, 10));
+    if (tpl) {
+      templateAppliedRef.current = true;
+      setForm({
+        channel: tpl.channel,
+        recipient: '',
+        subject: tpl.subject ?? '',
+        body: tpl.bodyTemplate,
+      });
+      setSelectedTemplateId(String(tpl.id));
+      setIsCreateOpen(true);
+      router.replace(pathname);
+    }
+  }, [templateIdParam, activeTemplates, pathname, router]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['notifications', { channel, status, dateFrom, dateTo, page, limit }],
@@ -135,6 +196,7 @@ export default function NotificationsPage() {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       setIsCreateOpen(false);
       setForm({ ...defaultForm });
+      setSelectedTemplateId('none');
     },
   });
 
@@ -168,6 +230,44 @@ export default function NotificationsPage() {
                 <DialogDescription>{t('createDescription')}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
+                {activeTemplates.length > 0 && (
+                  <div>
+                    <Label>
+                      <FileCode className="mr-1 inline h-4 w-4" />
+                      {t('fromTemplate')}
+                    </Label>
+                    <Select
+                      value={selectedTemplateId}
+                      onValueChange={(value) => {
+                        setSelectedTemplateId(value);
+                        if (value !== 'none') {
+                          const tpl = activeTemplates.find((t) => t.id === parseInt(value, 10));
+                          if (tpl) {
+                            setForm({
+                              channel: tpl.channel,
+                              recipient: form.recipient,
+                              subject: tpl.subject ?? '',
+                              body: tpl.bodyTemplate,
+                            });
+                          }
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('selectTemplate')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{t('noTemplate')}</SelectItem>
+                        {activeTemplates.map((tpl) => (
+                          <SelectItem key={tpl.id} value={String(tpl.id)}>
+                            {tpl.subject || tpl.type} ({tpl.channel})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div>
                   <Label>{t('channel')}</Label>
                   <div className="mt-2 flex gap-3">

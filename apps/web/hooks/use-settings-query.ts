@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 export interface CompanySettings {
@@ -46,5 +46,49 @@ export function useWorkingHoursQuery() {
       return result.data;
     },
     staleTime: 120_000,
+  });
+}
+
+export interface CompanyUpdateData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  description?: string;
+  address_street?: string;
+  address_city?: string;
+  address_zip?: string;
+  currency?: string;
+  timezone?: string;
+}
+
+export interface WorkingHourInput {
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  is_active?: boolean;
+}
+
+export function useUpdateCompanySettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: CompanyUpdateData) => {
+      return apiClient.put('/settings/company', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings', 'company'] });
+    },
+  });
+}
+
+export function useUpdateWorkingHours() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: WorkingHourInput[]) => {
+      return apiClient.put('/settings/working-hours', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings', 'working-hours'] });
+    },
   });
 }

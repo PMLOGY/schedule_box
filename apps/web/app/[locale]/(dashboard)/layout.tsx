@@ -2,11 +2,13 @@ import { AuthGuard } from '@/components/layout/auth-guard';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { SkipLink } from '@/components/accessibility/skip-link';
+import { NavigationProgress } from '@/components/layout/navigation-progress';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
       <SkipLink />
+      <NavigationProgress />
       <div className="flex h-screen">
         <aside aria-label="Dashboard sidebar">
           <Sidebar />

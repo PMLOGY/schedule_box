@@ -8,7 +8,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { format } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
 import { Loader2, Calendar, User, Briefcase, Clock, Coins, FileText } from 'lucide-react';
@@ -65,6 +65,7 @@ const LOCALE_MAP = {
 export default function BookingDetailPanel({ bookingId, open, onClose }: BookingDetailPanelProps) {
   const t = useTranslations('booking.detail');
   const tCommon = useTranslations('common');
+  const locale = useLocale() as 'cs' | 'sk' | 'en';
   const queryClient = useQueryClient();
 
   const { data: booking, isLoading } = useBookingDetail(bookingId) as {
@@ -72,8 +73,6 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
     isLoading: boolean;
   };
 
-  // Get locale from next-intl (default to cs if not available)
-  const locale = 'cs' as 'cs' | 'sk' | 'en'; // TODO: Get from useLocale() hook
   const dateLocale = LOCALE_MAP[locale] || cs;
 
   // Map API action names to translation keys (no-show → noShow)
@@ -121,6 +120,8 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
+            <SheetTitle className="sr-only">{t('loading')}</SheetTitle>
+            <SheetDescription className="sr-only">{t('loading')}</SheetDescription>
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : booking ? (
@@ -326,6 +327,8 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
           </>
         ) : (
           <div className="flex items-center justify-center h-full">
+            <SheetTitle className="sr-only">{t('notFound')}</SheetTitle>
+            <SheetDescription className="sr-only">{t('notFound')}</SheetDescription>
             <p className="text-muted-foreground">{t('notFound')}</p>
           </div>
         )}

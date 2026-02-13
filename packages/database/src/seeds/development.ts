@@ -276,17 +276,24 @@ async function seed() {
       .returning();
     users.push(adminUserResult[0]);
 
-    // Owner users (one per company)
-    for (const company of companies) {
-      const ownerName = czechName();
+    // Owner users (one per company) — deterministic emails for easy login
+    const ownerProfiles = [
+      { name: 'Lukáš Fiala', email: 'lukas.fiala@centrum.cz', phone: '+420 777 111 222' },
+      { name: 'Martin Novák', email: 'martin.novak@seznam.cz', phone: '+420 777 333 444' },
+      { name: 'Eva Svobodová', email: 'eva.svobodova@email.cz', phone: '+420 777 555 666' },
+    ];
+
+    for (let i = 0; i < companies.length; i++) {
+      const company = companies[i];
+      const profile = ownerProfiles[i];
       const ownerUserResult = await db
         .insert(schema.users)
         .values({
           companyId: company.id,
-          email: czechEmail(ownerName.firstName, ownerName.lastName),
+          email: profile.email,
           passwordHash: DEV_PASSWORD_HASH,
-          name: `${ownerName.firstName} ${ownerName.lastName}`,
-          phone: czechPhone(),
+          name: profile.name,
+          phone: profile.phone,
           roleId: ownerRole.id,
           emailVerified: true,
           isActive: true,
@@ -294,6 +301,22 @@ async function seed() {
         .returning();
       users.push(ownerUserResult[0]);
     }
+
+    // Test user — easy to remember, owner of Salon Krása
+    const testUserResult = await db
+      .insert(schema.users)
+      .values({
+        companyId: companies[0].id,
+        email: 'test@example.com',
+        passwordHash: DEV_PASSWORD_HASH,
+        name: 'Test User',
+        phone: '+420 777 000 000',
+        roleId: ownerRole.id,
+        emailVerified: true,
+        isActive: true,
+      })
+      .returning();
+    users.push(testUserResult[0]);
 
     // Employee users (2 per company)
     for (const company of companies) {
@@ -763,9 +786,12 @@ async function seed() {
     console.log(`Tags:           ${tags.length}`);
     console.log('═'.repeat(60));
     console.log('\n✨ Development database is ready!\n');
-    console.log('Login credentials:');
-    console.log('  Email:    admin@schedulebox.cz');
-    console.log('  Password: password123\n');
+    console.log('Login credentials (all use password: password123):');
+    console.log('  admin@schedulebox.cz     — Superadmin (no company)');
+    console.log('  lukas.fiala@centrum.cz   — Owner of Salon Krása');
+    console.log('  martin.novak@seznam.cz   — Owner of Holičství U Brouska');
+    console.log('  eva.svobodova@email.cz   — Owner of FitZone Gym');
+    console.log('  test@example.com         — Test owner (Salon Krása)\n');
   } catch (error) {
     console.error('❌ Seed failed:', error);
     throw error;

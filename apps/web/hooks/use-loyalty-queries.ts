@@ -31,8 +31,10 @@ export const loyaltyKeys = {
   all: ['loyalty'] as const,
   program: () => [...loyaltyKeys.all, 'program'] as const,
   tiers: () => [...loyaltyKeys.all, 'tiers'] as const,
+  cardsAll: () => [...loyaltyKeys.all, 'cards'] as const,
   cards: (params?: Record<string, unknown>) => [...loyaltyKeys.all, 'cards', params] as const,
   card: (id: string) => [...loyaltyKeys.all, 'cards', id] as const,
+  rewardsAll: () => [...loyaltyKeys.all, 'rewards'] as const,
   rewards: (params?: Record<string, unknown>) => [...loyaltyKeys.all, 'rewards', params] as const,
   transactions: (cardId: string, params?: Record<string, unknown>) =>
     [...loyaltyKeys.all, 'transactions', cardId, params] as const,
@@ -71,7 +73,12 @@ export function useLoyaltyProgram() {
 /**
  * Hook for fetching paginated loyalty cards list
  */
-export function useLoyaltyCards(params?: { page?: number; limit?: number; customer_id?: string }) {
+export function useLoyaltyCards(params?: {
+  page?: number;
+  limit?: number;
+  customer_id?: string;
+  search?: string;
+}) {
   const queryParams = params as Record<string, unknown> | undefined;
   return useQuery({
     queryKey: loyaltyKeys.cards(queryParams),
@@ -199,7 +206,7 @@ export function useCreateReward() {
       return apiClient.post<Reward>('/loyalty/rewards', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewards() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewardsAll() });
     },
   });
 }
@@ -214,7 +221,7 @@ export function useUpdateReward() {
       return apiClient.put<Reward>(`/loyalty/rewards/${id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewards() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewardsAll() });
     },
   });
 }
@@ -233,7 +240,7 @@ export function useAddPoints() {
       queryClient.invalidateQueries({
         queryKey: loyaltyKeys.transactions(variables.cardId),
       });
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cards() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cardsAll() });
     },
   });
 }
@@ -249,8 +256,8 @@ export function useRedeemReward() {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: loyaltyKeys.card(variables.cardId) });
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewards() });
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cards() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.rewardsAll() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cardsAll() });
     },
   });
 }
@@ -265,7 +272,7 @@ export function useCreateCard() {
       return apiClient.post<LoyaltyCard>('/loyalty/cards', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cards() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.cardsAll() });
     },
   });
 }
@@ -278,6 +285,22 @@ export function useCreateTier() {
   return useMutation({
     mutationFn: async (data: TierCreate) => {
       return apiClient.post<LoyaltyTier>('/loyalty/tiers', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.program() });
+      queryClient.invalidateQueries({ queryKey: loyaltyKeys.tiers() });
+    },
+  });
+}
+
+/**
+ * Hook for deleting a loyalty tier
+ */
+export function useDeleteTier() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (tierId: number) => {
+      return apiClient.delete(`/loyalty/tiers/${tierId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: loyaltyKeys.program() });

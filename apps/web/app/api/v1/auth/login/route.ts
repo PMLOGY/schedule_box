@@ -39,16 +39,21 @@ export async function POST(req: NextRequest) {
 
     // 1.5. Check account lockout before expensive password verification
     const lockoutKey = `login_lockout:${input.email}`;
-    const isLocked = await redis.get(lockoutKey);
-    if (isLocked) {
-      const ttl = await redis.ttl(lockoutKey);
-      const minutes = ttl > 0 ? Math.ceil(ttl / 60) : 15; // Fallback to full lockout if TTL unavailable
-      throw new UnauthorizedError(
-        `Account temporarily locked due to too many failed attempts. Try again in ${minutes} minutes.`,
-      );
+    try {
+      const isLocked = await redis.get(lockoutKey);
+      if (isLocked) {
+        const ttl = await redis.ttl(lockoutKey);
+        const minutes = ttl > 0 ? Math.ceil(ttl / 60) : 15;
+        throw new UnauthorizedError(
+          `Account temporarily locked due to too many failed attempts. Try again in ${minutes} minutes.`,
+        );
+      }
+    } catch (error) {
+      if (error instanceof UnauthorizedError) throw error;
+      console.error('[Login] Redis lockout check failed, skipping:', (error as Error).message);
     }
 
-    // 2. Find user with role name and company UUID (JOIN roles and companies)
+    // 2. Find user with role name and company UUID (LEFT JOIN companies for superadmins)
     const [userRecord] = await db
       .select({
         id: users.id,
@@ -67,7 +72,7 @@ export async function POST(req: NextRequest) {
       })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
-      .innerJoin(companies, eq(users.companyId, companies.id))
+      .leftJoin(companies, eq(users.companyId, companies.id))
       .where(eq(users.email, input.email))
       .limit(1);
 
@@ -81,31 +86,39 @@ export async function POST(req: NextRequest) {
       throw new UnauthorizedError('Account is inactive');
     }
 
-    if (!userRecord.companyId) {
-      throw new UnauthorizedError('User is not associated with a company');
-    }
-
     // 4. Verify password
     const isValidPassword = await verifyPassword(userRecord.passwordHash, input.password);
     if (!isValidPassword) {
       // Increment failed login counter and lock after threshold
-      const failKey = `login_failures:${input.email}`;
-      const failures = await redis.incr(failKey);
-      if (failures === 1) {
-        await redis.expire(failKey, LOGIN_LOCKOUT_SECONDS);
-      }
-      if (failures >= LOGIN_LOCKOUT_THRESHOLD) {
-        await redis.setex(lockoutKey, LOGIN_LOCKOUT_SECONDS, '1');
-        await redis.del(failKey);
-        throw new UnauthorizedError(
-          'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
+      try {
+        const failKey = `login_failures:${input.email}`;
+        const failures = await redis.incr(failKey);
+        if (failures === 1) {
+          await redis.expire(failKey, LOGIN_LOCKOUT_SECONDS);
+        }
+        if (failures >= LOGIN_LOCKOUT_THRESHOLD) {
+          await redis.setex(lockoutKey, LOGIN_LOCKOUT_SECONDS, '1');
+          await redis.del(failKey);
+          throw new UnauthorizedError(
+            'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
+          );
+        }
+      } catch (error) {
+        if (error instanceof UnauthorizedError) throw error;
+        console.error(
+          '[Login] Redis lockout increment failed, skipping:',
+          (error as Error).message,
         );
       }
       throw new UnauthorizedError('Invalid email or password');
     }
 
     // Clear failed login counter on successful password verification
-    await redis.del(`login_failures:${input.email}`);
+    try {
+      await redis.del(`login_failures:${input.email}`);
+    } catch {
+      // Redis unavailable - no-op
+    }
 
     // 5. Handle MFA flow
     if (userRecord.mfaEnabled) {

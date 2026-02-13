@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/auth.store';
 import { downloadCSV, downloadBlob, formatCSVDate } from '@/lib/export/csv-exporter';
 
 interface ExportToolbarProps {
@@ -30,6 +31,7 @@ interface ExportToolbarProps {
 
 export function ExportToolbar({ revenueData, bookingData, days, isLoading }: ExportToolbarProps) {
   const t = useTranslations('analytics.export');
+  const locale = useLocale();
   const [isExportingRevenuePdf, setIsExportingRevenuePdf] = useState(false);
   const [isExportingBookingsPdf, setIsExportingBookingsPdf] = useState(false);
 
@@ -40,11 +42,10 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
         return;
       }
 
-      // Format data for CSV export with Czech date format
       const csvData = revenueData.map((row) => ({
-        Datum: formatCSVDate(row.date),
-        'Tržby (CZK)': row.revenue,
-        Rezervace: row.bookings,
+        [t('csvColumns.date')]: formatCSVDate(row.date),
+        [t('csvColumns.revenue')]: row.revenue,
+        [t('csvColumns.bookings')]: row.bookings,
       }));
 
       const filename = `revenue-${new Date().toISOString().split('T')[0]}`;
@@ -63,13 +64,12 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
         return;
       }
 
-      // Format data for CSV export with Czech date format
       const csvData = bookingData.map((row) => ({
-        Datum: formatCSVDate(row.date),
-        Dokončené: row.completed,
-        Zrušené: row.cancelled,
-        'No-shows': row.noShows,
-        Celkem: row.total,
+        [t('csvColumns.date')]: formatCSVDate(row.date),
+        [t('csvColumns.completed')]: row.completed,
+        [t('csvColumns.cancelled')]: row.cancelled,
+        [t('csvColumns.noShows')]: row.noShows,
+        [t('csvColumns.total')]: row.total,
       }));
 
       const filename = `bookings-${new Date().toISOString().split('T')[0]}`;
@@ -81,11 +81,20 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
     }
   };
 
+  const fetchPdfWithAuth = async (url: string): Promise<Response> => {
+    const accessToken = useAuthStore.getState().accessToken;
+    return fetch(url, {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    });
+  };
+
   const handleRevenuePDF = async () => {
     try {
       setIsExportingRevenuePdf(true);
 
-      const response = await fetch(`/api/v1/reports/revenue/pdf?days=${days}`);
+      const response = await fetchPdfWithAuth(
+        `/api/v1/reports/revenue/pdf?days=${days}&locale=${locale}`,
+      );
 
       if (!response.ok) {
         throw new Error('PDF generation failed');
@@ -107,7 +116,9 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
     try {
       setIsExportingBookingsPdf(true);
 
-      const response = await fetch(`/api/v1/reports/bookings/pdf?days=${days}`);
+      const response = await fetchPdfWithAuth(
+        `/api/v1/reports/bookings/pdf?days=${days}&locale=${locale}`,
+      );
 
       if (!response.ok) {
         throw new Error('PDF generation failed');
@@ -127,52 +138,44 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Revenue CSV Export */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleRevenueCSV}
         disabled={isLoading || !revenueData || revenueData.length === 0}
-        aria-label="Export revenue data as CSV file"
       >
         <Download className="mr-2 h-4 w-4" />
-        Export Tržeb CSV
+        {t('revenueCSV')}
       </Button>
 
-      {/* Bookings CSV Export */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleBookingsCSV}
         disabled={isLoading || !bookingData || bookingData.length === 0}
-        aria-label="Export booking data as CSV file"
       >
         <Download className="mr-2 h-4 w-4" />
-        Export Rezervací CSV
+        {t('bookingsCSV')}
       </Button>
 
-      {/* Revenue PDF Export */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleRevenuePDF}
         disabled={isLoading || !revenueData || revenueData.length === 0 || isExportingRevenuePdf}
-        aria-label="Export revenue report as PDF file"
       >
         <FileText className="mr-2 h-4 w-4" />
-        {isExportingRevenuePdf ? t('downloading') : 'Export Tržeb PDF'}
+        {isExportingRevenuePdf ? t('downloading') : t('revenuePDF')}
       </Button>
 
-      {/* Bookings PDF Export */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleBookingsPDF}
         disabled={isLoading || !bookingData || bookingData.length === 0 || isExportingBookingsPdf}
-        aria-label="Export booking report as PDF file"
       >
         <FileText className="mr-2 h-4 w-4" />
-        {isExportingBookingsPdf ? t('downloading') : 'Export Rezervací PDF'}
+        {isExportingBookingsPdf ? t('downloading') : t('bookingsPDF')}
       </Button>
     </div>
   );

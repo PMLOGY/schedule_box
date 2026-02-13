@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Select,
@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Mail, MessageSquare, Bell } from 'lucide-react';
+import { Mail, MessageSquare, Bell, X } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 
 export type ActionType = 'send_email' | 'send_sms' | 'send_push';
@@ -42,8 +42,9 @@ export interface ActionNodeData extends Record<string, unknown> {
   onChange?: (actionType: ActionType, config: { templateId?: number }) => void;
 }
 
-function ActionNode({ data }: NodeProps) {
+function ActionNode({ id, data }: NodeProps) {
   const nodeData = data as ActionNodeData;
+  const { deleteElements } = useReactFlow();
   const { data: allTemplates } = useQuery({
     queryKey: ['notification-templates'],
     queryFn: async () => {
@@ -108,7 +109,14 @@ function ActionNode({ data }: NodeProps) {
       <Handle type="target" position={Position.Top} className="h-3 w-3 !bg-green-500" />
       <div className="mb-3 flex items-center gap-2">
         {getIcon()}
-        <span className="font-semibold text-green-900">Akce</span>
+        <span className="flex-1 font-semibold text-green-900">Akce</span>
+        <button
+          onClick={() => deleteElements({ nodes: [{ id }] })}
+          className="rounded p-0.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
+          title="Odstranit"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
       <div className="min-w-[240px] space-y-2">
         <Select value={nodeData.actionType} onValueChange={handleActionTypeChange}>

@@ -93,7 +93,7 @@ export default function BookingCalendar() {
           }
 
           const events: EventInput[] = bookingList.map((booking) => ({
-            id: String(booking.uuid),
+            id: String(booking.id),
             title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
             start: booking.startTime,
             end: booking.endTime,

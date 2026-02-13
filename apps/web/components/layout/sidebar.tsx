@@ -1,11 +1,12 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Link, usePathname } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useUIStore } from '@/stores/ui.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { filterNavByRole } from '@/lib/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -15,6 +16,12 @@ export function Sidebar() {
   const t = useTranslations('nav');
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const { user } = useAuthStore();
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  // Clear pending state once navigation completes
+  useEffect(() => {
+    setPendingPath(null);
+  }, [pathname]);
 
   const navItems = user ? filterNavByRole(user.role) : [];
 
@@ -42,20 +49,30 @@ export function Sidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
+            const isPending = pendingPath === item.href && !isActive;
 
             const linkContent = (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => {
+                  if (!isActive) setPendingPath(item.href);
+                }}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                   isActive
                     ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                    : isPending
+                      ? 'bg-primary/20 text-primary'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                {isPending ? (
+                  <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin" />
+                ) : (
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                )}
                 {!sidebarCollapsed && <span>{t(item.key)}</span>}
               </Link>
             );

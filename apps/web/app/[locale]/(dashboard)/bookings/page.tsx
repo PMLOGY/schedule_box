@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
 import { format } from 'date-fns';
-import { cs } from 'date-fns/locale';
+import { cs, sk, enUS } from 'date-fns/locale';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,8 @@ export default function BookingsPage() {
   const t = useTranslations('booking.list');
   const tBooking = useTranslations('booking');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const dateLocale = { cs, sk, en: enUS }[locale] || cs;
 
   // Filter state
   const [status, setStatus] = useState<BookingStatus | undefined>(undefined);
@@ -63,11 +65,11 @@ export default function BookingsPage() {
   };
 
   const formatDateTime = (dateString: string) => {
-    return format(new Date(dateString), 'PPP p', { locale: cs });
+    return format(new Date(dateString), 'PPP p', { locale: dateLocale });
   };
 
   const formatPrice = (price: string, currency: string) => {
-    return new Intl.NumberFormat('cs', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currency.toUpperCase(),
     }).format(parseFloat(price));
@@ -159,7 +161,7 @@ export default function BookingsPage() {
                     <TableRow
                       key={booking.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(String(booking.uuid))}
+                      onClick={() => handleRowClick(String(booking.id))}
                     >
                       <TableCell className="font-medium">
                         {formatDateTime(booking.startTime)}

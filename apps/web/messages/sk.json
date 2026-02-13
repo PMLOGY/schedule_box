@@ -83,9 +83,17 @@
     "loyalty": "Vernostný program",
     "analytics": "Analytika",
     "ai": "AI optimalizácia",
+    "capacity": "Kapacita",
+    "pricing": "Cenotvorba",
+    "optimization": "Optimalizácia",
     "marketing": "Marketing",
     "settings": "Nastavenia",
     "templates": "Šablóny",
+    "rewards": "Katalóg odmien",
+    "cards": "Vernostné karty",
+    "new": "Nová",
+    "logs": "Protokoly",
+    "builder": "Editor",
     "help": "Nápoveda",
     "logout": "Odhlásiť sa"
   },
@@ -140,6 +148,7 @@
       "cancelledAt": "Zrušené",
       "cancellationReason": "Dôvod zrušenia",
       "minutes": "minút",
+      "loading": "Načítava sa rezervácia...",
       "notFound": "Rezervácia nebola nájdená",
       "actions": {
         "confirm": {
@@ -269,6 +278,7 @@
     "noCustomers": "Žiadni zákazníci",
     "add": "Pridať zákazníka",
     "addTitle": "Nový zákazník",
+    "addDescription": "Vyplňte údaje nového zákazníka",
     "form": {
       "name": "Meno",
       "email": "E-mail",
@@ -278,6 +288,7 @@
     "createSuccess": "Zákazník bol vytvorený",
     "createError": "Nepodarilo sa vytvoriť zákazníka",
     "editTitle": "Upraviť zákazníka",
+    "editDescription": "Upravte údaje zákazníka",
     "updateSuccess": "Zákazník bol upravený",
     "updateError": "Nepodarilo sa upraviť zákazníka"
   },
@@ -390,9 +401,22 @@
     "export": {
       "csv": "Exportovať CSV",
       "pdf": "Exportovať PDF",
+      "revenueCSV": "Tržby CSV",
+      "bookingsCSV": "Rezervácie CSV",
+      "revenuePDF": "Tržby PDF",
+      "bookingsPDF": "Rezervácie PDF",
       "downloading": "Sťahovanie...",
       "success": "Export bol úspešne stiahnutý",
-      "error": "Chyba pri exporte dát"
+      "error": "Chyba pri exporte dát",
+      "csvColumns": {
+        "date": "Dátum",
+        "revenue": "Tržby",
+        "bookings": "Rezervácie",
+        "completed": "Dokončené",
+        "cancelled": "Zrušené",
+        "noShows": "No-shows",
+        "total": "Celkom"
+      }
     },
     "period": {
       "last7days": "Posledných 7 dní",
@@ -445,8 +469,10 @@
     "fixed": "{value} Kč",
     "addCoupon": "Pridať kupón",
     "addCouponTitle": "Nový kupón",
+    "addCouponDescription": "Vytvorte nový zľavový kupón pre vašich zákazníkov.",
     "addGiftCard": "Pridať poukaz",
     "addGiftCardTitle": "Nový darčekový poukaz",
+    "addGiftCardDescription": "Vytvorte nový darčekový poukaz s počiatočným zostatkom.",
     "couponForm": {
       "code": "Kód",
       "description": "Popis",
@@ -463,23 +489,32 @@
     "createSuccess": "Úspešne vytvorené",
     "createError": "Nepodarilo sa vytvoriť",
     "editCouponTitle": "Upraviť kupón",
+    "editCouponDescription": "Upravte nastavenie tohto kupónu.",
     "editGiftCardTitle": "Upraviť poukaz",
+    "editGiftCardDescription": "Upravte údaje tohto darčekového poukazu.",
     "updateSuccess": "Úspešne upravené",
     "updateError": "Nepodarilo sa upraviť"
   },
   "settings": {
     "title": "Nastavenia",
+    "description": "Správa profilu spoločnosti a pracovnej doby",
     "companyProfile": "Profil spoločnosti",
+    "companyProfileDescription": "Upravte údaje o spoločnosti a kontaktné informácie",
     "workingHours": "Pracovná doba",
+    "workingHoursDescription": "Nastavte predvolenú otváraciu dobu vašej spoločnosti",
     "fields": {
-      "name": "Názov",
+      "name": "Názov spoločnosti",
       "email": "E-mail",
       "phone": "Telefón",
       "website": "Web",
       "address": "Adresa",
+      "addressStreet": "Ulica",
+      "addressCity": "Mesto",
+      "addressZip": "PSČ",
       "currency": "Mena",
       "timezone": "Časové pásmo",
-      "plan": "Tarif"
+      "plan": "Tarif",
+      "description": "Popis"
     },
     "days": {
       "0": "Nedeľa",
@@ -491,7 +526,12 @@
       "6": "Sobota"
     },
     "closed": "Zatvorené",
-    "noWorkingHours": "Pracovná doba nie je nastavená"
+    "noWorkingHours": "Pracovná doba nie je nastavená",
+    "startTime": "Od",
+    "endTime": "Do",
+    "saveSuccess": "Nastavenia úspešne uložené",
+    "saveError": "Nepodarilo sa uložiť nastavenia",
+    "saving": "Ukladanie..."
   },
   "notifications": {
     "title": "História notifikácií",
@@ -535,7 +575,11 @@
     "body": "Obsah správy",
     "cancel": "Zrušiť",
     "creating": "Odosielanie...",
-    "send": "Odoslať"
+    "send": "Odoslať",
+    "fromTemplate": "Zo šablóny",
+    "selectTemplate": "Vyberte šablónu...",
+    "noTemplate": "Bez šablóny (ručné zadanie)",
+    "useTemplate": "Použiť"
   },
   "automation": {
     "title": "Automatizácia",
@@ -625,6 +669,228 @@
         "reduce_hours": "skrátiť hodiny",
         "add_employee": "pridať zamestnanca"
       }
+    }
+  },
+  "loyalty": {
+    "title": "Vernostný program",
+    "description": "Nastavenie vernostného programu a úrovní",
+    "editSettings": "Upraviť nastavenia",
+    "programSettings": "Nastavenia programu",
+    "programSettingsDescriptionExisting": "Zobrazenie a úprava konfigurácie vernostného programu",
+    "programSettingsDescriptionNew": "Vytvorte nový vernostný program pre vaše podnikanie",
+    "form": {
+      "name": "Názov",
+      "namePlaceholder": "Môj vernostný program",
+      "description": "Popis",
+      "descriptionPlaceholder": "Získajte body s každou rezerváciou",
+      "type": "Typ programu",
+      "typePoints": "Body",
+      "typeStamps": "Pečiatky",
+      "typeTiers": "Úrovne",
+      "pointsPerCurrency": "Body za euro",
+      "pointsPerCurrencyHint": "Koľko bodov zákazník získa za 1 €",
+      "saving": "Ukladanie...",
+      "update": "Aktualizovať program",
+      "create": "Vytvoriť program",
+      "cancel": "Zrušiť"
+    },
+    "info": {
+      "name": "Názov",
+      "type": "Typ",
+      "pointsPerCurrency": "Bodov za €",
+      "status": "Stav",
+      "active": "Aktívny",
+      "inactive": "Neaktívny",
+      "descriptionLabel": "Popis"
+    },
+    "tiers": {
+      "title": "Úrovne",
+      "description": "Správa vernostných úrovní a ich bodových prahov",
+      "add": "Pridať úroveň",
+      "noTiers": "Žiadne úrovne nie sú nakonfigurované. Použiť navrhované predvolené hodnoty?",
+      "applied": "Použité",
+      "applyDefaults": "Použiť predvolené úrovne",
+      "pointsSuffix": "b.",
+      "columns": {
+        "order": "Poradie",
+        "name": "Názov",
+        "minPoints": "Min. bodov",
+        "color": "Farba",
+        "actions": "Akcie"
+      },
+      "dialog": {
+        "title": "Pridať úroveň",
+        "description": "Vytvorte novú vernostnú úroveň pre váš program.",
+        "name": "Názov",
+        "namePlaceholder": "napr. Strieborná",
+        "minPoints": "Minimálny počet bodov",
+        "color": "Farba",
+        "sortOrder": "Poradie",
+        "cancel": "Zrušiť",
+        "creating": "Vytváranie...",
+        "create": "Vytvoriť úroveň"
+      },
+      "deleteConfirm": "Naozaj chcete odstrániť túto úroveň?",
+      "deleting": "Odstraňovanie...",
+      "delete": "Odstrániť"
+    },
+    "suggestedTiers": {
+      "bronze": "Bronzová",
+      "silver": "Strieborná",
+      "gold": "Zlatá"
+    },
+    "links": {
+      "cardsTitle": "Vernostné karty",
+      "cardsDescription": "Správa kariet zákazníkov, bodov a pečiatok",
+      "rewardsTitle": "Katalóg odmien",
+      "rewardsDescription": "Správa odmien, ktoré môžu zákazníci získať za body"
+    }
+  },
+  "loyaltyCards": {
+    "title": "Vernostné karty",
+    "description": "Zobrazenie a správa vernostných kariet zákazníkov",
+    "issueCard": "Vydať kartu",
+    "search": "Hľadať",
+    "searchLabel": "Hľadať zákazníka",
+    "searchPlaceholder": "Hľadať podľa mena alebo e-mailu...",
+    "clear": "Vymazať",
+    "empty": "Žiadne vernostné karty",
+    "emptyFiltered": "Žiadne karty nenájdené pre tento výraz",
+    "emptyDefault": "Vydajte prvú kartu zákazníkovi",
+    "columns": {
+      "cardNumber": "Číslo karty",
+      "customer": "Zákazník",
+      "pointsBalance": "Body",
+      "stampsBalance": "Pečiatky",
+      "tier": "Úroveň",
+      "created": "Vytvorené"
+    },
+    "noTier": "Žiadna",
+    "page": "Stránka {page} z {totalPages} (celkom {total})",
+    "previous": "Predchádzajúca",
+    "next": "Ďalšia",
+    "dialog": {
+      "title": "Vydať vernostnú kartu",
+      "description": "Vytvorte novú vernostnú kartu pre zákazníka.",
+      "customerLabel": "Zákazník",
+      "customerPlaceholder": "Hľadať podľa mena alebo e-mailu...",
+      "customerHint": "Vyberte zákazníka zo zoznamu",
+      "noCustomersFound": "Žiadni zákazníci nenájdení",
+      "searchingCustomers": "Hľadanie...",
+      "cancel": "Zrušiť",
+      "issuing": "Vydávanie...",
+      "issue": "Vydať kartu"
+    }
+  },
+  "loyaltyCardDetail": {
+    "backToCards": "Späť na karty",
+    "cardTitle": "Karta: {cardNumber}",
+    "addPoints": "Pridať body",
+    "cardNotFound": "Karta nenájdená",
+    "cardNotFoundDescription": "Táto vernostná karta neexistuje alebo bola odstránená.",
+    "pointsBalance": "Stav bodov",
+    "stampsBalance": "Stav pečiatok",
+    "currentTier": "Aktuálna úroveň",
+    "noTier": "Žiadna úroveň",
+    "memberSince": "Členom od",
+    "tierProgress": "Postup v úrovniach",
+    "maxTierReached": "{tierName} - Dosiahnutá maximálna úroveň",
+    "pointsNeeded": "{points} bodov potreba",
+    "pointsToTier": "{current} / {target} bodov do úrovne {tierName}",
+    "digitalWallet": "Digitálna peňaženka",
+    "digitalWalletDescription": "Pridajte túto vernostnú kartu do digitálnej peňaženky",
+    "addToAppleWallet": "Pridať do Apple Wallet",
+    "addToGoogleWallet": "Pridať do Google Wallet",
+    "transactionHistory": "História transakcií",
+    "transactionHistoryDescription": "Všetky bodové transakcie pre túto kartu",
+    "noTransactions": "Zatiaľ žiadne transakcie",
+    "noTransactionsDescription": "Body sa tu zobrazia, keď budú získané alebo uplatnené",
+    "columns": {
+      "date": "Dátum",
+      "type": "Typ",
+      "points": "Body",
+      "balanceAfter": "Zostatok po",
+      "description": "Popis"
+    },
+    "transactionTypes": {
+      "earn": "Získanie",
+      "redeem": "Uplatnenie",
+      "adjust": "Úprava",
+      "expire": "Expirácia",
+      "stamp": "Pečiatka"
+    },
+    "page": "Stránka {page} z {totalPages} (celkom {total})",
+    "previous": "Predchádzajúca",
+    "next": "Ďalšia",
+    "addPointsDialog": {
+      "title": "Pridať body",
+      "description": "Manuálne pridajte body na túto vernostnú kartu.",
+      "points": "Body",
+      "descriptionLabel": "Popis",
+      "descriptionOptional": "(voliteľné)",
+      "descriptionPlaceholder": "napr. Manuálny bonus",
+      "cancel": "Zrušiť",
+      "adding": "Pridávanie...",
+      "add": "Pridať body"
+    }
+  },
+  "loyaltyRewards": {
+    "title": "Katalóg odmien",
+    "description": "Správa odmien, ktoré zákazníci môžu uplatniť za body",
+    "addReward": "Pridať odmenu",
+    "filters": "Filtre",
+    "status": "Stav",
+    "all": "Všetko",
+    "active": "Aktívne",
+    "inactive": "Neaktívne",
+    "columns": {
+      "name": "Názov",
+      "pointsCost": "Cena v bodoch",
+      "type": "Typ",
+      "redemptions": "Uplatnenie",
+      "status": "Stav",
+      "actions": "Akcie"
+    },
+    "pointsSuffix": "b.",
+    "empty": "Zatiaľ žiadne odmeny",
+    "emptyDescription": "Vytvorte prvú odmenu, ktorú zákazníci môžu uplatniť",
+    "page": "Stránka {page} z {totalPages} (celkom {total})",
+    "previous": "Predchádzajúca",
+    "next": "Ďalšia",
+    "dialog": {
+      "createTitle": "Pridať odmenu",
+      "editTitle": "Upraviť odmenu",
+      "createDescription": "Vytvorte novú odmenu pre váš vernostný program.",
+      "editDescription": "Aktualizujte detaily odmeny.",
+      "name": "Názov",
+      "namePlaceholder": "napr. 10% zľava na ďalšiu rezerváciu",
+      "descriptionLabel": "Popis",
+      "descriptionPlaceholder": "Popis odmeny",
+      "pointsCost": "Cena v bodoch",
+      "rewardType": "Typ odmeny",
+      "value": "Hodnota",
+      "optional": "(voliteľné)",
+      "valuePlaceholderPercent": "napr. 10",
+      "valuePlaceholderFixed": "napr. 100",
+      "maxRedemptions": "Max. uplatnení",
+      "unlimited": "Neobmedzene",
+      "cancel": "Zrušiť",
+      "saving": "Ukladanie...",
+      "create": "Vytvoriť odmenu",
+      "update": "Aktualizovať odmenu"
+    },
+    "types": {
+      "discount_percentage": "Zľava %",
+      "discount_fixed": "Pevná zľava",
+      "free_service": "Služba zadarmo",
+      "gift": "Darček"
+    },
+    "toast": {
+      "createSuccess": "Odmena bola vytvorená",
+      "updateSuccess": "Odmena bola aktualizovaná",
+      "createError": "Nepodarilo sa vytvoriť odmenu",
+      "updateError": "Nepodarilo sa aktualizovať odmenu",
+      "noProgramError": "Najprv vytvorte vernostný program"
     }
   },
   "errors": {

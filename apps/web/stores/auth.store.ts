@@ -107,8 +107,10 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'schedulebox-auth',
       partialize: (state) => ({
-        // Only persist user - NOT tokens (accessToken in memory only)
+        // Persist auth state so dashboard survives page refresh
         user: state.user,
+        accessToken: state.accessToken,
+        isAuthenticated: state.isAuthenticated,
       }),
     },
   ),

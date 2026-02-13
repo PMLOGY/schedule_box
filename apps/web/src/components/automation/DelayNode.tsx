@@ -1,5 +1,5 @@
 import { memo, useCallback, useState, useEffect } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Clock } from 'lucide-react';
+import { Clock, X } from 'lucide-react';
 
 type TimeUnit = 'minutes' | 'hours' | 'days';
 
@@ -17,8 +17,9 @@ export interface DelayNodeData extends Record<string, unknown> {
   onChange?: (delayMinutes: number) => void;
 }
 
-function DelayNode({ data }: NodeProps) {
+function DelayNode({ id, data }: NodeProps) {
   const nodeData = data as DelayNodeData;
+  const { deleteElements } = useReactFlow();
   const [value, setValue] = useState(0);
   const [unit, setUnit] = useState<TimeUnit>('minutes');
 
@@ -77,7 +78,14 @@ function DelayNode({ data }: NodeProps) {
       <Handle type="target" position={Position.Top} className="h-3 w-3 !bg-amber-500" />
       <div className="mb-3 flex items-center gap-2">
         <Clock className="h-5 w-5 text-amber-500" />
-        <span className="font-semibold text-amber-900">Zpoždění</span>
+        <span className="flex-1 font-semibold text-amber-900">Zpoždění</span>
+        <button
+          onClick={() => deleteElements({ nodes: [{ id }] })}
+          className="rounded p-0.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
+          title="Odstranit"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
       <div className="flex min-w-[240px] gap-2">
         <Input

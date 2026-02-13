@@ -9,17 +9,38 @@ import { z } from 'zod';
  * Gift card creation schema
  * POST /api/v1/gift-cards
  */
+/**
+ * Preprocess helper: convert empty/whitespace-only strings to undefined
+ * so that optional Zod validators don't reject them.
+ */
+const emptyToUndefined = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? undefined : v);
+
 export const giftCardCreateSchema = z.object({
-  initial_balance: z
-    .number()
-    .positive('Initial balance must be positive')
-    .max(100000, 'Initial balance cannot exceed 100,000'),
+  initial_balance: z.preprocess(
+    (v) => (v === null ? undefined : v),
+    z
+      .number()
+      .positive('Initial balance must be positive')
+      .max(100000, 'Initial balance cannot exceed 100,000'),
+  ),
   currency: z.string().length(3, 'Currency must be 3 characters').default('CZK'),
-  purchased_by_customer_id: z.string().uuid('Invalid customer UUID').optional(),
-  recipient_email: z.string().email('Invalid email format').optional(),
-  recipient_name: z.string().max(255, 'Recipient name too long').optional(),
-  message: z.string().max(500, 'Message too long').optional(),
-  valid_until: z.string().datetime('Invalid datetime format').optional(),
+  purchased_by_customer_id: z.preprocess(
+    emptyToUndefined,
+    z.string().uuid('Invalid customer UUID').optional(),
+  ),
+  recipient_email: z.preprocess(
+    emptyToUndefined,
+    z.string().email('Invalid email format').optional(),
+  ),
+  recipient_name: z.preprocess(
+    emptyToUndefined,
+    z.string().max(255, 'Recipient name too long').optional(),
+  ),
+  message: z.preprocess(emptyToUndefined, z.string().max(500, 'Message too long').optional()),
+  valid_until: z.preprocess(
+    emptyToUndefined,
+    z.string().datetime('Invalid datetime format').optional(),
+  ),
 });
 
 export type GiftCardCreate = z.infer<typeof giftCardCreateSchema>;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,9 +38,10 @@ import {
   useUpdateProgram,
   useCreateTier,
   useTiers,
+  useDeleteTier,
 } from '@/hooks/use-loyalty-queries';
 import { useLoyaltyStore } from '@/stores/loyalty.store';
-import { Settings, Plus, Star, Pencil, CreditCard, Gift } from 'lucide-react';
+import { Settings, Plus, Star, Pencil, CreditCard, Gift, Trash2 } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
 import type { LoyaltyProgramType } from '@schedulebox/shared/types';
 
@@ -51,6 +53,7 @@ function ProgramForm({
   initialValues,
   onSubmit,
   isSubmitting,
+  t,
 }: {
   initialValues?: {
     name: string;
@@ -65,6 +68,7 @@ function ProgramForm({
     points_per_currency: number;
   }) => void;
   isSubmitting: boolean;
+  t: ReturnType<typeof useTranslations<'loyalty'>>;
 }) {
   const [name, setName] = useState(initialValues?.name ?? '');
   const [description, setDescription] = useState(initialValues?.description ?? '');
@@ -86,42 +90,42 @@ function ProgramForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="program-name">Název</Label>
+        <Label htmlFor="program-name">{t('form.name')}</Label>
         <Input
           id="program-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Můj věrnostní program"
+          placeholder={t('form.namePlaceholder')}
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-description">Popis</Label>
+        <Label htmlFor="program-description">{t('form.description')}</Label>
         <Input
           id="program-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Získejte body s každou rezervací"
+          placeholder={t('form.descriptionPlaceholder')}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-type">Typ programu</Label>
+        <Label htmlFor="program-type">{t('form.type')}</Label>
         <Select value={type} onValueChange={(v) => setType(v as LoyaltyProgramType)}>
           <SelectTrigger id="program-type">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="points">Body</SelectItem>
-            <SelectItem value="stamps">Razítka</SelectItem>
-            <SelectItem value="tiers">Úrovně</SelectItem>
+            <SelectItem value="points">{t('form.typePoints')}</SelectItem>
+            <SelectItem value="stamps">{t('form.typeStamps')}</SelectItem>
+            <SelectItem value="tiers">{t('form.typeTiers')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program-ppc">Body za korunu</Label>
+        <Label htmlFor="program-ppc">{t('form.pointsPerCurrency')}</Label>
         <Input
           id="program-ppc"
           type="number"
@@ -131,11 +135,11 @@ function ProgramForm({
           onChange={(e) => setPointsPerCurrency(Number(e.target.value))}
           required
         />
-        <p className="text-xs text-muted-foreground">Kolik bodů zákazník získá za 1 Kč</p>
+        <p className="text-xs text-muted-foreground">{t('form.pointsPerCurrencyHint')}</p>
       </div>
 
       <Button type="submit" disabled={isSubmitting || !name}>
-        {isSubmitting ? 'Ukládání...' : initialValues ? 'Aktualizovat program' : 'Vytvořit program'}
+        {isSubmitting ? t('form.saving') : initialValues ? t('form.update') : t('form.create')}
       </Button>
     </form>
   );
@@ -148,9 +152,11 @@ function ProgramForm({
 function TierFormDialog({
   open,
   onOpenChange,
+  t,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  t: ReturnType<typeof useTranslations<'loyalty'>>;
 }) {
   const [name, setName] = useState('');
   const [minPoints, setMinPoints] = useState(0);
@@ -184,23 +190,23 @@ function TierFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Přidat úroveň</DialogTitle>
-          <DialogDescription>Vytvořte novou věrnostní úroveň pro váš program.</DialogDescription>
+          <DialogTitle>{t('tiers.dialog.title')}</DialogTitle>
+          <DialogDescription>{t('tiers.dialog.description')}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="tier-name">Název</Label>
+            <Label htmlFor="tier-name">{t('tiers.dialog.name')}</Label>
             <Input
               id="tier-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="např. Stříbrná"
+              placeholder={t('tiers.dialog.namePlaceholder')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-min-points">Minimální počet bodů</Label>
+            <Label htmlFor="tier-min-points">{t('tiers.dialog.minPoints')}</Label>
             <Input
               id="tier-min-points"
               type="number"
@@ -212,7 +218,7 @@ function TierFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-color">Barva</Label>
+            <Label htmlFor="tier-color">{t('tiers.dialog.color')}</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="tier-color"
@@ -231,7 +237,7 @@ function TierFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tier-sort">Pořadí</Label>
+            <Label htmlFor="tier-sort">{t('tiers.dialog.sortOrder')}</Label>
             <Input
               id="tier-sort"
               type="number"
@@ -243,10 +249,10 @@ function TierFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Zrušit
+              {t('tiers.dialog.cancel')}
             </Button>
             <Button type="submit" disabled={createTier.isPending || !name}>
-              {createTier.isPending ? 'Vytváření...' : 'Vytvořit úroveň'}
+              {createTier.isPending ? t('tiers.dialog.creating') : t('tiers.dialog.create')}
             </Button>
           </DialogFooter>
         </form>
@@ -259,14 +265,14 @@ function TierFormDialog({
 // SUGGESTED TIERS
 // ============================================================================
 
-function SuggestedTiers() {
+function SuggestedTiers({ t }: { t: ReturnType<typeof useTranslations<'loyalty'>> }) {
   const createTier = useCreateTier();
   const [applied, setApplied] = useState(false);
 
   const suggestedTiers = [
-    { name: 'Bronzová', min_points: 0, color: '#CD7F32', sort_order: 0 },
-    { name: 'Stříbrná', min_points: 500, color: '#C0C0C0', sort_order: 1 },
-    { name: 'Zlatá', min_points: 1500, color: '#FFD700', sort_order: 2 },
+    { name: t('suggestedTiers.bronze'), min_points: 0, color: '#CD7F32', sort_order: 0 },
+    { name: t('suggestedTiers.silver'), min_points: 500, color: '#C0C0C0', sort_order: 1 },
+    { name: t('suggestedTiers.gold'), min_points: 1500, color: '#FFD700', sort_order: 2 },
   ];
 
   const applyDefaults = async () => {
@@ -278,13 +284,15 @@ function SuggestedTiers() {
 
   return (
     <div className="rounded-lg border border-dashed p-4">
-      <p className="mb-2 text-sm text-muted-foreground">
-        Žádné úrovně nejsou nakonfigurovány. Použít navrhované výchozí hodnoty?
-      </p>
+      <p className="mb-2 text-sm text-muted-foreground">{t('tiers.noTiers')}</p>
       <div className="mb-3 flex gap-2">
-        {suggestedTiers.map((t) => (
-          <Badge key={t.name} variant="outline" style={{ borderColor: t.color, color: t.color }}>
-            {t.name} ({t.min_points} b.)
+        {suggestedTiers.map((tier) => (
+          <Badge
+            key={tier.name}
+            variant="outline"
+            style={{ borderColor: tier.color, color: tier.color }}
+          >
+            {tier.name} ({tier.min_points} {t('tiers.pointsSuffix')})
           </Badge>
         ))}
       </div>
@@ -294,7 +302,7 @@ function SuggestedTiers() {
         onClick={applyDefaults}
         disabled={applied || createTier.isPending}
       >
-        {applied ? 'Použito' : 'Použít výchozí úrovně'}
+        {applied ? t('tiers.applied') : t('tiers.applyDefaults')}
       </Button>
     </div>
   );
@@ -305,10 +313,12 @@ function SuggestedTiers() {
 // ============================================================================
 
 export default function LoyaltyProgramPage() {
+  const t = useTranslations('loyalty');
   const { data: program, isLoading, error } = useLoyaltyProgram();
   const { data: tiers } = useTiers();
   const createProgram = useCreateProgram();
   const updateProgram = useUpdateProgram();
+  const deleteTier = useDeleteTier();
   const { programFormOpen, openProgramForm, closeProgramForm } = useLoyaltyStore();
   const [tierDialogOpen, setTierDialogOpen] = useState(false);
 
@@ -343,10 +353,15 @@ export default function LoyaltyProgramPage() {
     });
   };
 
+  const handleDeleteTier = (tierId: number) => {
+    if (!confirm(t('tiers.deleteConfirm'))) return;
+    deleteTier.mutate(tierId);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-8">
-        <PageHeader title="Věrnostní program" />
+        <PageHeader title={t('title')} />
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-48" />
@@ -367,13 +382,13 @@ export default function LoyaltyProgramPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Věrnostní program"
-        description="Nastavení věrnostního programu a úrovní"
+        title={t('title')}
+        description={t('description')}
         actions={
           hasProgram && !programFormOpen ? (
             <Button variant="outline" onClick={openProgramForm}>
               <Pencil className="mr-2 h-4 w-4" />
-              Upravit nastavení
+              {t('editSettings')}
             </Button>
           ) : undefined
         }
@@ -384,17 +399,17 @@ export default function LoyaltyProgramPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Nastavení programu
+            {t('programSettings')}
           </CardTitle>
           <CardDescription>
             {hasProgram
-              ? 'Zobrazení a úprava konfigurace věrnostního programu'
-              : 'Vytvořte nový věrnostní program pro vaše podnikání'}
+              ? t('programSettingsDescriptionExisting')
+              : t('programSettingsDescriptionNew')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!hasProgram ? (
-            <ProgramForm onSubmit={handleCreate} isSubmitting={createProgram.isPending} />
+            <ProgramForm onSubmit={handleCreate} isSubmitting={createProgram.isPending} t={t} />
           ) : programFormOpen ? (
             <div className="space-y-4">
               <ProgramForm
@@ -406,40 +421,41 @@ export default function LoyaltyProgramPage() {
                 }}
                 onSubmit={handleUpdate}
                 isSubmitting={updateProgram.isPending}
+                t={t}
               />
               <Button variant="ghost" onClick={closeProgramForm}>
-                Zrušit
+                {t('form.cancel')}
               </Button>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div>
-                <p className="text-sm text-muted-foreground">Název</p>
+                <p className="text-sm text-muted-foreground">{t('info.name')}</p>
                 <p className="font-medium">{program.name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Typ</p>
+                <p className="text-sm text-muted-foreground">{t('info.type')}</p>
                 <Badge variant="outline" className="capitalize">
                   {program.type === 'points'
-                    ? 'Body'
+                    ? t('form.typePoints')
                     : program.type === 'stamps'
-                      ? 'Razítka'
-                      : 'Úrovně'}
+                      ? t('form.typeStamps')
+                      : t('form.typeTiers')}
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Bodů za Kč</p>
+                <p className="text-sm text-muted-foreground">{t('info.pointsPerCurrency')}</p>
                 <p className="font-medium">{program.pointsPerCurrency}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Stav</p>
+                <p className="text-sm text-muted-foreground">{t('info.status')}</p>
                 <Badge variant={program.isActive ? 'default' : 'secondary'}>
-                  {program.isActive ? 'Aktivní' : 'Neaktivní'}
+                  {program.isActive ? t('info.active') : t('info.inactive')}
                 </Badge>
               </div>
               {program.description && (
                 <div className="col-span-full">
-                  <p className="text-sm text-muted-foreground">Popis</p>
+                  <p className="text-sm text-muted-foreground">{t('info.descriptionLabel')}</p>
                   <p className="text-sm">{program.description}</p>
                 </div>
               )}
@@ -456,27 +472,28 @@ export default function LoyaltyProgramPage() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="h-5 w-5" />
-                  Úrovně
+                  {t('tiers.title')}
                 </CardTitle>
-                <CardDescription>Správa věrnostních úrovní a jejich bodových prahů</CardDescription>
+                <CardDescription>{t('tiers.description')}</CardDescription>
               </div>
               <Button onClick={() => setTierDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Přidat úroveň
+                {t('tiers.add')}
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             {programTiers.length === 0 ? (
-              <SuggestedTiers />
+              <SuggestedTiers t={t} />
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Pořadí</TableHead>
-                    <TableHead>Název</TableHead>
-                    <TableHead>Min. bodů</TableHead>
-                    <TableHead>Barva</TableHead>
+                    <TableHead>{t('tiers.columns.order')}</TableHead>
+                    <TableHead>{t('tiers.columns.name')}</TableHead>
+                    <TableHead>{t('tiers.columns.minPoints')}</TableHead>
+                    <TableHead>{t('tiers.columns.color')}</TableHead>
+                    <TableHead className="text-right">{t('tiers.columns.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -496,6 +513,16 @@ export default function LoyaltyProgramPage() {
                             <span className="text-sm text-muted-foreground">{tier.color}</span>
                           </div>
                         </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTier(tier.id)}
+                            disabled={deleteTier.isPending}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -505,7 +532,7 @@ export default function LoyaltyProgramPage() {
         </Card>
       )}
 
-      <TierFormDialog open={tierDialogOpen} onOpenChange={setTierDialogOpen} />
+      <TierFormDialog open={tierDialogOpen} onOpenChange={setTierDialogOpen} t={t} />
 
       {/* Quick Links to sub-pages */}
       {hasProgram && (
@@ -515,9 +542,9 @@ export default function LoyaltyProgramPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <CreditCard className="h-5 w-5" />
-                  Věrnostní karty
+                  {t('links.cardsTitle')}
                 </CardTitle>
-                <CardDescription>Správa karet zákazníků, bodů a razítek</CardDescription>
+                <CardDescription>{t('links.cardsDescription')}</CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -526,11 +553,9 @@ export default function LoyaltyProgramPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Gift className="h-5 w-5" />
-                  Katalog odměn
+                  {t('links.rewardsTitle')}
                 </CardTitle>
-                <CardDescription>
-                  Správa odměn, které mohou zákazníci získat za body
-                </CardDescription>
+                <CardDescription>{t('links.rewardsDescription')}</CardDescription>
               </CardHeader>
             </Card>
           </Link>

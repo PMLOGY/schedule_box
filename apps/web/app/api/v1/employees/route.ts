@@ -6,7 +6,7 @@
  * Create a new employee with optional service assignments
  */
 
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, inArray } from 'drizzle-orm';
 import { db, employees, employeeServices, services } from '@schedulebox/database';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
@@ -17,17 +17,44 @@ import { employeeCreateSchema } from '@/validations/employee';
 /**
  * List employees
  * Includes assigned services for each employee (single query with LEFT JOIN)
+ *
+ * Optional query params:
+ * - service_id: Filter to only employees who can provide this service
  */
 export const GET = createRouteHandler({
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.EMPLOYEES_MANAGE],
-  handler: async ({ user }) => {
+  handler: async ({ user, req }) => {
     if (!user) {
       throw new Error('User not authenticated');
     }
 
     // Get company scope
     const { companyId } = await findCompanyId(user.sub);
+
+    // Parse optional service_id filter
+    const serviceIdParam = req.nextUrl.searchParams.get('service_id');
+    const filterServiceId = serviceIdParam ? parseInt(serviceIdParam, 10) : null;
+
+    // Build where conditions
+    const conditions = [eq(employees.companyId, companyId), isNull(employees.deletedAt)];
+
+    // If filtering by service, only include employees assigned to that service
+    let employeeIdFilter: number[] | null = null;
+    if (filterServiceId && !isNaN(filterServiceId)) {
+      const assignedEmployees = await db
+        .select({ employeeId: employeeServices.employeeId })
+        .from(employeeServices)
+        .where(eq(employeeServices.serviceId, filterServiceId));
+
+      employeeIdFilter = assignedEmployees.map((e) => e.employeeId);
+
+      if (employeeIdFilter.length === 0) {
+        return successResponse([]);
+      }
+
+      conditions.push(inArray(employees.id, employeeIdFilter));
+    }
 
     // Single query: employees LEFT JOIN their assigned services
     const rows = await db
@@ -54,7 +81,7 @@ export const GET = createRouteHandler({
       .from(employees)
       .leftJoin(employeeServices, eq(employeeServices.employeeId, employees.id))
       .leftJoin(services, eq(employeeServices.serviceId, services.id))
-      .where(and(eq(employees.companyId, companyId), isNull(employees.deletedAt)))
+      .where(and(...conditions))
       .orderBy(employees.sortOrder, employees.name);
 
     // Group rows by employee (LEFT JOIN produces one row per employee-service pair)

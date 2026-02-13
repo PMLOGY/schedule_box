@@ -4,7 +4,7 @@
  * POST /api/v1/loyalty/cards - Issue a new loyalty card
  */
 
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or, ilike, sql } from 'drizzle-orm';
 import { db, loyaltyCards, loyaltyPrograms, loyaltyTiers, customers } from '@schedulebox/database';
 import { NotFoundError, InternalError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
@@ -43,11 +43,12 @@ export const GET = createRouteHandler({
       page: number;
       limit: number;
       customer_id?: string;
+      search?: string;
     };
 
     // Get company's program
     const [program] = await db
-      .select({ id: loyaltyPrograms.id })
+      .select({ id: loyaltyPrograms.id, type: loyaltyPrograms.type })
       .from(loyaltyPrograms)
       .where(eq(loyaltyPrograms.companyId, companyId))
       .limit(1);
@@ -56,7 +57,7 @@ export const GET = createRouteHandler({
       throw new NotFoundError('No loyalty program found for this company');
     }
 
-    // Build query with optional customer filter
+    // Build query with optional filters
     const conditions = [eq(loyaltyCards.programId, program.id)];
     if (query.customer_id) {
       // Convert customer UUID to internal ID
@@ -70,6 +71,18 @@ export const GET = createRouteHandler({
         throw new NotFoundError('Customer not found');
       }
       conditions.push(eq(loyaltyCards.customerId, customer.id));
+    }
+
+    // Search by customer name or email
+    if (query.search) {
+      const searchTerm = `%${query.search}%`;
+      const searchCondition = or(
+        ilike(customers.name, searchTerm),
+        ilike(customers.email, searchTerm),
+      );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     // Calculate offset
@@ -101,13 +114,14 @@ export const GET = createRouteHandler({
       .limit(query.limit)
       .offset(offset);
 
-    // Count total for pagination
+    // Count total for pagination (join customers for search filter)
     const [countResult] = await db
-      .select({ count: loyaltyCards.id })
+      .select({ count: sql<number>`COUNT(*)` })
       .from(loyaltyCards)
+      .innerJoin(customers, eq(loyaltyCards.customerId, customers.id))
       .where(conditions.length > 1 ? and(...conditions) : conditions[0]);
 
-    const total = countResult ? Number(countResult.count) : 0;
+    const total = Number(countResult?.count) || 0;
     const total_pages = Math.ceil(total / query.limit);
 
     // Format response

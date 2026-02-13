@@ -85,7 +85,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     key: 'ai',
-    href: '/ai/pricing',
+    href: '/ai',
     icon: Brain,
     roles: ['owner'],
   },
@@ -104,5 +104,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export function filterNavByRole(role: string): NavItem[] {
+  // Admin (superadmin) sees all nav items
+  if (role === 'admin') return NAV_ITEMS;
   return NAV_ITEMS.filter((item) => item.roles.includes(role));
 }

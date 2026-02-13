@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { format } from 'date-fns';
-import { cs } from 'react-day-picker/locale';
+import { cs, sk, enUS } from 'react-day-picker/locale';
 import { apiClient } from '@/lib/api-client';
 import { useBookingWizard } from '@/stores/booking-wizard.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvailabilityGrid } from './AvailabilityGrid';
+
+const calendarLocales: Record<string, typeof cs> = { cs, sk, en: enUS };
 
 interface AvailabilitySlot {
   date: string; // YYYY-MM-DD
@@ -29,8 +31,10 @@ interface AvailabilityResponse {
 export function Step2DateTimeSelect() {
   const t = useTranslations('booking.wizard.step2');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const { data, updateData, nextStep, prevStep } = useBookingWizard();
   const { user } = useAuthStore();
+  const calendarLocale = useMemo(() => calendarLocales[locale] || enUS, [locale]);
 
   // Default to tomorrow
   const tomorrow = new Date();
@@ -42,17 +46,22 @@ export function Step2DateTimeSelect() {
 
   const dateString = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined;
 
-  const { data: availabilityData, isLoading } = useQuery<AvailabilityResponse>({
+  const {
+    data: availabilityData,
+    isLoading,
+    isError,
+  } = useQuery<AvailabilityResponse>({
     queryKey: ['availability', data.serviceId, data.employeeId, dateString],
     queryFn: () =>
       apiClient.get('/availability', {
-        company_slug: user?.companyId || '', // Using companyId as slug for now
+        company_slug: user?.companyId || '',
         service_id: data.serviceId,
         employee_id: data.employeeId,
         date_from: dateString,
         date_to: dateString,
       }),
     enabled: !!data.serviceId && !!dateString,
+    retry: 1,
   });
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -100,7 +109,7 @@ export function Step2DateTimeSelect() {
             onSelect={handleDateSelect}
             disabled={(date) => date < new Date()}
             showOutsideDays={false}
-            locale={cs}
+            locale={calendarLocale}
             className="rounded-md border"
           />
         </div>
@@ -114,13 +123,21 @@ export function Step2DateTimeSelect() {
                 <Skeleton className="h-12 w-full" />
                 <Skeleton className="h-12 w-full" />
               </div>
+            ) : isError ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">{t('noSlotsAvailable')}</p>
+              </div>
             ) : availabilityData?.slots ? (
               <AvailabilityGrid
                 slots={availabilityData.slots}
                 selectedDate={dateString ?? ''}
                 onSelect={handleSlotSelect}
               />
-            ) : null}
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">{t('noSlotsAvailable')}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

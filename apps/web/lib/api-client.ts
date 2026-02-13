@@ -9,6 +9,11 @@ interface ApiError {
 
 class ApiClient {
   private baseUrl: string;
+  private isRefreshing = false;
+  private refreshPromise: Promise<void> | null = null;
+
+  // Endpoints that should never trigger a token refresh (prevents infinite loops)
+  private static NO_REFRESH_ENDPOINTS = ['/auth/refresh', '/auth/logout', '/auth/login'];
 
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
@@ -38,10 +43,23 @@ class ApiClient {
       });
 
       // Handle 401 Unauthorized - attempt token refresh
-      if (response.status === 401) {
-        // Try to refresh token
+      // Skip refresh for auth endpoints to prevent infinite loops
+      const skipRefresh =
+        ApiClient.NO_REFRESH_ENDPOINTS.some((e) => endpoint.startsWith(e)) || this.isRefreshing;
+
+      if (response.status === 401 && !skipRefresh) {
         try {
-          await useAuthStore.getState().refreshToken();
+          // If another request is already refreshing, wait for it
+          if (this.isRefreshing && this.refreshPromise) {
+            await this.refreshPromise;
+          } else {
+            // Start a new refresh
+            this.isRefreshing = true;
+            this.refreshPromise = useAuthStore.getState().refreshToken();
+            await this.refreshPromise;
+            this.isRefreshing = false;
+            this.refreshPromise = null;
+          }
 
           // Retry the request with new token
           const newToken = useAuthStore.getState().accessToken;
@@ -64,6 +82,8 @@ class ApiClient {
             return this.handleResponse<T>(retryResponse);
           }
         } catch {
+          this.isRefreshing = false;
+          this.refreshPromise = null;
           // Refresh failed - logout
           useAuthStore.getState().logout();
           throw this.buildError(response, await response.json());

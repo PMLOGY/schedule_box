@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Zap } from 'lucide-react';
+import { Zap, X } from 'lucide-react';
 
 export type TriggerType =
   | 'booking_created'
@@ -35,8 +35,12 @@ export interface TriggerNodeData extends Record<string, unknown> {
   onChange?: (triggerType: TriggerType) => void;
 }
 
-function TriggerNode({ data }: NodeProps) {
+function TriggerNode({ id, data }: NodeProps) {
   const nodeData = data as TriggerNodeData;
+  const { deleteElements } = useReactFlow();
+  const handleDelete = useCallback(() => {
+    deleteElements({ nodes: [{ id }] });
+  }, [id, deleteElements]);
   const handleChange = useCallback(
     (value: TriggerType) => {
       if (nodeData.onChange) {
@@ -50,7 +54,14 @@ function TriggerNode({ data }: NodeProps) {
     <div className="rounded-lg border-2 border-blue-500 bg-white p-4 shadow-lg">
       <div className="mb-3 flex items-center gap-2">
         <Zap className="h-5 w-5 text-blue-500" />
-        <span className="font-semibold text-blue-900">Trigger</span>
+        <span className="flex-1 font-semibold text-blue-900">Trigger</span>
+        <button
+          onClick={handleDelete}
+          className="rounded p-0.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
+          title="Odstranit"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
       <div className="min-w-[240px]">
         <Select value={nodeData.triggerType} onValueChange={handleChange}>

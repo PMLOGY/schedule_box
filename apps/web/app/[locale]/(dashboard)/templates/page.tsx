@@ -24,9 +24,10 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Mail, MessageSquare, Bell, Plus, Edit, Trash2 } from 'lucide-react';
+import { Mail, MessageSquare, Bell, Plus, Edit, Trash2, Send } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
+import { Link } from '@/lib/i18n/navigation';
 
 type NotificationChannel = 'email' | 'sms' | 'push';
 type NotificationTemplateType =
@@ -403,14 +404,14 @@ export default function TemplatesPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(template)}
-                      className="flex-1"
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Upravit
+                    <Button variant="default" size="sm" asChild className="flex-1">
+                      <Link href={`/notifications?template_id=${template.id}`}>
+                        <Send className="mr-2 h-4 w-4" />
+                        Použít
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleEdit(template)}>
+                      <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="outline"
