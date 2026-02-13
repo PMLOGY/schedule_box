@@ -211,7 +211,7 @@ export default function LoyaltyCardsPage() {
   const pagination = data?.meta;
 
   const handleRowClick = (cardUuid: string) => {
-    router.push(`loyalty/cards/${cardUuid}`);
+    router.push(`/${locale}/loyalty/cards/${cardUuid}`);
   };
 
   return (

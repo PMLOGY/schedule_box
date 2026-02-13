@@ -639,7 +639,7 @@
       "difference": "Rozdíl",
       "confidence": "Spolehlivost",
       "constrained": "Omezeno",
-      "fallbackMessage": "AI ceny nejsou k dispozici — zobrazují se statické ceny.",
+      "fallbackMessage": "Odhad ceny je založen na pravidlech (vytížení, den, hodina). Plný AI model se připojí po spuštění AI služby.",
       "errorMessage": "Nepodařilo se načíst cenová data. Zkuste to prosím znovu.",
       "noServices": "Dynamické ceny budou k dispozici po nasbírání dostatečného množství dat o rezervacích.",
       "days": {
@@ -662,7 +662,7 @@
       "suggestionsTitle": "Návrhy na úpravu rozvrhu",
       "suggestionsDescription": "AI doporučení pro úpravy rozvrhu na základě predikce poptávky",
       "noSuggestions": "Žádné změny v rozvrhu nejsou pro příštích 7 dní doporučeny.",
-      "fallbackMessage": "AI predikce není k dispozici — je potřeba minimálně 12 týdnů dat o rezervacích.",
+      "fallbackMessage": "AI predikce kapacity bude dostupná po připojení AI služby.",
       "noData": "Predikce kapacity bude k dispozici po nasbírání dostatečného množství dat o rezervacích.",
       "errorMessage": "Nepodařilo se načíst predikci kapacity. Zkuste to prosím později.",
       "utilization": { "low": "nízké", "medium": "střední", "high": "vysoké" },

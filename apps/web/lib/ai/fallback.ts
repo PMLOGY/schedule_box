@@ -159,15 +159,98 @@ export function getDynamicPricingFallback(request: DynamicPricingRequest): Dynam
 
 /**
  * Fallback for capacity forecasting.
- * Returns empty forecast - no misleading predictions when AI unavailable.
+ * Generates a rule-based 7-day forecast when the AI service is unavailable:
+ * - Weekday patterns: Mon/Tue quieter, Wed-Fri busier, Sat half-day
+ * - Adds variance for realism
+ * - Generates schedule suggestions for high/low utilization days
  */
 export function getCapacityForecastFallback(
-  _request: CapacityForecastRequest,
+  request: CapacityForecastRequest,
 ): CapacityForecastResponse {
+  const daysAhead = request.days_ahead ?? 7;
+  const capacity = request.current_capacity ?? 8;
+
+  // Base booking patterns by day of week (0=Sun..6=Sat)
+  // Expressed as fraction of capacity
+  const dayPatterns = [0.15, 0.45, 0.5, 0.7, 0.75, 0.85, 0.6];
+
+  const forecast: CapacityForecastEntry[] = [];
+  const suggestions: CapacityScheduleSuggestion[] = [];
+
+  for (let i = 0; i < daysAhead; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    const dow = date.getDay();
+
+    // Skip Sundays (salon closed)
+    if (dow === 0) {
+      forecast.push({
+        datetime: date.toISOString(),
+        predicted_bookings: 0,
+        lower_bound: 0,
+        upper_bound: 1,
+        utilization_level: 'low',
+      });
+      continue;
+    }
+
+    const baseFraction = dayPatterns[dow];
+    // Add some pseudo-random variance using day-of-month as seed
+    const dayOfMonth = date.getDate();
+    const variance = (((dayOfMonth * 7 + i * 13) % 20) - 10) / 100; // -10% to +10%
+    const adjustedFraction = Math.max(0.1, Math.min(1.0, baseFraction + variance));
+
+    const predicted = Math.round(adjustedFraction * capacity);
+    const lowerBound = Math.max(0, predicted - Math.ceil(capacity * 0.15));
+    const upperBound = Math.min(capacity + 2, predicted + Math.ceil(capacity * 0.2));
+
+    const utilizationLevel: 'low' | 'medium' | 'high' =
+      adjustedFraction < 0.4 ? 'low' : adjustedFraction < 0.7 ? 'medium' : 'high';
+
+    forecast.push({
+      datetime: date.toISOString(),
+      predicted_bookings: predicted,
+      lower_bound: lowerBound,
+      upper_bound: upperBound,
+      utilization_level: utilizationLevel,
+    });
+
+    // Generate suggestions for notable days
+    if (utilizationLevel === 'high' && dow !== 6) {
+      suggestions.push({
+        datetime: date.toISOString(),
+        type: 'add_employee',
+        reason:
+          dow === 5
+            ? 'Pátek bývá vytížený — zvažte přidání dalšího zaměstnance.'
+            : 'Vysoká předpokládaná poptávka — zajistěte dostatek personálu.',
+        priority: adjustedFraction > 0.85 ? 'high' : 'medium',
+      });
+    }
+
+    if (utilizationLevel === 'low' && dow >= 1 && dow <= 3) {
+      suggestions.push({
+        datetime: date.toISOString(),
+        type: 'reduce_hours',
+        reason: 'Nízká poptávka — zvažte zkrácení otevírací doby nebo nabídněte slevu.',
+        priority: 'low',
+      });
+    }
+
+    if (dow === 6 && adjustedFraction > 0.55) {
+      suggestions.push({
+        datetime: date.toISOString(),
+        type: 'extend_hours',
+        reason: 'Sobota s vyšší poptávkou — zvažte prodloužení otevírací doby.',
+        priority: 'medium',
+      });
+    }
+  }
+
   return {
-    forecast: [],
-    suggestions: [],
-    model_version: 'fallback',
+    forecast,
+    suggestions,
+    model_version: 'rule-based-v1',
     fallback: true,
   };
 }

@@ -639,7 +639,7 @@
       "difference": "Difference",
       "confidence": "Confidence",
       "constrained": "Constrained",
-      "fallbackMessage": "AI pricing is not available — showing static prices.",
+      "fallbackMessage": "Price estimate is rule-based (utilization, day, hour). Full AI model will activate once the AI service is connected.",
       "errorMessage": "Failed to load pricing data. Please try again.",
       "noServices": "Dynamic pricing will be available after collecting enough booking data.",
       "days": {
@@ -662,7 +662,7 @@
       "suggestionsTitle": "Schedule Adjustment Suggestions",
       "suggestionsDescription": "AI recommendations for schedule adjustments based on demand prediction",
       "noSuggestions": "No schedule changes are recommended for the next 7 days.",
-      "fallbackMessage": "AI prediction is not available — at least 12 weeks of booking data is needed.",
+      "fallbackMessage": "AI capacity prediction will be available once the AI service is connected.",
       "noData": "Capacity forecast will be available after collecting enough booking data.",
       "errorMessage": "Failed to load capacity forecast. Please try again later.",
       "utilization": { "low": "low", "medium": "medium", "high": "high" },
