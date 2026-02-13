@@ -69,7 +69,7 @@ export function MobileNav() {
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout} className="w-full">
                 <LogOut className="mr-2 h-4 w-4" />
-                Odhlásit se
+                {t('logout')}
               </Button>
             </div>
           </>

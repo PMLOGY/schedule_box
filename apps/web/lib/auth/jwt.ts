@@ -18,10 +18,10 @@ import { UnauthorizedError } from '@schedulebox/shared';
 
 // JWT Configuration — lazy to avoid crash during next build
 function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET;
   if (secret) return secret;
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET must be set in production');
+    throw new Error('JWT_SECRET or JWT_ACCESS_SECRET must be set in production');
   }
   return 'dev-secret-change-me';
 }
