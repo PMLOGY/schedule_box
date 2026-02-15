@@ -8,7 +8,7 @@ import { dirname, resolve } from 'node:path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
+// Load environment variables (dotenv for local dev, Railway provides env directly)
 config({ path: resolve(__dirname, '../../../../.env') });
 
 const DATABASE_URL = process.env.DATABASE_URL;

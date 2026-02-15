@@ -40,7 +40,7 @@ export async function GET() {
   checks.push(redisCheck);
   if (redisCheck.status === 'error') allHealthy = false;
 
-  // Check RabbitMQ
+  // Check RabbitMQ (optional — app degrades gracefully without it)
   const rmqCheck = await checkService('RabbitMQ', async () => {
     if (!process.env.RABBITMQ_URL) {
       throw new Error('RABBITMQ_URL not configured');
@@ -48,7 +48,7 @@ export async function GET() {
     return true;
   });
   checks.push(rmqCheck);
-  if (rmqCheck.status === 'error') allHealthy = false;
+  // RabbitMQ is not required for core functionality — don't mark unhealthy
 
   const response = {
     status: allHealthy ? ('ok' as const) : ('degraded' as const),

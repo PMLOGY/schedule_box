@@ -51,8 +51,17 @@ async function startWorkers() {
 
   console.log('[Notification Worker] BullMQ workers started');
 
-  // 2. Start RabbitMQ consumers
-  await startRabbitMQConsumers();
+  // 2. Start RabbitMQ consumers (non-fatal if unavailable)
+  try {
+    await startRabbitMQConsumers();
+  } catch (error) {
+    console.warn('[Notification Worker] RabbitMQ unavailable — running without event consumers');
+    console.warn(
+      '[Notification Worker] RabbitMQ error:',
+      error instanceof Error ? error.message : error,
+    );
+    console.warn('[Notification Worker] BullMQ workers will still process jobs from Redis queues');
+  }
 
   // 3. Start schedulers (reminder scheduler + automation engine)
   schedulerResources = await startSchedulers({ emailQueue, smsQueue, pushQueue }, redisConnection);
