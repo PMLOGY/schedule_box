@@ -4,15 +4,22 @@
  */
 
 /**
- * Parse Redis URL into host and port
- * @param url Redis connection URL (e.g., redis://localhost:6379)
+ * Parse Redis URL into BullMQ connection options
+ * @param url Redis connection URL (e.g., redis://default:password@host:6379)
  */
-export function parseRedisUrl(url: string): { host: string; port: number } {
+export function parseRedisUrl(url: string): {
+  host: string;
+  port: number;
+  password?: string;
+  username?: string;
+} {
   try {
     const parsed = new URL(url);
     return {
       host: parsed.hostname || 'localhost',
       port: parsed.port ? parseInt(parsed.port, 10) : 6379,
+      ...(parsed.password && { password: decodeURIComponent(parsed.password) }),
+      ...(parsed.username && parsed.username !== 'default' && { username: parsed.username }),
     };
   } catch {
     return { host: 'localhost', port: 6379 };
