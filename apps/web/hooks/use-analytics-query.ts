@@ -2,11 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { PaginatedResponse } from '@schedulebox/shared/types';
 
-interface AnalyticsData {
+export interface AnalyticsData {
   totalBookings: number;
   totalRevenue: number;
   totalCustomers: number;
   avgHealthScore: number;
+  comparison: {
+    revenueChange: number;
+    bookingsChange: number;
+    noShowChange: number;
+  };
 }
 
 interface PeriodStats {
@@ -55,6 +60,7 @@ export function useAnalyticsQuery(days: number = 30) {
         totalRevenue: overview.currentPeriod.totalRevenue,
         totalCustomers: customersRes.meta.total,
         avgHealthScore: Math.round(avgHealthScore),
+        comparison: overview.comparison,
       } satisfies AnalyticsData;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

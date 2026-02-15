@@ -59,7 +59,7 @@ export const GET = createRouteHandler({
     // Format dates as YYYY-MM-DD
     const currentStartDate = currentPeriodStart.toISOString().split('T')[0];
     const previousStartDate = previousPeriodStart.toISOString().split('T')[0];
-    const currentEndDate = currentPeriodStart.toISOString().split('T')[0];
+    const currentEndDate = today.toISOString().split('T')[0];
 
     // Query current period
     const [currentPeriodData] = await db
