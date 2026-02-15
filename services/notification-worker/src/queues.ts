@@ -9,9 +9,9 @@ import { config } from './config.js';
  * Queue name constants
  */
 export const QUEUE_NAMES = {
-  EMAIL: 'notification:email',
-  SMS: 'notification:sms',
-  PUSH: 'notification:push',
+  EMAIL: 'notification-email',
+  SMS: 'notification-sms',
+  PUSH: 'notification-push',
 } as const;
 
 /**
