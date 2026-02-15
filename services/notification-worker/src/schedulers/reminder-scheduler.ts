@@ -9,7 +9,7 @@ import { between, and, inArray, eq, isNull, sql } from 'drizzle-orm';
 import { db, bookings, customers, services, employees, notifications } from '@schedulebox/database';
 import { renderTemplateFile } from '../services/template-renderer.js';
 
-const REMINDER_QUEUE_NAME = 'notification:reminders';
+const REMINDER_QUEUE_NAME = 'notification-reminders';
 const SCANNER_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
