@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "pnpm --filter @schedulebox/web dev",
     "build": "pnpm --filter @schedulebox/web build",
+    "start": "pnpm db:deploy && pnpm --filter @schedulebox/web start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "pnpm -r --parallel type-check",

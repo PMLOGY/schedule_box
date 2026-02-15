@@ -1,5 +1,0 @@
-[build]
-buildCommand = "pnpm install && pnpm build"
-
-[deploy]
-startCommand = "pnpm db:deploy && pnpm --filter @schedulebox/web start"
