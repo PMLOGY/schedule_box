@@ -42,6 +42,8 @@ async function startWorkers() {
   const redisConnection = {
     host: config.redis.host,
     port: config.redis.port,
+    ...('password' in config.redis && { password: config.redis.password }),
+    ...('username' in config.redis && { username: config.redis.username }),
   };
 
   // 1. Create BullMQ workers
