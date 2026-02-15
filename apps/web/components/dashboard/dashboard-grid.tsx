@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Banknote, Users, Activity } from 'lucide-react';
+import { Calendar, Banknote, Users, CheckCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { StatCard } from './stat-card';
 import { useAnalyticsQuery } from '@/hooks/use-analytics-query';
@@ -44,8 +44,8 @@ export function DashboardGrid() {
       />
       <StatCard
         title={t('averageRating')}
-        value={data?.avgHealthScore ?? 0}
-        icon={Activity}
+        value={data?.completedBookings ?? 0}
+        icon={CheckCircle}
         formatter="number"
       />
     </div>
