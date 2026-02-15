@@ -166,7 +166,12 @@ export async function POST(req: NextRequest) {
       await redis.del(mfaAttemptKey);
     }
 
-    // 6. Generate JWT token pair
+    // 6. Ensure user has a company (superadmins may not)
+    if (!userRecord.companyId) {
+      throw new UnauthorizedError('User is not associated with a company');
+    }
+
+    // 7. Generate JWT token pair
     const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
       userRecord.id,
       userRecord.uuid,
@@ -176,10 +181,10 @@ export async function POST(req: NextRequest) {
       userRecord.mfaEnabled ?? false, // mfa_verified = true if MFA was verified
     );
 
-    // 7. Update last login timestamp
+    // 8. Update last login timestamp
     await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, userRecord.id));
 
-    // 8. Return success with tokens and set httpOnly cookie
+    // 9. Return success with tokens and set httpOnly cookie
     const response = NextResponse.json({
       data: {
         access_token: accessToken,

@@ -16,6 +16,7 @@ import { createdResponse, paginatedResponse } from '@/lib/utils/response';
 import {
   giftCardCreateSchema,
   giftCardQuerySchema,
+  type GiftCardCreate,
   type GiftCardQuery,
 } from '@/validations/gift-card';
 
@@ -120,7 +121,9 @@ export const POST = createRouteHandler({
   bodySchema: giftCardCreateSchema,
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.COUPONS_MANAGE],
-  handler: async ({ body, user }) => {
+  handler: async ({ body: rawBody, user }) => {
+    const body = rawBody as GiftCardCreate;
+
     // Find user's company ID for tenant isolation
     const userSub = user?.sub ?? '';
     const { companyId } = await findCompanyId(userSub);

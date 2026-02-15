@@ -2,8 +2,10 @@
 // Return sensible default values when the AI service is unavailable
 
 import type {
+  CapacityForecastEntry,
   CapacityForecastRequest,
   CapacityForecastResponse,
+  CapacityScheduleSuggestion,
   CLVPredictionRequest,
   CLVPredictionResponse,
   CompetitorDataRequest,
