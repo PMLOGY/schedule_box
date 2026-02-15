@@ -39,12 +39,11 @@ async function startWorkers() {
   // Start health server first so probes respond during startup
   healthServer = startHealthServer();
 
-  const redisConnection = {
-    host: config.redis.host,
-    port: config.redis.port,
-    ...('password' in config.redis && { password: config.redis.password }),
-    ...('username' in config.redis && { username: config.redis.username }),
-  };
+  const redisConnection = config.redis;
+
+  console.log(
+    `[Notification Worker] Redis config: host=${redisConnection.host}, port=${redisConnection.port}, hasPassword=${'password' in redisConnection && !!redisConnection.password}`,
+  );
 
   // 1. Create BullMQ workers
   emailWorker = createEmailWorker(redisConnection);
