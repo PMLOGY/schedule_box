@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 20 in progress (SMS Delivery), Plan 02 complete
+**Current focus:** v1.1 Production Hardening — Phase 22 in progress (Monitoring & Alerts), Plan 02 complete
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 20 in progress (SMS Delivery)
-- **Current Plan:** 20-01 complete, continuing to 20-02
-- **Status:** Phase 20 plan 1/3 complete
-- **Last activity:** 2026-02-20 — Phase 20 Plan 01 complete (AI-gated SMS core logic)
+- **Phase:** 22 in progress (Monitoring & Alerts)
+- **Current Plan:** 22-02 complete, continuing to 22-03 (if exists)
+- **Status:** Phase 22 plan 2/N complete
+- **Last activity:** 2026-02-20 — Phase 22 Plan 02 complete (webhook metrics, monitoring API endpoints, CI coverage summary)
 
-Progress: [██████████████████████░░░░░░░░░░░░░░] 83% (19/22 phases complete, phase 20 plan 1/3 done)
+Progress: [██████████████████████░░░░░░░░░░░░░░] 83% (19/22 phases complete, phase 22 plan 2 done)
 
 ## What's Done
 
@@ -138,6 +138,24 @@ Progress: [██████████████████████░
 - AI-gated SMS in reminder-scheduler.ts: SMS only enqueues when no_show_probability > 0.7 AND prediction is not a fallback
 - Added AI config: AI_SERVICE_URL, SMS_NO_SHOW_THRESHOLD, SMS_BUDGET_ALERT_THRESHOLD env vars
 
+**Phase 21 Plan 01 complete** (2026-02-20):
+- Replaced verifyComgateSignature (HMAC-SHA256 header) with verifyComgateWebhookSecret (POST body secret comparison)
+- Comgate sends merchant secret as POST body "secret" parameter — not an HMAC header (confirmed via PHP/Node/Clojure SDKs)
+- Webhook handler: parse body first, extract parsedBody.get('secret'), verify via crypto.timingSafeEqual with length pre-check
+- Defense-in-depth: getComgatePaymentStatus called after payment lookup; API status overrides webhook on mismatch (best-effort)
+- Integration tests rewritten: 7 cases for verifyComgateWebhookSecret (valid, wrong, empty, whitespace, null-like, timing-safe, special chars)
+
+**Phase 22 Plan 02 complete** (2026-02-20):
+- Added webhookProcessingTotal Counter to @schedulebox/shared/metrics/business (gateway + status labels)
+- Instrumented Comgate webhook handler: success counter after markWebhookCompleted(), failure counter in catch block
+- Created GET /api/v1/monitoring/email-stats: delivered/failed/total/bounceRate for configurable window (default 60min)
+- Created GET /api/v1/monitoring/sms-stats: sent/failed/total + estimatedCostCzk + percentOfLimit for current month
+- Created GET /api/v1/monitoring/webhook-stats: completed/failed/stuck (>5min in processing) for configurable window
+- All monitoring endpoints protected by SETTINGS_MANAGE permission (admin only)
+- Added json-summary to vitest.shared.ts coverage reporters (generates coverage-summary.json per package)
+- Added "Generate coverage summary" CI step: writes per-package markdown table to GITHUB_STEP_SUMMARY with if: always()
+- MON-03 complete (webhook failure counter), MON-04 complete (80% threshold + human-readable CI reporting)
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -199,6 +217,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Dual SMS gating condition: probability > threshold AND not fallback (both must pass); prevents unreliable predictions from triggering expensive SMS
 - Czech mobile regex +420[67]xxxxxxxx is intentionally strict: rejects non-Czech and no-country-code numbers
 - UCS-2 multipart uses 67 chars/segment (not 70) and GSM-7 uses 153 (not 160) due to User Data Header overhead in concatenated SMS
+- Monitoring endpoints use SETTINGS_MANAGE permission (not new MONITORING_READ): reuses existing admin role, avoids permission proliferation
+- SMS monitoring cost estimate uses sent * 1.5 * costPerSegment: precise count in worker process not available in web process
+- Webhook stuck threshold is 5 minutes: webhooks complete within seconds, 5 min is conservative to avoid false positives
+- bounceRate = failed/(delivered+failed) matches industry definition: failure rate among attempted deliveries (not all records)
+- json-summary reporter added alongside existing reporters: compact totals for CI jq parsing, detailed json for external coverage tools
+- CI coverage summary uses if: always() so table visible on threshold failures: critical for diagnosing which package dropped below 80%
 
 ## Blockers
 
@@ -224,6 +248,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
 | 19-email-delivery | 04 | 19min | 2/2 | 1 |
 | 20-sms-delivery | 01 | 4min | 2/2 | 5 |
+| 22-monitoring-alerts | 02 | 4min | 2/2 | 7 |
 
 ## Metrics
 
@@ -236,5 +261,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 20 Plan 01 complete (AI-gated SMS core logic)*
-*Last session: Completed 20-01-PLAN.md (SMS core logic: UCS-2 fix, Czech phone validation, AI no-show gating)*
+*Last updated: 2026-02-20 after Phase 22 Plan 02 complete (webhook metrics + monitoring API endpoints + CI coverage summary)*
+*Last session: Completed 22-02-PLAN.md (MON-03 webhook failure counter, MON-04 coverage reporting, 3 monitoring endpoints)*
