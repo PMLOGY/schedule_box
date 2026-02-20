@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 19 Plan 03 complete (Helm SMTP secrets configuration)
+**Current focus:** v1.1 Production Hardening — Phase 19 Plan 04 in progress (DNS authentication + deliverability verification) — stopped at Task 1 checkpoint (human DNS action required)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
 - **Phase:** 19 in progress (Email Delivery)
-- **Current Plan:** 19-03 complete, ready for next Phase 19 plan
-- **Status:** Phase 19 Plan 03 complete
-- **Last activity:** 2026-02-20 — Phase 19 Plan 03 complete (Helm SMTP secrets + worker-deployment fix + .env.example update)
+- **Current Plan:** 19-04 in progress — stopped at Task 1 (checkpoint:human-action)
+- **Status:** Awaiting human DNS configuration (DKIM + DMARC for schedulebox.cz via cesky-hosting.cz)
+- **Last activity:** 2026-02-20 — Phase 19 Plan 04 started, stopped at Task 1 checkpoint (DNS configuration required)
 
 Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete, phase 19 in progress)
 
@@ -212,5 +212,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 Plan 01 (nodemailer auth email library + forgot-password/register wiring)*
-*Last session: Stopped at Completed 19-01-PLAN.md*
+*Last updated: 2026-02-20 after Phase 19 Plan 04 started (DNS authentication + deliverability — stopped at Task 1 checkpoint)*
+*Last session: Stopped at Task 1 of 19-04-PLAN.md (checkpoint:human-action — DNS configuration required)*
