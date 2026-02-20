@@ -28,7 +28,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:e2e": "pnpm --filter @schedulebox/web test:e2e"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",

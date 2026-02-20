@@ -118,10 +118,13 @@ Plans:
 4. Booking confirmations and reminders (24h, 2h) deliver successfully
 5. Password reset and email verification flows work end-to-end
 
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 19-01: TBD
+- [ ] 19-01-PLAN.md — Auth email library (nodemailer) + password reset and email verification wiring
+- [ ] 19-02-PLAN.md — Booking cancellation template + company name DB lookup fix
+- [ ] 19-03-PLAN.md — Helm SMTP secrets fix + .env.example Brevo update
+- [ ] 19-04-PLAN.md — DNS setup (DKIM/DMARC) + end-to-end deliverability verification
 
 ---
 
@@ -204,7 +207,7 @@ Plans:
 | 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 17. Integration Testing | v1.1 | 0/3 | Planned | - |
 | 18. E2E Testing | v1.1 | 0/3 | Planned | - |
-| 19. Email Delivery | v1.1 | 0/TBD | Not started | - |
+| 19. Email Delivery | v1.1 | 0/4 | Planned | - |
 | 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
 | 21. Payment Processing | v1.1 | 0/TBD | Not started | - |
 | 22. Monitoring & Alerts | v1.1 | 0/TBD | Not started | - |
