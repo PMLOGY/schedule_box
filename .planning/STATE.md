@@ -156,6 +156,14 @@ Progress: [██████████████████████░
 - Added "Generate coverage summary" CI step: writes per-package markdown table to GITHUB_STEP_SUMMARY with if: always()
 - MON-03 complete (webhook failure counter), MON-04 complete (80% threshold + human-readable CI reporting)
 
+
+**Phase 21 Plan 02 complete** (2026-02-20):
+- Created POST /api/v1/payments/expire-pending/cron: standalone cron endpoint with CRON_SECRET bearer auth via crypto.timingSafeEqual
+- Returns 503 if CRON_SECRET unset, 401 on token mismatch, 200 with {expired_count, timestamp}
+- Fixed docs/env-vars-reference.md: COMGATE_API_KEY replaced with COMGATE_SECRET, COMGATE_TEST_MODE removed, COMGATE_API_URL added
+- Added Payment Cron section to env-vars-reference.md with CRON_SECRET and PAYMENT_TIMEOUT_MINUTES
+- Added CRON_SECRET placeholder to .env.example
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -217,12 +225,20 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Dual SMS gating condition: probability > threshold AND not fallback (both must pass); prevents unreliable predictions from triggering expensive SMS
 - Czech mobile regex +420[67]xxxxxxxx is intentionally strict: rejects non-Czech and no-country-code numbers
 - UCS-2 multipart uses 67 chars/segment (not 70) and GSM-7 uses 153 (not 160) due to User Data Header overhead in concatenated SMS
+- CRON_SECRET bearer token for external cron auth over IP allowlisting: works across all providers (Railway, cron-job.org, GitHub Actions)
+- Returns 503 when CRON_SECRET not set vs 401 on bad token: distinguishes misconfiguration from authentication failure
+- crypto.timingSafeEqual for cron token comparison: prevents timing oracle attacks on secret comparison
+- COMGATE_TEST_MODE removed from docs: actual behavior controlled by NODE_ENV !== production in client.ts, no separate env var
 - Monitoring endpoints use SETTINGS_MANAGE permission (not new MONITORING_READ): reuses existing admin role, avoids permission proliferation
 - SMS monitoring cost estimate uses sent * 1.5 * costPerSegment: precise count in worker process not available in web process
 - Webhook stuck threshold is 5 minutes: webhooks complete within seconds, 5 min is conservative to avoid false positives
 - bounceRate = failed/(delivered+failed) matches industry definition: failure rate among attempted deliveries (not all records)
 - json-summary reporter added alongside existing reporters: compact totals for CI jq parsing, detailed json for external coverage tools
 - CI coverage summary uses if: always() so table visible on threshold failures: critical for diagnosing which package dropped below 80%
+- Comgate sends merchant secret as POST body 'secret' parameter, not HMAC header: verifyComgateWebhookSecret replaces verifyComgateSignature
+- Defense-in-depth API status check is best-effort: if getComgatePaymentStatus fails, webhook proceeds with POST body status
+- API status overrides webhook status on mismatch: API is authoritative (no incentive to lie unlike crafted webhook body)
+- crypto.timingSafeEqual requires equal-length buffers: always pre-check lengths and return false on mismatch before calling timingSafeEqual
 
 ## Blockers
 
@@ -248,6 +264,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
 | 19-email-delivery | 04 | 19min | 2/2 | 1 |
 | 20-sms-delivery | 01 | 4min | 2/2 | 5 |
+| 21-payment-processing | 01 | 6min | 2/2 | 3 |
 | 22-monitoring-alerts | 02 | 4min | 2/2 | 7 |
 
 ## Metrics
@@ -258,8 +275,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | WORKING: cesky-hosting.cz SMTP verified, Gmail inbox delivery confirmed, DKIM+DMARC DNS configured | Working SMTP |
 | SMS Delivery | Not configured | Core logic done: AI-gated enqueue, UCS-2 fix, Czech phone validation (Twilio account not yet configured) | Working Twilio |
-| Payments | Code only | Code only | Live Comgate |
+| Payments | Webhook verification fixed (POST body secret, defense-in-depth API check) | Webhook verification fixed | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 22 Plan 02 complete (webhook metrics + monitoring API endpoints + CI coverage summary)*
-*Last session: Completed 22-02-PLAN.md (MON-03 webhook failure counter, MON-04 coverage reporting, 3 monitoring endpoints)*
+*Last updated: 2026-02-20 after Phase 21 Plan 01 complete (Comgate webhook secret verification fix)*
+*Last session: Completed 21-01-PLAN.md (verifyComgateWebhookSecret replaces HMAC-based verifyComgateSignature, integration tests updated)*
