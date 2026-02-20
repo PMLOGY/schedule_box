@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 18 complete (all 3 plans), E2E testing fully done
+**Current focus:** v1.1 Production Hardening — Phase 19 Plan 02 complete (email template fixes)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 18 complete (E2E Testing)
-- **Current Plan:** 18 complete, ready for Phase 19
-- **Status:** Phase 18 complete (3/3 plans done)
-- **Last activity:** 2026-02-20 — Phase 18 Plan 03 complete (payment + AI fallback E2E tests + CI integration)
+- **Phase:** 19 in progress (Email Delivery)
+- **Current Plan:** 19-02 complete, ready for 19-03
+- **Status:** Phase 19 Plan 02 complete
+- **Last activity:** 2026-02-20 — Phase 19 Plan 02 complete (booking-cancellation template, layout unsubscribe fix, real company name DB lookup)
 
-Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete)
+Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete, phase 19 in progress)
 
 ## What's Done
 
@@ -105,6 +105,13 @@ Progress: [████████████████████░░░
 - CI pipeline Job 5 (E2E): PostgreSQL 16 + Redis 7 service containers, db:setup, Next.js build, Playwright 3-browser test, artifact upload
 - E2E job depends on [lint, test] not [build] (build only runs on main, E2E does own build)
 
+**Phase 19 Plan 02 complete** (2026-02-20):
+- Created booking-cancellation.hbs: Czech cancellation email template (Rezervace zrušena) with customer_name, service_name, booking_date, reason (optional), company_name
+- Fixed layout.hbs: replaced broken {{unsubscribe_url}} anchor with static transactional note (spam filter fix)
+- Fixed booking-consumer.ts: handleBookingCreated and handleBookingCancelled now fetch real company name from companies DB table
+- Fixed reminder-scheduler.ts: scanWindow fetches real company name per booking from companies DB table
+- Cancellation handler now calls renderTemplateFile('booking-cancellation') instead of inline HTML string
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -148,6 +155,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - VALID_TRANSITIONS map duplicated in integration test file (not imported from app): intentional contract test — if app logic changes, test catches discrepancy
 - TESTCONTAINERS_RYUK_DISABLED=true for CI integration-test job: Ryuk resource reaper causes Docker socket permission failures on ephemeral GitHub Actions VMs; disabling is safe
 - integration-test CI job uses needs: test (not needs: [lint, test]): lint already validated before test; adding it would be redundant
+- Transactional emails do not need unsubscribe links under Czech law: replaced {{unsubscribe_url}} with static note in layout.hbs
+- renderTemplateFile is synchronous (uses readFileSync internally): no await used in cancellation template call
+- Company name fallback to string 'ScheduleBox': prevents empty sender name if DB lookup returns no row
 
 ## Blockers
 
@@ -168,6 +178,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 18-e2e-testing | 01 | 8min | 2/2 | 13 |
 | 18-e2e-testing | 02 | 4min | 2/2 | 2 |
 | 18-e2e-testing | 03 | 6min | 2/2 | 3 |
+| 19-email-delivery | 02 | 3min | 2/2 | 4 |
 
 ## Metrics
 
@@ -180,5 +191,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 18 Plan 03 (payment + AI fallback E2E tests + CI integration)*
-*Last session: Stopped at Completed 18-03-PLAN.md*
+*Last updated: 2026-02-20 after Phase 19 Plan 02 (booking-cancellation template + layout fix + company name DB lookup)*
+*Last session: Stopped at Completed 19-02-PLAN.md*
