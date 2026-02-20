@@ -143,9 +143,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 20-01-PLAN.md — Fix UCS-2 segment estimation, add AI no-show gating to reminder scheduler
-- [ ] 20-02-PLAN.md — Twilio usage trigger webhook + setup script, Helm secrets fix
-- [ ] 20-03-PLAN.md — Twilio account setup (human) + end-to-end SMS delivery verification
+- [x] 20-01-PLAN.md — Fix UCS-2 segment estimation, add AI no-show gating to reminder scheduler
+- [x] 20-02-PLAN.md — Twilio usage trigger webhook + setup script, Helm secrets fix
+- [ ] 20-03-PLAN.md — Twilio account setup (human) + end-to-end SMS delivery verification *(deferred)*
 
 ---
 
@@ -164,9 +164,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 21-01-PLAN.md — Fix webhook verification (POST body secret + API status check) and update integration tests
-- [ ] 21-02-PLAN.md — Cron-safe payment expiration endpoint and env var documentation fixes
-- [ ] 21-03-PLAN.md — Production Comgate credentials setup and end-to-end payment validation
+- [x] 21-01-PLAN.md — Fix webhook verification (POST body secret + API status check) and update integration tests
+- [x] 21-02-PLAN.md — Cron-safe payment expiration endpoint and env var documentation fixes
+- [ ] 21-03-PLAN.md — Production Comgate credentials setup and end-to-end payment validation *(deferred)*
 
 ---
 
@@ -185,8 +185,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md — Worker monitoring: email/SMS metrics, instrumented jobs, monitoring scheduler, alert sender
-- [ ] 22-02-PLAN.md — Web monitoring: webhook metrics, monitoring API endpoints, CI coverage summary
+- [x] 22-01-PLAN.md — Worker monitoring: email/SMS metrics, instrumented jobs, monitoring scheduler, alert sender
+- [x] 22-02-PLAN.md — Web monitoring: webhook metrics, monitoring API endpoints, CI coverage summary
 
 ---
 
@@ -213,9 +213,9 @@ Plans:
 | 17. Integration Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 19. Email Delivery | v1.1 | 4/4 | Complete | 2026-02-20 |
-| 20. SMS Delivery | v1.1 | 0/3 | Planned | - |
-| 21. Payment Processing | v1.1 | 0/3 | Planned | - |
-| 22. Monitoring & Alerts | v1.1 | 0/2 | Planned | - |
+| 20. SMS Delivery | v1.1 | 2/3 | Code complete (Twilio setup deferred) | 2026-02-20 |
+| 21. Payment Processing | v1.1 | 2/3 | Code complete (Comgate setup deferred) | 2026-02-20 |
+| 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
 
 ---
 *Roadmap created: 2026-02-10*

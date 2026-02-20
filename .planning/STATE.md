@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 22 in progress (Monitoring & Alerts), Plan 02 complete
+**Current focus:** v1.1 Production Hardening — All code work complete, 2 human checkpoints deferred (Twilio 20-03, Comgate 21-03)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 22 in progress (Monitoring & Alerts)
-- **Current Plan:** 22-02 complete, continuing to 22-03 (if exists)
-- **Status:** Phase 22 plan 2/N complete
-- **Last activity:** 2026-02-20 — Phase 22 Plan 02 complete (webhook metrics, monitoring API endpoints, CI coverage summary)
+- **Phase:** All automated phases complete (16-22 code done)
+- **Current Plan:** 20-03 + 21-03 deferred (human checkpoints: Twilio + Comgate account setup)
+- **Status:** 20/22 plans complete, 2 human checkpoints pending
+- **Last activity:** 2026-02-20 — Phase 20 Wave 1 executed (SMS logic + Helm), Phase 22 complete (monitoring)
 
-Progress: [██████████████████████░░░░░░░░░░░░░░] 83% (19/22 phases complete, phase 22 plan 2 done)
+Progress: [██████████████████████████████████░░] 95% (all code complete, 2 human checkpoints deferred)
 
 ## What's Done
 
@@ -302,12 +302,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
-| Phases Complete | 15/15 | 4/7 (phases 16, 17, 18, 19 done) | 7/7 |
+| Phases Complete | 15/15 | 7/7 code done (20-03, 21-03 human checkpoints deferred) | 7/7 |
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | WORKING: cesky-hosting.cz SMTP verified, Gmail inbox delivery confirmed, DKIM+DMARC DNS configured | Working SMTP |
 | SMS Delivery | Not configured | Core logic + cost monitoring done: AI-gated enqueue, usage trigger webhook, Helm secrets fixed (Twilio account not yet configured) | Working Twilio |
 | Payments | Webhook verification fixed (POST body secret, defense-in-depth API check) | Webhook verification fixed | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 22 Plan 01 complete (worker monitoring metrics + scheduler + alert sender)*
-*Last session: Completed 22-01-PLAN.md (prom-client metrics, BullMQ monitoring scheduler, dual-channel alert sender)*
+*Last updated: 2026-02-20 after Phase 20 execution (Wave 1 complete, Wave 2 human checkpoint deferred)*
+*Last session: Executed Phase 20 plans 01+02 (SMS logic + Helm), deferred 20-03 (Twilio setup). All v1.1 code work complete.*
