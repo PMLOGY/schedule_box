@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["vitest/globals"],
     "paths": {
       "@schedulebox/database": ["./packages/database/src/index.ts"],
       "@schedulebox/shared": ["./packages/shared/src/index.ts"],
