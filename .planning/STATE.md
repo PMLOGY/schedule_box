@@ -135,6 +135,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Availability mock uses AvailabilitySlot format (startTime/endTime/employeeId) matching component expectations, not simpler helper format
 - AI upselling endpoint mocked with empty recommendations to prevent widget interference in booking tests
 - Calendar day selection uses button text filter with regex anchors for exact day matching in react-day-picker
+- E2E CI job needs: [lint, test] not [lint, test, build]: build only runs on main (if: github.ref == 'refs/heads/main'), E2E does its own pnpm build step
+- AI health endpoint E2E test accepts 200 or 401/403: test owner may lack SETTINGS_MANAGE permission, both prove endpoint doesn't crash
+- Comgate payment E2E mocked at /api/v1/payments/comgate/create response level: server-side Comgate API calls cannot be intercepted by page.route()
 
 ## Blockers
 
@@ -153,17 +156,18 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 17-integration-testing | 02 | 5min | 2/2 | 4 |
 | 18-e2e-testing | 01 | 8min | 2/2 | 13 |
 | 18-e2e-testing | 02 | 4min | 2/2 | 2 |
+| 18-e2e-testing | 03 | 6min | 2/2 | 3 |
 
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
-| Phases Complete | 15/15 | 1/7 (phase 16 done) | 7/7 |
-| Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 6 E2E tests), CI gate enforced | 80%+ critical paths |
+| Phases Complete | 15/15 | 3/7 (phases 16, 17, 18 done) | 7/7 |
+| Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 18 Plan 02 (auth + booking E2E test specs)*
-*Last session: Stopped at Completed 18-02-PLAN.md*
+*Last updated: 2026-02-20 after Phase 18 Plan 03 (payment + AI fallback E2E tests + CI integration)*
+*Last session: Stopped at Completed 18-03-PLAN.md*
