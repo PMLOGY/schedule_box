@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 19 Plan 02 complete (email template fixes)
+**Current focus:** v1.1 Production Hardening — Phase 19 Plan 03 complete (Helm SMTP secrets configuration)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
 - **Phase:** 19 in progress (Email Delivery)
-- **Current Plan:** 19-02 complete, ready for 19-03
-- **Status:** Phase 19 Plan 02 complete
-- **Last activity:** 2026-02-20 — Phase 19 Plan 02 complete (booking-cancellation template, layout unsubscribe fix, real company name DB lookup)
+- **Current Plan:** 19-03 complete, ready for next Phase 19 plan
+- **Status:** Phase 19 Plan 03 complete
+- **Last activity:** 2026-02-20 — Phase 19 Plan 03 complete (Helm SMTP secrets + worker-deployment fix + .env.example update)
 
 Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete, phase 19 in progress)
 
@@ -112,6 +112,11 @@ Progress: [████████████████████░░░
 - Fixed reminder-scheduler.ts: scanWindow fetches real company name per booking from companies DB table
 - Cancellation handler now calls renderTemplateFile('booking-cancellation') instead of inline HTML string
 
+**Phase 19 Plan 03 complete** (2026-02-20):
+- Added SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM to Helm secrets.yaml (native K8s Secret stringData + ExternalSecret data array)
+- Removed hardcoded empty-string SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS env overrides from worker-deployment.yaml (they overrode secretRef, silently blocking email delivery)
+- Updated .env.example from SendGrid to cesky-hosting.cz with correct field documentation (SMTP_USER = full email address)
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -119,7 +124,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 **Recent decisions:**
 - Phase ordering: Testing infrastructure first (16-18), then services (19-21), monitoring last (22)
 - Test coverage target: 80% enforced in CI (not 100% — focus on critical paths)
-- SMTP provider: Brevo (best free tier, lowest entry cost)
+- SMTP provider changed to cesky-hosting.cz (not Brevo): smtp.cesky-hosting.cz, SMTP_USER = full email address, SMTP_FROM = no-reply@schedulebox.cz
 - SMS provider: Keep Twilio (code exists, TypeScript-native SDK v4)
 - E2E framework: Playwright over Cypress (Safari support for 40% CZ iOS users)
 - Vitest 4.0 removed defineWorkspace: use test.projects array in vitest.config.ts instead
@@ -158,10 +163,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Transactional emails do not need unsubscribe links under Czech law: replaced {{unsubscribe_url}} with static note in layout.hbs
 - renderTemplateFile is synchronous (uses readFileSync internally): no await used in cancellation template call
 - Company name fallback to string 'ScheduleBox': prevents empty sender name if DB lookup returns no row
+- Helm secrets pattern: credentials belong in secrets.yaml stringData/ExternalSecret data only; hardcoded empty-string env entries in deployment manifests override secretRef and silently break runtime credential injection
+- SMTP_PORT excluded from Helm ExternalSecret block: has safe 587 default in native Secret, no per-environment override needed
 
 ## Blockers
 
-- No external service accounts yet (SMTP, Twilio, Comgate production) — will configure during v1.1 phases
+- No external service accounts yet (SMTP cesky-hosting.cz credentials, Twilio, Comgate production) — will configure during v1.1 phases
 - Testcontainers on Railway compatibility unknown — will test in Phase 17, fallback to Railway test DB if Docker-in-Docker fails
 
 ## Performance Metrics
@@ -179,6 +186,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 18-e2e-testing | 02 | 4min | 2/2 | 2 |
 | 18-e2e-testing | 03 | 6min | 2/2 | 3 |
 | 19-email-delivery | 02 | 3min | 2/2 | 4 |
+| 19-email-delivery | 03 | 8min | 2/2 | 3 |
 
 ## Metrics
 
@@ -186,10 +194,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 |--------|-----------|--------------|-------------|
 | Phases Complete | 15/15 | 3/7 (phases 16, 17, 18 done) | 7/7 |
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
-| Email Delivery | Not configured | Not configured | Working SMTP |
+| Email Delivery | Not configured | Helm chart configured (cesky-hosting.cz), credentials pending | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 Plan 02 (booking-cancellation template + layout fix + company name DB lookup)*
-*Last session: Stopped at Completed 19-02-PLAN.md*
+*Last updated: 2026-02-20 after Phase 19 Plan 03 (Helm SMTP secrets configuration + worker-deployment fix)*
+*Last session: Stopped at Completed 19-03-PLAN.md*
