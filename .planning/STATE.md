@@ -63,6 +63,12 @@ Progress: [████████████████░░░░░░░
 - tsconfig.integration.json: resolves @schedulebox/database + drizzle-orm + postgres for TS checks
 - pnpm test:integration command exists, returns "no test files found" (expected at this stage)
 
+**Phase 17 Plan 02 complete** (2026-02-20):
+- 4 double-booking tests: concurrent SELECT FOR UPDATE (exactly 1 success + 1 failure), btree_gist exclusion constraint rejection, adjacent bookings succeed, cancelled slot reuse works
+- 9 RLS isolation tests: customers/bookings/services/employees per-company isolation, explicit cross-tenant WHERE returns 0 rows, cross-table disjoint result sets, INSERT isolation
+- Fixed vitest.integration.config.ts: added resolve.alias for drizzle-orm + postgres (pnpm doesn't hoist to root; Vite runtime needs explicit paths)
+- Fixed tsconfig.integration.json: added vitest/globals types for describe/it/expect globals
+
 **Phase 18 Plan 01 complete** (2026-02-20):
 - Playwright 1.58.2 installed with Chromium, Firefox, WebKit browser binaries
 - playwright.config.ts: 3 browser projects + setup project + webServer (pnpm start)
@@ -106,6 +112,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - TRUNCATE companies CASCADE for test cleanup: fastest method since all 47 tenant tables FK to companies
 - SET LOCAL (not SET) for RLS session variables: scopes context to current transaction, prevents cross-test contamination
 - tsconfig.integration.json with paths to packages/database/node_modules: pnpm does not hoist drizzle-orm/postgres to root by default
+- resolve.alias in vitest.integration.config.ts required for Vite runtime resolution of drizzle-orm/postgres: tsconfigPaths handles TypeScript types only, not Vite module bundler runtime
+- tx.unsafe() instead of tagged template literals in postgres.js begin() callbacks: Omit<Sql, ...> strips call signatures from TransactionSql, making tx`...` tagged template fail type-check
+- Two independent postgres() clients for concurrent transaction tests: same pool can serialize begin() calls; separate clients guarantee independent physical connections
+- USING-only RLS policies (no WITH CHECK): cross-tenant INSERT may succeed but row is invisible to inserting company on SELECT
 - Playwright page.route() for E2E mocking over MSW: simpler at browser network level, no service worker setup needed
 - i18n-safe regex patterns in POMs: match Czech (Prihlasit), Slovak, English (Sign in) button text
 - storageState auth: authenticate once in setup project, reuse across chromium/firefox/webkit projects
