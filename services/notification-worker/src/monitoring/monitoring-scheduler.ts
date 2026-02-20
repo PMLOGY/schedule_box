@@ -5,11 +5,12 @@
  *
  * MON-01: Email bounce rate above 5% in rolling 1-hour window
  * MON-02: Estimated SMS monthly cost approaching monthly limit
+ * MON-03: Payment webhook failures above threshold in rolling 1-hour window
  */
 
 import { Queue, Worker } from 'bullmq';
 import { sql } from 'drizzle-orm';
-import { db, notifications } from '@schedulebox/database';
+import { db, notifications, processedWebhooks } from '@schedulebox/database';
 import { sendAlert } from './alert-sender.js';
 import { config } from '../config.js';
 import { smsSegmentsTotal, smsEstimatedMonthlyCostCzk } from './metrics.js';
@@ -42,6 +43,7 @@ interface EmailStatsRow {
 async function handleMonitoringCheck(): Promise<void> {
   let emailFailureRate = 0;
   let smsEstimatedCost = 0;
+  let webhookFailures = 0;
 
   // ─── MON-01: Email bounce rate check ────────────────────────────────────
   try {
@@ -123,9 +125,41 @@ async function handleMonitoringCheck(): Promise<void> {
     );
   }
 
+  // ─── MON-03: Webhook failure check ───────────────────────────────────────
+  try {
+    const rows = await db
+      .select({
+        failed: sql<string>`COUNT(*) FILTER (WHERE ${processedWebhooks.status} = 'failed')`,
+        total: sql<string>`COUNT(*)`,
+      })
+      .from(processedWebhooks)
+      .where(sql`${processedWebhooks.processedAt} > NOW() - INTERVAL '1 hour'`);
+
+    const row = rows[0] as { failed: string | number; total: string | number } | undefined;
+
+    if (row) {
+      webhookFailures = Number(row.failed ?? 0);
+
+      if (webhookFailures >= 5) {
+        const total = Number(row.total ?? 0);
+        await sendAlert({
+          subject: 'Payment webhook failures detected',
+          body: `Failed: ${webhookFailures}, Total: ${total} in last hour.`,
+          severity: webhookFailures >= 10 ? 'critical' : 'warning',
+        });
+      }
+    }
+  } catch (error) {
+    console.error(
+      '[Monitor] Failed to check webhook failures:',
+      error instanceof Error ? error.message : error,
+    );
+  }
+
   console.log('[Monitor] Health check completed', {
     emailFailureRate: emailFailureRate.toFixed(4),
     smsEstimatedCost: smsEstimatedCost.toFixed(2),
+    webhookFailures,
   });
 }
 
