@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 20 in progress (SMS Delivery), Plan 01 complete
+**Current focus:** v1.1 Production Hardening — Phase 20 in progress (SMS Delivery), Plan 02 complete
 
 ## Current Position
 
