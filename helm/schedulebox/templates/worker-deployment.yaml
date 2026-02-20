@@ -57,16 +57,7 @@ spec:
         {{- end }}
         - name: HEALTH_PORT
           value: "3001"
-        # SMTP configuration (from secrets in production)
-        - name: SMTP_HOST
-          value: ""
-        - name: SMTP_PORT
-          value: "587"
-        - name: SMTP_USER
-          value: ""
-        - name: SMTP_PASS
-          value: ""
-        # Twilio configuration (from secrets in production)
+        # Twilio credentials (injected via secretRef above — add to secrets.yaml to enable SMS)
         - name: TWILIO_ACCOUNT_SID
           value: ""
         - name: TWILIO_AUTH_TOKEN
