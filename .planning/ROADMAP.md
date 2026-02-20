@@ -54,10 +54,10 @@
 **Plans:** 4 plans
 
 Plans:
-- [ ] 16-01-PLAN.md — Vitest workspace config, shared config, per-package configs
-- [ ] 16-02-PLAN.md — Unit tests for shared utilities and Zod validation schemas
-- [ ] 16-03-PLAN.md — MSW external API mocking and CI pipeline test job
-- [ ] 16-04-PLAN.md — Gap closure: fix CI coverage gate enforcement (events coverage.include + pnpm -r CI command)
+- [x] 16-01-PLAN.md — Vitest workspace config, shared config, per-package configs
+- [x] 16-02-PLAN.md — Unit tests for shared utilities and Zod validation schemas
+- [x] 16-03-PLAN.md — MSW external API mocking and CI pipeline test job
+- [x] 16-04-PLAN.md — Gap closure: fix CI coverage gate enforcement (events coverage.include + pnpm -r CI command)
 
 ---
 
@@ -199,7 +199,7 @@ Plans:
 | 13. Polish | v1.0 | 4/4 | Complete | 2026-02-12 |
 | 14. AI Voice | v1.0 | 5/5 | Complete | 2026-02-12 |
 | 15. DevOps & Launch | v1.0 | 6/6 | Complete | 2026-02-12 |
-| 16. Testing Foundation | v1.1 | 0/4 | Gap closure in progress | - |
+| 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 17. Integration Testing | v1.1 | 0/3 | Planned | - |
 | 18. E2E Testing | v1.1 | 0/TBD | Not started | - |
 | 19. Email Delivery | v1.1 | 0/TBD | Not started | - |
