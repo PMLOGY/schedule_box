@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 
 - **Milestone:** v1.1 Production Hardening
 - **Phase:** 16 of 22 (Testing Foundation)
-- **Current Plan:** 16-02 (next to execute)
-- **Status:** In progress (1/N plans complete in phase 16)
-- **Last activity:** 2026-02-20 — Phase 16 Plan 01 complete (Vitest workspace configuration)
+- **Current Plan:** 16-04 (next to execute)
+- **Status:** In progress (3/N plans complete in phase 16)
+- **Last activity:** 2026-02-20 — Phase 16 Plan 03 complete (MSW 2.0 configuration + CI test pipeline)
 
 Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases)
 
@@ -40,6 +40,14 @@ Progress: [████████████████░░░░░░░
 - Root test scripts: test, test:unit, test:watch, test:ui, test:coverage
 - Smoke test passes (generateSlug Czech diacritics, 5 assertions)
 
+**Phase 16 Plan 03 complete** (2026-02-20):
+- MSW 2.0 installed and configured in @schedulebox/web
+- Default handlers for Comgate (3 endpoints), AI service (3 endpoints), notifications (1 endpoint)
+- MSW lifecycle in vitest.setup.ts (listen/resetHandlers/close); setupFiles added to web vitest.config.ts
+- 9 MSW handler tests verify interception and override pattern work
+- CI pipeline updated: test job runs pnpm test:coverage, build job requires [lint, test]
+- Plan 16-02 partial work (shared utility tests + vitest config refinements) also committed
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -53,6 +61,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Vitest 4.0 removed defineWorkspace: use test.projects array in vitest.config.ts instead
 - Coverage thresholds at 80% for lines/functions/branches/statements enforced via v8 provider
 - web package uses happy-dom environment; all other packages use node environment
+- MSW onUnhandledRequest: 'warn' (not 'error') during bootstrap phase to avoid test failures
+- build-ai CI job only needs lint (AI service is Python, not covered by Vitest)
 
 ## Blockers
 
@@ -64,17 +74,18 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 16-testing-foundation | 01 | 8min | 2/2 | 13 |
+| 16-testing-foundation | 03 | 4min | 2/2 | 8 |
 
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
 | Phases Complete | 15/15 | 0/7 | 7/7 |
-| Test Coverage | 0% | ~10% (1 file) | 80%+ critical paths |
+| Test Coverage | 0% | ~15% (2 files, 78 tests) | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 16 Plan 01 (Vitest workspace configuration)*
-*Last session: Stopped at Completed 16-01-PLAN.md*
+*Last updated: 2026-02-20 after Phase 16 Plan 03 (MSW 2.0 + CI test pipeline)*
+*Last session: Stopped at Completed 16-03-PLAN.md*
