@@ -182,10 +182,11 @@ Plans:
 3. Payment webhook failures log to DLQ and trigger alerts
 4. Test coverage tracking in CI fails build if coverage drops below 80%
 
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 22-01: TBD
+- [ ] 22-01-PLAN.md — Worker monitoring: email/SMS metrics, instrumented jobs, monitoring scheduler, alert sender
+- [ ] 22-02-PLAN.md — Web monitoring: webhook metrics, monitoring API endpoints, CI coverage summary
 
 ---
 
@@ -214,7 +215,7 @@ Plans:
 | 19. Email Delivery | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 20. SMS Delivery | v1.1 | 0/3 | Planned | - |
 | 21. Payment Processing | v1.1 | 0/3 | Planned | - |
-| 22. Monitoring & Alerts | v1.1 | 0/TBD | Not started | - |
+| 22. Monitoring & Alerts | v1.1 | 0/2 | Planned | - |
 
 ---
 *Roadmap created: 2026-02-10*
