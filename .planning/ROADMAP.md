@@ -99,9 +99,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 18-01-PLAN.md — Playwright setup, config, auth storageState, page objects, mock helpers
-- [ ] 18-02-PLAN.md — Auth (registration + login) and booking creation E2E tests
-- [ ] 18-03-PLAN.md — Payment flow and AI fallback E2E tests, CI pipeline E2E job
+- [x] 18-01-PLAN.md — Playwright setup, config, auth storageState, page objects, mock helpers
+- [x] 18-02-PLAN.md — Auth (registration + login) and booking creation E2E tests
+- [x] 18-03-PLAN.md — Payment flow and AI fallback E2E tests, CI pipeline E2E job
 
 ---
 
@@ -206,7 +206,7 @@ Plans:
 | 15. DevOps & Launch | v1.0 | 6/6 | Complete | 2026-02-12 |
 | 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 17. Integration Testing | v1.1 | 0/3 | Planned | - |
-| 18. E2E Testing | v1.1 | 0/3 | Planned | - |
+| 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 19. Email Delivery | v1.1 | 0/4 | Planned | - |
 | 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
 | 21. Payment Processing | v1.1 | 0/TBD | Not started | - |
