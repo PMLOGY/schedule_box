@@ -262,6 +262,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Defense-in-depth API status check is best-effort: if getComgatePaymentStatus fails, webhook proceeds with POST body status
 - API status overrides webhook status on mismatch: API is authoritative (no incentive to lie unlike crafted webhook body)
 - crypto.timingSafeEqual requires equal-length buffers: always pre-check lengths and return false on mismatch before calling timingSafeEqual
+- Worker-local prom-client Registry: notification-worker is a separate Node.js process; shared package registry is not visible from worker process
+- SMS cost estimated from in-process segment counter (not Twilio billing API): billing API has 24-48h delay; local estimation is immediate
+- alert-sender.ts never throws: alerting failures must never crash the monitoring loop (all paths wrapped in try/catch)
+- BullMQ repeatable job with jobId deduplication: jobId: 'delivery-stats-check' prevents duplicate jobs on worker restarts
+- Slack webhook optional via SLACK_WEBHOOK_URL env var: provides redundancy when SMTP is down
+- MONITORING_ALERT_EMAIL falls back to SMTP_FROM then admin@schedulebox.cz: no extra env var required in basic setup
 
 ## Blockers
 
@@ -303,5 +309,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Webhook verification fixed (POST body secret, defense-in-depth API check) | Webhook verification fixed | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 21 Plan 01 complete (Comgate webhook secret verification fix)*
-*Last session: Completed 21-01-PLAN.md (verifyComgateWebhookSecret replaces HMAC-based verifyComgateSignature, integration tests updated)*
+*Last updated: 2026-02-20 after Phase 22 Plan 01 complete (worker monitoring metrics + scheduler + alert sender)*
+*Last session: Completed 22-01-PLAN.md (prom-client metrics, BullMQ monitoring scheduler, dual-channel alert sender)*
