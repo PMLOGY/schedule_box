@@ -105,6 +105,14 @@ Progress: [████████████████████░░░
 - CI pipeline Job 5 (E2E): PostgreSQL 16 + Redis 7 service containers, db:setup, Next.js build, Playwright 3-browser test, artifact upload
 - E2E job depends on [lint, test] not [build] (build only runs on main, E2E does own build)
 
+**Phase 19 Plan 01 complete** (2026-02-20):
+- nodemailer@7 + @types/nodemailer installed in @schedulebox/web
+- Created apps/web/lib/email/auth-emails.ts: module-level SMTP transporter, sendPasswordResetEmail + sendEmailVerificationEmail with Czech HTML+text templates
+- Provider-agnostic SMTP config via env vars (SMTP_HOST/PORT/USER/PASS), STARTTLS port 587, default from no-reply@schedulebox.cz
+- forgot-password route: replaced TODO no-op with sendPasswordResetEmail (errors caught, not re-thrown)
+- register route: generate email_verify token, store in Redis 24hr TTL, fire-and-forget sendEmailVerificationEmail
+- Fixed pre-existing tsconfig.json build failure: excluded vitest.config.ts from Next.js tsc
+
 **Phase 19 Plan 02 complete** (2026-02-20):
 - Created booking-cancellation.hbs: Czech cancellation email template (Rezervace zrušena) with customer_name, service_name, booking_date, reason (optional), company_name
 - Fixed layout.hbs: replaced broken {{unsubscribe_url}} anchor with static transactional note (spam filter fix)
@@ -165,6 +173,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Company name fallback to string 'ScheduleBox': prevents empty sender name if DB lookup returns no row
 - Helm secrets pattern: credentials belong in secrets.yaml stringData/ExternalSecret data only; hardcoded empty-string env entries in deployment manifests override secretRef and silently break runtime credential injection
 - SMTP_PORT excluded from Helm ExternalSecret block: has safe 587 default in native Secret, no per-environment override needed
+- auth-emails.ts uses module-level nodemailer transporter (created once on import) for SMTP connection reuse across requests
+- Registration email send is fire-and-forget (.catch()) so account creation never blocked by SMTP outage
+- forgot-password email errors caught and logged but never propagated to response: prevents email enumeration side-channels
+- apps/web/tsconfig.json must exclude vitest.config.ts + vitest.setup.ts: Vitest 4 defineProject types conflict with Next.js tsc checker
 
 ## Blockers
 
@@ -185,6 +197,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 18-e2e-testing | 01 | 8min | 2/2 | 13 |
 | 18-e2e-testing | 02 | 4min | 2/2 | 2 |
 | 18-e2e-testing | 03 | 6min | 2/2 | 3 |
+| 19-email-delivery | 01 | 11min | 2/2 | 5 |
 | 19-email-delivery | 02 | 3min | 2/2 | 4 |
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
 
@@ -199,5 +212,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 Plan 03 (Helm SMTP secrets configuration + worker-deployment fix)*
-*Last session: Stopped at Completed 19-03-PLAN.md*
+*Last updated: 2026-02-20 after Phase 19 Plan 01 (nodemailer auth email library + forgot-password/register wiring)*
+*Last session: Stopped at Completed 19-01-PLAN.md*
