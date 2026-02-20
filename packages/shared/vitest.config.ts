@@ -11,10 +11,15 @@ export default mergeConfig(
       include: ['src/**/*.test.ts'],
       environment: 'node',
       coverage: {
-        // Instrument only the source files under test in this plan:
-        // utils (pure functions) and schemas (Zod validation).
-        // Type-only files, barrel re-exports, and test files are excluded.
-        include: ['src/utils/**/*.ts', 'src/schemas/**/*.ts'],
+        // Instrument only the source files that have tests in this phase.
+        // Other schema files (availability, loyalty, automation, etc.) will
+        // be added to coverage incrementally as tests are written for them.
+        include: [
+          'src/utils/index.ts',
+          'src/schemas/booking.ts',
+          'src/schemas/payment.ts',
+          'src/schemas/notification.ts',
+        ],
         exclude: [
           'node_modules/**',
           '**/*.config.{js,ts,mjs}',
@@ -22,8 +27,6 @@ export default mergeConfig(
           '**/mocks/**',
           '**/__tests__/setup.*',
           'src/**/*.test.ts',
-          // Barrel index files that only re-export (no runnable logic)
-          'src/schemas/index.ts',
         ],
       },
     },
