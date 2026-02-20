@@ -25,8 +25,8 @@ function getTwilioClient() {
 
 /**
  * Estimate SMS segment count
- * GSM-7 encoding: 160 chars per segment
- * UCS-2 encoding (with diacritics): 70 chars per segment
+ * GSM-7 encoding: 160 chars single, 153 chars per segment if multipart (UDH overhead)
+ * UCS-2 encoding (with diacritics): 70 chars single, 67 chars per segment if multipart
  *
  * @param body SMS text content
  */
@@ -35,10 +35,28 @@ export function estimateSMSSegments(body: string): number {
   // eslint-disable-next-line no-control-regex
   const hasUnicode = /[^\x00-\x7F]/.test(body);
 
-  const maxLength = hasUnicode ? 70 : 160;
-  const segments = Math.ceil(body.length / maxLength);
+  if (hasUnicode) {
+    // UCS-2: 70 chars single, 67 chars per segment if multipart
+    return body.length <= 70 ? 1 : Math.ceil(body.length / 67);
+  } else {
+    // GSM-7: 160 chars single, 153 chars per segment if multipart
+    return body.length <= 160 ? 1 : Math.ceil(body.length / 153);
+  }
+}
 
-  return segments;
+/**
+ * Czech mobile number regex (E.164 format)
+ * Mobile prefixes: +420 6xx or +420 7xx
+ * Landlines: +420 2xx-5xx (will be rejected)
+ */
+const CZECH_MOBILE_REGEX = /^\+420[67][0-9]{8}$/;
+
+/**
+ * Validate that a phone number is a Czech mobile number
+ * Rejects landlines which would cause Twilio error 21614
+ */
+export function isValidCzechMobile(phone: string): boolean {
+  return CZECH_MOBILE_REGEX.test(phone);
 }
 
 /**
