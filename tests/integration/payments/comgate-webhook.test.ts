@@ -1,21 +1,21 @@
 /**
- * Integration Tests: Comgate Webhook Signature Verification (ITEST-04)
+ * Integration Tests: Comgate Webhook Secret Verification (ITEST-04)
  *
- * Tests the HMAC-SHA256 cryptographic signature verification used by the Comgate
- * payment gateway webhook handler. This is security-critical: a compromised
- * signature check allows attackers to fake payment confirmations.
+ * Tests the POST body secret verification used by the Comgate payment gateway
+ * webhook handler. Comgate sends the merchant secret as a POST body parameter
+ * named "secret" — NOT as an HMAC header. This is Comgate's actual API behavior,
+ * confirmed via PHP SDK, Node SDK, and Clojure client source code.
  *
- * The `verifyComgateSignature` function uses crypto.timingSafeEqual to prevent
- * timing attacks, and rejects payloads with mismatched lengths before attempting
+ * The `verifyComgateWebhookSecret` function uses crypto.timingSafeEqual to prevent
+ * timing attacks, and rejects secrets with mismatched lengths before attempting
  * the comparison.
  *
  * These tests are placed in the integration suite (rather than unit tests) because
- * they exercise the actual crypto module behavior against known test vectors and
- * verify the environment-variable-based secret loading.
+ * they exercise the actual crypto module behavior and verify the environment-variable-
+ * based secret loading that matches the production credential injection pattern.
  */
 
-import crypto from 'node:crypto';
-import { verifyComgateSignature } from '../../../apps/web/app/api/v1/payments/comgate/client';
+import { verifyComgateWebhookSecret } from '../../../apps/web/app/api/v1/payments/comgate/client';
 
 // ============================================================================
 // Constants
@@ -39,74 +39,55 @@ afterAll(() => {
 });
 
 // ============================================================================
-// Helper: compute HMAC-SHA256 signature with the test secret
-// ============================================================================
-
-function computeSignature(body: string, secret = TEST_SECRET): string {
-  return crypto.createHmac('sha256', secret).update(body).digest('hex');
-}
-
-// ============================================================================
 // Tests
 // ============================================================================
 
-describe('Comgate webhook signature verification', () => {
-  it('accepts valid HMAC-SHA256 signature', () => {
-    const body = 'transId=ABC-123&status=PAID&price=50000&curr=CZK';
-    const signature = computeSignature(body);
-
-    expect(verifyComgateSignature(body, signature)).toBe(true);
-  });
-
-  it('rejects tampered payload (price changed)', () => {
-    // Attacker changes price from 50000 to 1 to pay much less
-    const originalBody = 'transId=ABC-123&status=PAID&price=50000&curr=CZK';
-    const originalSignature = computeSignature(originalBody);
-
-    const tamperedBody = 'transId=ABC-123&status=PAID&price=1&curr=CZK';
-
-    expect(verifyComgateSignature(tamperedBody, originalSignature)).toBe(false);
-  });
-
-  it('rejects tampered payload (status changed)', () => {
-    // Attacker changes status from PENDING to PAID to fake payment confirmation
-    const originalBody = 'transId=ABC-123&status=PENDING&price=50000&curr=CZK';
-    const originalSignature = computeSignature(originalBody);
-
-    const tamperedBody = 'transId=ABC-123&status=PAID&price=50000&curr=CZK';
-
-    expect(verifyComgateSignature(tamperedBody, originalSignature)).toBe(false);
+describe('Comgate webhook secret verification', () => {
+  it('accepts valid secret matching COMGATE_SECRET', () => {
+    expect(verifyComgateWebhookSecret(TEST_SECRET)).toBe(true);
   });
 
   it('rejects wrong secret', () => {
-    // Signature computed with an incorrect secret
-    const body = 'transId=ABC-123&status=PAID&price=50000&curr=CZK';
-    const wrongSignature = computeSignature(body, 'wrong-secret');
-
-    expect(verifyComgateSignature(body, wrongSignature)).toBe(false);
+    expect(verifyComgateWebhookSecret('wrong-secret')).toBe(false);
   });
 
-  it('rejects empty signature', () => {
-    const body = 'any-body';
-
-    // Length mismatch: HMAC-SHA256 hex is always 64 chars; empty string is 0
-    expect(verifyComgateSignature(body, '')).toBe(false);
+  it('rejects empty secret', () => {
+    // Length mismatch: empty string (0 chars) vs TEST_SECRET (27 chars)
+    expect(verifyComgateWebhookSecret('')).toBe(false);
   });
 
-  it('rejects truncated signature', () => {
-    const body = 'transId=ABC-123&status=PAID&price=50000&curr=CZK';
-    const validSignature = computeSignature(body);
-    // Truncate to half — length mismatch detected before timing-safe compare
-    const truncatedSignature = validSignature.slice(0, validSignature.length / 2);
-
-    expect(verifyComgateSignature(body, truncatedSignature)).toBe(false);
+  it('rejects secret with extra whitespace', () => {
+    // Trailing space causes length mismatch — rejected before timingSafeEqual
+    expect(verifyComgateWebhookSecret(TEST_SECRET + ' ')).toBe(false);
   });
 
-  it('handles special characters in body (Czech label)', () => {
-    // URL-encoded Czech diacritics as they appear in Comgate webhook payloads
-    const body = 'label=Masaz+relaxacni&refId=uuid-123';
-    const signature = computeSignature(body);
+  it('rejects undefined/null-like string values', () => {
+    // Comgate should never send these, but guards against deserialization bugs
+    expect(verifyComgateWebhookSecret('undefined')).toBe(false);
+    expect(verifyComgateWebhookSecret('null')).toBe(false);
+  });
 
-    expect(verifyComgateSignature(body, signature)).toBe(true);
+  it('uses timing-safe comparison (no throw on length-mismatched inputs)', () => {
+    // Design assertion: function must not throw regardless of input length
+    // Short string — length mismatch path
+    expect(() => verifyComgateWebhookSecret('short')).not.toThrow();
+    // Very long string — length mismatch path
+    expect(() => verifyComgateWebhookSecret('x'.repeat(10000))).not.toThrow();
+    // Both return false (length mismatch)
+    expect(verifyComgateWebhookSecret('short')).toBe(false);
+    expect(verifyComgateWebhookSecret('x'.repeat(10000))).toBe(false);
+  });
+
+  it('handles special characters in secret', () => {
+    // Verify timing-safe comparison works with URL-unsafe characters
+    const specialSecret = 'secret+key=test/value';
+    process.env.COMGATE_SECRET = specialSecret;
+    try {
+      expect(verifyComgateWebhookSecret(specialSecret)).toBe(true);
+      expect(verifyComgateWebhookSecret('secret+key=test/valu')).toBe(false);
+    } finally {
+      // Restore original test secret
+      process.env.COMGATE_SECRET = TEST_SECRET;
+    }
   });
 });

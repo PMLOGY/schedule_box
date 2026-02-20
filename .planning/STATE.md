@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 19 complete (Email Delivery), ready for Phase 20 (SMS/Twilio)
+**Current focus:** v1.1 Production Hardening — Phase 20 in progress (SMS Delivery), Plan 01 complete
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 19 complete (Email Delivery)
-- **Current Plan:** 19-04 complete, Phase 19 done — ready for Phase 20
-- **Status:** Phase 19 complete (4/4 plans)
-- **Last activity:** 2026-02-20 — Phase 19 Plan 04 complete (DNS auth + Gmail inbox delivery verified)
+- **Phase:** 20 in progress (SMS Delivery)
+- **Current Plan:** 20-01 complete, continuing to 20-02
+- **Status:** Phase 20 plan 1/3 complete
+- **Last activity:** 2026-02-20 — Phase 20 Plan 01 complete (AI-gated SMS core logic)
 
-Progress: [██████████████████████░░░░░░░░░░░░░░] 82% (18/22 phases complete, phase 19 complete, ready for phase 20)
+Progress: [██████████████████████░░░░░░░░░░░░░░] 83% (19/22 phases complete, phase 20 plan 1/3 done)
 
 ## What's Done
 
@@ -131,6 +131,13 @@ Progress: [██████████████████████░
 - SMTP env vars added to apps/web/.env.local for local development
 - Phase 19 (Email Delivery) COMPLETE: all 4 plans finished, SMTP pipeline operational
 
+**Phase 20 Plan 01 complete** (2026-02-20):
+- Fixed UCS-2 multipart segment estimation: 67 chars/segment (was 70), GSM-7 multipart: 153 chars/segment (was 160)
+- Added isValidCzechMobile() phone validation: +420 6xx/7xx only, rejects landlines (+420 2xx-5xx)
+- Created no-show-client.ts: lightweight HTTP client for AI predictions with 3s timeout, conservative fallback (low probability when AI unavailable)
+- AI-gated SMS in reminder-scheduler.ts: SMS only enqueues when no_show_probability > 0.7 AND prediction is not a fallback
+- Added AI config: AI_SERVICE_URL, SMS_NO_SHOW_THRESHOLD, SMS_BUDGET_ALERT_THRESHOLD env vars
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -187,6 +194,11 @@ See `.planning/PROJECT.md` Key Decisions section.
 - DMARC policy p=none for initial monitoring: allows observability without breaking legitimate mail flow
 - Gmail inbox delivery accepted as primary deliverability verification; seznam.cz/centrum.cz deferred to production smoke test
 - SMTP env vars added to .env.local: SMTP_HOST/PORT/USER/PASS/FROM with cesky-hosting.cz defaults
+- No-show client in notification worker is separate from web app AI client: different runtime (worker vs Next.js), no circuit breaker needed (15-min scan interval)
+- Conservative AI fallback: when AI unavailable, return low probability (0.15) + fallback=true so SMS is NOT sent (cost optimization over delivery)
+- Dual SMS gating condition: probability > threshold AND not fallback (both must pass); prevents unreliable predictions from triggering expensive SMS
+- Czech mobile regex +420[67]xxxxxxxx is intentionally strict: rejects non-Czech and no-country-code numbers
+- UCS-2 multipart uses 67 chars/segment (not 70) and GSM-7 uses 153 (not 160) due to User Data Header overhead in concatenated SMS
 
 ## Blockers
 
@@ -211,6 +223,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 19-email-delivery | 02 | 3min | 2/2 | 4 |
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
 | 19-email-delivery | 04 | 19min | 2/2 | 1 |
+| 20-sms-delivery | 01 | 4min | 2/2 | 5 |
 
 ## Metrics
 
@@ -219,9 +232,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phases Complete | 15/15 | 4/7 (phases 16, 17, 18, 19 done) | 7/7 |
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | WORKING: cesky-hosting.cz SMTP verified, Gmail inbox delivery confirmed, DKIM+DMARC DNS configured | Working SMTP |
-| SMS Delivery | Not configured | Not configured | Working Twilio |
+| SMS Delivery | Not configured | Core logic done: AI-gated enqueue, UCS-2 fix, Czech phone validation (Twilio account not yet configured) | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 complete (4/4 plans: auth emails, templates, Helm secrets, DNS+deliverability)*
-*Last session: Completed 19-04-PLAN.md (Phase 19 Email Delivery complete)*
+*Last updated: 2026-02-20 after Phase 20 Plan 01 complete (AI-gated SMS core logic)*
+*Last session: Completed 20-01-PLAN.md (SMS core logic: UCS-2 fix, Czech phone validation, AI no-show gating)*
