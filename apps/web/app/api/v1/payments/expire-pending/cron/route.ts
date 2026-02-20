@@ -10,7 +10,7 @@
  */
 
 import crypto from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { expirePendingPayments } from '@/app/api/v1/payments/saga/payment-timeout';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     console.warn(
       `[Twilio Usage Alert] ${usageCategory} spend reached $${currentValue} ` +
-      `(threshold: $${triggerValue}) | Trigger: ${triggerSid} | Fired: ${dateCreated}`
+        `(threshold: $${triggerValue}) | Trigger: ${triggerSid} | Fired: ${dateCreated}`,
     );
 
     // TODO: Phase 22 will add proper alerting (Slack webhook, admin email notification)
@@ -29,9 +29,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ received: true, timestamp: new Date().toISOString() });
   } catch (error) {
     console.error('[Twilio Usage Webhook] Error processing callback:', error);
-    return NextResponse.json(
-      { error: 'Failed to process usage callback' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process usage callback' }, { status: 500 });
   }
 }

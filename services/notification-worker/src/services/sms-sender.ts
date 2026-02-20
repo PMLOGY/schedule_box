@@ -5,6 +5,7 @@
 
 import twilio from 'twilio';
 import { config } from '../config.js';
+import { smsSegmentsTotal } from '../monitoring/metrics.js';
 
 let twilioClient: ReturnType<typeof twilio> | null = null;
 
@@ -85,6 +86,9 @@ export async function sendSMS(options: { to: string; body: string }): Promise<st
       to: options.to,
       body: options.body,
     });
+
+    // Track segment count for cost estimation (real Twilio sends only)
+    smsSegmentsTotal.inc(segments);
 
     console.log(`[SMS Sender] Sent SMS, SID: ${message.sid}`);
     return message.sid;
