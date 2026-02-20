@@ -6,7 +6,15 @@
 import { Queue, Worker } from 'bullmq';
 import type { ConnectionOptions } from 'bullmq';
 import { between, and, inArray, eq, isNull, sql } from 'drizzle-orm';
-import { db, bookings, customers, services, employees, notifications } from '@schedulebox/database';
+import {
+  db,
+  bookings,
+  companies,
+  customers,
+  services,
+  employees,
+  notifications,
+} from '@schedulebox/database';
 import { renderTemplateFile } from '../services/template-renderer.js';
 
 const REMINDER_QUEUE_NAME = 'notification-reminders';
@@ -169,6 +177,13 @@ async function scanWindow(
         ),
     });
 
+    const [company] = await db
+      .select({ name: companies.name })
+      .from(companies)
+      .where(eq(companies.id, booking.companyId))
+      .limit(1);
+    const companyName = company?.name || 'ScheduleBox';
+
     // Prepare template data
     const templateData = {
       customer_name: booking.customerName,
@@ -176,7 +191,7 @@ async function scanWindow(
       booking_date: booking.startTime,
       booking_time: booking.startTime,
       employee_name: booking.employeeName || 'náš tým',
-      company_name: 'ScheduleBox', // TODO: fetch from company settings
+      company_name: companyName,
       price: booking.price,
       currency: booking.currency,
     };

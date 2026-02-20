@@ -6,7 +6,7 @@
 import type { Channel, Message } from 'amqplib';
 import type { Queue } from 'bullmq';
 import { eq } from 'drizzle-orm';
-import { db, bookings } from '@schedulebox/database';
+import { db, bookings, companies } from '@schedulebox/database';
 import type {
   BookingCreatedEvent,
   BookingCompletedEvent,
@@ -74,7 +74,12 @@ async function handleBookingCreated(event: BookingCreatedEvent, queues: Queues):
   const customerName = booking.customer.name;
   const serviceName = booking.service?.name || 'Služba';
   const employeeName = booking.employee ? booking.employee.name : 'náš tým';
-  const companyName = 'ScheduleBox'; // TODO: fetch from company settings
+  const [company] = await db
+    .select({ name: companies.name })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  const companyName = company?.name || 'ScheduleBox';
   const cancelUrl = `${config.appUrl}/bookings/${bookingUuid}/cancel`;
 
   // Prepare template data
@@ -322,6 +327,12 @@ async function handleBookingCancelled(event: BookingCancelledEvent, queues: Queu
   const customerName = booking.customer.name;
   const serviceName = booking.service?.name || 'Služba';
   const bookingDate = new Date(booking.startTime);
+  const [company] = await db
+    .select({ name: companies.name })
+    .from(companies)
+    .where(eq(companies.id, companyId))
+    .limit(1);
+  const companyName = company?.name || 'ScheduleBox';
 
   // Prepare template data
   const templateData = {
@@ -330,6 +341,7 @@ async function handleBookingCancelled(event: BookingCancelledEvent, queues: Queu
     booking_date: booking.startTime,
     cancelled_by: cancelledBy,
     reason: reason || 'Nebyl uveden důvod',
+    company_name: companyName,
   };
 
   // Check for cancellation template in database
@@ -351,8 +363,7 @@ async function handleBookingCancelled(event: BookingCancelledEvent, queues: Queu
     html = renderTemplate(dbTemplate.bodyTemplate, templateData);
   } else {
     subject = 'Rezervace zrušena';
-    // Use booking-confirmation template as fallback (should create cancellation template)
-    html = `<p>Dobrý den ${customerName},</p><p>Vaše rezervace služby ${serviceName} byla zrušena.</p><p>Důvod: ${reason || 'Nebyl uveden'}</p>`;
+    html = renderTemplateFile('booking-cancellation', 'email', templateData);
   }
 
   // Enqueue email
