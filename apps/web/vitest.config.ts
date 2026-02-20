@@ -10,6 +10,7 @@ export default mergeConfig(
     test: {
       name: 'web',
       environment: 'happy-dom',
+      setupFiles: ['./vitest.setup.ts'],
       include: ['**/*.test.ts', '**/*.test.tsx'],
       exclude: ['node_modules', '.next', 'tests/e2e/**'],
     },
