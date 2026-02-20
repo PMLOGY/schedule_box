@@ -42,7 +42,8 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
