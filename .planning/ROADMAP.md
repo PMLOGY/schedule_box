@@ -140,10 +140,12 @@ Plans:
 3. SMS only sends for high no-show risk bookings (AI score > 0.7) to optimize costs
 4. SMS usage monitoring alerts when approaching cost threshold
 
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 20-01: TBD
+- [ ] 20-01-PLAN.md — Fix UCS-2 segment estimation, add AI no-show gating to reminder scheduler
+- [ ] 20-02-PLAN.md — Twilio usage trigger webhook + setup script, Helm secrets fix
+- [ ] 20-03-PLAN.md — Twilio account setup (human) + end-to-end SMS delivery verification
 
 ---
 
@@ -207,8 +209,8 @@ Plans:
 | 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 17. Integration Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
-| 19. Email Delivery | v1.1 | 0/4 | Planned | - |
-| 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
+| 19. Email Delivery | v1.1 | 4/4 | Complete | 2026-02-20 |
+| 20. SMS Delivery | v1.1 | 0/3 | Planned | - |
 | 21. Payment Processing | v1.1 | 0/TBD | Not started | - |
 | 22. Monitoring & Alerts | v1.1 | 0/TBD | Not started | - |
 
