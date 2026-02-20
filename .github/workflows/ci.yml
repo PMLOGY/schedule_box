@@ -40,12 +40,49 @@ jobs:
         run: pnpm type-check
 
   # =========================================
-  # Job 2: Build and Push Web Docker Image
+  # Job 2: Unit Tests with Coverage Enforcement
+  # =========================================
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            packages/shared/coverage/
+            packages/events/coverage/
+            apps/web/coverage/
+          retention-days: 14
+
+  # =========================================
+  # Job 3: Build and Push Web Docker Image
   # =========================================
   build:
     name: Build & Push Web Docker Image
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [lint, test]
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
@@ -106,7 +143,7 @@ jobs:
           trivyignores: '.trivyignore'
 
   # =========================================
-  # Job 3: Build and Push AI Service Docker Image
+  # Job 4: Build and Push AI Service Docker Image
   # =========================================
   build-ai:
     name: Build & Push AI Service Docker Image

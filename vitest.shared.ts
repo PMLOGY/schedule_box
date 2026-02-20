@@ -24,7 +24,9 @@ export default defineConfig({
         '**/*.d.ts',
         '**/mocks/**',
         '**/__tests__/setup.*',
-        '**/index.ts',
+        // Barrel re-export files at package root src level only
+        // Use package-specific coverage.exclude for finer control
+        'src/index.ts',
       ],
     },
   },
