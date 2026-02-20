@@ -96,10 +96,12 @@ Plans:
 4. AI circuit breaker returns fallback defaults when AI service times out
 5. E2E tests run in CI against staging deployment before production release
 
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 18-01: TBD
+- [ ] 18-01-PLAN.md — Playwright setup, config, auth storageState, page objects, mock helpers
+- [ ] 18-02-PLAN.md — Auth (registration + login) and booking creation E2E tests
+- [ ] 18-03-PLAN.md — Payment flow and AI fallback E2E tests, CI pipeline E2E job
 
 ---
 
@@ -201,7 +203,7 @@ Plans:
 | 15. DevOps & Launch | v1.0 | 6/6 | Complete | 2026-02-12 |
 | 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 17. Integration Testing | v1.1 | 0/3 | Planned | - |
-| 18. E2E Testing | v1.1 | 0/TBD | Not started | - |
+| 18. E2E Testing | v1.1 | 0/3 | Planned | - |
 | 19. Email Delivery | v1.1 | 0/TBD | Not started | - |
 | 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
 | 21. Payment Processing | v1.1 | 0/TBD | Not started | - |
