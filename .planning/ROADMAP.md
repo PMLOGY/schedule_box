@@ -77,9 +77,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Testcontainers infrastructure, globalSetup, DB helpers, seed factories
-- [ ] 17-02-PLAN.md — Double-booking prevention and RLS tenant isolation tests
-- [ ] 17-03-PLAN.md — Comgate webhook signature, booking status transitions, CI pipeline integration
+- [x] 17-01-PLAN.md — Testcontainers infrastructure, globalSetup, DB helpers, seed factories
+- [x] 17-02-PLAN.md — Double-booking prevention and RLS tenant isolation tests
+- [x] 17-03-PLAN.md — Comgate webhook signature, booking status transitions, CI pipeline integration
 
 ---
 
@@ -205,7 +205,7 @@ Plans:
 | 14. AI Voice | v1.0 | 5/5 | Complete | 2026-02-12 |
 | 15. DevOps & Launch | v1.0 | 6/6 | Complete | 2026-02-12 |
 | 16. Testing Foundation | v1.1 | 4/4 | Complete | 2026-02-20 |
-| 17. Integration Testing | v1.1 | 0/3 | Planned | - |
+| 17. Integration Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 19. Email Delivery | v1.1 | 0/4 | Planned | - |
 | 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
