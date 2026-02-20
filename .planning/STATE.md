@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 18 Plan 01 complete, E2E infrastructure ready
+**Current focus:** v1.1 Production Hardening — Phase 18 complete (all 3 plans), E2E testing fully done
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 18 in progress (E2E Testing)
-- **Current Plan:** 18-02 (next to execute)
-- **Status:** Phase 18 Plan 01 complete (1/3 plans done)
-- **Last activity:** 2026-02-20 — Phase 18 Plan 01 complete (Playwright E2E infrastructure)
+- **Phase:** 18 complete (E2E Testing)
+- **Current Plan:** 18 complete, ready for Phase 19
+- **Status:** Phase 18 complete (3/3 plans done)
+- **Last activity:** 2026-02-20 — Phase 18 Plan 03 complete (payment + AI fallback E2E tests + CI integration)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phases 17+18 in progress)
+Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete)
 
 ## What's Done
 
@@ -86,6 +86,18 @@ Progress: [████████████████░░░░░░░
 - CI updated from pnpm test:coverage (workspace mode, exits 0 regardless) to pnpm -r --if-present test:coverage (per-package, propagates exit codes, blocks build on violations)
 - All Phase 16 must-haves now fully verified (4/4)
 
+**Phase 18 Plan 02 complete** (2026-02-20):
+- 4 auth E2E tests: registration success, login with seeded credentials, invalid credentials error, email format validation
+- 2 booking E2E tests: full 4-step wizard flow with mocked APIs, field validation (Next button visibility)
+- All tests use Page Object Models and unauthenticated/authenticated context patterns
+- Comprehensive API mocking via page.route() for services, employees, availability, customers, bookings, AI
+
+**Phase 18 Plan 03 complete** (2026-02-20):
+- 2 payment E2E tests: Comgate payment flow with mocked redirect/callback, graceful error handling on 500
+- 2 AI fallback E2E tests: circuit breaker fallback rendering on capacity page, health endpoint circuit breaker state validation
+- CI pipeline Job 5 (E2E): PostgreSQL 16 + Redis 7 service containers, db:setup, Next.js build, Playwright 3-browser test, artifact upload
+- E2E job depends on [lint, test] not [build] (build only runs on main, E2E does own build)
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -120,6 +132,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - i18n-safe regex patterns in POMs: match Czech (Prihlasit), Slovak, English (Sign in) button text
 - storageState auth: authenticate once in setup project, reuse across chromium/firefox/webkit projects
 - Auth fixture pattern: authenticatedPage/unauthenticatedPage for explicit test isolation in E2E specs
+- Availability mock uses AvailabilitySlot format (startTime/endTime/employeeId) matching component expectations, not simpler helper format
+- AI upselling endpoint mocked with empty recommendations to prevent widget interference in booking tests
+- Calendar day selection uses button text filter with regex anchors for exact day matching in react-day-picker
 
 ## Blockers
 
@@ -135,18 +150,20 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 16-testing-foundation | 03 | 4min | 2/2 | 8 |
 | 16-testing-foundation | 04 | 3min | 2/2 | 5 |
 | 17-integration-testing | 01 | 8min | 2/2 | 6 |
+| 17-integration-testing | 02 | 5min | 2/2 | 4 |
 | 18-e2e-testing | 01 | 8min | 2/2 | 13 |
+| 18-e2e-testing | 02 | 4min | 2/2 | 2 |
 
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
 | Phases Complete | 15/15 | 1/7 (phase 16 done) | 7/7 |
-| Test Coverage | 0% | 100% on 6 measured files (243 tests), CI gate enforced | 80%+ critical paths |
+| Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 6 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 18 Plan 01 (Playwright E2E infrastructure)*
-*Last session: Stopped at Completed 18-01-PLAN.md*
+*Last updated: 2026-02-20 after Phase 18 Plan 02 (auth + booking E2E test specs)*
+*Last session: Stopped at Completed 18-02-PLAN.md*
