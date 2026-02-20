@@ -188,6 +188,9 @@ importers:
       next-intl:
         specifier: ^4.8.2
         version: 4.8.2(@swc/helpers@0.5.18)(next@15.5.12(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      nodemailer:
+        specifier: ^7.0.11
+        version: 7.0.13
       opossum:
         specifier: ^9.0.0
         version: 9.0.0
@@ -258,6 +261,9 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
+      '@types/nodemailer':
+        specifier: ^6.4.16
+        version: 6.4.22
       '@types/opossum':
         specifier: ^8.1.9
         version: 8.1.9
