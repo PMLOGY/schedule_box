@@ -32,6 +32,14 @@ export const notificationsTotalCounter = new Counter({
   registers: [register],
 });
 
+// Webhook processing metrics
+export const webhookProcessingTotal = new Counter({
+  name: 'schedulebox_webhook_processing_total',
+  help: 'Total webhook processing attempts by gateway and status',
+  labelNames: ['gateway', 'status'], // status: 'success', 'failure'
+  registers: [register],
+});
+
 // AI prediction metrics
 export const aiPredictionDuration = new Histogram({
   name: 'schedulebox_ai_prediction_duration_seconds',
