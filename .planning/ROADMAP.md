@@ -74,10 +74,12 @@ Plans:
 4. Booking status transitions validate correctly (pending -> confirmed -> completed)
 5. Integration tests run in CI using Testcontainers with real database behavior
 
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 17-01: TBD
+- [ ] 17-01-PLAN.md — Testcontainers infrastructure, globalSetup, DB helpers, seed factories
+- [ ] 17-02-PLAN.md — Double-booking prevention and RLS tenant isolation tests
+- [ ] 17-03-PLAN.md — Comgate webhook signature, booking status transitions, CI pipeline integration
 
 ---
 
@@ -198,7 +200,7 @@ Plans:
 | 14. AI Voice | v1.0 | 5/5 | Complete | 2026-02-12 |
 | 15. DevOps & Launch | v1.0 | 6/6 | Complete | 2026-02-12 |
 | 16. Testing Foundation | v1.1 | 0/4 | Gap closure in progress | - |
-| 17. Integration Testing | v1.1 | 0/TBD | Not started | - |
+| 17. Integration Testing | v1.1 | 0/3 | Planned | - |
 | 18. E2E Testing | v1.1 | 0/TBD | Not started | - |
 | 19. Email Delivery | v1.1 | 0/TBD | Not started | - |
 | 20. SMS Delivery | v1.1 | 0/TBD | Not started | - |
