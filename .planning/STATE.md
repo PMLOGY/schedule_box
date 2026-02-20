@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 19 Plan 04 in progress (DNS authentication + deliverability verification) — stopped at Task 1 checkpoint (human DNS action required)
+**Current focus:** v1.1 Production Hardening — Phase 19 Plan 04 in progress (DNS authentication + deliverability verification) — Task 1 complete, stopped at Task 2 checkpoint (human deliverability verification)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
 - **Phase:** 19 in progress (Email Delivery)
-- **Current Plan:** 19-04 in progress — stopped at Task 1 (checkpoint:human-action)
-- **Status:** Awaiting human DNS configuration (DKIM + DMARC for schedulebox.cz via cesky-hosting.cz)
-- **Last activity:** 2026-02-20 — Phase 19 Plan 04 started, stopped at Task 1 checkpoint (DNS configuration required)
+- **Current Plan:** 19-04 in progress — Task 1 (DNS) complete, stopped at Task 2 (checkpoint:human-verify)
+- **Status:** Awaiting human email deliverability verification (mail-tester.com, Gmail, seznam.cz, centrum.cz)
+- **Last activity:** 2026-02-20 — Phase 19 Plan 04 Task 1 confirmed (dns-configured), SMTP env vars added to .env.local, awaiting Task 2 deliverability verification
 
 Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete, phase 19 in progress)
 
@@ -212,5 +212,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 Plan 04 started (DNS authentication + deliverability — stopped at Task 1 checkpoint)*
-*Last session: Stopped at Task 1 of 19-04-PLAN.md (checkpoint:human-action — DNS configuration required)*
+*Last updated: 2026-02-20 after Phase 19 Plan 04 Task 1 complete (DNS configured, SMTP env vars added, awaiting deliverability verification)*
+*Last session: Stopped at Task 2 of 19-04-PLAN.md (checkpoint:human-verify — email deliverability verification)*

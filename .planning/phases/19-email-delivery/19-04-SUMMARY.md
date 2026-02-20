@@ -55,16 +55,17 @@ completed: 2026-02-20
 
 ## Performance
 
-- **Duration:** pending (stopped at checkpoint - awaiting human DNS configuration)
+- **Duration:** pending (stopped at Task 2 checkpoint - awaiting deliverability verification)
 - **Started:** 2026-02-20T18:55:23Z
 - **Completed:** pending
-- **Tasks:** 0/2 (stopped at first checkpoint)
-- **Files modified:** 0
+- **Tasks:** 1/2 (Task 1 complete, stopped at Task 2 checkpoint)
+- **Files modified:** 1 (apps/web/.env.local - SMTP block added)
 
 ## Accomplishments
 
-- (Pending Task 1: DNS configuration via cesky-hosting.cz panel)
-- (Pending Task 2: End-to-end deliverability verification)
+- Task 1 complete: DNS configured (DKIM + DMARC via cesky-hosting.cz) - user confirmed "dns-configured"
+- SMTP env vars added to apps/web/.env.local (host, port, user, from pre-filled; password placeholder)
+- (Pending Task 2: End-to-end deliverability verification to Gmail, seznam.cz, centrum.cz)
 
 ## Task Commits
 
@@ -98,9 +99,19 @@ None - this plan is DNS configuration and verification only. No code files modif
 **Total deviations:** 1 user override (provider substitution)
 **Impact on plan:** Functional outcome identical; cesky-hosting.cz replaces Brevo as DNS/SMTP provider.
 
+### Auto-fixed Issues
+
+**1. [Rule 3 - Blocking] Added SMTP env var block to apps/web/.env.local**
+
+- **Found during:** Task 1 continuation (preparing verification environment for Task 2)
+- **Issue:** apps/web/.env.local had no SMTP_HOST/PORT/USER/PASS/FROM entries; Next.js would not load credentials at runtime
+- **Fix:** Added 5 SMTP env vars to .env.local with cesky-hosting.cz defaults (password left as placeholder for user to fill)
+- **Files modified:** apps/web/.env.local
+- **Verification:** grep confirms all 5 SMTP vars present in .env.local
+
 ## Issues Encountered
 
-- Plan stopped at Task 1 (checkpoint:human-action) — DNS configuration requires human access to cesky-hosting.cz admin panel
+- Task 1 required human access to cesky-hosting.cz admin panel for DKIM + DMARC DNS configuration (expected checkpoint behavior)
 
 ## User Setup Required
 
