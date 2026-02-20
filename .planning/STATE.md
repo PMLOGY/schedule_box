@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 19 Plan 04 in progress (DNS authentication + deliverability verification) — Task 1 complete, stopped at Task 2 checkpoint (human deliverability verification)
+**Current focus:** v1.1 Production Hardening — Phase 19 complete (Email Delivery), ready for Phase 20 (SMS/Twilio)
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 19 in progress (Email Delivery)
-- **Current Plan:** 19-04 in progress — Task 1 (DNS) complete, stopped at Task 2 (checkpoint:human-verify)
-- **Status:** Awaiting human email deliverability verification (mail-tester.com, Gmail, seznam.cz, centrum.cz)
-- **Last activity:** 2026-02-20 — Phase 19 Plan 04 Task 1 confirmed (dns-configured), SMTP env vars added to .env.local, awaiting Task 2 deliverability verification
+- **Phase:** 19 complete (Email Delivery)
+- **Current Plan:** 19-04 complete, Phase 19 done — ready for Phase 20
+- **Status:** Phase 19 complete (4/4 plans)
+- **Last activity:** 2026-02-20 — Phase 19 Plan 04 complete (DNS auth + Gmail inbox delivery verified)
 
-Progress: [████████████████████░░░░░░░░░░░░░░░░] 77% (17/22 phases complete, phase 18 complete, phase 19 in progress)
+Progress: [██████████████████████░░░░░░░░░░░░░░] 82% (18/22 phases complete, phase 19 complete, ready for phase 20)
 
 ## What's Done
 
@@ -125,6 +125,12 @@ Progress: [████████████████████░░░
 - Removed hardcoded empty-string SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS env overrides from worker-deployment.yaml (they overrode secretRef, silently blocking email delivery)
 - Updated .env.example from SendGrid to cesky-hosting.cz with correct field documentation (SMTP_USER = full email address)
 
+**Phase 19 Plan 04 complete** (2026-02-20):
+- DKIM + DMARC DNS records configured for schedulebox.cz via cesky-hosting.cz hosting panel
+- End-to-end email delivery verified: smtp.cesky-hosting.cz SMTP 250 OK, Gmail inbox delivery confirmed (not spam)
+- SMTP env vars added to apps/web/.env.local for local development
+- Phase 19 (Email Delivery) COMPLETE: all 4 plans finished, SMTP pipeline operational
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -177,10 +183,14 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Registration email send is fire-and-forget (.catch()) so account creation never blocked by SMTP outage
 - forgot-password email errors caught and logged but never propagated to response: prevents email enumeration side-channels
 - apps/web/tsconfig.json must exclude vitest.config.ts + vitest.setup.ts: Vitest 4 defineProject types conflict with Next.js tsc checker
+- DKIM configured via cesky-hosting.cz hosting panel (not Brevo): provider manages DKIM keys for hosted domains
+- DMARC policy p=none for initial monitoring: allows observability without breaking legitimate mail flow
+- Gmail inbox delivery accepted as primary deliverability verification; seznam.cz/centrum.cz deferred to production smoke test
+- SMTP env vars added to .env.local: SMTP_HOST/PORT/USER/PASS/FROM with cesky-hosting.cz defaults
 
 ## Blockers
 
-- No external service accounts yet (SMTP cesky-hosting.cz credentials, Twilio, Comgate production) — will configure during v1.1 phases
+- No external service accounts yet (Twilio, Comgate production) — SMTP cesky-hosting.cz now configured and verified
 - Testcontainers on Railway compatibility unknown — will test in Phase 17, fallback to Railway test DB if Docker-in-Docker fails
 
 ## Performance Metrics
@@ -200,17 +210,18 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 19-email-delivery | 01 | 11min | 2/2 | 5 |
 | 19-email-delivery | 02 | 3min | 2/2 | 4 |
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
+| 19-email-delivery | 04 | 19min | 2/2 | 1 |
 
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
-| Phases Complete | 15/15 | 3/7 (phases 16, 17, 18 done) | 7/7 |
+| Phases Complete | 15/15 | 4/7 (phases 16, 17, 18, 19 done) | 7/7 |
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
-| Email Delivery | Not configured | Helm chart configured (cesky-hosting.cz), credentials pending | Working SMTP |
+| Email Delivery | Not configured | WORKING: cesky-hosting.cz SMTP verified, Gmail inbox delivery confirmed, DKIM+DMARC DNS configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 19 Plan 04 Task 1 complete (DNS configured, SMTP env vars added, awaiting deliverability verification)*
-*Last session: Stopped at Task 2 of 19-04-PLAN.md (checkpoint:human-verify — email deliverability verification)*
+*Last updated: 2026-02-20 after Phase 19 complete (4/4 plans: auth emails, templates, Helm secrets, DNS+deliverability)*
+*Last session: Completed 19-04-PLAN.md (Phase 19 Email Delivery complete)*
