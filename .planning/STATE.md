@@ -152,6 +152,18 @@ Progress: [██████████████████████░
 - Defense-in-depth: getComgatePaymentStatus called after payment lookup; API status overrides webhook on mismatch (best-effort)
 - Integration tests rewritten: 7 cases for verifyComgateWebhookSecret (valid, wrong, empty, whitespace, null-like, timing-safe, special chars)
 
+**Phase 22 Plan 01 complete** (2026-02-20):
+- Installed prom-client@15.1.3 in notification-worker package (worker-local registry, separate from shared)
+- Created monitoring/metrics.ts: emailDeliveryTotal, smsDeliveryTotal, smsSegmentsTotal, smsEstimatedMonthlyCostCzk
+- Instrumented email-job.ts and sms-job.ts: inc sent/failed counters on every delivery attempt
+- sms-sender.ts tracks segment count after real Twilio sends only (not mock SID)
+- Added monitoring config section to config.ts: alertEmail, slackWebhookUrl, thresholds (all env-var-overridable)
+- Added async /metrics route to health.ts for manual debugging via curl localhost:3001/metrics
+- Created monitoring/alert-sender.ts: sendAlert() with SMTP primary + Slack webhook fallback, never throws
+- Created monitoring/monitoring-scheduler.ts: startMonitoringScheduler() runs BullMQ repeatable job every 5 min
+- MON-01: email bounce rate > 5% in last hour triggers alert; MON-02: SMS cost > 80% of limit triggers alert
+- Updated index.ts: monitoringResources lifecycle (start after schedulers, shutdown gracefully)
+
 **Phase 22 Plan 02 complete** (2026-02-20):
 - Added webhookProcessingTotal Counter to @schedulebox/shared/metrics/business (gateway + status labels)
 - Instrumented Comgate webhook handler: success counter after markWebhookCompleted(), failure counter in catch block
@@ -275,7 +287,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 19-email-delivery | 03 | 8min | 2/2 | 3 |
 | 19-email-delivery | 04 | 19min | 2/2 | 1 |
 | 20-sms-delivery | 01 | 4min | 2/2 | 5 |
+| 20-sms-delivery | 02 | 4min | 2/2 | 5 |
 | 21-payment-processing | 01 | 6min | 2/2 | 3 |
+| 22-monitoring-alerts | 01 | 7min | 2/2 | 9 |
 | 22-monitoring-alerts | 02 | 4min | 2/2 | 7 |
 
 ## Metrics
@@ -285,7 +299,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phases Complete | 15/15 | 4/7 (phases 16, 17, 18, 19 done) | 7/7 |
 | Test Coverage | 0% | 100% on 6 measured files (243 unit + 13 integration + 10 E2E tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | WORKING: cesky-hosting.cz SMTP verified, Gmail inbox delivery confirmed, DKIM+DMARC DNS configured | Working SMTP |
-| SMS Delivery | Not configured | Core logic done: AI-gated enqueue, UCS-2 fix, Czech phone validation (Twilio account not yet configured) | Working Twilio |
+| SMS Delivery | Not configured | Core logic + cost monitoring done: AI-gated enqueue, usage trigger webhook, Helm secrets fixed (Twilio account not yet configured) | Working Twilio |
 | Payments | Webhook verification fixed (POST body secret, defense-in-depth API check) | Webhook verification fixed | Live Comgate |
 
 ---
