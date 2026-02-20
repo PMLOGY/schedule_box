@@ -121,10 +121,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 19-01-PLAN.md — Auth email library (nodemailer) + password reset and email verification wiring
-- [ ] 19-02-PLAN.md — Booking cancellation template + company name DB lookup fix
-- [ ] 19-03-PLAN.md — Helm SMTP secrets fix + .env.example Brevo update
-- [ ] 19-04-PLAN.md — DNS setup (DKIM/DMARC) + end-to-end deliverability verification
+- [x] 19-01-PLAN.md — Auth email library (nodemailer) + password reset and email verification wiring
+- [x] 19-02-PLAN.md — Booking cancellation template + company name DB lookup fix
+- [x] 19-03-PLAN.md — Helm SMTP secrets fix + .env.example cesky-hosting.cz update
+- [x] 19-04-PLAN.md — DNS setup (DKIM/DMARC) + end-to-end deliverability verification
 
 ---
 
