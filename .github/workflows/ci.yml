@@ -65,6 +65,26 @@ jobs:
       - name: Run unit tests with coverage
         run: pnpm -r --if-present test:coverage
 
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | Lines | Branches | Functions | Statements |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|----------|-----------|------------|" >> $GITHUB_STEP_SUMMARY
+          for pkg in packages/shared packages/events apps/web; do
+            if [ -f "$pkg/coverage/coverage-summary.json" ]; then
+              name=$(basename $pkg)
+              lines=$(jq -r '.total.lines.pct // "N/A"' "$pkg/coverage/coverage-summary.json")
+              branches=$(jq -r '.total.branches.pct // "N/A"' "$pkg/coverage/coverage-summary.json")
+              functions=$(jq -r '.total.functions.pct // "N/A"' "$pkg/coverage/coverage-summary.json")
+              statements=$(jq -r '.total.statements.pct // "N/A"' "$pkg/coverage/coverage-summary.json")
+              echo "| **$name** | ${lines}% | ${branches}% | ${functions}% | ${statements}% |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_Threshold: 80% (enforced by vitest.shared.ts)_" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
