@@ -40,13 +40,19 @@ Progress: [████████████████░░░░░░░
 - Root test scripts: test, test:unit, test:watch, test:ui, test:coverage
 - Smoke test passes (generateSlug Czech diacritics, 5 assertions)
 
+**Phase 16 Plan 02 complete** (2026-02-20):
+- 193 unit tests for shared utilities (69) and Zod schemas — booking (42), payment (42), notification (40)
+- 41 CloudEvent tests — createCloudEvent, validateCloudEvent, 11 domain event creators (booking + payment)
+- 100% coverage on utils/index.ts, booking.ts, payment.ts, notification.ts (all 4 metrics)
+- Fixed coverage config: narrowed vitest.shared.ts exclude from **/index.ts to src/index.ts
+- Fixed coverage.include: explicit file list prevents untested siblings from failing 80% threshold
+
 **Phase 16 Plan 03 complete** (2026-02-20):
 - MSW 2.0 installed and configured in @schedulebox/web
 - Default handlers for Comgate (3 endpoints), AI service (3 endpoints), notifications (1 endpoint)
 - MSW lifecycle in vitest.setup.ts (listen/resetHandlers/close); setupFiles added to web vitest.config.ts
 - 9 MSW handler tests verify interception and override pattern work
 - CI pipeline updated: test job runs pnpm test:coverage, build job requires [lint, test]
-- Plan 16-02 partial work (shared utility tests + vitest config refinements) also committed
 
 ## Decisions
 
@@ -63,6 +69,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - web package uses happy-dom environment; all other packages use node environment
 - MSW onUnhandledRequest: 'warn' (not 'error') during bootstrap phase to avoid test failures
 - build-ai CI job only needs lint (AI service is Python, not covered by Vitest)
+- Coverage.include must be explicit file list per package to prevent untested siblings from dragging below 80% threshold
+- vitest.shared.ts coverage.exclude uses src/index.ts (not **/index.ts) — narrow pattern avoids excluding implementation files
+- Events package unit tests cover only pure functions (createCloudEvent, validateCloudEvent); publishEvent needs RabbitMQ (integration test scope)
 
 ## Blockers
 
@@ -74,6 +83,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 16-testing-foundation | 01 | 8min | 2/2 | 13 |
+| 16-testing-foundation | 02 | 8min | 2/2 | 8 |
 | 16-testing-foundation | 03 | 4min | 2/2 | 8 |
 
 ## Metrics
@@ -81,11 +91,11 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
 | Phases Complete | 15/15 | 0/7 | 7/7 |
-| Test Coverage | 0% | ~15% (2 files, 78 tests) | 80%+ critical paths |
+| Test Coverage | 0% | ~25% (6 files, 243 tests) | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 16 Plan 03 (MSW 2.0 + CI test pipeline)*
-*Last session: Stopped at Completed 16-03-PLAN.md*
+*Last updated: 2026-02-20 after Phase 16 Plan 02 (shared unit tests) and Plan 03 (MSW 2.0 + CI test pipeline)*
+*Last session: Stopped at Completed 16-02-PLAN.md*
