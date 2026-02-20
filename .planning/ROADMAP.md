@@ -161,10 +161,12 @@ Plans:
 3. Webhook callback processes payment confirmations and updates booking status correctly
 4. Refund flow works end-to-end (customer receives money back)
 
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 21-01: TBD
+- [ ] 21-01-PLAN.md — Fix webhook verification (POST body secret + API status check) and update integration tests
+- [ ] 21-02-PLAN.md — Cron-safe payment expiration endpoint and env var documentation fixes
+- [ ] 21-03-PLAN.md — Production Comgate credentials setup and end-to-end payment validation
 
 ---
 
@@ -211,7 +213,7 @@ Plans:
 | 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 19. Email Delivery | v1.1 | 4/4 | Complete | 2026-02-20 |
 | 20. SMS Delivery | v1.1 | 0/3 | Planned | - |
-| 21. Payment Processing | v1.1 | 0/TBD | Not started | - |
+| 21. Payment Processing | v1.1 | 0/3 | Planned | - |
 | 22. Monitoring & Alerts | v1.1 | 0/TBD | Not started | - |
 
 ---
