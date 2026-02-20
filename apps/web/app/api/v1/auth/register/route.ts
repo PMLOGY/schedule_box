@@ -9,8 +9,10 @@
 import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { createHash } from 'crypto';
 import { db } from '@/lib/db/client';
 import { companies, users, roles, passwordHistory } from '@schedulebox/database';
+import { redis } from '@/lib/redis/client';
 import { hashPassword } from '@/lib/auth/password';
 import { generateTokenPair } from '@/lib/auth/jwt';
 import { registerSchema } from '@/validations/auth';
@@ -18,6 +20,7 @@ import { validateBody } from '@/lib/middleware/validate';
 import { handleRouteError } from '@/lib/utils/errors';
 import { createdResponse } from '@/lib/utils/response';
 import { ConflictError } from '@schedulebox/shared';
+import { sendEmailVerificationEmail } from '@/lib/email/auth-emails';
 
 /**
  * Generate URL-friendly slug from company name
@@ -108,7 +111,17 @@ export async function POST(req: NextRequest) {
       return { company, user, ownerRole };
     });
 
-    // 4. Generate JWT token pair
+    // 4. Generate email verification token (matches verify-email route pattern)
+    const verifyToken = nanoid(64);
+    const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
+    // Store with 24-hour TTL (86400 seconds); value is the user's internal ID
+    await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
+    // Fire-and-forget — registration succeeds even if email delivery fails
+    sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
+      console.error('[Register] Failed to send verification email:', err),
+    );
+
+    // 5. Generate JWT token pair
     const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
       result.user.id,
       result.user.uuid,
@@ -118,7 +131,7 @@ export async function POST(req: NextRequest) {
       false, // MFA not verified on registration
     );
 
-    // 5. Return success with tokens
+    // 6. Return success with tokens
     return createdResponse({
       access_token: accessToken,
       refresh_token: refreshToken,
