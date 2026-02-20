@@ -69,6 +69,13 @@ Progress: [████████████████████░░░
 - Fixed vitest.integration.config.ts: added resolve.alias for drizzle-orm + postgres (pnpm doesn't hoist to root; Vite runtime needs explicit paths)
 - Fixed tsconfig.integration.json: added vitest/globals types for describe/it/expect globals
 
+**Phase 17 Plan 03 complete** (2026-02-20):
+- 7 Comgate webhook signature tests (ITEST-04): valid HMAC-SHA256, tampered price, tampered status, wrong secret, empty, truncated, Czech chars
+- 11 booking status transition tests (ITEST-05): 6 valid (pending->confirmed/cancelled/expired, confirmed->completed/cancelled/no_show), 4 invalid (pending->completed, completed->pending, cancelled->confirmed, no_show->confirmed), full lifecycle
+- CI pipeline integration-test job added (ITEST-06): runs pnpm test:integration after unit tests, blocks Docker image build
+- build job updated to needs: [lint, test, integration-test]
+- Phase 17 complete: 31 total integration tests across 4 files
+
 **Phase 18 Plan 01 complete** (2026-02-20):
 - Playwright 1.58.2 installed with Chromium, Firefox, WebKit browser binaries
 - playwright.config.ts: 3 browser projects + setup project + webServer (pnpm start)
@@ -138,6 +145,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - E2E CI job needs: [lint, test] not [lint, test, build]: build only runs on main (if: github.ref == 'refs/heads/main'), E2E does its own pnpm build step
 - AI health endpoint E2E test accepts 200 or 401/403: test owner may lack SETTINGS_MANAGE permission, both prove endpoint doesn't crash
 - Comgate payment E2E mocked at /api/v1/payments/comgate/create response level: server-side Comgate API calls cannot be intercepted by page.route()
+- VALID_TRANSITIONS map duplicated in integration test file (not imported from app): intentional contract test — if app logic changes, test catches discrepancy
+- TESTCONTAINERS_RYUK_DISABLED=true for CI integration-test job: Ryuk resource reaper causes Docker socket permission failures on ephemeral GitHub Actions VMs; disabling is safe
+- integration-test CI job uses needs: test (not needs: [lint, test]): lint already validated before test; adding it would be redundant
 
 ## Blockers
 
@@ -154,6 +164,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 16-testing-foundation | 04 | 3min | 2/2 | 5 |
 | 17-integration-testing | 01 | 8min | 2/2 | 6 |
 | 17-integration-testing | 02 | 5min | 2/2 | 4 |
+| 17-integration-testing | 03 | 4min | 2/2 | 3 |
 | 18-e2e-testing | 01 | 8min | 2/2 | 13 |
 | 18-e2e-testing | 02 | 4min | 2/2 | 2 |
 | 18-e2e-testing | 03 | 6min | 2/2 | 3 |
