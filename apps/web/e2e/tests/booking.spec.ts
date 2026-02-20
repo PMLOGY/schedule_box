@@ -1,10 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { BookingWizardPage } from '../page-objects/booking-wizard.page';
-import {
-  mockServicesAPI,
-  mockEmployeesAPI,
-  mockAvailabilityAPI,
-} from '../helpers/mock-api';
+import { mockServicesAPI, mockEmployeesAPI } from '../helpers/mock-api';
 import { MOCK_SERVICE, MOCK_EMPLOYEE } from '../helpers/test-data';
 
 /**
@@ -28,7 +24,7 @@ test.describe('Booking Creation', () => {
    * Mocks services, employees, availability, AI upselling, customer search,
    * customer creation, and booking creation endpoints.
    */
-  async function setupBookingMocks(page: import('@playwright/test').Page) {
+  async function setupBookingMocks(page: Page) {
     // Mock services list (Step 1)
     await mockServicesAPI(page, [MOCK_SERVICE]);
 
@@ -40,14 +36,8 @@ test.describe('Booking Creation', () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const dateStr = tomorrow.toISOString().split('T')[0];
 
-    // Mock availability slots (Step 2)
-    await mockAvailabilityAPI(page, [
-      { date: dateStr, time: '10:00', available: true, employee_id: MOCK_EMPLOYEE.id },
-      { date: dateStr, time: '14:00', available: true, employee_id: MOCK_EMPLOYEE.id },
-    ]);
-
-    // Mock the availability endpoint with the AvailabilitySlot format the component expects
-    // The Step2DateTimeSelect component expects { slots: AvailabilitySlot[] } with startTime/endTime
+    // Mock availability with the AvailabilitySlot format the Step2DateTimeSelect component expects
+    // Uses { slots: AvailabilitySlot[] } with startTime/endTime/employeeId/employeeName/isAvailable
     await page.route('**/api/v1/availability*', async (route) => {
       await route.fulfill({
         status: 200,
@@ -165,7 +155,10 @@ test.describe('Booking Creation', () => {
 
     // Click the day in the calendar - find a button with the exact day text
     // The calendar may have multiple elements with the day number, so scope to the calendar area
-    const calendarDayButton = page.locator('button').filter({ hasText: new RegExp(`^${dayOfMonth}$`) }).first();
+    const calendarDayButton = page
+      .locator('button')
+      .filter({ hasText: new RegExp(`^${dayOfMonth}$`) })
+      .first();
     await calendarDayButton.click();
 
     // Wait for availability slots to load and click the first available slot
@@ -179,9 +172,9 @@ test.describe('Booking Creation', () => {
     // --- Step 3: Customer Info ---
     // Wait for the customer info form to be visible
     // The form has fields: customerName, customerEmail, customerPhone, notes
-    const customerNameInput = page.locator('input[name="customerName"]').or(
-      page.getByLabel(/name|jmeno/i),
-    );
+    const customerNameInput = page
+      .locator('input[name="customerName"]')
+      .or(page.getByLabel(/name|jmeno/i));
     await customerNameInput.waitFor({ state: 'visible', timeout: 10000 });
 
     // Fill customer information using the form fields
@@ -190,9 +183,9 @@ test.describe('Booking Creation', () => {
     const customerEmailInput = page.locator('input[type="email"]');
     await customerEmailInput.fill('e2e@example.com');
 
-    const customerPhoneInput = page.locator('input[type="tel"]').or(
-      page.locator('input[name="customerPhone"]'),
-    );
+    const customerPhoneInput = page
+      .locator('input[type="tel"]')
+      .or(page.locator('input[name="customerPhone"]'));
     await customerPhoneInput.fill('+420123456789');
 
     // Click Next to proceed to Step 4 (Confirmation)
