@@ -12,6 +12,7 @@ import {
   logNotificationSent,
   logNotificationFailed,
 } from '../services/notification-logger.js';
+import { smsDeliveryTotal } from '../monitoring/metrics.js';
 
 /**
  * SMS job data interface
@@ -24,6 +25,8 @@ export interface SmsJobData {
   body: string;
   notificationId?: number;
   eventId?: string;
+  templateId?: number;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -57,9 +60,15 @@ async function handleSmsJob(job: Job<SmsJobData>): Promise<void> {
     // Update notification status
     await logNotificationSent(notificationId, messageSid);
 
+    // Track delivery metric
+    smsDeliveryTotal.inc({ status: 'sent' });
+
     console.log(`[SMS Job] Completed job ${job.id}`);
   } catch (error) {
     console.error(`[SMS Job] Failed job ${job.id}:`, error);
+
+    // Track delivery failure metric (always, regardless of whether DB record exists)
+    smsDeliveryTotal.inc({ status: 'failed' });
 
     // Log failure if notification record exists
     if (data.notificationId) {

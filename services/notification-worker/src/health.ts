@@ -6,6 +6,7 @@
  */
 
 import { createServer, type Server } from 'node:http';
+import { getWorkerMetrics } from './monitoring/metrics.js';
 
 const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '3001', 10);
 
@@ -26,7 +27,7 @@ export const healthState = {
  * GET /ready   — readiness: returns 200 if workers and consumers are connected
  */
 export function startHealthServer(): Server {
-  const server = createServer((req, res) => {
+  const server = createServer(async (req, res) => {
     if (req.url === '/health' && req.method === 'GET') {
       if (healthState.alive) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -48,6 +49,12 @@ export function startHealthServer(): Server {
         res.writeHead(503, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'not_ready' }));
       }
+      return;
+    }
+
+    if (req.url === '/metrics' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'text/plain; version=0.0.4' });
+      res.end(await getWorkerMetrics());
       return;
     }
 
