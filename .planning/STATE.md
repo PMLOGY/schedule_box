@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 16 complete, ready for Phase 17
+**Current focus:** v1.1 Production Hardening — Phase 18 Plan 01 complete, E2E infrastructure ready
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 17 in progress (Integration Tests)
-- **Current Plan:** 17-02 (next to execute)
-- **Status:** Phase 17 Plan 01 complete (1/3 plans done)
-- **Last activity:** 2026-02-20 — Phase 17 Plan 01 complete (Testcontainers integration test infrastructure)
+- **Phase:** 18 in progress (E2E Testing)
+- **Current Plan:** 18-02 (next to execute)
+- **Status:** Phase 18 Plan 01 complete (1/3 plans done)
+- **Last activity:** 2026-02-20 — Phase 18 Plan 01 complete (Playwright E2E infrastructure)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phase 17 in progress)
+Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phases 17+18 in progress)
 
 ## What's Done
 
@@ -63,6 +63,16 @@ Progress: [████████████████░░░░░░░
 - tsconfig.integration.json: resolves @schedulebox/database + drizzle-orm + postgres for TS checks
 - pnpm test:integration command exists, returns "no test files found" (expected at this stage)
 
+**Phase 18 Plan 01 complete** (2026-02-20):
+- Playwright 1.58.2 installed with Chromium, Firefox, WebKit browser binaries
+- playwright.config.ts: 3 browser projects + setup project + webServer (pnpm start)
+- auth.setup.ts: storageState authentication for test owner (login once, reuse across browsers)
+- 4 Page Object Models: LoginPage, RegisterPage, BookingWizardPage, DashboardPage
+- 7 mock API helpers: mockServicesAPI, mockEmployeesAPI, mockAvailabilityAPI, mockComgatePaymentCreate, mockComgateRedirect, mockAIServiceDown, mockAIServiceHealthy
+- Auth fixture: authenticatedPage and unauthenticatedPage test extensions
+- test:e2e and test:e2e:ui scripts added to web and root package.json
+- .gitignore updated for playwright auth/results/report directories
+
 **Phase 16 Plan 04 complete** (2026-02-20):
 - Gap closure: fixed CI coverage gate so it actually enforces 80% threshold per package
 - Added coverage.include to packages/events/vitest.config.ts scoping to src/events/booking.ts and src/events/payment.ts (booking.ts + payment.ts at 100%, publisher.ts excluded — RabbitMQ integration scope)
@@ -96,6 +106,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - TRUNCATE companies CASCADE for test cleanup: fastest method since all 47 tenant tables FK to companies
 - SET LOCAL (not SET) for RLS session variables: scopes context to current transaction, prevents cross-test contamination
 - tsconfig.integration.json with paths to packages/database/node_modules: pnpm does not hoist drizzle-orm/postgres to root by default
+- Playwright page.route() for E2E mocking over MSW: simpler at browser network level, no service worker setup needed
+- i18n-safe regex patterns in POMs: match Czech (Prihlasit), Slovak, English (Sign in) button text
+- storageState auth: authenticate once in setup project, reuse across chromium/firefox/webkit projects
+- Auth fixture pattern: authenticatedPage/unauthenticatedPage for explicit test isolation in E2E specs
 
 ## Blockers
 
@@ -111,6 +125,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 16-testing-foundation | 03 | 4min | 2/2 | 8 |
 | 16-testing-foundation | 04 | 3min | 2/2 | 5 |
 | 17-integration-testing | 01 | 8min | 2/2 | 6 |
+| 18-e2e-testing | 01 | 8min | 2/2 | 13 |
 
 ## Metrics
 
@@ -123,5 +138,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 17 Plan 01 (Testcontainers integration test infrastructure)*
-*Last session: Stopped at Completed 17-01-PLAN.md*
+*Last updated: 2026-02-20 after Phase 18 Plan 01 (Playwright E2E infrastructure)*
+*Last session: Stopped at Completed 18-01-PLAN.md*
