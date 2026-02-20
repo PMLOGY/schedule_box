@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 16 complete — 17 of 22 next (Integration Tests)
-- **Current Plan:** 17-01 (next to execute)
-- **Status:** Phase 16 complete (4/4 plans done, all must-haves verified)
-- **Last activity:** 2026-02-20 — Phase 16 Plan 04 complete (CI coverage gate fix: per-package threshold enforcement)
+- **Phase:** 17 in progress (Integration Tests)
+- **Current Plan:** 17-02 (next to execute)
+- **Status:** Phase 17 Plan 01 complete (1/3 plans done)
+- **Last activity:** 2026-02-20 — Phase 17 Plan 01 complete (Testcontainers integration test infrastructure)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phase 16 done in v1.1)
+Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phase 17 in progress)
 
 ## What's Done
 
@@ -54,6 +54,15 @@ Progress: [████████████████░░░░░░░
 - 9 MSW handler tests verify interception and override pattern work
 - CI pipeline updated: test job runs pnpm test:coverage, build job requires [lint, test]
 
+**Phase 17 Plan 01 complete** (2026-02-20):
+- Testcontainers installed (testcontainers + @testcontainers/postgresql/redis/rabbitmq)
+- vitest.integration.config.ts: 30s test / 120s hook timeouts, node env, sequential, no coverage
+- globalSetup.ts: starts PG 16 + Redis 7 + RabbitMQ 3.13, applies migrations + 11 SQL files, creates test_app role
+- test-db.ts: createTestDb (superuser), createTestAppDb (RLS non-superuser), setRlsContext, truncateAllTables
+- seed-helpers.ts: 7 factories (company, user, service, employee, employeeService, customer, booking)
+- tsconfig.integration.json: resolves @schedulebox/database + drizzle-orm + postgres for TS checks
+- pnpm test:integration command exists, returns "no test files found" (expected at this stage)
+
 **Phase 16 Plan 04 complete** (2026-02-20):
 - Gap closure: fixed CI coverage gate so it actually enforces 80% threshold per package
 - Added coverage.include to packages/events/vitest.config.ts scoping to src/events/booking.ts and src/events/payment.ts (booking.ts + payment.ts at 100%, publisher.ts excluded — RabbitMQ integration scope)
@@ -81,6 +90,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Events package unit tests cover only pure functions (createCloudEvent, validateCloudEvent); publishEvent needs RabbitMQ (integration test scope)
 - pnpm -r --if-present test:coverage chosen over root workspace coverage thresholds: per-package exit codes propagate correctly, Vitest 4.0 workspace mode silently ignores per-package thresholds at root
 - events coverage.include scoped to src/events/booking.ts + src/events/payment.ts only: publisher.ts contains RabbitMQ-dependent functions that require a live broker (integration test scope Phase 17)
+- Integration tests run via separate pnpm test:integration (not in root vitest.config.ts projects): isolates Docker/Testcontainers dependency from fast unit tests
+- Vitest 4.0 globalSetup parameter type is TestProject (from vitest/node), not GlobalSetupContext (old Vitest 2.x type)
+- test_app PostgreSQL role required for RLS testing: superusers bypass RLS policies entirely
+- TRUNCATE companies CASCADE for test cleanup: fastest method since all 47 tenant tables FK to companies
+- SET LOCAL (not SET) for RLS session variables: scopes context to current transaction, prevents cross-test contamination
+- tsconfig.integration.json with paths to packages/database/node_modules: pnpm does not hoist drizzle-orm/postgres to root by default
 
 ## Blockers
 
@@ -95,6 +110,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 16-testing-foundation | 02 | 8min | 2/2 | 8 |
 | 16-testing-foundation | 03 | 4min | 2/2 | 8 |
 | 16-testing-foundation | 04 | 3min | 2/2 | 5 |
+| 17-integration-testing | 01 | 8min | 2/2 | 6 |
 
 ## Metrics
 
@@ -107,5 +123,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 16 Plan 04 (CI coverage gate fix — gap closure plan)*
-*Last session: Stopped at Completed 16-04-PLAN.md*
+*Last updated: 2026-02-20 after Phase 17 Plan 01 (Testcontainers integration test infrastructure)*
+*Last session: Stopped at Completed 17-01-PLAN.md*
