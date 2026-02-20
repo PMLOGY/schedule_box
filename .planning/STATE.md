@@ -11,8 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 
 - **Milestone:** v1.1 Production Hardening
 - **Phase:** 16 of 22 (Testing Foundation)
-- **Status:** Ready to plan
-- **Last activity:** 2026-02-15 — v1.1 roadmap created with 7 phases, 33 requirements
+- **Current Plan:** 16-02 (next to execute)
+- **Status:** In progress (1/N plans complete in phase 16)
+- **Last activity:** 2026-02-20 — Phase 16 Plan 01 complete (Vitest workspace configuration)
 
 Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases)
 
@@ -32,6 +33,13 @@ Progress: [████████████████░░░░░░░
 - Testing foundation → Integration/E2E tests → Email/SMS → Payments → Monitoring
 - Dependencies validated (test infrastructure before services)
 
+**Phase 16 Plan 01 complete** (2026-02-20):
+- Vitest 4.0.18 installed across monorepo with coverage-v8, UI, happy-dom
+- Shared base config (vitest.shared.ts) with 80% coverage thresholds
+- Per-package vitest.config.ts for shared, events, web, notification-worker
+- Root test scripts: test, test:unit, test:watch, test:ui, test:coverage
+- Smoke test passes (generateSlug Czech diacritics, 5 assertions)
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -42,21 +50,31 @@ See `.planning/PROJECT.md` Key Decisions section.
 - SMTP provider: Brevo (best free tier, lowest entry cost)
 - SMS provider: Keep Twilio (code exists, TypeScript-native SDK v4)
 - E2E framework: Playwright over Cypress (Safari support for 40% CZ iOS users)
+- Vitest 4.0 removed defineWorkspace: use test.projects array in vitest.config.ts instead
+- Coverage thresholds at 80% for lines/functions/branches/statements enforced via v8 provider
+- web package uses happy-dom environment; all other packages use node environment
 
 ## Blockers
 
 - No external service accounts yet (SMTP, Twilio, Comgate production) — will configure during v1.1 phases
 - Testcontainers on Railway compatibility unknown — will test in Phase 17, fallback to Railway test DB if Docker-in-Docker fails
 
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 16-testing-foundation | 01 | 8min | 2/2 | 13 |
+
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
 | Phases Complete | 15/15 | 0/7 | 7/7 |
-| Test Coverage | 0% | 0% | 80%+ critical paths |
+| Test Coverage | 0% | ~10% (1 file) | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-15 after v1.1 roadmap creation*
+*Last updated: 2026-02-20 after Phase 16 Plan 01 (Vitest workspace configuration)*
+*Last session: Stopped at Completed 16-01-PLAN.md*
