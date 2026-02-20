@@ -138,6 +138,13 @@ Progress: [██████████████████████░
 - AI-gated SMS in reminder-scheduler.ts: SMS only enqueues when no_show_probability > 0.7 AND prediction is not a fallback
 - Added AI config: AI_SERVICE_URL, SMS_NO_SHOW_THRESHOLD, SMS_BUDGET_ALERT_THRESHOLD env vars
 
+**Phase 20 Plan 02 complete** (2026-02-20):
+- Created Twilio usage trigger webhook at /api/v1/webhooks/twilio-usage (receives POST callbacks, logs spending alerts)
+- Created setup script scripts/setup-twilio-usage-trigger.ts for one-time Twilio Usage Trigger creation (monthly recurring, configurable threshold)
+- Added TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER to Helm secrets.yaml (native K8s Secret + ExternalSecret)
+- Removed hardcoded empty TWILIO_*/VAPID_* env vars from worker-deployment.yaml (same fix pattern as Phase 19 SMTP)
+- Updated .env.example with SMS_NO_SHOW_THRESHOLD, SMS_BUDGET_ALERT_THRESHOLD documentation
+
 **Phase 21 Plan 01 complete** (2026-02-20):
 - Replaced verifyComgateSignature (HMAC-SHA256 header) with verifyComgateWebhookSecret (POST body secret comparison)
 - Comgate sends merchant secret as POST body "secret" parameter — not an HMAC header (confirmed via PHP/Node/Clojure SDKs)
@@ -225,6 +232,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Dual SMS gating condition: probability > threshold AND not fallback (both must pass); prevents unreliable predictions from triggering expensive SMS
 - Czech mobile regex +420[67]xxxxxxxx is intentionally strict: rejects non-Czech and no-country-code numbers
 - UCS-2 multipart uses 67 chars/segment (not 70) and GSM-7 uses 153 (not 160) due to User Data Header overhead in concatenated SMS
+- TWILIO_FROM_NUMBER used in Helm secrets (matching config.ts) instead of incorrect TWILIO_PHONE_NUMBER from old worker-deployment.yaml
+- VAPID empty-string overrides removed alongside Twilio overrides in worker-deployment.yaml: same secretRef override bug pattern as SMTP fix in Phase 19
+- Usage trigger webhook logs alerts only (console.warn): Phase 22 Monitoring will add proper Slack/email alerting
+- One-time setup scripts live in scripts/ directory for external service configuration (new convention)
 - CRON_SECRET bearer token for external cron auth over IP allowlisting: works across all providers (Railway, cron-job.org, GitHub Actions)
 - Returns 503 when CRON_SECRET not set vs 401 on bad token: distinguishes misconfiguration from authentication failure
 - crypto.timingSafeEqual for cron token comparison: prevents timing oracle attacks on secret comparison
