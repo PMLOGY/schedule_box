@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — Phase 16 Testing Foundation
+**Current focus:** v1.1 Production Hardening — Phase 16 complete, ready for Phase 17
 
 ## Current Position
 
 - **Milestone:** v1.1 Production Hardening
-- **Phase:** 16 of 22 (Testing Foundation)
-- **Current Plan:** 16-04 (next to execute)
-- **Status:** In progress (3/N plans complete in phase 16)
-- **Last activity:** 2026-02-20 — Phase 16 Plan 03 complete (MSW 2.0 configuration + CI test pipeline)
+- **Phase:** 16 complete — 17 of 22 next (Integration Tests)
+- **Current Plan:** 17-01 (next to execute)
+- **Status:** Phase 16 complete (4/4 plans done, all must-haves verified)
+- **Last activity:** 2026-02-20 — Phase 16 Plan 04 complete (CI coverage gate fix: per-package threshold enforcement)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases)
+Progress: [████████████████░░░░░░░░░░░░░░░░░░░░] 68% (15/22 phases complete, phase 16 done in v1.1)
 
 ## What's Done
 
@@ -54,6 +54,13 @@ Progress: [████████████████░░░░░░░
 - 9 MSW handler tests verify interception and override pattern work
 - CI pipeline updated: test job runs pnpm test:coverage, build job requires [lint, test]
 
+**Phase 16 Plan 04 complete** (2026-02-20):
+- Gap closure: fixed CI coverage gate so it actually enforces 80% threshold per package
+- Added coverage.include to packages/events/vitest.config.ts scoping to src/events/booking.ts and src/events/payment.ts (booking.ts + payment.ts at 100%, publisher.ts excluded — RabbitMQ integration scope)
+- Added "test:coverage": "vitest run --coverage" script to packages/shared, packages/events, apps/web
+- CI updated from pnpm test:coverage (workspace mode, exits 0 regardless) to pnpm -r --if-present test:coverage (per-package, propagates exit codes, blocks build on violations)
+- All Phase 16 must-haves now fully verified (4/4)
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -72,6 +79,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Coverage.include must be explicit file list per package to prevent untested siblings from dragging below 80% threshold
 - vitest.shared.ts coverage.exclude uses src/index.ts (not **/index.ts) — narrow pattern avoids excluding implementation files
 - Events package unit tests cover only pure functions (createCloudEvent, validateCloudEvent); publishEvent needs RabbitMQ (integration test scope)
+- pnpm -r --if-present test:coverage chosen over root workspace coverage thresholds: per-package exit codes propagate correctly, Vitest 4.0 workspace mode silently ignores per-package thresholds at root
+- events coverage.include scoped to src/events/booking.ts + src/events/payment.ts only: publisher.ts contains RabbitMQ-dependent functions that require a live broker (integration test scope Phase 17)
 
 ## Blockers
 
@@ -85,17 +94,18 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 16-testing-foundation | 01 | 8min | 2/2 | 13 |
 | 16-testing-foundation | 02 | 8min | 2/2 | 8 |
 | 16-testing-foundation | 03 | 4min | 2/2 | 8 |
+| 16-testing-foundation | 04 | 3min | 2/2 | 5 |
 
 ## Metrics
 
 | Metric | v1.0 Final | v1.1 Current | v1.1 Target |
 |--------|-----------|--------------|-------------|
-| Phases Complete | 15/15 | 0/7 | 7/7 |
-| Test Coverage | 0% | ~25% (6 files, 243 tests) | 80%+ critical paths |
+| Phases Complete | 15/15 | 1/7 (phase 16 done) | 7/7 |
+| Test Coverage | 0% | 100% on 6 measured files (243 tests), CI gate enforced | 80%+ critical paths |
 | Email Delivery | Not configured | Not configured | Working SMTP |
 | SMS Delivery | Not configured | Not configured | Working Twilio |
 | Payments | Code only | Code only | Live Comgate |
 
 ---
-*Last updated: 2026-02-20 after Phase 16 Plan 02 (shared unit tests) and Plan 03 (MSW 2.0 + CI test pipeline)*
-*Last session: Stopped at Completed 16-02-PLAN.md*
+*Last updated: 2026-02-20 after Phase 16 Plan 04 (CI coverage gate fix — gap closure plan)*
+*Last session: Stopped at Completed 16-04-PLAN.md*
