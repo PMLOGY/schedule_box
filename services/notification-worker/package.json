@@ -5,7 +5,9 @@
   "main": "./src/index.ts",
   "scripts": {
     "start": "tsx src/index.ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "bullmq": "^5.29.5",
