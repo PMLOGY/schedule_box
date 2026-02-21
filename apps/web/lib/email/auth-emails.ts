@@ -16,7 +16,7 @@
 import nodemailer from 'nodemailer';
 
 // Module-level transporter — created once on import for connection reuse
-const smtpPort = Number(process.env.SMTP_PORT) || 465;
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: smtpPort,
