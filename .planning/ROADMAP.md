@@ -118,13 +118,13 @@ Plans:
 4. Footer displays company ICO, DIC, registered address; privacy policy and terms of service pages exist in Czech at /cs/privacy and /cs/terms
 5. Lighthouse performance score is above 90 (SSR/SSG, no above-the-fold client JS, next/image for hero)
 
-**Plans:** TBD
+**Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 25-01-PLAN.md — Marketing route group layout, navbar, footer with legal info
-- [ ] 25-02-PLAN.md — Hero section with live widget embed + feature grid + trust badges
-- [ ] 25-03-PLAN.md — Pricing page (3 tiers) + social proof section
-- [ ] 25-04-PLAN.md — Czech privacy policy, terms of service, cookie consent implementation
+- [ ] 25-01-PLAN.md — Marketing route group layout, navbar, footer with legal info, i18n messages, Motion install (Wave 1)
+- [ ] 25-02-PLAN.md — Hero section with live widget embed + feature grid + trust badges (Wave 2)
+- [ ] 25-03-PLAN.md — Pricing page (3 tiers) + social proof section (Wave 2)
+- [ ] 25-04-PLAN.md — Czech privacy policy, terms of service, cookie consent implementation (Wave 2)
 
 ---
 
@@ -202,7 +202,7 @@ Plans:
 | 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
 | 23. AI Service | v1.2 | 0/5 | Planning complete | - |
 | 24. AI-Powered UI | v1.2 | 0/2 | Not started | - |
-| 25. Landing Page | v1.2 | 0/4 | Not started | - |
+| 25. Landing Page | v1.2 | 0/4 | Planned | - |
 | 26. Booking UX Polish | v1.2 | 0/4 | Not started | - |
 | 27. Onboarding Wizard | v1.2 | 0/4 | Not started | - |
 
@@ -212,3 +212,4 @@ Plans:
 *v1.1 roadmap added: 2026-02-15*
 *v1.1 shipped: 2026-02-21*
 *v1.2 roadmap added: 2026-02-21*
+*Phase 25 planned: 2026-02-21*
