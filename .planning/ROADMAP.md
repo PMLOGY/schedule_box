@@ -3,12 +3,13 @@
 ## Milestones
 
 - ✅ **v1.0 ScheduleBox Platform** — Phases 1-15 (shipped 2026-02-12)
-- 🚧 **v1.1 Production Hardening** — Phases 16-22 (in progress)
+- ✅ **v1.1 Production Hardening** — Phases 16-22 (shipped 2026-02-21, Twilio + Comgate credentials deferred)
+- 🚧 **v1.2 Product Readiness** — Phases 23-27 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 ScheduleBox Platform (Phases 1-15) — SHIPPED 2026-02-12</summary>
+<summary>v1.0 ScheduleBox Platform (Phases 1-15) — SHIPPED 2026-02-12</summary>
 
 ### Milestone 1: Foundation & MVP
 - [x] Phase 1: Project Setup & Infrastructure (7/10 plans) — completed 2026-02-10
@@ -35,158 +36,141 @@
 
 </details>
 
-## 🚧 v1.1 Production Hardening (In Progress)
+<details>
+<summary>v1.1 Production Hardening (Phases 16-22) — SHIPPED 2026-02-21</summary>
 
-**Milestone Goal:** Make ScheduleBox production-ready with real email/SMS delivery, payment processing, and test coverage so it's reliable for real customers.
+- [x] Phase 16: Testing Foundation (4/4 plans) — completed 2026-02-20
+- [x] Phase 17: Integration Testing (3/3 plans) — completed 2026-02-20
+- [x] Phase 18: E2E Testing (3/3 plans) — completed 2026-02-20
+- [x] Phase 19: Email Delivery (4/4 plans) — completed 2026-02-20
+- [x] Phase 20: SMS Delivery (2/3 plans, Twilio setup deferred) — completed 2026-02-20
+- [x] Phase 21: Payment Processing (2/3 plans, Comgate setup deferred) — completed 2026-02-20
+- [x] Phase 22: Monitoring & Alerts (2/2 plans) — completed 2026-02-20
 
-### Phase 16: Testing Foundation
+**Note:** Plans 20-03 (Twilio account setup) and 21-03 (Comgate production credentials) are human checkpoints deferred to when external accounts are ready. All code work is complete.
 
-**Goal**: Developer can run automated tests locally and in CI to catch bugs before production
-**Depends on**: Nothing (foundation for all testing)
-**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04
-**Success Criteria** (what must be TRUE):
-
-1. Developer can run `pnpm test:unit` and see test results with coverage report
-2. CI pipeline fails on push if unit tests fail or coverage drops below 80%
-3. Shared utilities and validation schemas have 80%+ unit test coverage
-4. External APIs (Comgate, AI service, SMTP) are mockable via MSW in tests
-
-**Plans:** 4 plans
-
-Plans:
-- [x] 16-01-PLAN.md — Vitest workspace config, shared config, per-package configs
-- [x] 16-02-PLAN.md — Unit tests for shared utilities and Zod validation schemas
-- [x] 16-03-PLAN.md — MSW external API mocking and CI pipeline test job
-- [x] 16-04-PLAN.md — Gap closure: fix CI coverage gate enforcement (events coverage.include + pnpm -r CI command)
+</details>
 
 ---
 
-### Phase 17: Integration Testing
+## 🚧 v1.2 Product Readiness (In Progress)
 
-**Goal**: Critical database operations validate correctly against real PostgreSQL/Redis/RabbitMQ behavior
-**Depends on**: Phase 16 (test runner must exist)
-**Requirements**: ITEST-01, ITEST-02, ITEST-03, ITEST-04, ITEST-05, ITEST-06
-**Success Criteria** (what must be TRUE):
+**Milestone Goal:** Make ScheduleBox a polished, demo-ready product with working AI models, professional UI, smooth workflows, and a landing page — so the sales team can confidently present it to SMB customers.
 
-1. Concurrent booking attempts to the same slot fail correctly (double-booking prevention works)
-2. Two different companies cannot access each other's data via RLS policies
-3. Comgate webhook signature verification rejects tampered payloads
-4. Booking status transitions validate correctly (pending -> confirmed -> completed)
-5. Integration tests run in CI using Testcontainers with real database behavior
-
-**Plans:** 3 plans
-
-Plans:
-- [x] 17-01-PLAN.md — Testcontainers infrastructure, globalSetup, DB helpers, seed factories
-- [x] 17-02-PLAN.md — Double-booking prevention and RLS tenant isolation tests
-- [x] 17-03-PLAN.md — Comgate webhook signature, booking status transitions, CI pipeline integration
+**Key insight:** ScheduleBox's AI features (no-show prediction, CLV scoring, dynamic pricing) are genuinely unique in the Czech/Slovak scheduling market. No competitor (Reservio, Bookio, Calendly) offers ML-based predictions. This is the primary differentiator, but only if the models are actually trained and the predictions are visibly surfaced in the UI.
 
 ---
 
-### Phase 18: E2E Testing
+### Phase 23: AI Service — Training Pipeline and Model Deployment
 
-**Goal**: User flows work correctly across browsers and detect visual regressions before deployment
-**Depends on**: Phase 16 (test runner must exist)
-**Requirements**: E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06
+**Goal**: AI service returns real trained predictions instead of heuristic fallbacks, with model versioning, state persistence, and production-grade deployment on Railway
+**Depends on**: Nothing (foundation for all AI work in v1.2)
+**Requirements**: AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08
 **Success Criteria** (what must be TRUE):
 
-1. User can complete registration and login flow on Chrome, Firefox, and Safari
-2. User can create a booking end-to-end (select service -> choose slot -> confirm) without errors
-3. Payment flow with Comgate test mode completes successfully
-4. AI circuit breaker returns fallback defaults when AI service times out
-5. E2E tests run in CI against staging deployment before production release
+1. Training scripts fetch real feature data from Next.js internal API routes and produce trained model files
+2. No-show predictor returns predictions with `confidence > 0.5` and `fallback: false` (not the heuristic 0.4)
+3. Pricing optimizer state persists across Railway container restarts (Redis-backed, not filesystem)
+4. AI service starts on Railway with all models loaded, Prophet warmed up, and health check passing within 30 seconds
+5. Model version mismatch between training and serving environments raises a RuntimeError at startup (not silent degradation)
 
-**Plans:** 3 plans
+**Plans:** 5 plans
 
 Plans:
-- [x] 18-01-PLAN.md — Playwright setup, config, auth storageState, page objects, mock helpers
-- [x] 18-02-PLAN.md — Auth (registration + login) and booking creation E2E tests
-- [x] 18-03-PLAN.md — Payment flow and AI fallback E2E tests, CI pipeline E2E job
+- [ ] 23-01-PLAN.md — Internal training API routes (6 endpoints) + API key auth middleware
+- [ ] 23-02-PLAN.md — No-show and CLV model training with .meta.json sidecars
+- [ ] 23-03-PLAN.md — Pricing optimizer Redis persistence + model version validation at startup
+- [ ] 23-04-PLAN.md — Railway deployment (railway.toml, 1.5GB memory, Prophet warmup, ThreadPoolExecutor)
+- [ ] 23-05-PLAN.md — Weekly retraining CI workflow (.github/workflows/train-models.yml)
 
 ---
 
-### Phase 19: Email Delivery
+### Phase 24: AI-Powered UI Surfaces
 
-**Goal**: Customers receive booking confirmations, reminders, and password reset emails reliably in their inbox
-**Depends on**: Phase 16 (can test email templates with mocks)
-**Requirements**: EMAIL-01, EMAIL-02, EMAIL-03, EMAIL-04, EMAIL-05
+**Goal**: AI predictions are visible and actionable in the dashboard, making the AI investment tangible for demos
+**Depends on**: Phase 23 (needs real trained models returning meaningful predictions)
+**Requirements**: AIUI-01, AIUI-02, AIUI-03, AIUI-04, AIUI-05
 **Success Criteria** (what must be TRUE):
 
-1. SMTP provider (Brevo) is configured with production credentials and sends successfully
-2. Emails arrive in inbox (not spam) for major Czech providers (Gmail, Seznam, Centrum)
-3. SPF and DKIM DNS records validate correctly for sender domain
-4. Booking confirmations and reminders (24h, 2h) deliver successfully
-5. Password reset and email verification flows work end-to-end
+1. Every booking row in the management list shows a color-coded no-show risk badge (red >50%, yellow 30-50%, green <30%)
+2. Booking detail page shows the no-show probability with an actionable label ("High risk -- consider SMS reminder"), not a raw decimal
+3. Dashboard AI insights panel shows a daily digest of high-risk bookings and optimization suggestions
+4. When a company has fewer than 10 bookings, AI features show "AI features activate after 10 bookings" with a progress indicator instead of low-confidence predictions
 
-**Plans:** 4 plans
+**Plans:** TBD
 
 Plans:
-- [x] 19-01-PLAN.md — Auth email library (nodemailer) + password reset and email verification wiring
-- [x] 19-02-PLAN.md — Booking cancellation template + company name DB lookup fix
-- [x] 19-03-PLAN.md — Helm SMTP secrets fix + .env.example cesky-hosting.cz update
-- [x] 19-04-PLAN.md — DNS setup (DKIM/DMARC) + end-to-end deliverability verification
+- [ ] 24-01-PLAN.md — No-show risk badge on booking list + booking detail probability display
+- [ ] 24-02-PLAN.md — AI insights dashboard panel + confidence transparency + AI onboarding state
 
 ---
 
-### Phase 20: SMS Delivery
+### Phase 25: Landing Page and Czech Legal Compliance
 
-**Goal**: High-risk bookings receive SMS reminders to reduce no-shows
-**Depends on**: Phase 19 (email patterns established first)
-**Requirements**: SMS-01, SMS-02, SMS-03, SMS-04
+**Goal**: Czech SMB owners can discover ScheduleBox via a professional Czech-language landing page with live widget demo, clear pricing, and full legal compliance
+**Depends on**: Nothing (architecturally independent; marketing route group, no backend changes)
+**Requirements**: LAND-01, LAND-02, LAND-03, LAND-04, LAND-05, LAND-06, LAND-07
 **Success Criteria** (what must be TRUE):
 
-1. Twilio is configured with production credentials and Czech phone number
-2. SMS delivers to Czech mobile numbers with correct diacritics (UCS-2 encoding)
-3. SMS only sends for high no-show risk bookings (AI score > 0.7) to optimize costs
-4. SMS usage monitoring alerts when approaching cost threshold
+1. Unauthenticated visitor on schedulebox.cz sees a Czech-language landing page with a live embedded booking widget demo (not a screenshot)
+2. Pricing page shows three tiers (Free / CZK 299 / CZK 699) with "Zacit zdarma" primary CTA leading to registration
+3. Cookie consent banner has no pre-checked boxes (strict opt-in compliant with Czech Electronic Communications Act 2022)
+4. Footer displays company ICO, DIC, registered address; privacy policy and terms of service pages exist in Czech at /cs/privacy and /cs/terms
+5. Lighthouse performance score is above 90 (SSR/SSG, no above-the-fold client JS, next/image for hero)
 
-**Plans:** 3 plans
+**Plans:** TBD
 
 Plans:
-- [x] 20-01-PLAN.md — Fix UCS-2 segment estimation, add AI no-show gating to reminder scheduler
-- [x] 20-02-PLAN.md — Twilio usage trigger webhook + setup script, Helm secrets fix
-- [ ] 20-03-PLAN.md — Twilio account setup (human) + end-to-end SMS delivery verification *(deferred)*
+- [ ] 25-01-PLAN.md — Marketing route group layout, navbar, footer with legal info
+- [ ] 25-02-PLAN.md — Hero section with live widget embed + feature grid + trust badges
+- [ ] 25-03-PLAN.md — Pricing page (3 tiers) + social proof section
+- [ ] 25-04-PLAN.md — Czech privacy policy, terms of service, cookie consent implementation
 
 ---
 
-### Phase 21: Payment Processing
+### Phase 26: Booking UX Polish and Calendar Upgrade
 
-**Goal**: Customers can pay for bookings with real cards and businesses receive funds
-**Depends on**: Phase 17 (integration tests validate payment flows)
-**Requirements**: PAY-01, PAY-02, PAY-03, PAY-04
+**Goal**: Booking experience matches Calendly-level polish with drag-and-drop calendar, mobile-optimized slot selection, and smooth micro-animations
+**Depends on**: Phase 25 (landing page drives traffic to booking widget; widget must be polished when visitors arrive)
+**Requirements**: BUX-01, BUX-02, BUX-03, BUX-04, BUX-05, BUX-06, BUX-07
 **Success Criteria** (what must be TRUE):
 
-1. Comgate merchant account is verified (KYC complete) with production credentials
-2. Payment creation works with real cards in production environment
-3. Webhook callback processes payment confirmations and updates booking status correctly
-4. Refund flow works end-to-end (customer receives money back)
+1. Embed widget visual regression baseline exists in Playwright BEFORE any globals.css changes (prevents breaking widgets on customer sites)
+2. Dashboard booking calendar shows day/week/month views with drag-and-drop rescheduling via react-big-calendar
+3. Mobile booking flow has 44px minimum tap targets, time slots grouped by Morning/Afternoon/Evening, and a progress stepper showing "Step X of Y"
+4. After booking confirmation, user sees an add-to-calendar button that downloads a valid ICS file with correct booking details
+5. Booking confirmation page displays a micro-animation (Motion fade-in + scale on success icon) that makes the completion feel satisfying
 
-**Plans:** 3 plans
+**Plans:** TBD
 
 Plans:
-- [x] 21-01-PLAN.md — Fix webhook verification (POST body secret + API status check) and update integration tests
-- [x] 21-02-PLAN.md — Cron-safe payment expiration endpoint and env var documentation fixes
-- [ ] 21-03-PLAN.md — Production Comgate credentials setup and end-to-end payment validation *(deferred)*
+- [ ] 26-01-PLAN.md — Embed widget visual regression baseline + shadcn/ui diff audit
+- [ ] 26-02-PLAN.md — react-big-calendar upgrade with drag-and-drop + shadcn theme integration
+- [ ] 26-03-PLAN.md — Mobile UX audit: tap targets, slot grouping, progress stepper, skeleton loaders
+- [ ] 26-04-PLAN.md — ICS calendar endpoint + Motion micro-animations on booking confirmation
 
 ---
 
-### Phase 22: Monitoring & Alerts
+### Phase 27: Onboarding and Business Setup Wizard
 
-**Goal**: Production issues are detected and alerted immediately before customers complain
-**Depends on**: Phases 19, 20, 21 (services must exist to monitor)
-**Requirements**: MON-01, MON-02, MON-03, MON-04
+**Goal**: New business owner goes from registration to sharing their live booking link in under 5 minutes, with guided setup and helpful empty states throughout
+**Depends on**: Phase 26 (wizard's final step shows the live booking link; that widget should be polished when owners first see it)
+**Requirements**: ONB-01, ONB-02, ONB-03, ONB-04, ONB-05, ONB-06, ONB-07
 **Success Criteria** (what must be TRUE):
 
-1. Email delivery monitoring tracks bounce rate and alerts if above 5%
-2. SMS usage tracking alerts when approaching monthly cost threshold
-3. Payment webhook failures log to DLQ and trigger alerts
-4. Test coverage tracking in CI fails build if coverage drops below 80%
+1. New business owner completes a 4-step wizard (Company details + logo, First service, Working hours, Share booking link) in under 5 minutes
+2. Wizard's final step shows the live booking URL and a QR code with copy-to-clipboard feedback
+3. Dashboard onboarding checklist widget tracks 5 setup items and is dismissible when all are complete
+4. Every previously-blank table and list in the dashboard shows an action-oriented empty state with illustration, headline, and primary action button
+5. "Load demo data" option seeds a realistic Czech business (Beauty Studio Praha, 3 services, 10 bookings, 5 customers, AI predictions active) clearly labeled as demo data
 
-**Plans:** 2 plans
+**Plans:** TBD
 
 Plans:
-- [x] 22-01-PLAN.md — Worker monitoring: email/SMS metrics, instrumented jobs, monitoring scheduler, alert sender
-- [x] 22-02-PLAN.md — Web monitoring: webhook metrics, monitoring API endpoints, CI coverage summary
+- [ ] 27-01-PLAN.md — 4-step business setup wizard (company, service, hours, share link + QR)
+- [ ] 27-02-PLAN.md — Onboarding checklist widget + empty states across all dashboard sections
+- [ ] 27-03-PLAN.md — Demo company data seeder + Driver.js contextual tooltips
+- [ ] 27-04-PLAN.md — Industry template presets (8 verticals with Czech service names and CZK pricing)
 
 ---
 
@@ -216,8 +200,15 @@ Plans:
 | 20. SMS Delivery | v1.1 | 2/3 | Code complete (Twilio setup deferred) | 2026-02-20 |
 | 21. Payment Processing | v1.1 | 2/3 | Code complete (Comgate setup deferred) | 2026-02-20 |
 | 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
+| 23. AI Service | v1.2 | 0/5 | Planning complete | - |
+| 24. AI-Powered UI | v1.2 | 0/2 | Not started | - |
+| 25. Landing Page | v1.2 | 0/4 | Not started | - |
+| 26. Booking UX Polish | v1.2 | 0/4 | Not started | - |
+| 27. Onboarding Wizard | v1.2 | 0/4 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
 *v1.0 shipped: 2026-02-12*
 *v1.1 roadmap added: 2026-02-15*
+*v1.1 shipped: 2026-02-21*
+*v1.2 roadmap added: 2026-02-21*
