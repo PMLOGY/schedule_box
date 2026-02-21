@@ -164,7 +164,7 @@ Plans:
 4. Every previously-blank table and list in the dashboard shows an action-oriented empty state with illustration, headline, and primary action button
 5. "Load demo data" option seeds a realistic Czech business (Beauty Studio Praha, 3 services, 10 bookings, 5 customers, AI predictions active) clearly labeled as demo data
 
-**Plans:** TBD
+**Plans:** 4 plans in 2 waves
 
 Plans:
 - [ ] 27-01-PLAN.md — 4-step business setup wizard (company, service, hours, share link + QR)
@@ -204,7 +204,7 @@ Plans:
 | 24. AI-Powered UI | v1.2 | 0/2 | Planning complete | - |
 | 25. Landing Page | v1.2 | 0/4 | Planned | - |
 | 26. Booking UX Polish | v1.2 | 0/4 | Planned | - |
-| 27. Onboarding Wizard | v1.2 | 0/4 | Not started | - |
+| 27. Onboarding Wizard | v1.2 | 0/4 | Planning complete | - |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -215,3 +215,4 @@ Plans:
 *Phase 25 planned: 2026-02-21*
 *Phase 24 planned: 2026-02-21*
 *Phase 26 planned: 2026-02-21*
+*Phase 27 planned: 2026-02-21*
