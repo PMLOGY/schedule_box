@@ -1,0 +1,87 @@
+name: Weekly Model Retraining
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # Sunday 03:00 UTC
+  workflow_dispatch: # Manual trigger option (AI-06 requirement)
+
+permissions:
+  contents: write # Needed for git push of trained model files
+
+jobs:
+  train-and-commit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/ai
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: services/ai/requirements.txt
+
+      - name: Install AI service dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train no-show model
+        run: python -m scripts.train_no_show
+        env:
+          SCHEDULEBOX_API_URL: ${{ secrets.SCHEDULEBOX_INTERNAL_URL }}
+          AI_SERVICE_API_KEY: ${{ secrets.AI_SERVICE_API_KEY }}
+
+      - name: Train CLV model
+        run: python -m scripts.train_clv
+        env:
+          SCHEDULEBOX_API_URL: ${{ secrets.SCHEDULEBOX_INTERNAL_URL }}
+          AI_SERVICE_API_KEY: ${{ secrets.AI_SERVICE_API_KEY }}
+
+      - name: Train capacity model
+        run: python -m scripts.train_capacity
+        env:
+          SCHEDULEBOX_API_URL: ${{ secrets.SCHEDULEBOX_INTERNAL_URL }}
+          AI_SERVICE_API_KEY: ${{ secrets.AI_SERVICE_API_KEY }}
+
+      - name: Verify model files produced
+        run: |
+          echo "Checking model files..."
+          ls -la models/
+          test -f models/no_show_v1.0.0.joblib || exit 1
+          test -f models/no_show_v1.0.0.meta.json || exit 1
+          test -f models/clv_v1.0.0.joblib || exit 1
+          test -f models/clv_v1.0.0.meta.json || exit 1
+          test -f models/capacity_v1.0.0.json || exit 1
+          test -f models/capacity_v1.0.0.meta.json || exit 1
+          echo "All model files verified"
+
+      - name: Upload model artifacts (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-models
+          path: |
+            services/ai/models/*.joblib
+            services/ai/models/*.json
+            services/ai/models/*.meta.json
+          retention-days: 30
+
+      - name: Commit trained models to repository
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add services/ai/models/*.joblib services/ai/models/*.json services/ai/models/*.meta.json
+          if git diff --staged --quiet; then
+            echo "No model changes to commit"
+          else
+            git commit -m "chore(backend): update trained models [skip ci]
+
+          Retrained no-show, CLV, and capacity models with latest production data.
+          Triggered by: ${{ github.event_name }}"
+            git push
+            echo "Trained models committed and pushed"
+          fi
