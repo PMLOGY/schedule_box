@@ -1,1099 +1,508 @@
-# Architecture Patterns: Testing, SMTP, Twilio, Comgate Integration
+# Architecture Patterns: v1.2 Product Readiness Integration
 
-**Domain:** Production Hardening (v1.1)
-**Researched:** 2026-02-15
-**Confidence:** HIGH
+**Domain:** AI-powered SaaS Booking Platform — v1.2 Feature Integration
+**Researched:** 2026-02-21
+**Confidence:** HIGH (codebase-verified for integration points; MEDIUM for Railway private networking specifics)
+
+---
 
 ## Executive Summary
 
-This architecture research documents how testing infrastructure, SMTP email delivery, Twilio SMS, and Comgate payment processing integrate with the existing ScheduleBox Next.js monorepo. The architecture emphasizes minimal changes to existing code, leveraging environment variable configuration for feature enablement, and following established patterns already in place.
+This document answers the four integration questions for v1.2: Python AI service deployment alongside Next.js on Railway, ML model training data flow from PostgreSQL, landing page architecture, and UI component consolidation.
 
-**Key Finding:** The existing codebase is already structured for production services - notification-worker has nodemailer/twilio clients, payment routes have Comgate client with signature verification. The integration requires environment variable configuration, test infrastructure setup, and minimal code modifications.
-
----
-
-## Current Architecture Overview
-
-### 1. Existing Components
-
-```
-schedulebox/
-├── apps/web/                           # Next.js 14 App Router
-│   ├── app/api/v1/                    # API route handlers
-│   │   ├── payments/                  # Payment routes
-│   │   │   ├── comgate/client.ts     # ✅ Comgate HTTP client (existing)
-│   │   │   └── comgate/callback/     # ✅ User redirect handler (existing)
-│   │   └── webhooks/
-│   │       └── comgate/route.ts      # ✅ Webhook handler (existing)
-│   └── lib/                           # Business logic
-│       ├── middleware/                # Auth, validation, RBAC
-│       └── ai/circuit-breaker.ts     # ✅ Opossum circuit breaker (existing)
-├── packages/
-│   ├── database/                      # Drizzle ORM schemas
-│   └── shared/                        # Zod schemas, types
-└── services/
-    └── notification-worker/           # BullMQ + RabbitMQ consumers
-        └── src/services/
-            ├── email-sender.ts        # ✅ Nodemailer SMTP (existing)
-            └── sms-sender.ts          # ✅ Twilio SMS (existing)
-```
-
-### 2. Current Data Flow
-
-**Email/SMS Notifications:**
-```
-API Route → BullMQ Queue (Redis) → notification-worker → nodemailer/twilio
-```
-
-**Comgate Payments:**
-```
-POST /payments/comgate/create → Comgate API → User pays → Webhook → SAGA handlers
-```
+**Key finding:** The existing codebase is already well-structured for these additions. The Python AI service has a complete FastAPI skeleton with Dockerfile, all endpoint interfaces, circuit breaker in the Next.js client, and training scripts that call `SCHEDULEBOX_API_URL/api/internal/features/training/*` — but the internal feature-extraction API routes do not yet exist in Next.js. The `packages/ui` package is a 0%-implemented placeholder with correct exports structure. The App Router's route-group pattern supports public landing pages without any middleware changes.
 
 ---
 
-## Integration Points: What's New vs Modified
+## Integration Map: v1.2 Components
 
-### A. Testing Infrastructure (NEW)
+### What Already Exists (Do Not Rebuild)
 
-#### A.1. Test Framework Selection
+| Component | Location | Status |
+|-----------|----------|--------|
+| FastAPI AI service skeleton | `services/ai/` | Routers, schemas, models, config all written |
+| AI Dockerfile (multi-stage) | `services/ai/Dockerfile` | Production-ready |
+| AI client in Next.js | `apps/web/lib/ai/client.ts` | All 10 endpoints wired with circuit breaker |
+| Circuit breaker (Opossum) | `apps/web/lib/ai/circuit-breaker.ts` | Tuned per endpoint (2s–30s timeouts) |
+| Fallback responses | `apps/web/lib/ai/fallback.ts` | All 10 fallback functions written |
+| ML training scripts | `services/ai/scripts/train_*.py` | 6 model trainers, call internal API |
+| `packages/ui` export skeleton | `packages/ui/src/index.ts` | Placeholder, exports `{}` |
+| 21 shadcn/ui primitives | `apps/web/components/ui/` | All working, inline in web app |
+| 45 domain components | `apps/web/components/` | booking, analytics, loyalty, etc. |
+| Helm chart with AI service | `helm/schedulebox/templates/` | `ai-deployment.yaml`, `ai-service.yaml` |
 
-**Recommendation: Vitest + React Testing Library**
+### What Does Not Yet Exist (Must Build)
 
-**Rationale:**
-- Next.js 15 official docs emphasize Vitest as modern choice
-- Native ESM support (ScheduleBox uses "type": "module")
-- 4x faster than Jest (3.8s vs 15.5s for 100 tests per benchmarks)
-- Jest-compatible API (easy migration if needed)
-- Built-in TypeScript support
-
-**Source: Medium confidence** - Based on official Next.js docs and community consensus in 2026.
-
-#### A.2. Test Structure (NEW)
-
-```
-schedulebox/
-├── apps/web/
-│   ├── __tests__/                    # NEW: Integration tests
-│   │   ├── api/                      # Route handler tests
-│   │   │   ├── payments.test.ts
-│   │   │   └── webhooks.test.ts
-│   │   └── lib/                      # Business logic tests
-│   │       └── booking-service.test.ts
-│   └── vitest.config.ts              # NEW: Vitest configuration
-├── packages/database/
-│   └── __tests__/                    # NEW: Schema tests
-│       └── migrations.test.ts
-├── services/notification-worker/
-│   ├── __tests__/                    # NEW: Worker tests
-│   │   ├── email-sender.test.ts
-│   │   └── sms-sender.test.ts
-│   └── vitest.config.ts              # NEW: Vitest configuration
-└── vitest.workspace.ts               # NEW: Monorepo workspace config
-```
-
-#### A.3. Testing Layers
-
-| Layer | Tool | What to Test | Where |
-|-------|------|--------------|-------|
-| Unit | Vitest | Pure functions, validators, utils | All packages |
-| Integration | Vitest + Testcontainers | API routes, DB queries, queue jobs | apps/web, services/* |
-| E2E | Playwright | Critical user flows (20 scenarios) | apps/web |
-| Contract | Pact (future) | API contracts between services | Future milestone |
-
-**Integration test pattern for BullMQ:**
-- Use real Redis instance (Testcontainers recommended)
-- Pattern: Arrange → Act → Wait → Assert
-- Use dedicated queue names per test to prevent interference
-- Clean up queues in afterEach hooks
-
-**Source: High confidence** - Based on official BullMQ docs and oneuptime.com integration testing guide (Jan 2026).
-
-#### A.4. Database Testing Patterns (MODIFIED)
-
-**Current:** Drizzle migrations in `packages/database/drizzle/`
-
-**New:** Test migrations in isolated database
-
-```typescript
-// packages/database/__tests__/migrations.test.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-
-describe('Database Migrations', () => {
-  let testDb: ReturnType<typeof drizzle>;
-  let sql: ReturnType<typeof postgres>;
-
-  beforeAll(async () => {
-    // Use Testcontainers or dedicated test DB
-    sql = postgres(process.env.TEST_DATABASE_URL!);
-    testDb = drizzle(sql);
-  });
-
-  afterAll(async () => {
-    await sql.end();
-  });
-
-  it('should apply all migrations successfully', async () => {
-    await migrate(testDb, { migrationsFolder: './drizzle' });
-    // Verify schema
-  });
-
-  it('should enforce RLS policies', async () => {
-    // Test multi-tenant isolation
-  });
-});
-```
-
-**Pattern: Additive DDL for safety**
-- Add columns/tables (low risk, online)
-- Rename via add-migrate-drop pattern
-- Use concurrent indexes for large tables
-- Idempotency in migration scripts
-
-**Source: High confidence** - From Drizzle migration patterns (Medium article, 2025).
+| Component | Why Needed | Location |
+|-----------|-----------|----------|
+| Internal training feature-extraction API routes | Training scripts call `SCHEDULEBOX_API_URL/api/internal/features/training/*` but these routes are missing from Next.js | `apps/web/app/api/internal/features/training/` |
+| Railway service configuration | Kubernetes deployment exists but Railway is the actual runtime — `railway.toml` or per-service config not present | `services/ai/` root |
+| Landing page routes + layout | `(marketing)` route group does not exist | `apps/web/app/[locale]/(marketing)/` |
+| Model artifact build step | `.joblib` model files not committed — Dockerfile copies `./models/` dir but it's empty | CI training job or build script |
+| `packages/ui` component implementations | Package is a placeholder; exports nothing | `packages/ui/src/components/` |
 
 ---
 
-### B. SMTP Email Delivery (MODIFIED)
+## Component Boundaries
 
-#### B.1. Current Implementation
-
-**File:** `services/notification-worker/src/services/email-sender.ts`
-
-**Already implemented:**
-- ✅ Nodemailer transporter with connection pooling
-- ✅ Environment variable configuration (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS)
-- ✅ Fallback to mock message ID when SMTP not configured
-- ✅ Tracking pixel injection for email open tracking
-
-**Configuration flow:**
-```
-ENV VARS → config.ts → email-sender.ts → getTransporter()
-```
-
-#### B.2. Production Changes Required
-
-**MODIFIED file:** `services/notification-worker/src/config.ts`
-
-**Current:**
-```typescript
-const smtp = {
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : undefined,
-  user: process.env.SMTP_USER,
-  pass: process.env.SMTP_PASS,
-  from: process.env.SMTP_FROM || 'noreply@schedulebox.cz',
-};
-```
-
-**No code changes needed** - just set Railway environment variables:
-- `SMTP_HOST=smtp.sendgrid.net` (or other provider)
-- `SMTP_PORT=587`
-- `SMTP_USER=apikey`
-- `SMTP_PASS=<SendGrid API key>`
-- `SMTP_FROM=noreply@schedulebox.cz`
-
-#### B.3. SMTP Testing Patterns
-
-**Development/Testing:** Use Ethereal Email (nodemailer built-in test service)
-
-```typescript
-// services/notification-worker/__tests__/email-sender.test.ts
-import nodemailer from 'nodemailer';
-import { sendEmail } from '../src/services/email-sender';
-
-describe('Email Sender', () => {
-  let testAccount: any;
-
-  beforeAll(async () => {
-    testAccount = await nodemailer.createTestAccount();
-    process.env.SMTP_HOST = 'smtp.ethereal.email';
-    process.env.SMTP_PORT = '587';
-    process.env.SMTP_USER = testAccount.user;
-    process.env.SMTP_PASS = testAccount.pass;
-  });
-
-  it('should send email and return message ID', async () => {
-    const result = await sendEmail({
-      to: 'test@example.com',
-      subject: 'Test',
-      html: '<p>Test email</p>',
-    });
-
-    expect(result).toContain('@ethereal.email');
-
-    // View email at: https://ethereal.email/message/{messageId}
-    console.log('Preview URL:', nodemailer.getTestMessageUrl(result));
-  });
-});
-```
-
-**Alternative: Mock transport for unit tests**
-
-```typescript
-import { nodemailerMock } from 'nodemailer-mock';
-
-// In test, replace real nodemailer with mock
-jest.mock('nodemailer', () => nodemailerMock);
-
-// Access sent emails
-const sentEmails = nodemailerMock.mock.getSentMail();
-```
-
-**Source: High confidence** - Official Nodemailer docs for testing.
-
-#### B.4. SMTP Deployment Architecture
-
-**Railway configuration:**
-
-1. **Development environment:**
-   - No SMTP vars → falls back to mock IDs
-   - Logs: "[Email Sender] SMTP not configured, using mock message ID"
-
-2. **Staging environment:**
-   - SMTP_HOST=smtp.ethereal.email (free test service)
-   - All emails captured, none delivered
-   - Team reviews emails at ethereal.email
-
-3. **Production environment:**
-   - SMTP_HOST=smtp.sendgrid.net (or Mailgun, AWS SES)
-   - Real delivery with connection pooling (maxConnections: 5)
-   - Monitor via SendGrid dashboard
-
-**No code changes needed between environments** - only Railway env vars.
+| Component | Responsibility | Communicates With |
+|-----------|---------------|------------------|
+| `apps/web` (Next.js) | Dashboard, auth, public booking widget, API proxy to AI service, landing page | AI service (HTTP private network), PostgreSQL, Redis, RabbitMQ |
+| `services/ai` (FastAPI) | ML inference, OpenAI follow-up generation, competitor scraping | Redis (feature cache), `apps/web` internal API (training data pull) |
+| `services/notification-worker` | Email/SMS delivery, BullMQ job processing | PostgreSQL, Redis, RabbitMQ, SMTP, Twilio |
+| `packages/database` | Drizzle schemas, migrations | Used by `apps/web` only |
+| `packages/shared` | Zod schemas, TypeScript types | Used by `apps/web`, test tooling |
+| `packages/ui` | Shared shadcn/ui primitives | Used by `apps/web` (once populated) |
 
 ---
 
-### C. Twilio SMS (MODIFIED)
+## Architecture by Feature Area
 
-#### C.1. Current Implementation
+### 1. Python AI Service on Railway
 
-**File:** `services/notification-worker/src/services/sms-sender.ts`
+**Current state:** Kubernetes Helm chart exists (`ai-deployment.yaml`). There is no `railway.toml`. The web app references `AI_SERVICE_URL` env var (default: `http://localhost:8000`). The Helm configmap sets: `AI_SERVICE_URL: "http://schedulebox-ai:8000"`.
 
-**Already implemented:**
-- ✅ Twilio client initialization
-- ✅ Environment variable configuration (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER)
-- ✅ Fallback to mock SID when Twilio not configured
-- ✅ SMS segment estimation (GSM-7 vs UCS-2 for Czech diacritics)
+**Railway deployment model:**
 
-**Configuration flow:**
-```
-ENV VARS → config.ts → sms-sender.ts → getTwilioClient()
-```
-
-#### C.2. Production Changes Required
-
-**MODIFIED file:** `services/notification-worker/src/config.ts`
-
-**Current:**
-```typescript
-const twilio = {
-  accountSid: process.env.TWILIO_ACCOUNT_SID,
-  authToken: process.env.TWILIO_AUTH_TOKEN,
-  fromNumber: process.env.TWILIO_FROM_NUMBER,
-};
-```
-
-**No code changes needed** - just set Railway environment variables:
-- `TWILIO_ACCOUNT_SID=AC...`
-- `TWILIO_AUTH_TOKEN=...`
-- `TWILIO_FROM_NUMBER=+420...` (purchased Twilio number)
-
-#### C.3. Twilio Testing Patterns
-
-**Test Credentials + Magic Numbers:**
-
-Twilio provides test credentials that don't charge account or send real SMS.
-
-```typescript
-// services/notification-worker/__tests__/sms-sender.test.ts
-import { sendSMS } from '../src/services/sms-sender';
-
-describe('SMS Sender', () => {
-  beforeAll(() => {
-    // Use test credentials from Twilio Console
-    process.env.TWILIO_ACCOUNT_SID = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; // Test SID
-    process.env.TWILIO_AUTH_TOKEN = 'test_token';
-    process.env.TWILIO_FROM_NUMBER = '+15005550006'; // Magic number (valid)
-  });
-
-  it('should send SMS without errors (using magic number)', async () => {
-    const result = await sendSMS({
-      to: '+420123456789', // Any valid number (not actually sent)
-      body: 'Test SMS with Czech characters: Příliš žluťoučký kůň',
-    });
-
-    expect(result).toMatch(/^SM/); // Twilio SID format
-  });
-
-  it('should handle invalid number error (magic number)', async () => {
-    process.env.TWILIO_FROM_NUMBER = '+15005550001'; // Magic number → invalid error
-
-    await expect(sendSMS({
-      to: '+420123456789',
-      body: 'Test',
-    })).rejects.toThrow();
-  });
-});
-```
-
-**Magic phone numbers (from Twilio docs):**
-- `+15005550006` → Valid number (no error, no delivery)
-- `+15005550001` → Invalid phone number error
-- `+15005550007` → Forbidden error
-
-**IMPORTANT:** Twilio Verify API does NOT support test credentials. For SMS verification testing, use trial account credits (not test credentials).
-
-**Source: High confidence** - Official Twilio test credentials documentation.
-
-#### C.4. SMS Cost Optimization
-
-**Segment estimation already implemented:**
-```typescript
-export function estimateSMSSegments(body: string): number {
-  const hasUnicode = /[^\x00-\x7F]/.test(body);
-  const maxLength = hasUnicode ? 70 : 160; // UCS-2 for Czech diacritics
-  return Math.ceil(body.length / maxLength);
-}
-```
-
-**Cost optimization strategies:**
-1. **Template shortening** - Review SMS templates, remove unnecessary text
-2. **Dynamic pricing alert** - If segment count > 2, consider email fallback
-3. **Monitoring** - Track `sms_segments_sent_total` metric (add to existing logging)
-
----
-
-### D. Comgate Payment Gateway (MODIFIED)
-
-#### D.1. Current Implementation
-
-**Files:**
-- ✅ `apps/web/app/api/v1/payments/comgate/client.ts` - HTTP client
-- ✅ `apps/web/app/api/v1/payments/comgate/callback/route.ts` - User redirect
-- ✅ `apps/web/app/api/v1/webhooks/comgate/route.ts` - Webhook handler
-
-**Already implemented:**
-- ✅ Init payment (initComgatePayment)
-- ✅ Get status (getComgatePaymentStatus)
-- ✅ Refund (refundComgatePayment)
-- ✅ Signature verification (verifyComgateSignature) using HMAC-SHA256 + timingSafeEqual
-- ✅ Webhook idempotency (checkWebhookIdempotency)
-- ✅ SAGA pattern (handlePaymentCompleted, handlePaymentFailed)
-
-**Configuration flow:**
-```
-ENV VARS → comgate/client.ts → getComgateCredentials()
-```
-
-#### D.2. Production Changes Required
-
-**MODIFIED file:** `apps/web/app/api/v1/payments/comgate/client.ts`
-
-**Current:**
-```typescript
-const COMGATE_API_URL = process.env.COMGATE_API_URL || 'https://payments.comgate.cz';
-
-function getComgateCredentials() {
-  const merchantId = process.env.COMGATE_MERCHANT_ID;
-  const secret = process.env.COMGATE_SECRET;
-  if (!merchantId || !secret) {
-    throw new AppError(...);
-  }
-  return { merchantId, secret };
-}
-```
-
-**No code changes needed** - just set Railway environment variables:
-- `COMGATE_MERCHANT_ID=12345`
-- `COMGATE_SECRET=<secret from portal.comgate.cz>`
-- `COMGATE_API_URL=https://payments.comgate.cz` (production) or test URL
-
-**Test mode handling:**
-```typescript
-requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
-```
-
-Already toggles based on NODE_ENV - no changes needed.
-
-#### D.3. Webhook Signature Verification
-
-**Current implementation (already secure):**
-
-```typescript
-export function verifyComgateSignature(rawBody: string, signature: string): boolean {
-  const { secret } = getComgateCredentials();
-  const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-
-  // Timing-safe comparison
-  return crypto.timingSafeEqual(
-    Buffer.from(expectedSignature, 'utf8'),
-    Buffer.from(signature, 'utf8')
-  );
-}
-```
-
-**Security features:**
-- ✅ HMAC-SHA256 hashing
-- ✅ Constant-time comparison (prevents timing attacks)
-- ✅ Raw body verification (before parsing)
-- ✅ Length validation before comparison
-
-**Testing webhook signature:**
-
-```typescript
-// apps/web/__tests__/api/webhooks/comgate.test.ts
-import crypto from 'crypto';
-import { POST } from '@/app/api/v1/webhooks/comgate/route';
-
-describe('Comgate Webhook', () => {
-  const mockSecret = 'test_secret_key';
-
-  beforeAll(() => {
-    process.env.COMGATE_SECRET = mockSecret;
-    process.env.COMGATE_MERCHANT_ID = '12345';
-  });
-
-  it('should reject webhook with invalid signature', async () => {
-    const body = 'transId=123&status=PAID';
-    const req = new Request('http://localhost/api/v1/webhooks/comgate', {
-      method: 'POST',
-      headers: { 'x-signature': 'invalid_signature' },
-      body,
-    });
-
-    const response = await POST(req as any);
-    expect(response.status).toBe(401);
-  });
-
-  it('should accept webhook with valid signature', async () => {
-    const body = 'transId=123&status=PAID';
-    const validSignature = crypto
-      .createHmac('sha256', mockSecret)
-      .update(body)
-      .digest('hex');
-
-    const req = new Request('http://localhost/api/v1/webhooks/comgate', {
-      method: 'POST',
-      headers: { 'x-signature': validSignature },
-      body,
-    });
-
-    // Mock database calls
-    // ... test logic
-  });
-});
-```
-
-**Note:** Verify actual signature header name from Comgate docs (currently assumes `x-signature` or `signature`).
-
-#### D.4. Comgate Testing Strategy
-
-**Test environment configuration:**
-
-1. **Development:**
-   - No credentials → lazy validation (error only when function called)
-   - Mock payment flow in tests
-
-2. **Staging:**
-   - Use Comgate test merchant ID
-   - `test=true` parameter automatically set (NODE_ENV !== 'production')
-   - Real API calls, no actual money transfer
-   - Test cards from Comgate docs
-
-3. **Production:**
-   - Production merchant ID
-   - `test=false` parameter
-   - Real transactions
-
-**Webhook testing without Comgate:**
-
-Use webhook testing tools:
-- Hookdeck (webhook development platform)
-- ngrok + manual POST with signature
-- Unit tests with mocked requests (as shown above)
-
-**Source: Medium confidence** - Based on general payment gateway testing patterns and Comgate GitHub SDK examples.
-
-#### D.5. Payment Saga Architecture (EXISTING)
-
-**Current implementation:**
-
-```
-Webhook → verifySignature → updatePaymentStatus → publishEvent → SAGA handlers
-```
-
-**SAGA handlers (synchronous in MVP):**
-- `handlePaymentCompleted` - Confirm booking, award loyalty points, send email
-- `handlePaymentFailed` - Cancel booking, release slot, send notification
-
-**Future enhancement (not in v1.1):**
-- RabbitMQ consumer for async SAGA execution
-- Retry logic for transient failures
-- Dead letter queue for permanent failures
-
----
-
-## New Components Required
-
-### 1. Test Infrastructure (NEW)
-
-**Files to create:**
-
-```
-vitest.workspace.ts                    # Monorepo test workspace
-apps/web/vitest.config.ts             # Web app test config
-apps/web/__tests__/setup.ts           # Test setup (DB, mocks)
-services/notification-worker/vitest.config.ts
-packages/database/__tests__/migrations.test.ts
-```
-
-**Dependencies to add:**
-
-```json
-// Root package.json (devDependencies)
-{
-  "vitest": "^2.0.0",
-  "@vitest/ui": "^2.0.0",
-  "@testing-library/react": "^16.0.0",
-  "@testing-library/jest-dom": "^6.0.0",
-  "testcontainers": "^10.0.0",
-  "next-test-api-route-handler": "^4.0.0"
-}
-```
-
-**Scripts to add:**
-
-```json
-// Root package.json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
-  }
-}
-```
-
-### 2. CI/CD Integration (MODIFIED)
-
-**File to modify:** `.github/workflows/ci.yml` (or create new)
-
-```yaml
-name: CI
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - run: pnpm install
-      - run: pnpm db:deploy # Run migrations on test DB
-      - run: pnpm test
-      - run: pnpm lint
-      - run: pnpm type-check
-```
-
-### 3. Environment Variable Documentation (NEW)
-
-**File to create:** `.env.example`
-
-```bash
-# Database
-DATABASE_URL=postgresql://user:pass@localhost:5432/schedulebox
-REDIS_URL=redis://localhost:6379
-
-# SMTP Email (Production)
-SMTP_HOST=smtp.sendgrid.net
-SMTP_PORT=587
-SMTP_USER=apikey
-SMTP_PASS=SG.xxxxx
-SMTP_FROM=noreply@schedulebox.cz
-
-# Twilio SMS (Production)
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_FROM_NUMBER=+420123456789
-
-# Comgate Payments (Production)
-COMGATE_MERCHANT_ID=12345
-COMGATE_SECRET=your_secret_key
-COMGATE_API_URL=https://payments.comgate.cz
-
-# Testing (Development/CI)
-TEST_DATABASE_URL=postgresql://test:test@localhost:5432/schedulebox_test
-NODE_ENV=development
-```
-
----
-
-## Data Flow Changes
-
-### Before (v1.0 - Mock Services)
-
-```
-Email: API → BullMQ → email-sender → Mock message ID → Log
-SMS:   API → BullMQ → sms-sender → Mock SID → Log
-Payment: API → Comgate client → throws error (no credentials)
-```
-
-### After (v1.1 - Production Services)
-
-```
-Email: API → BullMQ → email-sender → SMTP → SendGrid → Delivered
-SMS:   API → BullMQ → sms-sender → Twilio API → Delivered
-Payment: API → Comgate API → User pays → Webhook → SAGA → Complete
-```
-
-**Configuration switches behavior** - no code changes in existing files.
-
----
-
-## Build Order & Dependencies
-
-### Phase 1: Foundation (Week 1)
-
-**No dependencies**
-
-1. **Setup test infrastructure**
-   - Create `vitest.workspace.ts`
-   - Add Vitest configs for apps/web, services/notification-worker
-   - Install testing dependencies
-   - Create test setup files
-
-2. **Add environment variable documentation**
-   - Create `.env.example`
-   - Document all required vars
-   - Add Railway deployment guide
-
-### Phase 2: Testing (Week 1-2)
-
-**Depends on: Phase 1 complete**
-
-3. **Write unit tests**
-   - Test email-sender.ts (with Ethereal mock)
-   - Test sms-sender.ts (with Twilio test credentials)
-   - Test Comgate client (with mocked fetch)
-   - Test signature verification
-
-4. **Write integration tests**
-   - Test webhook endpoint (with valid/invalid signatures)
-   - Test payment SAGA handlers
-   - Test BullMQ workers (with Testcontainers Redis)
-
-5. **Setup CI pipeline**
-   - Add GitHub Actions workflow
-   - Run tests on every push
-   - Run migrations before tests
-   - Generate coverage reports
-
-### Phase 3: Service Configuration (Week 2)
-
-**Depends on: Tests passing**
-
-6. **Configure SMTP on Railway**
-   - Add staging environment with Ethereal
-   - Add production environment with SendGrid/Mailgun
-   - Test email delivery end-to-end
-
-7. **Configure Twilio on Railway**
-   - Purchase Twilio phone number
-   - Add credentials to Railway
-   - Test SMS delivery to real numbers
-
-8. **Configure Comgate on Railway**
-   - Register merchant account at portal.comgate.cz
-   - Add test credentials to staging
-   - Add production credentials to production
-   - Configure webhook URL: `https://app.schedulebox.cz/api/v1/webhooks/comgate`
-   - Whitelist Railway IP addresses at Comgate portal
-
-### Phase 4: Validation (Week 2-3)
-
-**Depends on: Phase 3 complete**
-
-9. **End-to-end testing**
-   - Create booking requiring payment
-   - Complete Comgate payment flow
-   - Verify webhook signature in logs
-   - Verify booking confirmation email/SMS
-
-10. **Monitoring setup**
-    - Add Sentry for error tracking (if not already)
-    - Monitor webhook delivery success rate
-    - Monitor email/SMS delivery rates
-    - Set up alerts for failed payments
-
----
-
-## Testing Strategy by Component
-
-### A. Email Sender Testing
-
-| Test Type | Approach | Tools |
-|-----------|----------|-------|
-| Unit | Mock nodemailer transport | nodemailer-mock |
-| Integration | Real SMTP with Ethereal | Testcontainers + Ethereal |
-| E2E | Send to test email, verify receipt | Manual + Ethereal inbox |
-| Production | Monitor SendGrid dashboard | SendGrid analytics |
-
-### B. SMS Sender Testing
-
-| Test Type | Approach | Tools |
-|-----------|----------|-------|
-| Unit | Mock Twilio client | jest.mock('twilio') |
-| Integration | Twilio test credentials + magic numbers | Twilio test API |
-| E2E | Send to real test number | Manual verification |
-| Production | Monitor Twilio console | Twilio logs |
-
-### C. Comgate Integration Testing
-
-| Test Type | Approach | Tools |
-|-----------|----------|-------|
-| Unit | Mock fetch, test signature verification | Vitest + crypto |
-| Integration | Comgate test merchant + test mode | Comgate test environment |
-| Webhook | Simulate webhook with valid/invalid signatures | Hookdeck or manual curl |
-| E2E | Complete payment with test card | Comgate test portal |
-| Production | Monitor via Comgate portal + logs | Comgate dashboard |
-
-### D. Database Migration Testing
-
-| Test Type | Approach | Tools |
-|-----------|----------|-------|
-| Unit | Test individual migration SQL | Vitest + pg |
-| Integration | Apply migrations to clean DB | Testcontainers Postgres |
-| Idempotency | Run migrations twice, verify no errors | Drizzle migrate |
-| Rollback | Test down migrations (if created) | Manual testing |
-
----
-
-## Railway Deployment Architecture
-
-### Environment Structure
+Railway uses private networking for service-to-service communication. Each service in a project gets a DNS name at `<service-name>.railway.internal`. The AI service should be named `ai` so the web service can reach it at `http://ai.railway.internal:8000`.
 
 ```
 Railway Project: ScheduleBox
-├── Development
-│   ├── web (apps/web)
-│   ├── notification-worker (services/notification-worker)
-│   ├── postgres (Railway template)
-│   ├── redis (Railway template)
-│   └── rabbitmq (Railway template)
-│
-├── Staging
-│   ├── web (branch: staging)
-│   ├── notification-worker
-│   ├── postgres
-│   ├── redis
-│   ├── rabbitmq
-│   └── Environment Variables:
-│       ├── SMTP: Ethereal (test email catcher)
-│       ├── Twilio: Test credentials
-│       └── Comgate: Test merchant ID
-│
-└── Production
-    ├── web (branch: main)
-    ├── notification-worker
-    ├── postgres (production instance)
-    ├── redis
-    ├── rabbitmq
-    └── Environment Variables:
-        ├── SMTP: SendGrid production
-        ├── Twilio: Production credentials
-        └── Comgate: Production merchant ID
+├── web          (Next.js, port 3000)
+├── ai           (FastAPI, port 8000)   ← NEW service
+├── worker       (notification-worker)
+├── postgres     (Railway template)
+├── redis        (Railway template)
+└── rabbitmq     (Railway template)
 ```
 
-### Variable Inheritance Pattern
+**Environment variable wiring (Railway):**
 
-Railway supports environment-specific variables. Use this pattern:
+| Service | Variable | Value |
+|---------|----------|-------|
+| `web` | `AI_SERVICE_URL` | `http://ai.railway.internal:8000` |
+| `ai` | `REDIS_URL` | Railway reference: `${{Redis.REDIS_URL}}` |
+| `ai` | `SCHEDULEBOX_API_URL` | `http://web.railway.internal:3000` |
+| `ai` | `AI_SERVICE_API_KEY` | Secret — set as sealed variable |
+| `ai` | `OPENAI_API_KEY` | Secret — set as sealed variable |
+| `ai` | `MODEL_DIR` | `/app/models` |
 
-**Shared variables (all environments):**
-- `NEXT_PUBLIC_APP_URL` → Env-specific
-- `DATABASE_URL` → Railway provides
-- `REDIS_URL` → Railway provides
-- `RABBITMQ_URL` → Railway provides
+**Important constraint:** Railway's private network (new environments, post Oct 16 2025) resolves to both IPv4 and IPv6. The `http://ai.railway.internal:8000` URL uses HTTP (not HTTPS) because traffic is internal. The AI service config already accepts `ALLOWED_ORIGINS` from env — set this to the web service public URL.
 
-**Environment-specific:**
-- Development: No SMTP/Twilio/Comgate → fallback to mocks
-- Staging: Test credentials
-- Production: Production credentials
+**Railway service configuration file:**
 
-**Sealed variables (production only):**
-- `SMTP_PASS` → Sealed
-- `TWILIO_AUTH_TOKEN` → Sealed
-- `COMGATE_SECRET` → Sealed
+Each service requires either a `railway.toml` at the service root or a `railway.json`. For the AI service (Docker-based), Railway auto-detects the Dockerfile if no config file is present. For clarity, a `railway.toml` should be added to `services/ai/`:
 
----
+```toml
+[build]
+builder = "dockerfile"
+dockerfilePath = "services/ai/Dockerfile"
 
-## Security Considerations
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+```
 
-### 1. Webhook Signature Verification
+**What changes in Next.js:** Only the `AI_SERVICE_URL` environment variable value changes from the default. The circuit breaker client (`apps/web/lib/ai/client.ts`) needs no code changes — it reads `process.env.AI_SERVICE_URL`.
 
-**Current implementation is secure:**
-- ✅ HMAC-SHA256 with secret key
-- ✅ Timing-safe comparison
-- ✅ Raw body verification (before parsing)
-
-**No changes needed.**
-
-### 2. Environment Variable Security
-
-**Best practices:**
-- ✅ Use Railway sealed variables for secrets
-- ✅ Never commit `.env` files
-- ✅ Use `.env.example` for documentation only
-- ✅ Rotate secrets periodically (quarterly)
-
-### 3. SMTP Authentication
-
-**Recommendation:** Use API keys, not passwords
-- SendGrid: API key authentication
-- Mailgun: API key authentication
-- AWS SES: IAM credentials
-
-**Current nodemailer config supports both** - no changes needed.
-
-### 4. Twilio Account Security
-
-**Recommendations:**
-- Enable two-factor authentication on Twilio account
-- Use API keys (not master credentials) if available
-- Restrict allowed IPs in Twilio console
-- Monitor usage for anomalies
+**Confidence:** HIGH for internal hostname pattern. MEDIUM for `railway.toml` format — verify exact syntax at Railway docs before finalizing.
 
 ---
 
-## Performance Considerations
+### 2. ML Model Training Pipeline and Data Flow
 
-### 1. Email Connection Pooling
+**Current state:** Training scripts at `services/ai/scripts/train_*.py` each:
+1. Call `SCHEDULEBOX_API_URL/api/internal/features/training/{model}` to fetch real data
+2. Fall back to synthetic data if the endpoint returns an error or is unreachable
+3. Save trained `.joblib` or `.json` files to `MODEL_DIR`
 
-**Already optimized:**
+**The gap:** The `api/internal/features/training/*` endpoints do not exist in `apps/web/app/api/`. These need to be created before model training can use real production data.
+
+**Required internal API routes (new in Next.js):**
+
+```
+apps/web/app/api/internal/features/training/
+├── no-show/route.ts      # Booking + customer features → no-show label
+├── clv/route.ts          # Customer booking history aggregates
+├── capacity/route.ts     # Hourly booking counts {ds, y} for Prophet
+├── pricing/route.ts      # Service bookings with utilization + outcome
+├── reminder-timing/route.ts  # Notification delivery with open tracking
+└── upselling/route.ts    # Customer-service co-occurrence matrix
+```
+
+**Each route pattern:** Queries PostgreSQL via Drizzle, aggregates features, returns JSON array. These are internal routes — they must be protected by `AI_SERVICE_API_KEY` header validation, not the standard JWT auth (the AI service calls them, not browser clients).
+
+**Data flow for a training run:**
+
+```
+GitHub Actions (scheduled weekly) or manual trigger
+    │
+    ▼
+Run: python -m scripts.train_no_show
+  SCHEDULEBOX_API_URL=http://web.railway.internal:3000
+  AI_SERVICE_API_KEY=<secret>
+    │
+    ▼
+GET /api/internal/features/training/no-show
+  ← Next.js queries PostgreSQL via Drizzle
+  ← Returns [{booking_lead_time_hours, customer_no_show_rate, ..., no_show}]
+    │
+    ▼
+XGBoost trains on data
+    │
+    ▼
+Saves no_show_v1.0.0.joblib to MODEL_DIR
+    │
+    ▼
+AI service loads model on next restart (or: POST /admin/reload-models)
+```
+
+**Where trained model files live:** Two options exist:
+
+| Option | Approach | Tradeoff |
+|--------|----------|---------|
+| **Baked into Docker image (recommended for v1.2)** | Training job runs as CI step, outputs `.joblib` files, new Docker image built with models included | Simple, reproducible, no runtime S3 dependency |
+| **Object storage (S3/Cloudflare R2)** | Models uploaded to R2 after training, downloaded by AI service at startup | More complex but enables model hot-swap without redeploy |
+
+For v1.2, bake models into the Docker image. The `services/ai/Dockerfile` already has `COPY ./models ./models` — the CI job runs training scripts before `docker build`, so `.joblib` files are present when the image is built.
+
+**Training CI job pattern:**
+
+```yaml
+# .github/workflows/train-models.yml
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly Sunday 2am
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r services/ai/requirements.txt
+      - name: Train models
+        env:
+          SCHEDULEBOX_API_URL: ${{ secrets.SCHEDULEBOX_API_URL }}
+          AI_SERVICE_API_KEY: ${{ secrets.AI_SERVICE_API_KEY }}
+        run: |
+          cd services/ai
+          python -m scripts.train_no_show
+          python -m scripts.train_clv
+          python -m scripts.train_capacity
+          python -m scripts.train_upselling
+          python -m scripts.train_pricing
+          python -m scripts.train_reminder_timing
+      - name: Build and push Docker image with models
+        run: docker build -t ghcr.io/schedulebox/schedulebox-ai:trained-$(date +%Y%m%d) services/ai/
+```
+
+**Confidence:** HIGH — training scripts verified against codebase. The `SCHEDULEBOX_API_URL` internal API routes are the only missing piece.
+
+---
+
+### 3. Landing Page Architecture
+
+**Decision: Same Next.js app, new route group.**
+
+**Why not a separate app:**
+- Railway charges per service; adding a static landing page as a separate service wastes resources
+- The existing `apps/web` serves the embed booking widget (`/embed/[company_slug]`), which is already public with no auth — proving the pattern works
+- The App Router's route-group feature (`(marketing)`) is exactly designed for this: different layout with no URL prefix change
+
+**Existing middleware analysis:**
+
+The middleware at `apps/web/middleware.ts` only runs `next-intl` locale detection. It does NOT enforce authentication globally. Auth is enforced by the `AuthGuard` component inside `app/[locale]/(dashboard)/layout.tsx`. Adding a `(marketing)` route group that does NOT use `AuthGuard` is all that is required.
+
+**URL structure (landing page routes):**
+
+```
+app/[locale]/
+├── (auth)/                  # Existing: login, register
+├── (dashboard)/             # Existing: dashboard pages with AuthGuard
+├── [company_slug]/          # Existing: public booking widget
+└── (marketing)/             # NEW: public landing pages
+    ├── layout.tsx            # Marketing layout (navbar + footer, no sidebar, no AuthGuard)
+    ├── page.tsx              # / — Home / Hero
+    ├── pricing/page.tsx      # /pricing
+    ├── features/page.tsx     # /features
+    └── contact/page.tsx      # /contact
+```
+
+**What the marketing layout does NOT include:**
+- No `AuthGuard` — public
+- No dashboard sidebar
+- No `next-intl` locale detection changes (already handled by middleware)
+
+**What it DOES include:**
+- Marketing navbar with CTA (Sign up / Log in)
+- Footer with links
+- Different metadata (SEO-optimized, Czech content)
+
+**Conflict check:** The App Router requires route groups resolve to unique URLs. Currently `/` redirects to `/cs` (handled by `app/page.tsx`). The marketing home page at `app/[locale]/(marketing)/page.tsx` would resolve to `/cs/` — the same as the current redirect target. This requires adjusting the root redirect: either route `/cs` to the marketing home, or add a route at `app/[locale]/page.tsx` that checks auth status and redirects accordingly.
+
+**Recommended pattern:**
+
 ```typescript
-transporter = nodemailer.createTransport({
-  pool: true,
-  maxConnections: 5,
-  maxMessages: 100,
-});
+// app/[locale]/(marketing)/page.tsx
+// No auth check — renders marketing home
+export default function MarketingHome() { ... }
+
+// app/page.tsx (existing)
+// Redirects / → /cs (unchanged — /cs resolves to (marketing)/page.tsx)
 ```
 
-No changes needed.
+This means unauthenticated users landing on `/` see the marketing page. Authenticated users navigating to `/dashboard` see the dashboard. The auth flow is unchanged.
 
-### 2. SMS Segment Optimization
+**i18n handling:** All marketing content uses `next-intl` like the rest of the app. Czech-language marketing copy goes in `messages/cs.json` under a `marketing.*` namespace.
 
-**Already implemented:**
-```typescript
-const segments = estimateSMSSegments(options.body);
-console.log(`Sending SMS (${segments} segment${segments > 1 ? 's' : ''})`);
-```
-
-**Recommendation:** Add monitoring metric for cost tracking.
-
-### 3. Comgate API Timeout
-
-**Already configured:**
-```typescript
-async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 15000)
-```
-
-**Webhook response time requirement:** Comgate expects response within 5 seconds.
-
-**Current implementation returns 200 immediately after processing** - compliant.
-
-### 4. Database Connection Pooling
-
-**Already managed by Drizzle + PostgreSQL driver** - no changes needed.
+**Confidence:** HIGH — verified against existing middleware, route group pattern, and App Router behavior.
 
 ---
 
-## Monitoring & Observability
+### 4. UI Component Architecture
 
-### 1. Metrics to Track (NEW)
+**Decision: Leave components in `apps/web/components/ui/` for now. Populate `packages/ui` incrementally.**
 
-Add to existing metrics collection:
+**Current state:**
+- `packages/ui/src/index.ts` exports `{}` (placeholder)
+- `packages/ui/src/components/.gitkeep` — empty
+- `apps/web/components/ui/` has 21 shadcn/ui primitives (button, card, dialog, form, input, etc.)
+- `apps/web` already has `"@schedulebox/ui": "workspace:*"` in `package.json` dependencies but nothing is imported from it
 
-```typescript
-// Email metrics
-email_sent_total{status="success|failed", provider="sendgrid"}
-email_delivery_duration_seconds
+**Why NOT a big-bang migration to `packages/ui`:**
+- All 66 components in `apps/web/components/` import from `@/components/ui/...` (relative paths)
+- Moving primitives to `packages/ui` requires updating every import across 45+ domain components
+- There is no second consumer of `packages/ui` right now — the benefit of sharing doesn't materialize
+- Risk: shadcn/ui components require Tailwind config to be accessible from the consuming package, which requires path aliases and peer deps to be wired correctly
 
-// SMS metrics
-sms_sent_total{status="success|failed"}
-sms_segments_sent_total
-sms_delivery_duration_seconds
+**Recommended approach for v1.2: Additive, not disruptive.**
 
-// Payment metrics
-payment_created_total{gateway="comgate"}
-payment_completed_total{gateway="comgate"}
-payment_failed_total{gateway="comgate", reason}
-webhook_received_total{gateway="comgate", status="valid|invalid_signature"}
-webhook_processing_duration_seconds
+Build new landing page components directly in `apps/web/components/marketing/`:
+
+```
+apps/web/components/
+├── marketing/                  # NEW: landing page components
+│   ├── hero-section.tsx
+│   ├── feature-grid.tsx
+│   ├── pricing-cards.tsx
+│   ├── testimonials.tsx
+│   ├── cta-section.tsx
+│   └── marketing-nav.tsx
+├── ui/                         # EXISTING: shadcn/ui primitives (stay here)
+└── {booking,analytics,...}/    # EXISTING: domain components (stay here)
 ```
 
-### 2. Logging Requirements (MODIFIED)
+**When to populate `packages/ui`:** Only when a second app (e.g., `apps/admin`) or `services/*` needs the same components. For v1.2, the placeholder stays as-is. The `packages/ui` package.json already has the correct exports structure — no changes needed.
 
-Enhance structured logging for new services:
+**For UI polish (existing components):**
 
-```typescript
-// Email logging
-console.log('[Email Sender] Sent email', {
-  to: options.to,
-  messageId: info.messageId,
-  provider: 'sendgrid',
-  duration_ms: Date.now() - startTime,
-});
+UI polish on existing dashboard components requires no architectural change. Identify specific components to polish (e.g., `BookingCalendar.tsx`, `dashboard-grid.tsx`) and modify them in place. No migration.
 
-// SMS logging (already exists, enhance with cost)
-console.log('[SMS Sender] Sent SMS', {
-  to: options.to,
-  sid: message.sid,
-  segments: segments,
-  estimated_cost: segments * 0.05, // Example pricing
-});
+**Confidence:** HIGH — verified against actual package structure and import patterns.
 
-// Webhook logging (already exists, add more detail)
-console.log('[Comgate Webhook] Processed', {
-  transId: transId,
-  status: status,
-  signature_valid: true,
-  processing_time_ms: Date.now() - startTime,
-});
+---
+
+## Data Flow: Complete v1.2 Picture
+
+### AI Prediction Flow (Existing + Active)
+
+```
+Browser → POST /api/v1/ai/predictions/no-show (Next.js)
+    → predictNoShow.fire(body)             [circuit breaker]
+    → POST http://ai.railway.internal:8000/api/v1/predictions/no-show
+    → FastAPI router → NoShowPredictor.predict()
+    → returns {no_show_probability, confidence, risk_level}
+    ← success response to browser
+
+If AI service is down:
+    → circuit breaker opens after 5 failures
+    → fallback: getNoShowFallback() → {probability: 0.15, confidence: 0}
 ```
 
-### 3. Alerting Rules (NEW)
+### Model Training Flow (New)
 
-Add to existing alerting setup:
+```
+GitHub Actions (weekly cron) or manual dispatch
+    → python -m scripts.train_no_show
+    → GET http://web.railway.internal:3000/api/internal/features/training/no-show
+    → Next.js queries PostgreSQL:
+        SELECT bookings.*, customers.no_show_rate, ...
+        FROM bookings JOIN customers ...
+        WHERE bookings.status IN ('completed', 'no_show')
+    ← Returns [{...features, no_show: 0|1}]
+    → XGBoost fits on data → saves no_show_v1.0.0.joblib
+    → docker build (includes models/) → push to GHCR → redeploy AI service
+```
 
-| Alert | Condition | Severity | Action |
-|-------|-----------|----------|--------|
-| Webhook signature failures | > 5 in 10 min | High | Check Comgate secret, investigate logs |
-| Email delivery failures | > 10% in 1 hour | High | Check SMTP status, verify credentials |
-| SMS delivery failures | > 10% in 1 hour | High | Check Twilio status, verify credits |
-| Payment webhook timeout | Processing > 4s | Medium | Optimize SAGA handlers |
+### Landing Page Flow (New)
 
----
-
-## Migration Checklist
-
-### Pre-deployment
-
-- [ ] All tests passing in CI
-- [ ] `.env.example` documented
-- [ ] Railway environments created (staging, production)
-- [ ] SMTP credentials obtained (SendGrid/Mailgun)
-- [ ] Twilio account created, phone number purchased
-- [ ] Comgate merchant account registered
-- [ ] Webhook URL configured in Comgate portal
-- [ ] IP whitelist updated in Comgate portal
-
-### Staging Deployment
-
-- [ ] Set staging environment variables
-- [ ] Deploy to staging
-- [ ] Test email delivery (send test booking confirmation)
-- [ ] Test SMS delivery (send test reminder)
-- [ ] Test Comgate payment flow (with test card)
-- [ ] Verify webhook signature validation in logs
-- [ ] Monitor logs for errors
-
-### Production Deployment
-
-- [ ] Set production environment variables (sealed)
-- [ ] Deploy to production
-- [ ] Monitor error rates for 24 hours
-- [ ] Test one real booking with payment
-- [ ] Verify email/SMS delivery to real customer
-- [ ] Set up alerts (Sentry, Slack)
-- [ ] Document rollback procedure
+```
+Browser → GET https://schedulebox.cz/
+    → Next.js middleware (next-intl locale detection)
+    → redirects to /cs
+    → renders app/[locale]/(marketing)/page.tsx
+    → NO AuthGuard → public content rendered
+    → CTA "Vyzkoušet zdarma" → /cs/register → (auth)/register/page.tsx
+```
 
 ---
 
-## Rollback Strategy
+## New vs Modified Components
 
-### If email delivery fails:
+### New Components
 
-1. **Check:** SMTP credentials valid? SendGrid account active?
-2. **Rollback:** Set `SMTP_HOST=` (empty) to fall back to mock mode
-3. **Impact:** Emails logged but not sent (customer doesn't receive notifications)
-4. **Fix:** Resolve SMTP issue, re-deploy with credentials
+| Component | Location | Notes |
+|-----------|----------|-------|
+| Internal training API routes (6) | `apps/web/app/api/internal/features/training/` | Protected by API key header |
+| Marketing route group | `apps/web/app/[locale]/(marketing)/` | layout.tsx + pages |
+| Marketing UI components | `apps/web/components/marketing/` | Hero, features, pricing, CTA |
+| Railway AI service config | `services/ai/railway.toml` | Dockerfile path, health check |
+| Model training CI workflow | `.github/workflows/train-models.yml` | Scheduled + manual |
 
-### If SMS delivery fails:
+### Modified Components
 
-1. **Check:** Twilio account active? Credits available?
-2. **Rollback:** Set `TWILIO_ACCOUNT_SID=` (empty) to fall back to mock mode
-3. **Impact:** SMS logged but not sent (customer doesn't receive reminders)
-4. **Fix:** Resolve Twilio issue, re-deploy with credentials
+| Component | Location | Change |
+|-----------|----------|--------|
+| `apps/web/.env.example` | Root | Add `AI_SERVICE_URL=http://ai.railway.internal:8000` |
+| `services/ai/.env.example` | AI service root | Add `SCHEDULEBOX_API_URL=http://web.railway.internal:3000` |
+| Root `app/page.tsx` or `app/[locale]/page.tsx` | Next.js | Redirect `/cs` → marketing home (currently redirects to login if unauthenticated) |
 
-### If Comgate payments fail:
+### Not Changed
 
-1. **Check:** Merchant ID valid? Secret correct? Webhook URL reachable?
-2. **Rollback:** Not possible - requires manual payment processing
-3. **Impact:** Customers cannot pay online (must pay in person)
-4. **Fix:** Urgent - resolve Comgate issue ASAP
-
-**Critical:** Payment failures require immediate attention. Comgate cannot be "disabled" without breaking booking flow.
-
----
-
-## Open Questions & Future Enhancements
-
-### Questions for validation:
-
-1. **Comgate webhook signature header:** Verify actual header name (`x-signature` vs `signature`) from official docs
-2. **Comgate IP whitelist:** Obtain Railway outbound IP addresses for Comgate portal configuration
-3. **Twilio number purchase:** Which country code? (+420 Czech or +421 Slovak?)
-4. **SMTP provider choice:** SendGrid vs Mailgun vs AWS SES? (Cost/features comparison)
-
-### Future enhancements (not in v1.1):
-
-1. **Email template testing:** Visual regression testing with Percy or similar
-2. **SMS delivery receipts:** Implement Twilio status callbacks
-3. **Payment retry logic:** Retry failed payments before cancellation
-4. **Multi-currency support:** Extend Comgate integration for EUR
-5. **Email bounce handling:** Implement webhook for SendGrid bounce events
-6. **A/B testing notifications:** Test different email/SMS templates for conversion
+| Component | Reason |
+|-----------|--------|
+| `apps/web/lib/ai/client.ts` | Circuit breaker client reads `AI_SERVICE_URL` — only env var changes |
+| `apps/web/lib/ai/circuit-breaker.ts` | No changes needed |
+| `services/ai/app/` (all routers, models) | Existing skeleton is complete |
+| `packages/ui` | Stays as placeholder |
+| `apps/web/components/ui/` | Stays in place |
+| `apps/web/middleware.ts` | No changes — public routes work without modification |
 
 ---
 
-## Sources & References
+## Build Order and Dependencies
 
-### High Confidence
+The following order is forced by code dependencies, not preference:
 
-- [Next.js Vitest Testing Guide](https://nextjs.org/docs/app/guides/testing/vitest) - Official Next.js 15 testing documentation
-- [Nodemailer Testing Documentation](https://nodemailer.com/smtp/testing) - Official SMTP testing guide with Ethereal
-- [Twilio Test Credentials](https://www.twilio.com/docs/iam/test-credentials) - Official Twilio testing documentation
-- [Railway Environment Variables](https://docs.railway.com/variables) - Official Railway configuration guide
-- [BullMQ Integration Testing](https://oneuptime.com/blog/post/2026-01-21-bullmq-integration-testing/view) - Integration testing patterns (Jan 2026)
+```
+Step 1: Internal training API routes (FIRST — unblocks everything else)
+    apps/web/app/api/internal/features/training/*.ts
+    Reason: Training scripts can't fetch real data until these exist.
+    Duration: ~1 day
+    Risk: LOW — standard Drizzle queries behind API key check
 
-### Medium Confidence
+Step 2: Railway AI service deployment config
+    services/ai/railway.toml + Railway environment variables
+    Reason: Circuit breaker already exists; AI service can deploy independently.
+    Duration: ~2 hours
+    Risk: LOW — Dockerfile already production-ready
 
-- [Vitest vs Jest for Next.js](https://www.wisp.blog/blog/vitest-vs-jest-which-should-i-use-for-my-nextjs-app) - Performance comparison
-- [Drizzle Migration Patterns](https://medium.com/@bhagyarana80/8-drizzle-orm-patterns-for-clean-fast-migrations-456c4c35b9d8) - Production-safe migration strategies
-- [Next.js Route Handler Testing](https://github.com/Xunnamius/next-test-api-route-handler) - Testing library for API routes
+Step 3: Model training CI workflow
+    .github/workflows/train-models.yml
+    Depends on: Step 1 (training API routes), Step 2 (railway.toml)
+    Reason: Can now train against real data and deploy updated models.
+    Duration: ~1 day (workflow + testing)
+    Risk: MEDIUM — Prophet and XGBoost may need dependency pinning for CI
 
-### Low Confidence (verify before using)
+Step 4: Landing page (marketing route group + components)
+    apps/web/app/[locale]/(marketing)/ + components/marketing/
+    Depends on: Nothing (fully independent)
+    Duration: ~3 days (design + content)
+    Risk: LOW — route group pattern is well understood
 
-- Comgate webhook signature header name (assumed `x-signature`) - Verify with official Comgate docs
-- Comgate IP whitelist requirement - Confirm with Comgate support
+Step 5: UI polish (existing components)
+    Modify specific components in apps/web/components/
+    Depends on: Nothing (independent)
+    Duration: Ongoing
+    Risk: LOW — in-place modifications, no migration
+```
+
+---
+
+## Railway Deployment Implications
+
+### Existing Infrastructure
+
+The project already has a Kubernetes Helm chart (`helm/schedulebox/`) with the AI service defined. If Railway is the actual hosting environment, the Helm chart may be aspirational / future Kubernetes migration. For Railway:
+
+| Helm Template | Railway Equivalent |
+|---------------|-------------------|
+| `ai-deployment.yaml` | Railway service "ai" with Docker build |
+| `configmap.yaml` — `AI_SERVICE_URL` | Railway env var on "web" service |
+| `ai-service.yaml` — port 8000 | Railway service port 8000 |
+
+### Service Naming Matters
+
+The Railway internal DNS is `<service-name>.railway.internal`. The service should be named `ai` in Railway so the web service can use `http://ai.railway.internal:8000`. If named differently (e.g., `ai-service`), the URL changes accordingly.
+
+### Model Size and Build Time
+
+The `services/ai/requirements.txt` includes `prophet==1.1.6` which installs `pystan` and has a long build time (~5 min). Railway caches pip installs between builds. First deploy will be slow; subsequent builds with only model file changes will be fast.
+
+### Memory Requirements
+
+The Helm chart specifies `memory: 512Mi` request, `1Gi` limit. Prophet models use ~100-200MB. XGBoost models are ~10-50MB. This headroom is adequate.
+
+### Cold Start
+
+Railway can suspend idle services. The AI service loads all models on startup (`@app.on_event("startup") → load_models()`). If the service cold-starts under load, the circuit breaker on the Next.js side will catch the startup latency and serve fallbacks until the AI service is healthy. This is by design.
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Direct PostgreSQL Connection from Python AI Service
+
+**What:** Having the AI service connect directly to PostgreSQL for feature extraction.
+**Why bad:** The AI service then needs database credentials, the Drizzle schema (Python equivalent), and must implement RLS. This duplicates logic and creates a security surface.
+**Instead:** Use the internal HTTP API pattern already designed — Next.js handles DB access, AI service calls Next.js internal endpoints.
+
+### Anti-Pattern 2: Committing `.joblib` Model Files to Git
+
+**What:** Checking in trained model files alongside code.
+**Why bad:** Model files are 10-500MB each. Git history becomes bloated and slow. Large binary files in git cause clone and CI performance problems.
+**Instead:** Train in CI, include in Docker image. If models need versioning independent of code, use Cloudflare R2 (already in the stack) with a model registry pattern.
+
+### Anti-Pattern 3: Migrating All UI Components to `packages/ui` Before v1.2
+
+**What:** Moving all 21 `apps/web/components/ui/*.tsx` files to `packages/ui` as part of v1.2.
+**Why bad:** Requires updating 45+ component imports, wiring Tailwind config through the package, and risks breaking the entire UI with no immediate benefit (still only one consumer).
+**Instead:** Add new marketing components to `apps/web/components/marketing/`. Migrate `packages/ui` only when a second consumer exists.
+
+### Anti-Pattern 4: Public AI Training Endpoint
+
+**What:** Making `/api/internal/features/training/*` routes accessible without authentication.
+**Why bad:** Exposes customer data (booking history, financial data) publicly.
+**Instead:** Require `AI_SERVICE_API_KEY` header on all internal routes. Validate with timing-safe comparison. The pattern already exists in the AI service config (`AI_SERVICE_API_KEY: str = ""`).
+
+---
+
+## Scalability Considerations
+
+| Concern | At 100 users | At 10K users | At 1M users |
+|---------|-------------|-------------|------------|
+| AI service inference | 1 replica, 512Mi | 2 replicas + autoscaling | Dedicated inference cluster |
+| Model training frequency | Weekly on schedule | Weekly still fine | Near-real-time retraining |
+| Feature extraction API | Drizzle query, <1s | Add DB read replica | Read replica + caching |
+| Landing page performance | Next.js SSG/ISR adequate | CDN + ISR | Same CDN pattern |
+| Redis feature cache | TTL 1h adequate | TTL 30min, larger Redis | Redis cluster |
+
+---
+
+## Sources
+
+- Codebase: `services/ai/` (FastAPI skeleton, Dockerfile, training scripts) — HIGH confidence, direct inspection
+- Codebase: `apps/web/lib/ai/` (circuit breaker, client, fallbacks) — HIGH confidence, direct inspection
+- Codebase: `apps/web/middleware.ts` (next-intl only, no auth) — HIGH confidence, direct inspection
+- Codebase: `apps/web/app/[locale]/(dashboard)/layout.tsx` (AuthGuard location) — HIGH confidence
+- Codebase: `apps/web/app/[locale]/(auth)/layout.tsx` (route group pattern) — HIGH confidence
+- [Railway Private Networking](https://docs.railway.com/guides/private-networking) — MEDIUM confidence for hostname format `<service>.railway.internal`
+- [Railway How Private Networking Works](https://docs.railway.com/networking/private-networking/how-it-works) — IPv4/IPv6 resolution details
+- [Next.js Route Groups](https://nextjs.org/docs/app/api-reference/file-conventions/route-groups) — HIGH confidence for `(marketing)` pattern
+- [Railway FastAPI Deploy Guide](https://docs.railway.com/guides/fastapi) — Dockerfile detection and deployment
