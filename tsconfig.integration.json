@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["vitest/globals"],
+    "paths": {
+      "@schedulebox/database": ["./packages/database/src/index.ts"],
+      "@schedulebox/shared": ["./packages/shared/src/index.ts"],
+      "@schedulebox/events": ["./packages/events/src/index.ts"],
+      "drizzle-orm": ["./packages/database/node_modules/drizzle-orm/index.d.ts"],
+      "drizzle-orm/*": ["./packages/database/node_modules/drizzle-orm/*"],
+      "postgres": ["./packages/database/node_modules/postgres/types/index.d.ts"]
+    },
+    "moduleResolution": "bundler"
+  },
+  "include": ["tests/integration/**/*.ts", "vitest.integration.config.ts"]
+}

@@ -13,6 +13,10 @@ import { createPushWorker } from './jobs/push-job.js';
 import { emailQueue, smsQueue, pushQueue, QUEUE_NAMES } from './queues.js';
 import { startConsumers } from './consumers/index.js';
 import { startSchedulers, type SchedulerResources } from './schedulers/index.js';
+import {
+  startMonitoringScheduler,
+  type MonitoringResources,
+} from './monitoring/monitoring-scheduler.js';
 import { config } from './config.js';
 import { startHealthServer, healthState } from './health.js';
 
@@ -28,6 +32,9 @@ let rabbitChannel: Channel | null = null;
 
 // Scheduler resources
 let schedulerResources: SchedulerResources | null = null;
+
+// Monitoring scheduler resources
+let monitoringResources: MonitoringResources | null = null;
 
 // Health server
 let healthServer: Server | null = null;
@@ -66,6 +73,9 @@ async function startWorkers() {
 
   // 3. Start schedulers (reminder scheduler + automation engine)
   schedulerResources = await startSchedulers({ emailQueue, smsQueue, pushQueue }, redisConnection);
+
+  // 4. Start monitoring scheduler (email bounce rate + SMS cost checks every 5 min)
+  monitoringResources = await startMonitoringScheduler(redisConnection);
 
   // Mark as ready for Kubernetes readiness probe
   healthState.ready = true;
@@ -140,6 +150,13 @@ async function shutdown(signal: string) {
       await schedulerResources.reminderWorker.close();
       await schedulerResources.reminderQueue.close();
       console.log('[Notification Worker] Schedulers closed');
+    }
+
+    // 2.5. Close monitoring resources
+    if (monitoringResources) {
+      await monitoringResources.worker.close();
+      await monitoringResources.queue.close();
+      console.log('[Notification Worker] Monitoring scheduler closed');
     }
 
     // 3. Close BullMQ workers

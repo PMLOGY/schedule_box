@@ -1,0 +1,18 @@
+<h2>Rezervace zrušena</h2>
+
+<p>Dobrý den {{customer_name}},</p>
+
+<p>Vaše rezervace byla zrušena.</p>
+
+<div class="details-box">
+  <p><strong>Služba:</strong> {{service_name}}</p>
+  <p><strong>Datum:</strong> {{formatDate booking_date}}</p>
+  {{#if reason}}
+  <p><strong>Důvod zrušení:</strong> {{reason}}</p>
+  {{/if}}
+</div>
+
+<p>Pokud si přejete rezervovat nový termín, navštivte prosím naše stránky.</p>
+
+<p>S pozdravem,<br>
+Tým {{company_name}}</p>

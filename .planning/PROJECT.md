@@ -26,11 +26,22 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
+## Current Milestone: v1.1 Production Hardening
+
+**Goal:** Make ScheduleBox production-ready with real email/SMS delivery, payment processing, and test coverage so it's reliable for real customers.
+
+**Target features:**
+- Email notifications via SMTP (booking confirmations, reminders, password resets)
+- SMS notifications via Twilio (booking reminders)
+- Comgate payment gateway production setup
+- Unit & integration tests for critical paths (auth, bookings, payments)
+- Integration setup documentation and environment configuration
+
 ## Current State
-- **v1.0 shipped:** 2026-02-12
+- **v1.0 shipped:** 2026-02-12, deployed to Railway 2026-02-15
 - **Codebase:** ~62,000 LOC (50k TypeScript, 6k Python, 5k YAML/JSON)
-- **322 commits** across 15 phases, 101 plans
-- **Production-ready:** Kubernetes Helm charts, Prometheus/Grafana monitoring, OpenTelemetry tracing
+- **322+ commits** across 15 phases, 101 plans
+- **Deployed:** Railway (web + notification worker + PostgreSQL + Redis + RabbitMQ)
 - **Test coverage:** 0% (unit/integration tests not yet written)
 
 ## Requirements
@@ -54,14 +65,14 @@ Freemium with 4 tiers:
 - ✓ OPS-01..06 — Kubernetes, monitoring, tracing, load testing, security audit, beta playbook — v1.0
 
 ### Active
-(None — all v1 requirements shipped. Define new requirements with `/gsd:new-milestone`)
+See `.planning/REQUIREMENTS.md` for v1.1 requirements.
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
 - Video chat integration — uses external providers (Zoom/Meet/Teams)
 - Offline mode — real-time booking is core value
 - Multi-language AI models — Czech/Slovak only for v1
-- Real payment processing — gateway integration ready, needs live credentials
+- Mobile native app — deferred, PWA covers mobile use cases
 
 ## Key Decisions
 1. Next.js 14 monorepo with standalone microservices for AI/notifications — ✓ Good
@@ -81,4 +92,4 @@ Freemium with 4 tiers:
 
 ---
 
-_Last updated: 2026-02-12 after v1.0 milestone_
+_Last updated: 2026-02-15 after v1.1 milestone start_

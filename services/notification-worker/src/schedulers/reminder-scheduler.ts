@@ -6,8 +6,19 @@
 import { Queue, Worker } from 'bullmq';
 import type { ConnectionOptions } from 'bullmq';
 import { between, and, inArray, eq, isNull, sql } from 'drizzle-orm';
-import { db, bookings, customers, services, employees, notifications } from '@schedulebox/database';
+import {
+  db,
+  bookings,
+  companies,
+  customers,
+  services,
+  employees,
+  notifications,
+} from '@schedulebox/database';
 import { renderTemplateFile } from '../services/template-renderer.js';
+import { getNoShowPrediction } from '../services/no-show-client.js';
+import { isValidCzechMobile } from '../services/sms-sender.js';
+import { config } from '../config.js';
 
 const REMINDER_QUEUE_NAME = 'notification-reminders';
 const SCANNER_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
@@ -169,6 +180,13 @@ async function scanWindow(
         ),
     });
 
+    const [company] = await db
+      .select({ name: companies.name })
+      .from(companies)
+      .where(eq(companies.id, booking.companyId))
+      .limit(1);
+    const companyName = company?.name || 'ScheduleBox';
+
     // Prepare template data
     const templateData = {
       customer_name: booking.customerName,
@@ -176,7 +194,7 @@ async function scanWindow(
       booking_date: booking.startTime,
       booking_time: booking.startTime,
       employee_name: booking.employeeName || 'náš tým',
-      company_name: 'ScheduleBox', // TODO: fetch from company settings
+      company_name: companyName,
       price: booking.price,
       currency: booking.currency,
     };
@@ -215,44 +233,66 @@ async function scanWindow(
 
     enqueueCount++;
 
-    // Enqueue SMS reminder if customer has phone
-    if (booking.customerPhone) {
-      // SMS template (short format)
-      let smsBody: string;
+    // Enqueue SMS reminder only for high no-show risk bookings (cost optimization)
+    if (booking.customerPhone && isValidCzechMobile(booking.customerPhone)) {
+      const prediction = await getNoShowPrediction(booking.id);
 
-      const smsTemplate = await db.query.notificationTemplates.findFirst({
-        where: (templates, { eq, and }) =>
-          and(
-            eq(templates.companyId, booking.companyId),
-            eq(templates.type, 'booking_reminder'),
-            eq(templates.channel, 'sms'),
-            eq(templates.isActive, true),
-          ),
-      });
+      // Only send SMS if:
+      // 1. AI predicts high no-show risk (above threshold, default 0.7)
+      // 2. The prediction is NOT a fallback (AI was actually available)
+      if (prediction.no_show_probability > config.ai.noShowThreshold && !prediction.fallback) {
+        // SMS template (short format)
+        let smsBody: string;
 
-      if (smsTemplate) {
-        // Use custom SMS template
-        smsBody = await renderTemplateFile(smsTemplate.bodyTemplate, 'sms', templateData);
+        const smsTemplate = await db.query.notificationTemplates.findFirst({
+          where: (templates, { eq, and }) =>
+            and(
+              eq(templates.companyId, booking.companyId),
+              eq(templates.type, 'booking_reminder'),
+              eq(templates.channel, 'sms'),
+              eq(templates.isActive, true),
+            ),
+        });
+
+        if (smsTemplate) {
+          // Use custom SMS template
+          smsBody = await renderTemplateFile(smsTemplate.bodyTemplate, 'sms', templateData);
+        } else {
+          // Use default SMS template
+          smsBody = await renderTemplateFile('booking-reminder', 'sms', templateData);
+        }
+
+        const smsJobId = `reminder-sms-${booking.id}-${reminderType}`;
+        await smsQueue.add(
+          'send-sms',
+          {
+            companyId: booking.companyId,
+            recipient: booking.customerPhone,
+            body: smsBody,
+            customerId: booking.customerId,
+            bookingId: booking.id,
+            templateId: smsTemplate?.id,
+            metadata: {
+              noShowProbability: prediction.no_show_probability,
+              riskLevel: prediction.risk_level,
+            },
+          },
+          {
+            jobId: smsJobId,
+          },
+        );
+
+        console.log(
+          `[Reminder Scheduler] SMS enqueued for booking ${booking.id} ` +
+            `(no-show: ${(prediction.no_show_probability * 100).toFixed(1)}%, ${prediction.risk_level})`,
+        );
       } else {
-        // Use default SMS template
-        smsBody = await renderTemplateFile('booking-reminder', 'sms', templateData);
+        console.log(
+          `[Reminder Scheduler] SMS skipped for booking ${booking.id} ` +
+            `(no-show: ${(prediction.no_show_probability * 100).toFixed(1)}%, ` +
+            `fallback: ${prediction.fallback}, threshold: ${config.ai.noShowThreshold})`,
+        );
       }
-
-      const smsJobId = `reminder-sms-${booking.id}-${reminderType}`;
-      await smsQueue.add(
-        'send-sms',
-        {
-          companyId: booking.companyId,
-          recipient: booking.customerPhone,
-          body: smsBody,
-          customerId: booking.customerId,
-          bookingId: booking.id,
-          templateId: smsTemplate?.id,
-        },
-        {
-          jobId: smsJobId,
-        },
-      );
     }
   }
 

@@ -57,25 +57,4 @@ spec:
         {{- end }}
         - name: HEALTH_PORT
           value: "3001"
-        # SMTP configuration (from secrets in production)
-        - name: SMTP_HOST
-          value: ""
-        - name: SMTP_PORT
-          value: "587"
-        - name: SMTP_USER
-          value: ""
-        - name: SMTP_PASS
-          value: ""
-        # Twilio configuration (from secrets in production)
-        - name: TWILIO_ACCOUNT_SID
-          value: ""
-        - name: TWILIO_AUTH_TOKEN
-          value: ""
-        - name: TWILIO_PHONE_NUMBER
-          value: ""
-        # VAPID configuration (from secrets in production)
-        - name: VAPID_PUBLIC_KEY
-          value: ""
-        - name: VAPID_PRIVATE_KEY
-          value: ""
       terminationGracePeriodSeconds: 60

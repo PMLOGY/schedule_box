@@ -311,3 +311,21 @@ export async function markWebhookCompleted(eventId: string): Promise<void> {
     })
     .where(eq(processedWebhooks.eventId, eventId));
 }
+
+/**
+ * Mark webhook processing as failed
+ *
+ * Updates processed_webhooks record to 'failed' status with completion timestamp.
+ * Called in the webhook handler's catch block so MON-03 can detect failures.
+ *
+ * @param eventId - Gateway's unique event/transaction ID
+ */
+export async function markWebhookFailed(eventId: string): Promise<void> {
+  await db
+    .update(processedWebhooks)
+    .set({
+      status: 'failed',
+      completedAt: new Date(),
+    })
+    .where(eq(processedWebhooks.eventId, eventId));
+}

@@ -235,36 +235,39 @@ export async function refundComgatePayment(
 }
 
 // ============================================================================
-// VERIFY COMGATE SIGNATURE
+// VERIFY COMGATE WEBHOOK SECRET
 // ============================================================================
 
 /**
- * Verify Comgate webhook signature using HMAC-SHA256
+ * Verify Comgate webhook secret from POST body parameter
  *
- * Uses crypto.timingSafeEqual for constant-time comparison to prevent timing attacks.
+ * Comgate sends the merchant secret as a POST body parameter named "secret",
+ * NOT as an HMAC header. This function compares the received secret with the
+ * configured COMGATE_SECRET using timing-safe comparison to prevent timing attacks.
  *
- * @param rawBody Raw webhook body (before parsing)
- * @param signature Signature from webhook header
- * @returns True if signature is valid
+ * Per Comgate's API behavior (confirmed via PHP SDK, Node SDK, Clojure client):
+ * the gateway echoes back the merchant secret in the webhook POST body, and
+ * merchant code is expected to verify it matches the configured secret.
+ *
+ * @param receivedSecret The "secret" field value from the POST body
+ * @returns True if the secret matches the configured COMGATE_SECRET
  */
-export function verifyComgateSignature(rawBody: string, signature: string): boolean {
+export function verifyComgateWebhookSecret(receivedSecret: string): boolean {
   try {
-    // Compute expected signature using HMAC-SHA256
     const { secret } = getComgateCredentials();
-    const expectedSignature = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
 
-    // Ensure both signatures are the same length before comparison
-    if (expectedSignature.length !== signature.length) {
+    // Length mismatch: reject immediately (timingSafeEqual requires same-length buffers)
+    if (receivedSecret.length !== secret.length) {
       return false;
     }
 
     // Use timing-safe comparison to prevent timing attacks
-    const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
-    const signatureBuffer = Buffer.from(signature, 'utf8');
+    const receivedBuffer = Buffer.from(receivedSecret, 'utf8');
+    const expectedBuffer = Buffer.from(secret, 'utf8');
 
-    return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+    return crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
   } catch {
-    // Return false on any error (e.g., Buffer length mismatch)
+    // Return false on any error (e.g., credentials not configured)
     return false;
   }
 }

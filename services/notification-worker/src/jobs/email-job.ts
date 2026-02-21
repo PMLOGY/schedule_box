@@ -12,6 +12,7 @@ import {
   logNotificationSent,
   logNotificationFailed,
 } from '../services/notification-logger.js';
+import { emailDeliveryTotal } from '../monitoring/metrics.js';
 
 /**
  * Email job data interface
@@ -65,9 +66,15 @@ async function handleEmailJob(job: Job<EmailJobData>): Promise<void> {
     // Update notification status
     await logNotificationSent(notificationId, messageId);
 
+    // Track delivery metric
+    emailDeliveryTotal.inc({ status: 'sent' });
+
     console.log(`[Email Job] Completed job ${job.id}`);
   } catch (error) {
     console.error(`[Email Job] Failed job ${job.id}:`, error);
+
+    // Track delivery failure metric (always, regardless of whether DB record exists)
+    emailDeliveryTotal.inc({ status: 'failed' });
 
     // Log failure if notification record exists
     if (data.notificationId) {

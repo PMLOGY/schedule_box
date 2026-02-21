@@ -5,7 +5,7 @@
  * Security:
  * - NEVER reveals whether email exists (prevents email enumeration)
  * - Stores hashed token in Redis with 1-hour TTL
- * - Logs reset link to console in development (email service not yet implemented)
+ * - Email send errors are logged but not exposed to caller
  */
 
 import { type NextRequest } from 'next/server';
@@ -18,6 +18,7 @@ import { redis } from '@/lib/redis/client';
 import { forgotPasswordSchema } from '@/validations/auth';
 import { handleRouteError } from '@/lib/utils/errors';
 import { successResponse } from '@/lib/utils/response';
+import { sendPasswordResetEmail } from '@/lib/email/auth-emails';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,14 +43,12 @@ export async function POST(req: NextRequest) {
       // Store in Redis with 1-hour TTL (3600 seconds)
       await redis.setex(`password_reset:${tokenHash}`, 3600, user.id.toString());
 
-      // Log reset link to console in development
-      // In production, this would send email via notification service
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[DEV] Password reset link: /reset-password?token=${resetToken}`);
+      try {
+        await sendPasswordResetEmail(input.email, resetToken);
+      } catch (err) {
+        // Log but do not expose email failure to caller (security: don't reveal if email exists)
+        console.error('[Forgot Password] Email send failed:', err);
       }
-
-      // TODO: Send email via notification service when implemented
-      // await sendPasswordResetEmail(input.email, resetToken);
     }
 
     // 4. ALWAYS return success message (don't reveal if email exists)
