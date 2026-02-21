@@ -97,11 +97,11 @@ Plans:
 3. Dashboard AI insights panel shows a daily digest of high-risk bookings and optimization suggestions
 4. When a company has fewer than 10 bookings, AI features show "AI features activate after 10 bookings" with a progress indicator instead of low-confidence predictions
 
-**Plans:** TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 24-01-PLAN.md — No-show risk badge on booking list + booking detail probability display
-- [ ] 24-02-PLAN.md — AI insights dashboard panel + confidence transparency + AI onboarding state
+- [ ] 24-01-PLAN.md — No-show risk badge on booking list + booking detail probability display (Wave 1)
+- [ ] 24-02-PLAN.md — AI insights dashboard panel + confidence transparency + AI onboarding state (Wave 2)
 
 ---
 
@@ -201,7 +201,7 @@ Plans:
 | 21. Payment Processing | v1.1 | 2/3 | Code complete (Comgate setup deferred) | 2026-02-20 |
 | 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
 | 23. AI Service | v1.2 | 0/5 | Planning complete | - |
-| 24. AI-Powered UI | v1.2 | 0/2 | Not started | - |
+| 24. AI-Powered UI | v1.2 | 0/2 | Planning complete | - |
 | 25. Landing Page | v1.2 | 0/4 | Planned | - |
 | 26. Booking UX Polish | v1.2 | 0/4 | Not started | - |
 | 27. Onboarding Wizard | v1.2 | 0/4 | Not started | - |
@@ -213,3 +213,4 @@ Plans:
 *v1.1 shipped: 2026-02-21*
 *v1.2 roadmap added: 2026-02-21*
 *Phase 25 planned: 2026-02-21*
+*Phase 24 planned: 2026-02-21*
