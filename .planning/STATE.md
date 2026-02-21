@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 23: AI Service Training Pipeline and Model Deployment
+**Current focus:** v1.2 Product Readiness — Phase 23 complete, ready for Phase 24
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 23 of 27 (AI Service — Training Pipeline and Model Deployment)
-- **Plan:** 0 of 5 in current phase
-- **Status:** Ready to plan
-- **Last activity:** 2026-02-21 — v1.2 roadmap created (5 phases, 34 requirements, 19 plans)
+- **Phase:** 23 of 27 (AI Service — Training Pipeline and Model Deployment) **COMPLETE**
+- **Plan:** 5 of 5 in current phase
+- **Status:** Phase 23 complete — ready for Phase 24
+- **Last activity:** 2026-02-21 — Phase 23 executed (5 plans, all committed)
 
-Progress: [░░░░░░░░░░] 0% (v1.2: 0/19 plans)
+Progress: [██░░░░░░░░] 26% (v1.2: 5/19 plans)
 
 ## What's Done
 
@@ -29,6 +29,13 @@ Progress: [░░░░░░░░░░] 0% (v1.2: 0/19 plans)
 - 19 plans estimated across all phases
 - Research complete: SUMMARY.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md, STACK.md
 
+**Phase 23 complete** (2026-02-21) — AI Service Training Pipeline:
+- Plan 01: 6 internal training API routes + auth middleware (Next.js)
+- Plan 02: Fixed training scripts (removed deprecated XGBoost param, Prophet JSON serialization, .meta.json sidecars)
+- Plan 03: Redis pricing state persistence + model version validation at startup
+- Plan 04: Railway config, Prophet warmup, ThreadPoolExecutor for ML inference
+- Plan 05: Weekly retraining GitHub Actions workflow + Dockerfile scripts directory
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -40,6 +47,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Landing page as (marketing) route group in existing Next.js app (not separate service)
 - UI components stay in apps/web/components/ (not migrated to packages/ui) — no second consumer exists
 - Motion 12.34 for animations (not GSAP — commercial license), driver.js 1.4 for onboarding (not react-joyride — unresolved bugs)
+- has_payment feature uses payments table JOIN (not bookings.payment_status which doesn't exist)
+- healthcheckTimeout=45s (not 30s from AI-07) to accommodate Prophet Stan JIT warmup
 
 ## Blockers
 
@@ -52,7 +61,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 0/19 | - | - |
+| v1.2 (23-27) | 5/19 | - | - |
 
 ---
-*Last updated: 2026-02-21 after v1.2 roadmap creation*
+*Last updated: 2026-02-21 after Phase 23 execution complete*
