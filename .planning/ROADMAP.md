@@ -141,13 +141,13 @@ Plans:
 4. After booking confirmation, user sees an add-to-calendar button that downloads a valid ICS file with correct booking details
 5. Booking confirmation page displays a micro-animation (Motion fade-in + scale on success icon) that makes the completion feel satisfying
 
-**Plans:** TBD
+**Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 26-01-PLAN.md — Embed widget visual regression baseline + shadcn/ui diff audit
-- [ ] 26-02-PLAN.md — react-big-calendar upgrade with drag-and-drop + shadcn theme integration
-- [ ] 26-03-PLAN.md — Mobile UX audit: tap targets, slot grouping, progress stepper, skeleton loaders
-- [ ] 26-04-PLAN.md — ICS calendar endpoint + Motion micro-animations on booking confirmation
+- [ ] 26-01-PLAN.md — Embed widget visual regression baseline + shadcn/ui diff audit (Wave 1)
+- [ ] 26-02-PLAN.md — react-big-calendar upgrade with drag-and-drop + shadcn theme integration (Wave 2)
+- [ ] 26-03-PLAN.md — Mobile UX audit: tap targets, slot grouping, progress stepper, skeleton loaders (Wave 2)
+- [ ] 26-04-PLAN.md — ICS calendar endpoint + Motion micro-animations on booking confirmation (Wave 2)
 
 ---
 
@@ -203,7 +203,7 @@ Plans:
 | 23. AI Service | v1.2 | 0/5 | Planning complete | - |
 | 24. AI-Powered UI | v1.2 | 0/2 | Planning complete | - |
 | 25. Landing Page | v1.2 | 0/4 | Planned | - |
-| 26. Booking UX Polish | v1.2 | 0/4 | Not started | - |
+| 26. Booking UX Polish | v1.2 | 0/4 | Planned | - |
 | 27. Onboarding Wizard | v1.2 | 0/4 | Not started | - |
 
 ---
@@ -214,3 +214,4 @@ Plans:
 *v1.2 roadmap added: 2026-02-21*
 *Phase 25 planned: 2026-02-21*
 *Phase 24 planned: 2026-02-21*
+*Phase 26 planned: 2026-02-21*
