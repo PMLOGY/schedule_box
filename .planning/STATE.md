@@ -2,20 +2,18 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-15)
+See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.1 Production Hardening — All code work complete, 2 human checkpoints deferred (Twilio 20-03, Comgate 21-03)
+**Current focus:** v1.2 Product Readiness — AI service, UI polish, workflow improvements, landing page
 
 ## Current Position
 
-- **Milestone:** v1.1 Production Hardening
-- **Phase:** All automated phases complete (16-22 code done)
-- **Current Plan:** 20-03 + 21-03 deferred (human checkpoints: Twilio + Comgate account setup)
-- **Status:** 20/22 plans complete, 2 human checkpoints pending
-- **Last activity:** 2026-02-20 — Phase 20 Wave 1 executed (SMS logic + Helm), Phase 22 complete (monitoring)
-
-Progress: [██████████████████████████████████░░] 95% (all code complete, 2 human checkpoints deferred)
+- **Milestone:** v1.2 Product Readiness
+- **Phase:** Not started (defining requirements)
+- **Plan:** —
+- **Status:** Defining requirements
+- **Last activity:** 2026-02-21 — Milestone v1.2 started
 
 ## What's Done
 

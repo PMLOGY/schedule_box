@@ -26,23 +26,23 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v1.1 Production Hardening
+## Current Milestone: v1.2 Product Readiness
 
-**Goal:** Make ScheduleBox production-ready with real email/SMS delivery, payment processing, and test coverage so it's reliable for real customers.
+**Goal:** Make ScheduleBox a polished, demo-ready product with working AI models, professional UI, smooth workflows, and a landing page — so the sales team can confidently present it to SMB customers.
 
 **Target features:**
-- Email notifications via SMTP (booking confirmations, reminders, password resets)
-- SMS notifications via Twilio (booking reminders)
-- Comgate payment gateway production setup
-- Unit & integration tests for critical paths (auth, bookings, payments)
-- Integration setup documentation and environment configuration
+- Python AI microservice with real ML models (no-show, CLV, health, upselling, pricing, capacity)
+- UI/UX polish across all pages — professional look, consistent design, responsive
+- Core workflow improvements — booking, scheduling, customer management feel smooth
+- Landing page and onboarding flow for new business signups
+- Admin dashboard improvements — analytics, reporting, daily operations
 
 ## Current State
 - **v1.0 shipped:** 2026-02-12, deployed to Railway 2026-02-15
+- **v1.1 shipped:** 2026-02-21, all code complete (Twilio + Comgate credentials deferred)
 - **Codebase:** ~62,000 LOC (50k TypeScript, 6k Python, 5k YAML/JSON)
-- **322+ commits** across 15 phases, 101 plans
+- **Tests:** 243 unit + 31 integration + 10 E2E, 80% CI coverage gate
 - **Deployed:** Railway (web + notification worker + PostgreSQL + Redis + RabbitMQ)
-- **Test coverage:** 0% (unit/integration tests not yet written)
 
 ## Requirements
 
@@ -65,7 +65,7 @@ Freemium with 4 tiers:
 - ✓ OPS-01..06 — Kubernetes, monitoring, tracing, load testing, security audit, beta playbook — v1.0
 
 ### Active
-See `.planning/REQUIREMENTS.md` for v1.1 requirements.
+See `.planning/REQUIREMENTS.md` for v1.2 requirements.
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
@@ -92,4 +92,4 @@ See `.planning/REQUIREMENTS.md` for v1.1 requirements.
 
 ---
 
-_Last updated: 2026-02-15 after v1.1 milestone start_
+_Last updated: 2026-02-21 after v1.2 milestone start_
