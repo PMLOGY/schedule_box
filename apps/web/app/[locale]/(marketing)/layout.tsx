@@ -1,0 +1,28 @@
+import { setRequestLocale } from 'next-intl/server';
+import { routing } from '@/lib/i18n/routing';
+import { MarketingNavbar } from './_components/marketing-navbar';
+import { MarketingFooter } from './_components/marketing-footer';
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function MarketingLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <MarketingNavbar />
+      <main className="flex-1">{children}</main>
+      <MarketingFooter />
+      {/* CookieConsentBanner will be added in plan 25-04 */}
+    </div>
+  );
+}

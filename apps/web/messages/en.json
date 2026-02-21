@@ -937,5 +937,117 @@
     "forbidden": "Access forbidden",
     "networkError": "Network error",
     "serverError": "Server error"
+  },
+  "landing": {
+    "meta": {
+      "homeTitle": "ScheduleBox — Online Booking System for Czech Businesses",
+      "homeDescription": "AI-powered booking system for salons, fitness centers, and services. Online bookings 24/7, SMS reminders, payments via Comgate. Try for free.",
+      "pricingTitle": "Pricing — ScheduleBox",
+      "pricingDescription": "Transparent pricing with no surprises. Choose the plan that fits your business.",
+      "privacyTitle": "Privacy Policy — ScheduleBox",
+      "termsTitle": "Terms of Service — ScheduleBox"
+    },
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "login": "Sign in",
+      "cta": "Start for free"
+    },
+    "hero": {
+      "badge": "AI-powered booking system",
+      "headline": "Online bookings for your business",
+      "subheadline": "Automate bookings, reduce no-shows, and increase revenue with an intelligent system designed for Czech businesses.",
+      "cta": "Start for free",
+      "ctaSecondary": "View demo",
+      "widgetTitle": "Booking widget preview"
+    },
+    "features": {
+      "title": "Everything you need to manage bookings",
+      "aiPrediction": "AI Predictions",
+      "aiPredictionDesc": "Predict demand and optimize pricing with machine learning.",
+      "onlineBooking": "Online Booking 24/7",
+      "onlineBookingDesc": "Customers book anytime through your own website widget.",
+      "notifications": "Smart Notifications",
+      "notificationsDesc": "Automatic SMS and email reminders reduce no-shows by 35%.",
+      "payments": "Online Payments",
+      "paymentsDesc": "Accept payments via Comgate — cards, bank transfers, Apple Pay.",
+      "crm": "CRM & Loyalty Program",
+      "crmDesc": "Track customer history and reward loyal clients.",
+      "analytics": "Analytics & Reports",
+      "analyticsDesc": "Clear charts of revenue, occupancy, and employee performance."
+    },
+    "trust": {
+      "gdpr": "GDPR Compliant",
+      "hosting": "Czech Hosting",
+      "payment": "Comgate Payments",
+      "security": "Bank-level Security"
+    },
+    "pricing": {
+      "title": "Transparent pricing with no surprises",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualSaving": "Save 2 months",
+      "currency": "CZK/mo",
+      "cta": "Start for free",
+      "free": {
+        "name": "Free",
+        "description": "For starting entrepreneurs"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For growing businesses"
+      },
+      "business": {
+        "name": "Business",
+        "description": "For large establishments"
+      },
+      "mostPopular": "Most Popular",
+      "features": {
+        "onlineBooking": "Online booking 24/7",
+        "basicCalendar": "Basic calendar",
+        "emailNotifications": "Email notifications",
+        "oneStaff": "1 staff member",
+        "fiftyBookings": "50 bookings/month",
+        "everythingFree": "Everything in Free",
+        "smsReminders": "SMS reminders",
+        "payments": "Online payments",
+        "crm": "CRM & loyal customers",
+        "fiveStaff": "5 staff members",
+        "unlimitedBookings": "Unlimited bookings",
+        "everythingPro": "Everything in Pro",
+        "aiPredictions": "AI predictions & recommendations",
+        "dynamicPricing": "Dynamic pricing",
+        "apiAccess": "API access",
+        "unlimitedStaff": "Unlimited staff members",
+        "prioritySupport": "Priority support"
+      }
+    },
+    "social": {
+      "title": "Businesses that trust us",
+      "placeholder": "Customer reviews will be added before launch."
+    },
+    "cookie": {
+      "message": "This website uses cookies to ensure the best experience. Learn more in our",
+      "accept": "Accept",
+      "reject": "Reject",
+      "privacyLink": "privacy policy"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated"
+    },
+    "footer": {
+      "product": "Product",
+      "legal": "Legal",
+      "contact": "Contact",
+      "privacyLink": "Privacy Policy",
+      "termsLink": "Terms of Service",
+      "copyright": "© {year} ScheduleBox. All rights reserved.",
+      "registryNote": "Registered in the Commercial Register maintained by the Municipal Court in Prague."
+    }
   }
 }

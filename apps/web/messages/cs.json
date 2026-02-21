@@ -937,5 +937,117 @@
     "forbidden": "Přístup zakázán",
     "networkError": "Chyba sítě",
     "serverError": "Chyba serveru"
+  },
+  "landing": {
+    "meta": {
+      "homeTitle": "ScheduleBox — Online rezervační systém pro české firmy",
+      "homeDescription": "AI-powered rezervační systém pro salony, fitness centra a služby. Online rezervace 24/7, SMS připomínky, platby přes Comgate. Vyzkoušejte zdarma.",
+      "pricingTitle": "Ceník — ScheduleBox",
+      "pricingDescription": "Transparentní ceny bez překvapení. Vyberte si tarif, který vyhovuje vašemu podnikání.",
+      "privacyTitle": "Zásady ochrany osobních údajů — ScheduleBox",
+      "termsTitle": "Obchodní podmínky — ScheduleBox"
+    },
+    "nav": {
+      "features": "Funkce",
+      "pricing": "Ceny",
+      "login": "Přihlásit se",
+      "cta": "Začít zdarma"
+    },
+    "hero": {
+      "badge": "AI-powered rezervační systém",
+      "headline": "Online rezervace pro vaše podnikání",
+      "subheadline": "Automatizujte rezervace, snižte absence a zvyšte tržby s inteligentním systémem navrženým pro české firmy.",
+      "cta": "Začít zdarma",
+      "ctaSecondary": "Zobrazit demo",
+      "widgetTitle": "Ukázka rezervačního widgetu"
+    },
+    "features": {
+      "title": "Vše, co potřebujete pro správu rezervací",
+      "aiPrediction": "AI predikce",
+      "aiPredictionDesc": "Předvídejte poptávku a optimalizujte ceny pomocí strojového učení.",
+      "onlineBooking": "Online rezervace 24/7",
+      "onlineBookingDesc": "Zákazníci si rezervují kdykoliv přes váš vlastní widget na webu.",
+      "notifications": "Chytré notifikace",
+      "notificationsDesc": "Automatické SMS a emailové připomínky snižují absence o 35 %.",
+      "payments": "Online platby",
+      "paymentsDesc": "Přijímejte platby přes Comgate — karty, bankovní převody, Apple Pay.",
+      "crm": "CRM a věrnostní program",
+      "crmDesc": "Sledujte historii zákazníků a odměňujte věrné klienty.",
+      "analytics": "Analytika a reporty",
+      "analyticsDesc": "Přehledné grafy tržeb, obsazenosti a výkonu zaměstnanců."
+    },
+    "trust": {
+      "gdpr": "GDPR compliant",
+      "hosting": "Hosting v ČR",
+      "payment": "Platby přes Comgate",
+      "security": "Bankovní zabezpečení"
+    },
+    "pricing": {
+      "title": "Transparentní ceny bez překvapení",
+      "monthly": "Měsíčně",
+      "annual": "Ročně",
+      "annualSaving": "Ušetříte 2 měsíce",
+      "currency": "Kč/měs",
+      "cta": "Začít zdarma",
+      "free": {
+        "name": "Free",
+        "description": "Pro začínající podnikatele"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Pro rostoucí firmy"
+      },
+      "business": {
+        "name": "Business",
+        "description": "Pro velké provozovny"
+      },
+      "mostPopular": "Nejoblíbenější",
+      "features": {
+        "onlineBooking": "Online rezervace 24/7",
+        "basicCalendar": "Základní kalendář",
+        "emailNotifications": "Emailové notifikace",
+        "oneStaff": "1 zaměstnanec",
+        "fiftyBookings": "50 rezervací/měsíc",
+        "everythingFree": "Vše z Free",
+        "smsReminders": "SMS připomínky",
+        "payments": "Online platby",
+        "crm": "CRM a věrní zákazníci",
+        "fiveStaff": "5 zaměstnanců",
+        "unlimitedBookings": "Neomezené rezervace",
+        "everythingPro": "Vše z Pro",
+        "aiPredictions": "AI predikce a doporučení",
+        "dynamicPricing": "Dynamické ceny",
+        "apiAccess": "API přístup",
+        "unlimitedStaff": "Neomezený počet zaměstnanců",
+        "prioritySupport": "Prioritní podpora"
+      }
+    },
+    "social": {
+      "title": "Firmy, které nám důvěřují",
+      "placeholder": "Recenze zákazníků budou doplněny před spuštěním."
+    },
+    "cookie": {
+      "message": "Tento web používá cookies pro zajištění nejlepšího zážitku. Více informací najdete v našich",
+      "accept": "Přijmout",
+      "reject": "Odmítnout",
+      "privacyLink": "zásadách ochrany osobních údajů"
+    },
+    "privacy": {
+      "title": "Zásady ochrany osobních údajů",
+      "lastUpdated": "Poslední aktualizace"
+    },
+    "terms": {
+      "title": "Obchodní podmínky",
+      "lastUpdated": "Poslední aktualizace"
+    },
+    "footer": {
+      "product": "Produkt",
+      "legal": "Právní",
+      "contact": "Kontakt",
+      "privacyLink": "Ochrana osobních údajů",
+      "termsLink": "Obchodní podmínky",
+      "copyright": "© {year} ScheduleBox. Všechna práva vyhrazena.",
+      "registryNote": "Zapsáno v obchodním rejstříku vedeném Městským soudem v Praze."
+    }
   }
 }

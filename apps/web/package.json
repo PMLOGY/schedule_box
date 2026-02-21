@@ -50,6 +50,7 @@
     "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.563.0",
+    "motion": "^12.34.3",
     "nanoid": "^5.1.6",
     "next": "^15.5.10",
     "next-intl": "^4.8.2",
