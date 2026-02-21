@@ -44,7 +44,27 @@ FEATURE_COLUMNS = [
 ]
 
 
-def load_training_data(api_url: str = "http://localhost:3000") -> pd.DataFrame:
+def write_meta_sidecar(model_path: str, model_name: str, metrics: dict, features: list) -> None:
+    """Write .meta.json version sidecar alongside the model file."""
+    import sklearn
+    import xgboost as xgb
+
+    meta = {
+        "model_name": model_name,
+        "model_version": "v1.0.0",
+        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "sklearn_version": sklearn.__version__,
+        "xgboost_version": xgb.__version__,
+        "features": features,
+        "metrics": metrics,
+    }
+    meta_path = model_path.replace(".joblib", ".meta.json")
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
+    logger.info(f"Version sidecar written to {meta_path}")
+
+
+def load_training_data(api_url: str | None = None) -> pd.DataFrame:
     """
     Load training data from the ScheduleBox API or generate synthetic data.
 
@@ -57,12 +77,18 @@ def load_training_data(api_url: str = "http://localhost:3000") -> pd.DataFrame:
     Returns:
         DataFrame with feature columns and 'no_show' target.
     """
+    if api_url is None:
+        api_url = os.environ.get("SCHEDULEBOX_API_URL", "http://localhost:3000")
+
     # Try to fetch from API
     try:
         import httpx
 
+        api_key = os.environ.get("AI_SERVICE_API_KEY", "")
+        headers = {"x-ai-service-key": api_key} if api_key else {}
         response = httpx.get(
             f"{api_url}/api/internal/features/training/no-show",
+            headers=headers,
             timeout=30.0,
         )
         if response.status_code == 200:
@@ -202,7 +228,7 @@ def train_model(output_dir: str = "models") -> None:
         colsample_bytree=0.8,
         scale_pos_weight=scale_pos_weight,
         random_state=42,
-        use_label_encoder=False,
+
     )
 
     # Cross-validation with TimeSeriesSplit
@@ -250,6 +276,9 @@ def train_model(output_dir: str = "models") -> None:
     model_path = os.path.join(output_dir, "no_show_v1.0.0.joblib")
     joblib.dump(model, model_path)
     logger.info(f"Model saved to {model_path}")
+
+    # Write version sidecar
+    write_meta_sidecar(model_path, "no_show_predictor", avg_metrics, FEATURE_COLUMNS)
 
     # Update metadata.json
     metadata_path = os.path.join(output_dir, "metadata.json")

@@ -16,7 +16,6 @@ import os
 import sys
 from datetime import datetime, timedelta, timezone
 
-import joblib
 import numpy as np
 import pandas as pd
 
@@ -115,6 +114,25 @@ def generate_synthetic_booking_counts(weeks: int = 26) -> pd.DataFrame:
     return df
 
 
+def write_meta_sidecar(model_path: str, model_name: str, training_points: int, date_range: str) -> None:
+    """Write .meta.json version sidecar alongside the model file."""
+    import prophet as prophet_lib
+
+    meta = {
+        "model_name": model_name,
+        "model_version": "v1.0.0",
+        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "prophet_version": prophet_lib.__version__,
+        "training_points": training_points,
+        "date_range": date_range,
+        "serialization": "prophet.serialize.model_to_json",
+    }
+    meta_path = model_path.replace(".json", ".meta.json")
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
+    logger.info(f"Version sidecar written to {meta_path}")
+
+
 def load_training_data(api_url: str | None = None) -> pd.DataFrame:
     """
     Load training data from the ScheduleBox API or generate synthetic data.
@@ -125,12 +143,18 @@ def load_training_data(api_url: str | None = None) -> pd.DataFrame:
     Returns:
         DataFrame with 'ds' and 'y' columns for Prophet.
     """
+    if api_url is None:
+        api_url = os.environ.get("SCHEDULEBOX_API_URL")
+
     if api_url is not None:
         try:
             import httpx
 
+            api_key = os.environ.get("AI_SERVICE_API_KEY", "")
+            headers = {"x-ai-service-key": api_key} if api_key else {}
             response = httpx.get(
                 f"{api_url}/api/internal/features/training/capacity",
+                headers=headers,
                 timeout=30.0,
             )
             if response.status_code == 200:
@@ -158,8 +182,7 @@ def train_model(output_dir: str = "models") -> None:
     logger.info("Starting capacity model training")
 
     # Load training data
-    api_url = os.environ.get("SCHEDULEBOX_API_URL")
-    df = load_training_data(api_url=api_url)
+    df = load_training_data()
 
     if df.empty:
         logger.error("No training data available, aborting")
@@ -179,15 +202,21 @@ def train_model(output_dir: str = "models") -> None:
         )
         return
 
-    # Save model
-    os.makedirs(output_dir, exist_ok=True)
-    model_path = os.path.join(output_dir, "capacity_v1.0.0.joblib")
-    joblib.dump(forecaster.model, model_path)
-    logger.info(f"Capacity model saved to {model_path}")
+    # Save model using Prophet JSON serialization (NOT joblib)
+    from prophet.serialize import model_to_json
 
-    # Print training summary
+    os.makedirs(output_dir, exist_ok=True)
+    model_path = os.path.join(output_dir, "capacity_v1.0.0.json")
+    with open(model_path, "w") as f:
+        json.dump(model_to_json(forecaster.model), f)
+    logger.info(f"Capacity model saved to {model_path} (Prophet JSON)")
+
+    # Write version sidecar
     date_range = f"{df['ds'].min()} to {df['ds'].max()}"
     n_points = len(df)
+    write_meta_sidecar(model_path, "capacity_forecaster", n_points, date_range)
+
+    # Print training summary
     logger.info(f"Training summary:")
     logger.info(f"  Date range: {date_range}")
     logger.info(f"  Total data points: {n_points}")
