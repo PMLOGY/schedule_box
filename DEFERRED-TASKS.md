@@ -66,7 +66,25 @@ ScheduleBox can process real SMS messages and payments.
 
 ---
 
-### 4. Czech Legal Content (v1.2 Phase 25 — upcoming)
+### 4. Railway Email — Switch to HTTP API Provider
+
+**Priority:** HIGH — Emails don't send on Railway (all SMTP ports blocked)
+**What to do:**
+
+- [ ] Sign up for an email provider with HTTP API (Resend, Brevo, or Mailgun)
+- [ ] Verify schedulebox.cz domain with the provider
+- [ ] Replace nodemailer SMTP calls with HTTP API calls in:
+  - `apps/web/lib/email/auth-emails.ts` (password reset, email verification)
+  - `services/notification-worker/src/services/email-sender.ts` (booking notifications)
+  - `services/notification-worker/src/monitoring/alert-sender.ts` (monitoring alerts)
+- [ ] Add API key to Railway env vars
+
+**Code status:** SMTP works locally (cesky-hosting.cz port 587). Railway blocks outbound SMTP (ports 25, 465, 587).
+**Recommended:** Resend (free tier: 100 emails/day, 3000/month, simple Node.js SDK)
+
+---
+
+### 5. Czech Legal Content (v1.2 Phase 25 — upcoming)
 
 **Priority:** MEDIUM — Needed before landing page goes live
 **What to do:**
