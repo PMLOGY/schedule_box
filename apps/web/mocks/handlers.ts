@@ -38,7 +38,7 @@ export const comgateHandlers = [
 // =========================================
 export const aiHandlers = [
   // No-show prediction
-  http.post('http://localhost:8000/api/v1/predict/no-show', () => {
+  http.post('http://localhost:8000/api/v1/predictions/no-show', () => {
     return HttpResponse.json({
       probability: 0.15,
       factors: ['new_customer', 'weekend'],
@@ -76,22 +76,6 @@ export const notificationHandlers = [
     });
   }),
 ];
-
-/**
- * Creates a handler that returns a specific HTTP status for the SMTP-like
- * notification endpoint. Useful for error scenario testing.
- */
-export function createSMTPHandler(status: number) {
-  return http.post('/api/v1/notifications/send', () => {
-    if (status >= 200 && status < 300) {
-      return HttpResponse.json({ success: true, messageId: 'test-msg-123' }, { status });
-    }
-    return HttpResponse.json(
-      { error: 'notification_failed', message: 'Failed to send notification' },
-      { status },
-    );
-  });
-}
 
 // =========================================
 // Combined default handlers

@@ -66,7 +66,7 @@ describe('MSW default handlers', () => {
 
   describe('AI service', () => {
     test('no-show prediction handler returns probability', async () => {
-      const response = await fetch('http://localhost:8000/api/v1/predict/no-show', {
+      const response = await fetch('http://localhost:8000/api/v1/predictions/no-show', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reservationId: 'test-123' }),
