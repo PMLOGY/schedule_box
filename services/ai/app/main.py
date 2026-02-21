@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .routers import competitor, followup, health, optimization, predictions, voice
-from .services.model_loader import load_models, cleanup_models
+from .services.model_loader import load_models, cleanup_models, warmup_prophet
 from .services import feature_store
 
 logging.basicConfig(
@@ -50,6 +50,7 @@ async def startup_event():
     """Load ML models on startup. Service starts in degraded mode if loading fails."""
     try:
         await load_models()
+        await warmup_prophet()
         logger.info("AI service started successfully with models loaded")
     except Exception as e:
         logger.warning(

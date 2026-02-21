@@ -5,7 +5,9 @@ All endpoints return typed fallback responses on error (never crash).
 Uses model_loader for ML models with graceful degradation.
 """
 
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import APIRouter
 
@@ -24,6 +26,8 @@ from ..schemas.responses import (
 from ..services import model_loader
 
 logger = logging.getLogger(__name__)
+
+_thread_pool = ThreadPoolExecutor(max_workers=4)
 
 router = APIRouter(prefix="/optimization", tags=["optimization"])
 
@@ -48,10 +52,14 @@ async def get_upselling_recommendations(
                 fallback=True,
             )
 
-        results = upselling_model.recommend(
-            current_service_id=request.current_service_id,
-            customer_history=request.customer_history or [],
-            n_recommendations=3,
+        loop = asyncio.get_event_loop()
+        results = await loop.run_in_executor(
+            _thread_pool,
+            lambda: upselling_model.recommend(
+                current_service_id=request.current_service_id,
+                customer_history=request.customer_history or [],
+                n_recommendations=3,
+            ),
         )
 
         # Determine if response is based on trained model or popularity fallback
@@ -103,15 +111,27 @@ async def get_dynamic_pricing(
                 fallback=True,
             )
 
-        result = pricing_model.get_optimal_price(
-            service_id=request.service_id,
-            price_min=request.price_min,
-            price_max=request.price_max,
-            hour_of_day=request.hour_of_day,
-            day_of_week=request.day_of_week,
-            utilization=request.utilization,
-            base_price=request.base_price,
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            _thread_pool,
+            lambda: pricing_model.get_optimal_price(
+                service_id=request.service_id,
+                price_min=request.price_min,
+                price_max=request.price_max,
+                hour_of_day=request.hour_of_day,
+                day_of_week=request.day_of_week,
+                utilization=request.utilization,
+                base_price=request.base_price,
+            ),
         )
+
+        # Persist MAB state to Redis after pricing optimization (fire-and-forget)
+        try:
+            from ..services.pricing_redis import save_pricing_state
+
+            asyncio.create_task(save_pricing_state(pricing_model.state))
+        except Exception as e:
+            logger.warning(f"Failed to persist pricing state to Redis: {e}")
 
         return DynamicPricingResponse(
             service_id=request.service_id,
@@ -158,10 +178,18 @@ async def get_capacity_forecast(
                 fallback=True,
             )
 
-        forecast_data = capacity_model.forecast(days_ahead=request.days_ahead)
-        suggestions = capacity_model.suggest_schedule_changes(
-            forecast_data=forecast_data,
-            current_capacity=request.current_capacity,
+        loop = asyncio.get_event_loop()
+        forecast_data = await loop.run_in_executor(
+            _thread_pool,
+            capacity_model.forecast,
+            request.days_ahead,
+        )
+        suggestions = await loop.run_in_executor(
+            _thread_pool,
+            lambda: capacity_model.suggest_schedule_changes(
+                forecast_data=forecast_data,
+                current_capacity=request.current_capacity,
+            ),
         )
 
         return CapacityForecastResponse(
@@ -206,9 +234,13 @@ async def get_reminder_timing(
                 fallback=True,
             )
 
-        result = timing_model.get_optimal_timing(
-            customer_id=request.customer_id,
-            notification_channel=request.notification_channel,
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            _thread_pool,
+            lambda: timing_model.get_optimal_timing(
+                customer_id=request.customer_id,
+                notification_channel=request.notification_channel,
+            ),
         )
 
         return ReminderTimingResponse(

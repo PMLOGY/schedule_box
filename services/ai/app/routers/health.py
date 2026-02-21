@@ -8,6 +8,7 @@ from fastapi import APIRouter, Response
 
 from ..services.model_loader import (
     is_models_loaded,
+    is_prophet_warmed_up,
     get_no_show_model,
     get_clv_model,
     get_health_score_model,
@@ -24,13 +25,16 @@ async def health_check(response: Response):
     Returns 200 if models are loaded, 503 if not.
     """
     models_loaded = is_models_loaded()
+    prophet_ready = is_prophet_warmed_up()
+    ready = models_loaded and prophet_ready
 
-    if not models_loaded:
+    if not ready:
         response.status_code = 503
 
     return {
-        "status": "healthy" if models_loaded else "degraded",
+        "status": "healthy" if ready else "starting",
         "models_loaded": models_loaded,
+        "prophet_warmed_up": prophet_ready,
         "version": "1.0.0",
     }
 

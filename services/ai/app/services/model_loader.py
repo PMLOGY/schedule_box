@@ -35,6 +35,7 @@ _models: dict = {
     "reminder_timing": None,
 }
 _models_loaded: bool = False
+_prophet_warmed_up: bool = False
 
 
 def _validate_model_versions(meta_path: str, model_name: str) -> None:
@@ -287,3 +288,28 @@ def get_reminder_timing_model():
 def is_models_loaded() -> bool:
     """Returns True if at least health_score model is ready."""
     return _models_loaded
+
+
+async def warmup_prophet() -> None:
+    """Run a throwaway prediction to warm up Prophet's Stan backend."""
+    global _prophet_warmed_up
+    import asyncio
+
+    capacity_model = _models.get("capacity")
+    if capacity_model and capacity_model.model:
+        try:
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, capacity_model.forecast, 1)
+            _prophet_warmed_up = True
+            logger.info("Prophet warmup prediction complete")
+        except Exception as e:
+            logger.warning(f"Prophet warmup failed (non-fatal): {e}")
+            _prophet_warmed_up = True  # Don't block health check forever
+    else:
+        _prophet_warmed_up = True  # No Prophet model loaded
+        logger.info("Prophet warmup skipped (no capacity model loaded)")
+
+
+def is_prophet_warmed_up() -> bool:
+    """Returns True if Prophet warmup is complete (or no Prophet model loaded)."""
+    return _prophet_warmed_up

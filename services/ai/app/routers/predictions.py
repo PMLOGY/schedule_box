@@ -5,7 +5,9 @@ All endpoints return fallback responses on error (never crash).
 Uses model_loader for ML models and feature_store for Redis caching.
 """
 
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import APIRouter
 
@@ -25,6 +27,8 @@ from ..services import model_loader
 from ..services import feature_store
 
 logger = logging.getLogger(__name__)
+
+_thread_pool = ThreadPoolExecutor(max_workers=4)
 
 router = APIRouter(prefix="/predictions", tags=["predictions"])
 
@@ -89,8 +93,9 @@ async def predict_no_show(request: NoShowPredictionRequest) -> NoShowPredictionR
                 fallback=True,
             )
 
-        # Make prediction
-        result = no_show_model.predict(features)
+        # Make prediction (offload to thread pool to avoid blocking event loop)
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(_thread_pool, no_show_model.predict, features)
 
         # Cache features for future requests
         await feature_store.cache_booking_features(request.booking_id, features)
@@ -148,8 +153,9 @@ async def predict_clv(request: CLVPredictionRequest) -> CLVPredictionResponse:
                 fallback=True,
             )
 
-        # Make prediction
-        result = clv_model.predict(features)
+        # Make prediction (offload to thread pool to avoid blocking event loop)
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(_thread_pool, clv_model.predict, features)
 
         # Cache features for future requests
         await feature_store.cache_customer_features(request.customer_id, features)
