@@ -15,6 +15,7 @@ import {
   updatePaymentStatus,
   checkWebhookIdempotency,
   markWebhookCompleted,
+  markWebhookFailed,
 } from '@/app/api/v1/payments/service';
 import {
   verifyComgateWebhookSecret,
@@ -39,6 +40,7 @@ import { webhookProcessingTotal } from '@schedulebox/shared/metrics/business';
  * - ... other fields
  */
 export async function POST(req: NextRequest) {
+  let webhookTransId: string | null = null;
   try {
     // 1. Read raw body
     const rawBody = await req.text();
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const transId = parsedBody.get('transId');
+    webhookTransId = transId;
     let status = parsedBody.get('status');
 
     if (!transId || !status) {
@@ -206,6 +209,10 @@ export async function POST(req: NextRequest) {
       '[Comgate Webhook] Processing error:',
       error instanceof Error ? error.message : error,
     );
+    // Mark webhook as failed in DB so MON-03 scheduler can detect failures
+    if (webhookTransId) {
+      await markWebhookFailed(webhookTransId).catch(() => {});
+    }
     // Increment webhook failure counter (non-blocking, synchronous)
     webhookProcessingTotal.inc({ gateway: 'comgate', status: 'failure' });
     return NextResponse.json({ message: 'Internal error' }, { status: 500 });
