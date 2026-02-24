@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-03 complete, Plan 02 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-04 complete, Plan 05+ pending)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 31 — Analytics & Reporting
-- **Plan:** 03 complete, 04+ pending
-- **Status:** Plan 03 complete (admin analytics + org analytics APIs)
-- **Last activity:** 2026-02-24 — Plan 31-03 complete (admin SaaS health metrics, cross-location org analytics)
+- **Plan:** 04 complete, 05+ pending
+- **Status:** Plan 04 complete (analytics UI charts and enhanced page)
+- **Last activity:** 2026-02-24 — Plan 31-04 complete (6 chart components, enhanced analytics page)
 
-Progress: [###-------] 30% (3/? plans)
+Progress: [####------] 40% (4/? plans)
 
 ## What's Done
 
@@ -57,6 +57,7 @@ Progress: [###-------] 30% (3/? plans)
 - Plan 01 complete: 5 analytics API routes (payment-methods, top-services, peak-hours, cancellations, customer-retention) with Drizzle raw SQL aggregation
 - Plan 02 complete: Employee utilization API (per-employee bookings, revenue, occupancy approximation), analytics_snapshots table, BullMQ hourly snapshot scheduler
 - Plan 03 complete: Admin SaaS health metrics API (MRR/ARR/churn/plan distribution/signup trends) + cross-location organization analytics API for franchise owners
+- Plan 04 complete: 6 analytics chart components (PieChart, BarChart, LineChart, CSS heatmap, composite panel) + enhanced analytics page with 8+ card sections
 
 ## Decisions
 
@@ -122,6 +123,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Organization analytics deduplicates customers by customerId across locations (not by email)
 - analytics_snapshots as Drizzle pgTable with BullMQ hourly refresh (not PostgreSQL MATERIALIZED VIEW)
 - Analytics scheduler standalone (no emailQueue dependency), concurrency 1, 2 attempts / exponential 30s backoff
+- PeakHoursHeatmap uses CSS flexbox grid (not Recharts) for better heatmap UX
+- CustomerRetentionPanel is composite (stats + badges + CLV histogram), not single chart
+- Pie chart labels use built-in name/percent props (avoids PieLabelRenderProps type issue)
 
 ## Blockers
 
@@ -153,6 +157,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 31 Plan 01 | 2 tasks | 5 files | 3 min |
 | Phase 31 Plan 02 | 2 tasks | 4 files | 5 min |
 | Phase 31 Plan 03 | 2 tasks | 2 files | 3 min |
+| Phase 31 Plan 04 | 2 tasks | 8 files | 6 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 31 Plans 01-03 complete. Plan 04 pending (analytics UI enhancement).*
+*Last updated: 2026-02-24 — Phase 31 Plans 01-04 complete. Plan 05 pending (export reports).*
