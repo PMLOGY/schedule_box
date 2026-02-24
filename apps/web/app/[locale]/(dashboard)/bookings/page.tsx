@@ -27,6 +27,7 @@ import {
 import { useBookingsQuery } from '@/hooks/use-bookings-query';
 import BookingStatusBadge from '@/components/booking/BookingStatusBadge';
 import BookingDetailPanel from '@/components/booking/BookingDetailPanel';
+import { NoShowRiskBadge } from '@/components/ai/NoShowRiskBadge';
 import type { BookingStatus } from '@schedulebox/shared/types';
 
 export default function BookingsPage() {
@@ -130,19 +131,20 @@ export default function BookingsPage() {
                 <TableHead>{t('columns.service')}</TableHead>
                 <TableHead>{t('columns.employee')}</TableHead>
                 <TableHead>{t('columns.status')}</TableHead>
+                <TableHead>{t('columns.risk')}</TableHead>
                 <TableHead className="text-right">{t('columns.price')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     {tCommon('loading')}
                   </TableCell>
                 </TableRow>
               ) : !data || data.data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     {t('noBookings')}
                   </TableCell>
                 </TableRow>
@@ -180,6 +182,9 @@ export default function BookingsPage() {
                       <TableCell>{booking.employee?.name || '-'}</TableCell>
                       <TableCell>
                         <BookingStatusBadge status={booking.status} />
+                      </TableCell>
+                      <TableCell>
+                        <NoShowRiskBadge probability={booking.noShowProbability} />
                       </TableCell>
                       <TableCell className="text-right">
                         {formatPrice(booking.price, booking.currency)}

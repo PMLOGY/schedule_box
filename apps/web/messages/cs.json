@@ -195,6 +195,7 @@
         "service": "Služba",
         "employee": "Zaměstnanec",
         "status": "Stav",
+        "risk": "Riziko",
         "price": "Cena",
         "actions": "Akce"
       },

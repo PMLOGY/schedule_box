@@ -193,6 +193,7 @@
         "service": "Služba",
         "employee": "Zamestnanec",
         "status": "Stav",
+        "risk": "Riziko",
         "price": "Cena",
         "actions": "Akcie"
       },

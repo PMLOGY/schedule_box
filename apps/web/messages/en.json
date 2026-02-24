@@ -195,6 +195,7 @@
         "service": "Service",
         "employee": "Employee",
         "status": "Status",
+        "risk": "Risk",
         "price": "Price",
         "actions": "Actions"
       },
