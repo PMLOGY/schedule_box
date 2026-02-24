@@ -141,6 +141,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
 | Phase 30 Plan 04 | 2 tasks | 9 files | 7 min |
 | Phase 31 Plan 01 | 2 tasks | 5 files | 3 min |
+| Phase 31 Plan 03 | 2 tasks | 2 files | 3 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 31 Plan 01 complete (5 analytics API routes). Phase 31 in progress.*
+*Last updated: 2026-02-24 — Phase 31 Plan 03 complete (admin + org analytics APIs). Phase 31 in progress.*
