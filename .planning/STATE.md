@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 05 complete, executing Plan 03/04
+**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 04 complete, executing Plan 03
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 05: complete, 04: UI, 03: scheduler)
-- **Status:** Plan 05 complete, ready for Plan 03/04
-- **Last activity:** 2026-02-24 — Phase 28 Plan 05 executed (subscription invoice service + PDF + API routes)
+- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 04: complete, 05: complete, 03: scheduler)
+- **Status:** Plan 04 complete, ready for Plan 03
+- **Last activity:** 2026-02-24 — Phase 28 Plan 04 executed (billing portal UI + hooks + translations)
 
-Progress: [######░░░░] 60% (3/5 plans)
+Progress: [########░░] 80% (4/5 plans)
 
 ## What's Done
 
@@ -36,6 +36,7 @@ Progress: [######░░░░] 60% (3/5 plans)
 - Plan 01 complete: Subscription schema (3 tables), Comgate recurring client, billing types/config
 - Plan 02 complete: 7 billing API routes + subscription service layer with state machine
 - Plan 05 complete: Subscription invoice service (SEQUENCE numbering, Czech VAT PDF, list/download API)
+- Plan 04 complete: Billing portal UI (plan comparison grid, subscription management, invoice history, payment polling)
 
 ## Decisions
 
@@ -54,6 +55,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Platform entity (ScheduleBox s.r.o.) is seller on subscription invoices, subscribing company is buyer
 - sellerSnapshot freezes buyer company details at invoice creation per Czech accounting law
 - Invoice PDF uses VAT rate from record (country-based), not hardcoded 21%
+- Cancel subscription implemented as downgrade to free via existing downgrade API
+- useBillingInvoices gracefully returns empty array on 404 (invoices API in Plan 05)
+- Growth plan shown as "Most Popular" with Crown badge emphasis
 
 ## Blockers
 
@@ -72,6 +76,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 01 | 2 tasks | 9 files | 5 min |
 | Phase 28 Plan 02 | 2 tasks | 8 files | 7 min |
 | Phase 28 Plan 05 | 2 tasks | 3 files | 4 min |
+| Phase 28 Plan 04 | 3 tasks | 4 files | 6 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 28 Plan 05 complete (subscription invoice service + PDF + API routes)*
+*Last updated: 2026-02-24 — Phase 28 Plan 04 complete (billing portal UI + hooks + translations)*
