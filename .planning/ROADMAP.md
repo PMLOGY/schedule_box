@@ -116,14 +116,19 @@ Plans:
 
 **Requirements:** LIMIT-01, LIMIT-02, LIMIT-03, LIMIT-04, LIMIT-05
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 29-01-PLAN.md — Redis booking counter infrastructure + plan-limits helper + GET /api/v1/usage endpoint
+- [ ] 29-02-PLAN.md — Server-side limit enforcement in POST handlers (bookings, employees, services) with 402 responses
+- [ ] 29-03-PLAN.md — Usage dashboard widget with progress bars + upgrade modal + Czech/English translations
+
 **Success Criteria:**
 
 1. A Free plan company that has reached 50 bookings in the current billing period receives an HTTP 402 response when attempting to create booking 51; the frontend shows an upgrade modal with plan comparison rather than a generic error.
 2. A Free plan company that tries to add a 4th employee or a 6th service is blocked with an upgrade prompt; the block is enforced at the API level and cannot be bypassed by removing the frontend check.
 3. An owner on any plan can see a usage widget in the dashboard showing current bookings consumed vs. their tier limit with a visual progress bar; the widget shows a warning banner when consumption reaches 80% of the limit.
 4. Plan limits match documented tier values: Free 50 bookings/month, Essential 500, Growth 2,000, AI-Powered unlimited; these values are defined in a single configuration file and not scattered across multiple check locations.
-
-**Plan estimates:** 3 plans (Redis counter infrastructure + tier limits config, server-side limit checks in POST handlers, usage dashboard widget + upgrade modal)
 
 ---
 
@@ -224,7 +229,7 @@ Plans:
 | 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 28. Subscription Billing | v1.3 | 0/5 | Planned | — |
-| 29. Usage Limits | v1.3 | — | Pending | — |
+| 29. Usage Limits | v1.3 | 0/3 | Planned | — |
 | 30. Multi-Location Orgs | v1.3 | — | Pending | — |
 | 31. Analytics | v1.3 | — | Pending | — |
 | 32. Frontend Polish | v1.3 | — | Pending | — |
@@ -236,3 +241,4 @@ Plans:
 *v1.2 shipped: 2026-02-24*
 *v1.3 roadmap created: 2026-02-24*
 *Phase 28 planned: 2026-02-24*
+*Phase 29 planned: 2026-02-24*
