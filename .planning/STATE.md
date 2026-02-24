@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 30 in progress (Plans 01-03 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 30 in progress (Plans 01-04 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 30 — Multi-Location Organizations
-- **Plan:** 03 complete, 04+ pending
-- **Status:** Plan 03 complete (organization CRUD API)
-- **Last activity:** 2026-02-24 — Plan 30-03 complete (org CRUD API, location management, member management)
+- **Plan:** 04 complete (pending checkpoint verification), 05+ pending
+- **Status:** Plan 04 auto tasks complete, awaiting human-verify checkpoint
+- **Last activity:** 2026-02-24 — Plan 30-04 complete (location switcher UI, org settings pages, navigation)
 
-Progress: [###-------] 30% (3/? plans)
+Progress: [####------] 40% (4/? plans)
 
 ## What's Done
 
@@ -50,6 +50,7 @@ Progress: [###-------] 30% (3/? plans)
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
 - Plan 02 complete: JWT context switch endpoint (POST /api/v1/auth/switch-location, validateLocationAccess security gate, cross-org rejection integration tests, org-scope query helpers, Zod schemas)
 - Plan 03 complete: Organization CRUD API (GET/POST orgs, GET/PUT org detail, location CRUD with plan limits, member management with role gating, PaymentRequiredError 402)
+- Plan 04 complete: Location switcher dropdown in header, organization overview page with location cards, organization settings page with location/member CRUD, sidebar navigation update
 
 ## Decisions
 
@@ -95,6 +96,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Subscription plan determines max locations: growth=3, ai_powered=10
 - Location slug uniqueness enforced globally across all companies
 - DELETE on locations = soft-deactivate (isActive=false), preserving all historical data
+- Full page reload after location switch (window.location.reload) for clean TanStack Query cache reset
+- LocationSwitcher renders null when user has no org or only 1 location
+- DELETE member endpoint uses direct fetch() because apiClient.delete doesn't support request body
 
 ## Blockers
 
@@ -121,6 +125,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 30 Plan 01 | 3 tasks | 7 files | 7 min |
 | Phase 30 Plan 02 | 3 tasks | 6 files | 8 min |
 | Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
+| Phase 30 Plan 04 | 2 tasks | 9 files | 7 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 30 Plan 02 complete (JWT context switch, org security). Plans 01-03 done.*
+*Last updated: 2026-02-24 — Phase 30 Plan 04 complete (location switcher, org settings pages). Plans 01-04 done.*
