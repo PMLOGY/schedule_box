@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 26 of 27 (Booking UX Polish) **IN PROGRESS**
-- **Plan:** 1 of 4 in current phase — Plan 01 complete
-- **Status:** Phase 26 Plan 01 complete — visual regression baseline established
-- **Last activity:** 2026-02-24 — Phase 26 Plan 01 executed (embed widget visual regression test + shadcn/ui audit)
+- **Phase:** 24 of 27 (AI-Powered UI) **IN PROGRESS**
+- **Plan:** 1 of N in current phase — Plan 01 complete
+- **Status:** Phase 24 Plan 01 complete — no-show risk badges in booking list + detail panel
+- **Last activity:** 2026-02-24 — Phase 24 Plan 01 executed (NoShowRiskBadge + NoShowRiskDetail components, 7-column booking table, i18n cs/en/sk)
 
-Progress: [█████░░░░░] 53% (v1.2: 10/19 plans)
+Progress: [█████░░░░░] 53% (v1.2: 11/19 plans)
 
 ## What's Done
 
@@ -48,6 +48,8 @@ Progress: [█████░░░░░] 53% (v1.2: 10/19 plans)
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 24-01: NoShowRiskBadge shows raw % in badge text + full label in tooltip; TooltipProvider scoped per-badge; NoShowRiskDetail includes own Separator for encapsulation
+- Phase 24-01: Risk column added as 7th column in booking table (between Status and Price); colSpan updated 6->7
 - v1.2 phase ordering: AI first (unblocks UI), Landing Page before Booking UX (drives traffic), Onboarding last (layers on everything)
 - Capacity optimizer uses GradientBoostingRegressor (not LSTM) for v1.2 — 80% accuracy at 10% complexity
 - Models baked into Docker image for v1.2 (not R2); migrate to R2 if deploys exceed 5 minutes
@@ -75,5 +77,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 (23-27) | 10/19 | - | - |
 
 ---
-*Last updated: 2026-02-24 after Phase 23 execution complete (5/5 plans, verification passed)*
+*Last updated: 2026-02-24 after Phase 24 Plan 01 execution complete (2/2 tasks, TypeScript clean)*
 
