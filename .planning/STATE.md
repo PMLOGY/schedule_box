@@ -46,6 +46,7 @@ Progress: [###-------] 30% (3/? plans)
 
 **v1.3 Phase 30 in progress:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
+- Plan 02 complete: JWT context switch endpoint (POST /api/v1/auth/switch-location, validateLocationAccess security gate, cross-org rejection integration tests, org-scope query helpers, Zod schemas)
 - Plan 03 complete: Organization CRUD API (GET/POST orgs, GET/PUT org detail, location CRUD with plan limits, member management with role gating, PaymentRequiredError 402)
 
 ## Decisions
@@ -85,6 +86,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - companies.organizationId defined as plain integer (no FK reference in Drizzle) to avoid circular import; FK enforced via migration SQL
 - organization_members.companyId nullable: null = franchise_owner access to ALL locations, non-null = location_manager scoped to specific company
 - Org roles (franchise_owner, location_manager) stored in org_members.role CHECK constraint, separate from system roles table
+- validateLocationAccess is single security enforcement point for all location switching; throws ForbiddenError (403) for cross-org access
+- Integration test re-implements validation logic using test DB to avoid coupling to app DB client singleton
+- Old access token blacklisted in Redis after successful location switch to prevent reuse
 - PaymentRequiredError (402) added to shared errors for subscription plan gating (free/essential blocked from org creation)
 - Subscription plan determines max locations: growth=3, ai_powered=10
 - Location slug uniqueness enforced globally across all companies
@@ -113,7 +117,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 29 Plan 02 | 2 tasks | 3 files | 3 min |
 | Phase 29 Plan 03 | 2 tasks | 7 files | 4 min |
 | Phase 30 Plan 01 | 3 tasks | 7 files | 7 min |
+| Phase 30 Plan 02 | 3 tasks | 6 files | 8 min |
 | Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 30 Plan 03 complete (organization CRUD API). Plans 01+03 done, Plan 02 in parallel.*
+*Last updated: 2026-02-24 — Phase 30 Plan 02 complete (JWT context switch, org security). Plans 01-03 done.*
