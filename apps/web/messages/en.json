@@ -1201,7 +1201,14 @@
       "subheadline": "Automate bookings, reduce no-shows, and increase revenue with an intelligent system designed for Czech businesses.",
       "cta": "Start for free",
       "ctaSecondary": "View demo",
-      "widgetTitle": "Booking widget preview"
+      "widgetTitle": "Booking widget preview",
+      "widgetBusiness": "Beauty Salon Prague",
+      "widgetSubtitle": "Choose a service and book online",
+      "widgetService1": "Haircut & Styling",
+      "widgetService2": "Manicure",
+      "widgetService3": "Hair Coloring",
+      "widgetSelectDate": "Select a date",
+      "widgetSelectTime": "Select a time"
     },
     "features": {
       "title": "Everything you need to manage bookings",
@@ -1276,14 +1283,82 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated"
+      "lastUpdated": "Last updated",
+      "controller": {
+        "title": "Data Controller",
+        "text": "The data controller is {company}, ID: {ico}, registered at {address} (hereinafter \"Controller\")."
+      },
+      "dataCollected": {
+        "title": "What Data We Collect",
+        "text": "We collect the following categories of personal data: identification data (first name, surname), contact data (email, phone), booking and payment data, technical data (IP address, browser type), and cookie data."
+      },
+      "purpose": {
+        "title": "Purpose of Processing",
+        "text": "We process personal data for the purpose of providing the ScheduleBox service, managing user accounts, processing payments, sending booking notifications, improving the service through analytics, and fulfilling legal obligations."
+      },
+      "legalBasis": {
+        "title": "Legal Basis",
+        "text": "Processing is based on performance of a contract (Art. 6(1)(b) GDPR), legitimate interests of the controller (Art. 6(1)(f) GDPR), consent of the data subject (Art. 6(1)(a) GDPR), and compliance with legal obligations (Art. 6(1)(c) GDPR)."
+      },
+      "retention": {
+        "title": "Data Retention",
+        "text": "We retain personal data for the duration of the contractual relationship and for the period required by applicable legal regulations (particularly tax and accounting regulations — 10 years). After this period, the data will be securely deleted."
+      },
+      "rights": {
+        "title": "Data Subject Rights",
+        "text": "You have the right to access your personal data, the right to rectification, erasure, restriction of processing, data portability, and the right to object to processing. You can exercise your rights by contacting the Controller at privacy@schedulebox.cz. You also have the right to lodge a complaint with the Office for Personal Data Protection."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "text": "We use technical cookies necessary for the operation of the service. We store analytical and marketing cookies only with your explicit consent, which you can withdraw at any time. Details can be found in the cookie banner on our website."
+      },
+      "contact": {
+        "title": "Data Protection Contact",
+        "text": "For questions regarding the processing of personal data, contact us at privacy@schedulebox.cz."
+      }
     },
     "terms": {
       "title": "Terms of Service",
-      "lastUpdated": "Last updated"
+      "lastUpdated": "Last updated",
+      "intro": {
+        "title": "General Provisions",
+        "text": "These terms and conditions govern the rights and obligations of the contracting parties when using the ScheduleBox service operated by ScheduleBox s.r.o. By using the service, you agree to these terms."
+      },
+      "description": {
+        "title": "Service Description",
+        "text": "ScheduleBox is a cloud platform for managing online bookings, capacity planning, and customer relationship management. The service includes a web application, a booking widget for embedding on user websites, a notification system, and analytical tools."
+      },
+      "registration": {
+        "title": "Registration and User Account",
+        "text": "Registration is required to use the service. The user is obliged to provide truthful and complete information. The user is responsible for the security of login credentials. In case of suspected unauthorized access, the user must immediately contact the provider."
+      },
+      "pricing": {
+        "title": "Prices and Payment Terms",
+        "text": "Service prices are listed on the pricing page in Czech crowns (CZK) excluding VAT. Payments are processed through the Comgate payment gateway. Billing occurs monthly or annually according to the chosen plan. Access to the service may be restricted in case of non-payment."
+      },
+      "usage": {
+        "title": "Terms of Use",
+        "text": "The user agrees to use the service in accordance with the applicable laws of the Czech Republic. It is prohibited to use the service for illegal purposes, sending unsolicited mail, or any action that could harm the provider or other users."
+      },
+      "liability": {
+        "title": "Limitation of Liability",
+        "text": "The provider is not liable for damages caused by service outages due to third parties, force majeure, or improper use by the user. The total liability of the provider is limited to the fees paid in the last 3 months."
+      },
+      "dataProtection": {
+        "title": "Personal Data Protection",
+        "textBefore": "The processing of personal data is governed by our",
+        "link": "privacy policy",
+        "textAfter": ". The provider acts as a processor of the user's customer personal data within the meaning of the GDPR."
+      },
+      "final": {
+        "title": "Final Provisions",
+        "text": "These terms and conditions are governed by the laws of the Czech Republic. Any disputes will be resolved by the competent courts of the Czech Republic. The provider reserves the right to unilaterally change these terms with 30 days' notice sent to the user by email."
+      }
     },
     "footer": {
       "product": "Product",
+      "featuresLink": "Features",
+      "pricingLink": "Pricing",
       "legal": "Legal",
       "contact": "Contact",
       "privacyLink": "Privacy Policy",

@@ -30,13 +30,13 @@ export async function MarketingFooter() {
             <h4 className="font-semibold">{t('product')}</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="#features" className="hover:text-foreground">
-                  {t('product')}
-                </a>
+                <Link href="/#features" className="hover:text-foreground">
+                  {t('featuresLink')}
+                </Link>
               </li>
               <li>
                 <Link href="/pricing" className="hover:text-foreground">
-                  {t('product')}
+                  {t('pricingLink')}
                 </Link>
               </li>
             </ul>

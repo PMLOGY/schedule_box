@@ -14,12 +14,12 @@ export async function MarketingNavbar() {
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          <a
-            href="#features"
+          <Link
+            href="/#features"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             {t('features')}
-          </a>
+          </Link>
           <Link
             href="/pricing"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

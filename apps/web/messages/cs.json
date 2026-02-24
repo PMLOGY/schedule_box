@@ -1201,7 +1201,14 @@
       "subheadline": "Automatizujte rezervace, snižte absence a zvyšte tržby s inteligentním systémem navrženým pro české firmy.",
       "cta": "Začít zdarma",
       "ctaSecondary": "Zobrazit demo",
-      "widgetTitle": "Ukázka rezervačního widgetu"
+      "widgetTitle": "Ukázka rezervačního widgetu",
+      "widgetBusiness": "Salon Krása Praha",
+      "widgetSubtitle": "Vyberte si službu a rezervujte online",
+      "widgetService1": "Střih a styling",
+      "widgetService2": "Manikúra",
+      "widgetService3": "Barvení vlasů",
+      "widgetSelectDate": "Vyberte datum",
+      "widgetSelectTime": "Vyberte čas"
     },
     "features": {
       "title": "Vše, co potřebujete pro správu rezervací",
@@ -1276,14 +1283,82 @@
     },
     "privacy": {
       "title": "Zásady ochrany osobních údajů",
-      "lastUpdated": "Poslední aktualizace"
+      "lastUpdated": "Poslední aktualizace",
+      "controller": {
+        "title": "Správce osobních údajů",
+        "text": "Správcem osobních údajů je {company}, IČO: {ico}, se sídlem {address} (dále jen \"Správce\")."
+      },
+      "dataCollected": {
+        "title": "Jaké údaje shromažďujeme",
+        "text": "Shromažďujeme následující kategorie osobních údajů: identifikační údaje (jméno, příjmení), kontaktní údaje (e-mail, telefon), údaje o rezervacích a platbách, technické údaje (IP adresa, typ prohlížeče) a údaje z cookies."
+      },
+      "purpose": {
+        "title": "Účel zpracování",
+        "text": "Osobní údaje zpracováváme za účelem poskytování služby ScheduleBox, správy uživatelských účtů, zpracování plateb, zasílání notifikací o rezervacích, zlepšování služby pomocí analytiky a plnění zákonných povinností."
+      },
+      "legalBasis": {
+        "title": "Právní základ",
+        "text": "Zpracování probíhá na základě plnění smlouvy (čl. 6 odst. 1 písm. b) GDPR), oprávněného zájmu správce (čl. 6 odst. 1 písm. f) GDPR), souhlasu subjektu údajů (čl. 6 odst. 1 písm. a) GDPR) a plnění zákonných povinností (čl. 6 odst. 1 písm. c) GDPR)."
+      },
+      "retention": {
+        "title": "Doba uchovávání",
+        "text": "Osobní údaje uchováváme po dobu trvání smluvního vztahu a dále po dobu stanovenou příslušnými právními předpisy (zejména daňové a účetní předpisy — 10 let). Po uplynutí této doby budou údaje bezpečně smazány."
+      },
+      "rights": {
+        "title": "Práva subjektů údajů",
+        "text": "Máte právo na přístup ke svým osobním údajům, právo na opravu, výmaz, omezení zpracování, přenositelnost údajů a právo vznést námitku proti zpracování. Svá práva můžete uplatnit kontaktováním Správce na e-mailové adrese privacy@schedulebox.cz. Máte také právo podat stížnost u Úřadu pro ochranu osobních údajů (ÚOOÚ)."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "text": "Používáme technické cookies nezbytné pro fungování služby. Analytické a marketingové cookies ukládáme pouze s vaším výslovným souhlasem, který můžete kdykoliv odvolat. Podrobnosti najdete v cookie liště na našem webu."
+      },
+      "contact": {
+        "title": "Kontakt na pověřence",
+        "text": "V případě dotazů ohledně zpracování osobních údajů nás kontaktujte na privacy@schedulebox.cz."
+      }
     },
     "terms": {
       "title": "Obchodní podmínky",
-      "lastUpdated": "Poslední aktualizace"
+      "lastUpdated": "Poslední aktualizace",
+      "intro": {
+        "title": "Úvodní ustanovení",
+        "text": "Tyto obchodní podmínky upravují práva a povinnosti smluvních stran při využívání služby ScheduleBox provozované společností ScheduleBox s.r.o. Používáním služby vyjadřujete souhlas s těmito podmínkami."
+      },
+      "description": {
+        "title": "Popis služby",
+        "text": "ScheduleBox je cloudová platforma pro správu online rezervací, plánování kapacit a řízení vztahů se zákazníky. Služba zahrnuje webovou aplikaci, rezervační widget pro vložení na webové stránky uživatele, systém notifikací a analytické nástroje."
+      },
+      "registration": {
+        "title": "Registrace a uživatelský účet",
+        "text": "Pro využívání služby je nutná registrace. Uživatel je povinen uvést pravdivé a úplné údaje. Za bezpečnost přihlašovacích údajů odpovídá uživatel. V případě podezření na neoprávněný přístup je uživatel povinen neprodleně kontaktovat poskytovatele."
+      },
+      "pricing": {
+        "title": "Ceny a platební podmínky",
+        "text": "Ceny služby jsou uvedeny na stránce ceníku v českých korunách (CZK) bez DPH. Platby jsou zpracovávány prostřednictvím platební brány Comgate. Fakturace probíhá měsíčně nebo ročně dle zvoleného tarifu. V případě nezaplacení může být přístup ke službě omezen."
+      },
+      "usage": {
+        "title": "Podmínky používání",
+        "text": "Uživatel se zavazuje používat službu v souladu s platnými právními předpisy České republiky. Je zakázáno službu využívat k nelegálním účelům, zasílání nevyžádané pošty nebo k jakémukoliv jednání, které by mohlo poškodit poskytovatele nebo jiné uživatele."
+      },
+      "liability": {
+        "title": "Omezení odpovědnosti",
+        "text": "Poskytovatel neodpovídá za škody vzniklé v důsledku výpadků služby způsobených třetími stranami, vyšší mocí nebo nesprávným použitím služby uživatelem. Celková odpovědnost poskytovatele je omezena na výši uhrazených poplatků za poslední 3 měsíce."
+      },
+      "dataProtection": {
+        "title": "Ochrana osobních údajů",
+        "textBefore": "Zpracování osobních údajů se řídí našimi",
+        "link": "zásadami ochrany osobních údajů",
+        "textAfter": ". Poskytovatel vystupuje jako zpracovatel osobních údajů zákazníků uživatele ve smyslu GDPR."
+      },
+      "final": {
+        "title": "Závěrečná ustanovení",
+        "text": "Tyto obchodní podmínky se řídí právním řádem České republiky. Případné spory budou řešeny příslušnými soudy České republiky. Poskytovatel si vyhrazuje právo tyto podmínky jednostranně změnit s 30denním předstihem oznámeným uživateli prostřednictvím e-mailu."
+      }
     },
     "footer": {
       "product": "Produkt",
+      "featuresLink": "Funkce",
+      "pricingLink": "Ceník",
       "legal": "Právní",
       "contact": "Kontakt",
       "privacyLink": "Ochrana osobních údajů",
