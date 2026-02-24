@@ -41,12 +41,17 @@ import { whitelabelApps } from './apps';
 import { automationRules, automationLogs } from './automation';
 import { auditLogs, analyticsEvents, competitorData, competitorMonitors } from './analytics';
 import { processedWebhooks } from './webhooks';
+import { organizations, organizationMembers } from './organizations';
 
 // ============================================================================
 // COMPANIES RELATIONS
 // ============================================================================
 
-export const companiesRelations = relations(companies, ({ many }) => ({
+export const companiesRelations = relations(companies, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [companies.organizationId],
+    references: [organizations.id],
+  }),
   users: many(users),
   customers: many(customers),
   services: many(services),
@@ -98,6 +103,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   passwordHistory: many(passwordHistory),
   customers: many(customers),
   employees: many(employees),
+  organizationMemberships: many(organizationMembers),
 }));
 
 // ============================================================================
@@ -719,6 +725,34 @@ export const subscriptionEventsRelations = relations(subscriptionEvents, ({ one 
   subscription: one(subscriptions, {
     fields: [subscriptionEvents.subscriptionId],
     references: [subscriptions.id],
+  }),
+}));
+
+// ============================================================================
+// ORGANIZATIONS RELATIONS
+// ============================================================================
+
+export const organizationsRelations = relations(organizations, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [organizations.ownerUserId],
+    references: [users.id],
+  }),
+  members: many(organizationMembers),
+  companies: many(companies),
+}));
+
+export const organizationMembersRelations = relations(organizationMembers, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [organizationMembers.organizationId],
+    references: [organizations.id],
+  }),
+  user: one(users, {
+    fields: [organizationMembers.userId],
+    references: [users.id],
+  }),
+  company: one(companies, {
+    fields: [organizationMembers.companyId],
+    references: [companies.id],
   }),
 }));
 

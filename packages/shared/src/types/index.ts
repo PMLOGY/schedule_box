@@ -114,6 +114,18 @@ export type {
   CompetitorQueryInput,
 } from './ai-voice-intelligence';
 
+// Organization types (Phase 30)
+export type {
+  OrgRole,
+  Organization,
+  OrganizationMember,
+  OrganizationWithLocations,
+  OrganizationLocation,
+  LocationMetrics,
+  SwitchLocationRequest,
+  SwitchLocationResponse,
+} from './organization';
+
 // Billing & Subscription types (Phase 28)
 export type {
   SubscriptionPlan,
