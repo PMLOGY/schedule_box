@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 04 complete, executing Plan 03
+**Current focus:** v1.3 Revenue & Growth — Phase 28 complete (all 5 plans), ready for Phase 29
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 04: complete, 05: complete, 03: scheduler)
-- **Status:** Plan 04 complete, ready for Plan 03
-- **Last activity:** 2026-02-24 — Phase 28 Plan 04 executed (billing portal UI + hooks + translations)
+- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 03: complete, 04: complete, 05: complete)
+- **Status:** Phase 28 complete, ready for Phase 29
+- **Last activity:** 2026-02-24 — Phase 28 Plan 03 executed (billing scheduler + dunning + invoice emails)
 
-Progress: [########░░] 80% (4/5 plans)
+Progress: [##########] 100% (5/5 plans)
 
 ## What's Done
 
@@ -32,11 +32,12 @@ Progress: [########░░] 80% (4/5 plans)
 
 **v1.3 roadmap created** (32 requirements, 5 phases: 28-32). Phases defined 2026-02-24.
 
-**v1.3 Phase 28 in progress:**
+**v1.3 Phase 28 complete:**
 - Plan 01 complete: Subscription schema (3 tables), Comgate recurring client, billing types/config
 - Plan 02 complete: 7 billing API routes + subscription service layer with state machine
 - Plan 05 complete: Subscription invoice service (SEQUENCE numbering, Czech VAT PDF, list/download API)
 - Plan 04 complete: Billing portal UI (plan comparison grid, subscription management, invoice history, payment polling)
+- Plan 03 complete: BullMQ billing scheduler (daily renewal, Comgate recurring, invoice creation, dunning workflow, 4 Czech email templates)
 
 ## Decisions
 
@@ -58,6 +59,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Cancel subscription implemented as downgrade to free via existing downgrade API
 - useBillingInvoices gracefully returns empty array on 404 (invoices API in Plan 05)
 - Growth plan shown as "Most Popular" with Crown badge emphasis
+- Inlined Comgate chargeRecurringPayment in billing scheduler to avoid cross-package coupling
+- Direct DB invoice creation in worker (SEQUENCE + VAT + sellerSnapshot) instead of internal HTTP API
+- Used upsertJobScheduler (BullMQ 5.16+) instead of deprecated Queue.add with repeat
 
 ## Blockers
 
@@ -77,6 +81,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 02 | 2 tasks | 8 files | 7 min |
 | Phase 28 Plan 05 | 2 tasks | 3 files | 4 min |
 | Phase 28 Plan 04 | 3 tasks | 4 files | 6 min |
+| Phase 28 Plan 03 | 2 tasks | 8 files | 5 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 28 Plan 04 complete (billing portal UI + hooks + translations)*
+*Last updated: 2026-02-24 — Phase 28 Plan 03 complete (billing scheduler + dunning + invoice emails). Phase 28 fully complete.*
