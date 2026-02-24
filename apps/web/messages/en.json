@@ -1526,6 +1526,36 @@
     },
     "orgName": "Organization Name",
     "createOrgDescription": "Create a new multi-location organization to manage multiple business locations.",
-    "create": "Create"
+    "create": "Create",
+    "dashboard": {
+      "title": "Organization Dashboard",
+      "totalBookings": "Total Bookings",
+      "totalRevenue": "Total Revenue",
+      "activeLocations": "Active Locations",
+      "thisMonth": "This month",
+      "switchToLocation": "Switch to location",
+      "occupancy": "Occupancy",
+      "na": "N/A",
+      "noLocations": "No locations found in this organization.",
+      "accessRestricted": "Access restricted. Only franchise owners can view the organization dashboard."
+    },
+    "customers": {
+      "title": "Organization Customers",
+      "description": "Cross-location customer search with deduplication",
+      "searchPlaceholder": "Search by name, email, or phone...",
+      "totalBookings": "Total Bookings",
+      "totalSpent": "Total Spent",
+      "lastVisit": "Last Visit",
+      "locationsVisited": "Locations Visited",
+      "locationsCount": "{count} locations",
+      "locationsSingle": "1 location",
+      "noCustomers": "No customers found.",
+      "accessRestricted": "Access restricted. Only franchise owners can view organization customers."
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Settings",
+      "customers": "Customers"
+    }
   }
 }

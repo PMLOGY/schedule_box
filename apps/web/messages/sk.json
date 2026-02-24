@@ -1452,6 +1452,36 @@
     },
     "orgName": "Názov organizácie",
     "createOrgDescription": "Vytvorte novú organizáciu s viacerými pobočkami na správu viacerých obchodných miest.",
-    "create": "Vytvoriť"
+    "create": "Vytvoriť",
+    "dashboard": {
+      "title": "Dashboard organizácie",
+      "totalBookings": "Celkom rezervácií",
+      "totalRevenue": "Celkové tržby",
+      "activeLocations": "Aktívne pobočky",
+      "thisMonth": "Tento mesiac",
+      "switchToLocation": "Prepnúť na pobočku",
+      "occupancy": "Obsadenosť",
+      "na": "N/A",
+      "noLocations": "V tejto organizácii neboli nájdené žiadne pobočky.",
+      "accessRestricted": "Prístup obmedzený. Dashboard organizácie môžu zobraziť iba vlastníci franšízy."
+    },
+    "customers": {
+      "title": "Zákazníci organizácie",
+      "description": "Vyhľadávanie zákazníkov naprieč pobočkami s deduplikáciou",
+      "searchPlaceholder": "Hľadať podľa mena, e-mailu alebo telefónu...",
+      "totalBookings": "Celkom rezervácií",
+      "totalSpent": "Celkom minuté",
+      "lastVisit": "Posledná návšteva",
+      "locationsVisited": "Navštívené pobočky",
+      "locationsCount": "{count} pobočiek",
+      "locationsSingle": "1 pobočka",
+      "noCustomers": "Žiadni zákazníci neboli nájdení.",
+      "accessRestricted": "Prístup obmedzený. Zákazníkov organizácie môžu zobraziť iba vlastníci franšízy."
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Nastavenia",
+      "customers": "Zákazníci"
+    }
   }
 }

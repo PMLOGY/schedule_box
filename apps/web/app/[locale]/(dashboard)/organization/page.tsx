@@ -172,11 +172,23 @@ export default function OrganizationPage() {
         title={org.name}
         description={t('description')}
         actions={
-          <Button asChild variant="outline">
-            <Link href={'/organization/settings' as Parameters<typeof Link>[0]['href']}>
-              {t('settings')}
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href={'/organization/dashboard' as Parameters<typeof Link>[0]['href']}>
+                {t('nav.dashboard')}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={'/organization/customers' as Parameters<typeof Link>[0]['href']}>
+                {t('nav.customers')}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={'/organization/settings' as Parameters<typeof Link>[0]['href']}>
+                {t('nav.settings')}
+              </Link>
+            </Button>
+          </div>
         }
       />
 
