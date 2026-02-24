@@ -114,7 +114,14 @@
     "quickActions": "Rychlé akce",
     "newBooking": "Nová rezervace",
     "addCustomer": "Přidat zákazníka",
-    "viewCalendar": "Zobrazit kalendář"
+    "viewCalendar": "Zobrazit kalendář",
+    "viewAnalytics": "Zobrazit analytiku",
+    "manageServices": "Spravovat služby",
+    "revenueTrend": "Trend tržeb",
+    "recentBookings": "Nedávné rezervace",
+    "viewAllBookings": "Zobrazit všechny rezervace",
+    "noRevenueData": "Trend tržeb se zobrazí po prvních rezervacích",
+    "noBookingsYet": "Zatím žádné rezervace"
   },
   "calendar": {
     "title": "Kalendář",

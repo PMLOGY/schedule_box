@@ -6,6 +6,8 @@ import { useRouter, Link } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { DashboardGrid } from '@/components/dashboard/dashboard-grid';
 import { QuickActions } from '@/components/dashboard/quick-actions';
+import { RevenueMiniChart } from '@/components/dashboard/revenue-mini-chart';
+import { RecentBookings } from '@/components/dashboard/recent-bookings';
 import { AiInsightsPanel } from '@/components/ai/AiInsightsPanel';
 import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
 import { DemoDataCard } from '@/components/onboarding/demo-data-card';
@@ -48,18 +50,35 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <PageHeader title={t('title')} />
-      {/* Onboarding checklist widget — shows setup progress for new users.
-          Renders conditionally (auto-hides when dismissed via localStorage). */}
+    <div className="space-y-6">
+      {/* Header row with quick actions */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <PageHeader title={t('title')} />
+        <QuickActions />
+      </div>
+
+      {/* Onboarding (conditional, above KPIs for new users) */}
       <OnboardingChecklist />
-      {/* Demo data card — lets new owners explore ScheduleBox with sample data.
-          Shows after onboarding is completed; hidden until then. */}
       <DemoDataCard />
+
+      {/* KPI Summary Row */}
       <DashboardGrid />
-      <UsageWidget />
+
+      {/* Data visualization row: 2-column grid on lg */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <RevenueMiniChart />
+        </div>
+        <div className="lg:col-span-1">
+          <RecentBookings />
+        </div>
+      </div>
+
+      {/* AI Insights */}
       <AiInsightsPanel />
-      <QuickActions />
+
+      {/* Usage widget */}
+      <UsageWidget />
     </div>
   );
 }

@@ -114,7 +114,14 @@
     "quickActions": "Quick actions",
     "newBooking": "New booking",
     "addCustomer": "Add customer",
-    "viewCalendar": "View calendar"
+    "viewCalendar": "View calendar",
+    "viewAnalytics": "View Analytics",
+    "manageServices": "Manage Services",
+    "revenueTrend": "Revenue Trend",
+    "recentBookings": "Recent Bookings",
+    "viewAllBookings": "View all bookings",
+    "noRevenueData": "Revenue trend will appear after first bookings",
+    "noBookingsYet": "No bookings yet"
   },
   "calendar": {
     "title": "Calendar",

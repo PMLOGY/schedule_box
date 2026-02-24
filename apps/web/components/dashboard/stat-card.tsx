@@ -10,6 +10,7 @@ interface StatCardProps {
   trend?: number;
   icon: LucideIcon;
   formatter?: 'currency' | 'number' | 'percentage' | 'rating';
+  className?: string;
 }
 
 function formatValue(value: string | number, formatter?: StatCardProps['formatter']): string {
@@ -28,11 +29,11 @@ function formatValue(value: string | number, formatter?: StatCardProps['formatte
   }
 }
 
-export function StatCard({ title, value, trend, icon: Icon, formatter }: StatCardProps) {
+export function StatCard({ title, value, trend, icon: Icon, formatter, className }: StatCardProps) {
   const t = useTranslations('dashboard');
 
   return (
-    <Card>
+    <Card className={`shadow-sm hover:shadow transition-shadow ${className ?? ''}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className="h-5 w-5 text-muted-foreground" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Banknote, Users, CheckCircle } from 'lucide-react';
+import { Calendar, Banknote, Users, AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { StatCard } from './stat-card';
 import { useAnalyticsQuery } from '@/hooks/use-analytics-query';
@@ -43,9 +43,18 @@ export function DashboardGrid() {
         formatter="number"
       />
       <StatCard
-        title={t('averageRating')}
-        value={data?.completedBookings ?? 0}
-        icon={CheckCircle}
+        title={t('noShowRate')}
+        value={
+          data?.comparison?.noShowChange != null
+            ? `${Math.abs(Math.round(data.comparison.noShowChange))}%`
+            : 'N/A'
+        }
+        trend={
+          data?.comparison?.noShowChange != null
+            ? -Math.round(data.comparison.noShowChange)
+            : undefined
+        }
+        icon={AlertTriangle}
         formatter="number"
       />
     </div>
