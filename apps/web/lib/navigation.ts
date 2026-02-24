@@ -85,6 +85,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ['owner'],
   },
   {
+    key: 'adminAnalytics',
+    href: '/analytics/admin',
+    icon: BarChart3,
+    roles: ['admin'],
+  },
+  {
     key: 'ai',
     href: '/ai',
     icon: Brain,
