@@ -846,35 +846,35 @@ async function seedHistoricalData() {
         channel: 'email',
         subject: 'Potvrzení rezervace — {{service_name}}',
         bodyTemplate:
-          'Dobrý den {{customer_name}},\n\nvaše rezervace služby {{service_name}} dne {{date}} v {{time}} u {{employee_name}} byla potvrzena.\n\nTěšíme se na vás!\nSalon Krása',
+          'Dobrý den {{customer_name}},\n\nvaše rezervace služby {{service_name}} dne {{formatDate booking_date}} v {{formatTime booking_time}} u {{employee_name}} byla potvrzena.\n\nTěšíme se na vás!\nSalon Krása',
       },
       {
         type: 'booking_confirmation',
         channel: 'sms',
         subject: null,
         bodyTemplate:
-          'Salon Krása: Vaše rezervace {{service_name}} dne {{date}} v {{time}} je potvrzena.',
+          'Salon Krása: Vaše rezervace {{service_name}} dne {{formatDate booking_date}} v {{formatTime booking_time}} je potvrzena.',
       },
       {
         type: 'booking_reminder',
         channel: 'email',
         subject: 'Připomínka — zítra máte rezervaci',
         bodyTemplate:
-          'Dobrý den {{customer_name}},\n\npřipomínáme vaši zítřejší rezervaci:\n{{service_name}} v {{time}} u {{employee_name}}.\n\nPokud potřebujete změnit termín, kontaktujte nás.\n\nSalon Krása',
+          'Dobrý den {{customer_name}},\n\npřipomínáme vaši zítřejší rezervaci:\n{{service_name}} v {{formatTime booking_time}} u {{employee_name}}.\n\nPokud potřebujete změnit termín, kontaktujte nás.\n\nSalon Krása',
       },
       {
         type: 'booking_reminder',
         channel: 'sms',
         subject: null,
         bodyTemplate:
-          'Salon Krása: Zítra v {{time}} — {{service_name}} u {{employee_name}}. Těšíme se!',
+          'Salon Krása: Zítra v {{formatTime booking_time}} — {{service_name}} u {{employee_name}}. Těšíme se!',
       },
       {
         type: 'booking_cancellation',
         channel: 'email',
         subject: 'Zrušení rezervace',
         bodyTemplate:
-          'Dobrý den {{customer_name}},\n\nvaše rezervace {{service_name}} dne {{date}} byla zrušena.\n\nPokud si přejete nový termín, zarezervujte si online.\n\nSalon Krása',
+          'Dobrý den {{customer_name}},\n\nvaše rezervace {{service_name}} dne {{formatDate booking_date}} byla zrušena.\n\nPokud si přejete nový termín, zarezervujte si online.\n\nSalon Krása',
       },
       {
         type: 'payment_confirmation',

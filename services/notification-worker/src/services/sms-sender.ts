@@ -69,7 +69,7 @@ export async function sendSMS(options: { to: string; body: string }): Promise<st
   const client = getTwilioClient();
 
   // Development mode: Twilio not configured
-  if (!client || !config.twilio.fromNumber) {
+  if (!client || (!config.twilio.fromNumber && !config.twilio.messagingServiceSid)) {
     const mockSid = `SM${Date.now()}mock`;
     console.warn('[SMS Sender] Twilio not configured, using mock SID:', mockSid);
     return mockSid;
@@ -82,7 +82,9 @@ export async function sendSMS(options: { to: string; body: string }): Promise<st
     );
 
     const message = await client.messages.create({
-      from: config.twilio.fromNumber,
+      ...(config.twilio.messagingServiceSid
+        ? { messagingServiceSid: config.twilio.messagingServiceSid }
+        : { from: config.twilio.fromNumber }),
       to: options.to,
       body: options.body,
     });
