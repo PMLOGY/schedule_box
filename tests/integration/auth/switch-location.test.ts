@@ -110,9 +110,7 @@ async function testValidateLocationAccess(
 
   // 3. Check company has organization
   if (!targetCompany.organizationId) {
-    throw new Error(
-      'FORBIDDEN: Company is not part of an organization',
-    );
+    throw new Error('FORBIDDEN: Company is not part of an organization');
   }
 
   // 4. Check user's org membership
@@ -126,19 +124,14 @@ async function testValidateLocationAccess(
     .where(
       and(
         eq(schema.organizationMembers.userId, user.id),
-        eq(
-          schema.organizationMembers.organizationId,
-          targetCompany.organizationId,
-        ),
+        eq(schema.organizationMembers.organizationId, targetCompany.organizationId),
       ),
     )
     .limit(1);
 
   // 5. No membership = cross-org rejection
   if (!membership) {
-    throw new Error(
-      'FORBIDDEN: You do not have access to this location',
-    );
+    throw new Error('FORBIDDEN: You do not have access to this location');
   }
 
   // 6. Location manager scope check
@@ -147,9 +140,7 @@ async function testValidateLocationAccess(
     membership.companyId !== null &&
     membership.companyId !== targetCompany.id
   ) {
-    throw new Error(
-      'FORBIDDEN: You do not have access to this location',
-    );
+    throw new Error('FORBIDDEN: You do not have access to this location');
   }
 
   return {
@@ -308,11 +299,7 @@ afterAll(async () => {
 
 describe('Switch Location — franchise_owner', () => {
   it('CAN switch within their organization (A1 -> A2)', async () => {
-    const result = await testValidateLocationAccess(
-      superDb,
-      user1.uuid,
-      companyA2.uuid,
-    );
+    const result = await testValidateLocationAccess(superDb, user1.uuid, companyA2.uuid);
 
     expect(result.targetCompanyId).toBe(companyA2.id);
     expect(result.organizationId).toBe(orgA.id);
@@ -320,20 +307,16 @@ describe('Switch Location — franchise_owner', () => {
   });
 
   it('CAN switch to any company in their org (A2 -> A1)', async () => {
-    const result = await testValidateLocationAccess(
-      superDb,
-      user1.uuid,
-      companyA1.uuid,
-    );
+    const result = await testValidateLocationAccess(superDb, user1.uuid, companyA1.uuid);
 
     expect(result.targetCompanyId).toBe(companyA1.id);
     expect(result.organizationId).toBe(orgA.id);
   });
 
   it('CANNOT switch to company in different org (Org A -> Org B)', async () => {
-    await expect(
-      testValidateLocationAccess(superDb, user1.uuid, companyB1.uuid),
-    ).rejects.toThrow('FORBIDDEN');
+    await expect(testValidateLocationAccess(superDb, user1.uuid, companyB1.uuid)).rejects.toThrow(
+      'FORBIDDEN',
+    );
   });
 });
 
@@ -343,26 +326,22 @@ describe('Switch Location — franchise_owner', () => {
 
 describe('Switch Location — location_manager', () => {
   it('CAN access their assigned location (A1)', async () => {
-    const result = await testValidateLocationAccess(
-      superDb,
-      user2.uuid,
-      companyA1.uuid,
-    );
+    const result = await testValidateLocationAccess(superDb, user2.uuid, companyA1.uuid);
 
     expect(result.targetCompanyId).toBe(companyA1.id);
     expect(result.organizationId).toBe(orgA.id);
   });
 
   it('CANNOT switch to unassigned location in same org (A1 -> A2)', async () => {
-    await expect(
-      testValidateLocationAccess(superDb, user2.uuid, companyA2.uuid),
-    ).rejects.toThrow('FORBIDDEN');
+    await expect(testValidateLocationAccess(superDb, user2.uuid, companyA2.uuid)).rejects.toThrow(
+      'FORBIDDEN',
+    );
   });
 
   it('CANNOT switch to company in different org', async () => {
-    await expect(
-      testValidateLocationAccess(superDb, user2.uuid, companyB1.uuid),
-    ).rejects.toThrow('FORBIDDEN');
+    await expect(testValidateLocationAccess(superDb, user2.uuid, companyB1.uuid)).rejects.toThrow(
+      'FORBIDDEN',
+    );
   });
 });
 
@@ -372,15 +351,15 @@ describe('Switch Location — location_manager', () => {
 
 describe('Switch Location — cross-org rejection', () => {
   it('User from Org B CANNOT access Org A company', async () => {
-    await expect(
-      testValidateLocationAccess(superDb, user3.uuid, companyA1.uuid),
-    ).rejects.toThrow('FORBIDDEN');
+    await expect(testValidateLocationAccess(superDb, user3.uuid, companyA1.uuid)).rejects.toThrow(
+      'FORBIDDEN',
+    );
   });
 
   it('User from Org B CANNOT access Org A second location', async () => {
-    await expect(
-      testValidateLocationAccess(superDb, user3.uuid, companyA2.uuid),
-    ).rejects.toThrow('FORBIDDEN');
+    await expect(testValidateLocationAccess(superDb, user3.uuid, companyA2.uuid)).rejects.toThrow(
+      'FORBIDDEN',
+    );
   });
 });
 
@@ -391,29 +370,21 @@ describe('Switch Location — cross-org rejection', () => {
 describe('Switch Location — edge cases', () => {
   it('Switch to non-existent company returns NOT_FOUND', async () => {
     const fakeUuid = '00000000-0000-4000-8000-000000000000';
-    await expect(
-      testValidateLocationAccess(superDb, user1.uuid, fakeUuid),
-    ).rejects.toThrow('NOT_FOUND');
+    await expect(testValidateLocationAccess(superDb, user1.uuid, fakeUuid)).rejects.toThrow(
+      'NOT_FOUND',
+    );
   });
 
   it('Switch to company without organization returns FORBIDDEN', async () => {
     await expect(
-      testValidateLocationAccess(
-        superDb,
-        user1.uuid,
-        standaloneCompany.uuid,
-      ),
+      testValidateLocationAccess(superDb, user1.uuid, standaloneCompany.uuid),
     ).rejects.toThrow('FORBIDDEN');
   });
 
   it('Non-existent user returns NOT_FOUND', async () => {
     const fakeUserUuid = '00000000-0000-4000-8000-000000000001';
-    await expect(
-      testValidateLocationAccess(
-        superDb,
-        fakeUserUuid,
-        companyA1.uuid,
-      ),
-    ).rejects.toThrow('NOT_FOUND');
+    await expect(testValidateLocationAccess(superDb, fakeUserUuid, companyA1.uuid)).rejects.toThrow(
+      'NOT_FOUND',
+    );
   });
 });

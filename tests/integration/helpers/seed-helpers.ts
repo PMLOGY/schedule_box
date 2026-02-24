@@ -64,10 +64,7 @@ export async function seedUser(
 // ROLE
 // ============================================================================
 
-export async function seedRole(
-  db: Db,
-  overrides?: Partial<typeof schema.roles.$inferInsert>,
-) {
+export async function seedRole(db: Db, overrides?: Partial<typeof schema.roles.$inferInsert>) {
   const [role] = await db
     .insert(schema.roles)
     .values({
