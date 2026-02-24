@@ -18,9 +18,7 @@ export function useOnboardingRedirect(): {
   const { data, isLoading } = useQuery({
     queryKey: ['settings', 'company', 'onboarding'],
     queryFn: async () => {
-      const result = await apiClient.get<{ data: CompanyOnboardingStatus }>(
-        '/settings/company',
-      );
+      const result = await apiClient.get<{ data: CompanyOnboardingStatus }>('/settings/company');
       return result.data;
     },
     staleTime: 60_000,
