@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 25 of 27 (Landing Page and Czech Legal Compliance) **COMPLETE**
-- **Plan:** 4 of 4 in current phase
-- **Status:** Phase 25 complete — ready for Phase 26
-- **Last activity:** 2026-02-21 — Phase 25 executed (4 plans, all committed)
+- **Phase:** 26 of 27 (Booking UX Polish) **IN PROGRESS**
+- **Plan:** 1 of 4 in current phase — Plan 01 complete
+- **Status:** Phase 26 Plan 01 complete — visual regression baseline established
+- **Last activity:** 2026-02-24 — Phase 26 Plan 01 executed (embed widget visual regression test + shadcn/ui audit)
 
-Progress: [█████░░░░░] 47% (v1.2: 9/19 plans)
+Progress: [█████░░░░░] 53% (v1.2: 10/19 plans)
 
 ## What's Done
 
@@ -57,6 +57,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - healthcheckTimeout=45s (not 30s from AI-07) to accommodate Prophet Stan JIT warmup
 - Hero section uses CSS animations (not Motion) to keep client JS off critical path for Lighthouse >90
 - Cookie consent uses localStorage with mounted guard (not server-side) for hydration safety
+- Visual regression projects have no setup/auth dependency — embed widget is public (26-01)
+- 1% maxDiffPixelRatio tolerance for Playwright visual regression to handle anti-aliasing (26-01)
+- EMBED_TEST_SLUG env var with test-company default allows CI override without code changes (26-01)
 
 ## Blockers
 
@@ -68,7 +71,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 9/19 | - | - |
+| v1.2 (23-27) | 10/19 | - | - |
 
 ---
-*Last updated: 2026-02-24 — Phase 23 Plan 01 SUMMARY.md created (plan code was previously committed 2026-02-21 in 509072c)*
+*Last updated: 2026-02-24 after Phase 26 Plan 01 execution complete*
