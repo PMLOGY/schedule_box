@@ -47,6 +47,11 @@ export function KpiComparisonCards({ overview }: KpiComparisonCardsProps) {
   const formatCurrency = (value: number) =>
     formatCurrencyRaw(value, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
+  // Guard against missing data during initial load
+  if (!overview?.currentPeriod || !overview?.previousPeriod || !overview?.comparison) {
+    return null;
+  }
+
   // Format percentage change
   const formatPercentage = (value: number) => {
     const sign = value > 0 ? '+' : '';
