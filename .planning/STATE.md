@@ -39,9 +39,10 @@ Progress: [#---------] 10% (1/? plans)
 - Plan 04 complete: Billing portal UI (plan comparison grid, subscription management, invoice history, payment polling)
 - Plan 03 complete: BullMQ billing scheduler (daily renewal, Comgate recurring, invoice creation, dunning workflow, 4 Czech email templates)
 
-**v1.3 Phase 29 in progress:**
+**v1.3 Phase 29 complete:**
 - Plan 01 complete: Usage counting infrastructure (Redis booking counters, DB employee/service counts, plan-limits helper, GET /api/v1/usage endpoint)
 - Plan 02 complete: Server-side limit enforcement on POST /api/v1/bookings, /employees, /services (402 PLAN_LIMIT_EXCEEDED + Redis counter increment)
+- Plan 03 complete: Usage dashboard UI (UsageWidget with progress bars, UpgradeModal with plan comparison, useUsageQuery hook, cs/en/sk translations)
 
 **v1.3 Phase 30 in progress:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
