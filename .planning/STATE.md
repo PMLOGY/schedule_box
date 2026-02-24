@@ -71,4 +71,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 (23-27) | 9/19 | - | - |
 
 ---
-*Last updated: 2026-02-24 — Phase 23 Plan 03 SUMMARY.md created (plan code was previously committed 2026-02-21)*
+*Last updated: 2026-02-24 — Phase 23 Plan 01 SUMMARY.md created (plan code was previously committed 2026-02-21 in 509072c)*
