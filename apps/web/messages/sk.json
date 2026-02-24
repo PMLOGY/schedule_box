@@ -1245,6 +1245,16 @@
       "prevBtn": "Späť",
       "doneBtn": "Hotovo",
       "closeBtn": "Zavrieť"
+    },
+    "templates": {
+      "title": "Šablóny odvetví",
+      "subtitle": "Vyberte odvetvie a predvyplníme služby, ceny a pracovnú dobu",
+      "servicesCount": "{count} služieb",
+      "priceFrom": "od {price} Kč",
+      "applying": "Aplikujem šablónu...",
+      "applied": "Šablóna aplikovaná! Služby a pracovná doba nastavené.",
+      "useTemplate": "Použiť šablónu odvetvia",
+      "orCreateOwn": "alebo vytvorte vlastnú službu"
     }
   },
   "emptyStates": {

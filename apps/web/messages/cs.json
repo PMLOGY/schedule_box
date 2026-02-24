@@ -1133,6 +1133,16 @@
       "prevBtn": "Zpět",
       "doneBtn": "Hotovo",
       "closeBtn": "Zavřít"
+    },
+    "templates": {
+      "title": "Šablony oborů",
+      "subtitle": "Vyberte obor a předvyplníme služby, ceny a pracovní dobu",
+      "servicesCount": "{count} služeb",
+      "priceFrom": "od {price} Kč",
+      "applying": "Aplikuji šablonu...",
+      "applied": "Šablona aplikována! Služby a pracovní doba nastaveny.",
+      "useTemplate": "Použít šablonu oboru",
+      "orCreateOwn": "nebo vytvořte vlastní službu"
     }
   },
   "emptyStates": {

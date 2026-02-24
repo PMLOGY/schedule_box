@@ -1133,6 +1133,16 @@
       "prevBtn": "Previous",
       "doneBtn": "Done",
       "closeBtn": "Close"
+    },
+    "templates": {
+      "title": "Industry Templates",
+      "subtitle": "Choose your industry and we'll pre-fill services, prices, and working hours",
+      "servicesCount": "{count} services",
+      "priceFrom": "from {price} CZK",
+      "applying": "Applying template...",
+      "applied": "Template applied! Services and working hours configured.",
+      "useTemplate": "Use industry template",
+      "orCreateOwn": "or create your own service"
     }
   },
   "emptyStates": {
