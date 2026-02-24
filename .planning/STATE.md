@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-05 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 32 in progress (Plan 01 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
-- **Phase:** 31 — Analytics & Reporting
-- **Plan:** 05 complete, 06+ pending
-- **Status:** Plan 05 complete (admin dashboard, org analytics, customer export)
-- **Last activity:** 2026-02-24 — Plan 31-05 complete (admin dashboard, org analytics pages, customer PDF/CSV export)
+- **Phase:** 32 — Frontend Polish
+- **Plan:** 01 complete, 02+ pending
+- **Status:** Plan 01 complete (dark mode, design tokens, ThemeToggle)
+- **Last activity:** 2026-02-24 — Plan 32-01 complete (next-themes dark mode, ThemeProvider, ThemeToggle, semantic color tokens, hardcoded colors replaced)
 
-Progress: [#####-----] 50% (5/? plans)
+Progress: [#---------] 10% (1/? plans)
 
 ## What's Done
 
@@ -53,12 +53,15 @@ Progress: [#####-----] 50% (5/? plans)
 - Plan 04 complete: Location switcher dropdown in header, organization overview page with location cards, organization settings page with location/member CRUD, sidebar navigation update
 - Plan 05 complete: Org dashboard API with per-location metrics (bookings + revenue), cross-location customer API with email-based dedup, dashboard UI with KPI cards, customer search UI with debounce and pagination
 
-**v1.3 Phase 31 in progress:**
+**v1.3 Phase 31 complete:**
 - Plan 01 complete: 5 analytics API routes (payment-methods, top-services, peak-hours, cancellations, customer-retention) with Drizzle raw SQL aggregation
 - Plan 02 complete: Employee utilization API (per-employee bookings, revenue, occupancy approximation), analytics_snapshots table, BullMQ hourly snapshot scheduler
 - Plan 03 complete: Admin SaaS health metrics API (MRR/ARR/churn/plan distribution/signup trends) + cross-location organization analytics API for franchise owners
 - Plan 04 complete: 6 analytics chart components (PieChart, BarChart, LineChart, CSS heatmap, composite panel) + enhanced analytics page with 8+ card sections
 - Plan 05 complete: Admin dashboard page (MRR/churn/plan distribution charts), organization analytics page (per-location breakdown), customer PDF/CSV export, 6-button export toolbar
+
+**v1.3 Phase 32 in progress:**
+- Plan 01 complete: next-themes dark mode, ThemeProvider wrapping app, ThemeToggle in header/navbar, shadow/color CSS tokens, all hardcoded light-only colors replaced with semantic tokens
 
 ## Decisions
 
@@ -131,6 +134,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Customer retention data flattened from nested API response before passing to export toolbar
 - Customer PDF route reuses same DB queries as customer-retention analytics API for consistency
 
+**Phase 32 decisions:**
+- ThemeProvider wraps QueryClientProvider (outermost provider after html/body)
+- ThemeToggle uses mounted-state pattern (useState + useEffect) to avoid hydration mismatch
+- Shadow CSS variables (not Tailwind arbitrary values) for dark mode shadow adaptation
+- Stat card green trend uses dark:text-green-400 variant instead of text-success for visual consistency
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
@@ -163,6 +172,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 31 Plan 03 | 2 tasks | 2 files | 3 min |
 | Phase 31 Plan 04 | 2 tasks | 8 files | 6 min |
 | Phase 31 Plan 05 | 2 tasks | 18 files | 13 min |
+| Phase 32 Plan 01 | 2 tasks | 11 files | 8 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 31 Plans 01-05 complete. Plan 06+ pending.*
+*Last updated: 2026-02-24 — Phase 32 Plan 01 complete. Plan 02+ pending.*
