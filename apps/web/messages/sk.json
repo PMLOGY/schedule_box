@@ -125,7 +125,9 @@
   },
   "booking": {
     "title": "Rezervácie",
-    "new": { "title": "Nová rezervácia" },
+    "new": {
+      "title": "Nová rezervácia"
+    },
     "status": {
       "pending": "Čaká na potvrdenie",
       "confirmed": "Potvrdené",
@@ -252,10 +254,15 @@
         "employee": "Zamestnanec",
         "customer": "Zákazník",
         "notes": "Poznámky",
+        "price": "Cena",
         "confirmBooking": "Potvrdiť rezerváciu",
         "slotTaken": "Tento termín už nie je dostupný. Prosím vyberte iný.",
         "bookingSuccess": "Rezervácia bola úspešne vytvorená",
-        "bookingError": "Chyba pri vytváraní rezervácie"
+        "bookingError": "Chyba pri vytváraní rezervácie",
+        "bookingConfirmed": "Rezervácia potvrdená!",
+        "thankYou": "Ďakujeme za vašu rezerváciu",
+        "addToCalendar": "Pridať do kalendára",
+        "backToBookings": "Späť na rezervácie"
       }
     }
   },
@@ -719,8 +726,16 @@
       "fallbackMessage": "AI predikcia kapacity bude dostupná po pripojení AI služby.",
       "noData": "Predikcia kapacity bude k dispozícii po nazbieraní dostatočného množstva dát o rezerváciách.",
       "errorMessage": "Nepodarilo sa načítať predikciu kapacity. Skúste to prosím neskôr.",
-      "utilization": { "low": "nízke", "medium": "stredné", "high": "vysoké" },
-      "priority": { "low": "nízka", "medium": "stredná", "high": "vysoká" },
+      "utilization": {
+        "low": "nízke",
+        "medium": "stredné",
+        "high": "vysoké"
+      },
+      "priority": {
+        "low": "nízka",
+        "medium": "stredná",
+        "high": "vysoká"
+      },
       "suggestionTypes": {
         "extend_hours": "predĺžiť hodiny",
         "reduce_hours": "skrátiť hodiny",
@@ -1083,6 +1098,157 @@
       "termsLink": "Obchodné podmienky",
       "copyright": "© {year} ScheduleBox. Všetky práva vyhradené.",
       "registryNote": "Zapísané v obchodnom registri vedenom Mestským súdom v Prahe."
+    }
+  },
+  "onboarding": {
+    "steps": {
+      "company": "Firma",
+      "service": "Služba",
+      "hours": "Pracovná doba",
+      "share": "Zdieľanie"
+    },
+    "companyDetails": {
+      "title": "Základné údaje o firme",
+      "namePlaceholder": "Názov vašej firmy",
+      "nameLabel": "Názov firmy",
+      "phoneLabel": "Telefón",
+      "phonePlaceholder": "+421 123 456 789",
+      "industryLabel": "Odvetvie podnikania",
+      "descriptionLabel": "Popis firmy",
+      "descriptionPlaceholder": "Stručný popis vašej firmy...",
+      "addressStreetLabel": "Ulica a číslo",
+      "addressCityLabel": "Mesto",
+      "addressZipLabel": "PSČ",
+      "logoLabel": "Logo firmy",
+      "logoOptional": "(voliteľné)"
+    },
+    "firstService": {
+      "title": "Vaša prvá služba",
+      "tip": "Tip: Ďalšie služby pridáte kedykoľvek v Nastaveniach",
+      "useTemplate": "Použiť šablónu",
+      "nameLabel": "Názov služby",
+      "namePlaceholder": "napr. Strih dámsky",
+      "durationLabel": "Dĺžka trvania",
+      "priceLabel": "Cena (Kč)",
+      "descriptionLabel": "Popis (voliteľné)",
+      "skipText": "Pridať služby neskôr",
+      "minutes": "min"
+    },
+    "workingHours": {
+      "title": "Pracovná doba",
+      "useDefaults": "Použiť predvolené (Po-Pi 9:00-17:00)",
+      "days": {
+        "0": "Nedeľa",
+        "1": "Pondelok",
+        "2": "Utorok",
+        "3": "Streda",
+        "4": "Štvrtok",
+        "5": "Piatok",
+        "6": "Sobota"
+      },
+      "activeLabel": "Aktívny",
+      "fromLabel": "Od",
+      "toLabel": "Do"
+    },
+    "shareLink": {
+      "title": "Váš rezervačný odkaz je pripravený!",
+      "subtitle": "Zdieľajte tento odkaz so zákazníkmi, aby mohli rezervovať online.",
+      "copyLink": "Kopírovať odkaz",
+      "copied": "Skopírované!",
+      "downloadQR": "Stiahnuť QR kód",
+      "complete": "Dokončiť nastavenie",
+      "qrCodeAlt": "QR kód rezervačného odkazu"
+    },
+    "industryTypes": {
+      "beauty_salon": "Kaderníctvo / Kozmetika",
+      "barbershop": "Pánsky salón",
+      "spa_wellness": "Kúpele / Wellness",
+      "fitness_gym": "Fitness / Posilňovňa",
+      "yoga_pilates": "Jóga / Pilates",
+      "dance_studio": "Tanečné štúdio",
+      "medical_clinic": "Lekár / Zubár",
+      "veterinary": "Veterina",
+      "physiotherapy": "Fyzioterapia",
+      "psychology": "Psychológ / Terapeut",
+      "auto_service": "Autoservis",
+      "cleaning_service": "Upratovacia firma",
+      "tutoring": "Doučovanie",
+      "photography": "Fotografický ateliér",
+      "consulting": "Konzultácie",
+      "coworking": "Coworking",
+      "pet_grooming": "Psí salón",
+      "tattoo_piercing": "Tattoo / Piercing",
+      "escape_room": "Escape room",
+      "general": "Ostatné"
+    },
+    "skip": "Preskočiť",
+    "next": "Pokračovať",
+    "back": "Späť",
+    "saving": "Ukladám...",
+    "checklist": {
+      "title": "Sprievodca nastavením",
+      "progress": "{completed} z {total} dokončených",
+      "dismiss": "Skryť",
+      "companyProfile": {
+        "label": "Vyplniť profil firmy",
+        "description": "Pridajte telefón, popis a adresu"
+      },
+      "firstService": {
+        "label": "Pridať prvú službu",
+        "description": "Vytvorte službu, ktorú si zákazníci môžu objednať"
+      },
+      "workingHours": {
+        "label": "Nastaviť pracovnú dobu",
+        "description": "Určite, kedy ste k dispozícii pre rezervácie"
+      },
+      "firstBooking": {
+        "label": "Prijať prvú rezerváciu",
+        "description": "Zdieľajte váš rezervačný odkaz so zákazníkmi"
+      },
+      "notifications": {
+        "label": "Zapnúť upozornenia",
+        "description": "Nastavte email alebo SMS pripomienky"
+      }
+    },
+    "welcomeBanner": {
+      "title": "Vitajte v ScheduleBox!",
+      "description": "Dokončite nastavenie a začnite prijímať rezervácie",
+      "action": "Spustiť sprievodcu"
+    }
+  },
+  "emptyStates": {
+    "bookings": {
+      "title": "Zatiaľ žiadne rezervácie",
+      "description": "Zdieľajte váš rezervačný odkaz so zákazníkmi a prijmite prvú rezerváciu",
+      "action": "Zdieľať rezervačný odkaz",
+      "secondaryAction": "Vytvoriť rezerváciu ručne"
+    },
+    "customers": {
+      "title": "Zatiaľ žiadni zákazníci",
+      "description": "Zákazníci sa automaticky pridajú pri prvej rezervácii, alebo ich môžete pridať ručne",
+      "action": "Pridať zákazníka"
+    },
+    "services": {
+      "title": "Zatiaľ žiadne služby",
+      "description": "Pridajte služby, ktoré ponúkate, aby si ich zákazníci mohli objednať online",
+      "action": "Pridať službu",
+      "secondaryAction": "Použiť šablónu odboru"
+    },
+    "employees": {
+      "title": "Zatiaľ žiadni zamestnanci",
+      "description": "Pracujete sami? Nie je potrebné pridávať zamestnancov. Ak máte tím, pridajte ich tu.",
+      "action": "Pridať zamestnanca"
+    },
+    "analytics": {
+      "title": "Zatiaľ žiadne dáta na analýzu",
+      "description": "Analytika sa začne zobrazovať po vašich prvých rezerváciách",
+      "action": "Zdieľať rezervačný odkaz"
+    },
+    "calendar": {
+      "title": "Kalendár je prázdny",
+      "description": "Vaše rezervácie sa tu zobrazia, keď ich prijmete",
+      "action": "Vytvoriť rezerváciu",
+      "secondaryAction": "Nastaviť pracovnú dobu"
     }
   }
 }

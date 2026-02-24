@@ -1,63 +1,109 @@
-/* FullCalendar CSS overrides for ScheduleBox theme */
+/* react-big-calendar CSS overrides for ScheduleBox shadcn theme */
 
-.fc {
+.rbc-calendar {
   font-family: inherit;
 }
 
-.fc .fc-button {
-  border-radius: 0.375rem;
+/* Time gutter and header */
+.rbc-time-header,
+.rbc-time-gutter {
   font-size: 0.875rem;
   font-weight: 500;
-  padding: 0.375rem 0.75rem;
-  border: 1px solid hsl(var(--border));
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
 }
 
-.fc .fc-button:hover {
-  background-color: hsl(var(--accent));
-  color: hsl(var(--accent-foreground));
-}
-
-.fc .fc-button-active,
-.fc .fc-button:active {
-  background-color: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
-  border-color: hsl(var(--primary)) !important;
-}
-
-.fc .fc-event {
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  border: none;
-  padding: 2px 4px;
-}
-
-.fc .fc-timegrid-slot,
-.fc .fc-daygrid-day {
-  border-color: hsl(var(--border));
-}
-
-.fc .fc-scrollgrid {
-  border-color: hsl(var(--border));
-}
-
-.fc .fc-col-header-cell {
+.rbc-header {
   background-color: hsl(var(--muted));
   font-weight: 500;
   font-size: 0.875rem;
   padding: 0.5rem;
+  border-color: hsl(var(--border));
 }
 
-.fc .fc-day-today {
-  background-color: hsl(var(--primary) / 0.05) !important;
+.rbc-header + .rbc-header {
+  border-left-color: hsl(var(--border));
 }
 
-.fc .fc-highlight {
-  background-color: hsl(var(--primary) / 0.1) !important;
+/* Day and time cells */
+.rbc-day-bg,
+.rbc-time-slot {
+  border-color: hsl(var(--border));
 }
 
-.fc .fc-resource-header {
-  font-weight: 500;
+.rbc-time-content {
+  border-top-color: hsl(var(--border));
+}
+
+.rbc-timeslot-group {
+  border-bottom-color: hsl(var(--border));
+}
+
+/* Today highlight */
+.rbc-today {
+  background-color: hsl(var(--primary) / 0.05);
+}
+
+/* Events */
+.rbc-event {
+  border-radius: 0.375rem;
   font-size: 0.875rem;
+  border: none !important;
+  padding: 2px 4px;
+}
+
+.rbc-event:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+/* Selection highlight */
+.rbc-slot-selection {
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+/* Month view cells */
+.rbc-month-row + .rbc-month-row {
+  border-top-color: hsl(var(--border));
+}
+
+.rbc-date-cell {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Current time indicator */
+.rbc-current-time-indicator {
+  background-color: hsl(var(--destructive));
+  height: 2px;
+}
+
+/* Off-range days (month view) */
+.rbc-off-range-bg {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+/* DnD addon styles */
+.rbc-addons-dnd .rbc-event {
+  cursor: grab;
+}
+
+.rbc-addons-dnd .rbc-event:active {
+  cursor: grabbing;
+}
+
+.rbc-addons-dnd-drag-preview {
+  opacity: 0.7;
+}
+
+/* Scrollbar for week/day views */
+.rbc-time-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
 }

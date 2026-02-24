@@ -22,13 +22,13 @@ export function CalendarToolbar() {
 
   const handlePrev = () => {
     switch (view) {
-      case 'resourceTimelineDay':
+      case 'day':
         setSelectedDate(subDays(selectedDate, 1));
         break;
-      case 'resourceTimelineWeek':
+      case 'week':
         setSelectedDate(subWeeks(selectedDate, 1));
         break;
-      case 'dayGridMonth':
+      case 'month':
         setSelectedDate(subMonths(selectedDate, 1));
         break;
     }
@@ -36,13 +36,13 @@ export function CalendarToolbar() {
 
   const handleNext = () => {
     switch (view) {
-      case 'resourceTimelineDay':
+      case 'day':
         setSelectedDate(addDays(selectedDate, 1));
         break;
-      case 'resourceTimelineWeek':
+      case 'week':
         setSelectedDate(addWeeks(selectedDate, 1));
         break;
-      case 'dayGridMonth':
+      case 'month':
         setSelectedDate(addMonths(selectedDate, 1));
         break;
     }
@@ -54,9 +54,9 @@ export function CalendarToolbar() {
 
   const formatDateLabel = () => {
     switch (view) {
-      case 'resourceTimelineDay':
+      case 'day':
         return format(selectedDate, 'EEEE d. MMMM yyyy', { locale: cs });
-      case 'resourceTimelineWeek': {
+      case 'week': {
         const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
         return (
           format(selectedDate, 'd. MMM', { locale: cs }) +
@@ -64,7 +64,7 @@ export function CalendarToolbar() {
           format(weekEnd, 'd. MMM yyyy', { locale: cs })
         );
       }
-      case 'dayGridMonth':
+      case 'month':
         return format(selectedDate, 'MMMM yyyy', { locale: cs });
     }
   };
@@ -87,23 +87,23 @@ export function CalendarToolbar() {
 
       <div className="flex items-center gap-1">
         <Button
-          variant={view === 'resourceTimelineDay' ? 'default' : 'outline'}
+          variant={view === 'day' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => setView('resourceTimelineDay')}
+          onClick={() => setView('day')}
         >
           {t('day')}
         </Button>
         <Button
-          variant={view === 'resourceTimelineWeek' ? 'default' : 'outline'}
+          variant={view === 'week' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => setView('resourceTimelineWeek')}
+          onClick={() => setView('week')}
         >
           {t('week')}
         </Button>
         <Button
-          variant={view === 'dayGridMonth' ? 'default' : 'outline'}
+          variant={view === 'month' ? 'default' : 'outline'}
           size="sm"
-          onClick={() => setView('dayGridMonth')}
+          onClick={() => setView('month')}
         >
           {t('month')}
         </Button>

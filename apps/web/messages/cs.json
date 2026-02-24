@@ -254,10 +254,15 @@
         "employee": "Zaměstnanec",
         "customer": "Zákazník",
         "notes": "Poznámky",
+        "price": "Cena",
         "confirmBooking": "Potvrdit rezervaci",
         "slotTaken": "Tento termín již není dostupný. Prosím vyberte jiný.",
         "bookingSuccess": "Rezervace byla úspěšně vytvořena",
-        "bookingError": "Chyba při vytváření rezervace"
+        "bookingError": "Chyba při vytváření rezervace",
+        "bookingConfirmed": "Rezervace potvrzena!",
+        "thankYou": "Děkujeme za vaši rezervaci",
+        "addToCalendar": "Přidat do kalendáře",
+        "backToBookings": "Zpět na rezervace"
       }
     }
   },
@@ -721,8 +726,16 @@
       "fallbackMessage": "AI predikce kapacity bude dostupná po připojení AI služby.",
       "noData": "Predikce kapacity bude k dispozici po nasbírání dostatečného množství dat o rezervacích.",
       "errorMessage": "Nepodařilo se načíst predikci kapacity. Zkuste to prosím později.",
-      "utilization": { "low": "nízké", "medium": "střední", "high": "vysoké" },
-      "priority": { "low": "nízká", "medium": "střední", "high": "vysoká" },
+      "utilization": {
+        "low": "nízké",
+        "medium": "střední",
+        "high": "vysoké"
+      },
+      "priority": {
+        "low": "nízká",
+        "medium": "střední",
+        "high": "vysoká"
+      },
       "suggestionTypes": {
         "extend_hours": "prodloužit hodiny",
         "reduce_hours": "zkrátit hodiny",
@@ -974,6 +987,157 @@
     "forbidden": "Přístup zakázán",
     "networkError": "Chyba sítě",
     "serverError": "Chyba serveru"
+  },
+  "onboarding": {
+    "steps": {
+      "company": "Firma",
+      "service": "Služba",
+      "hours": "Pracovní doba",
+      "share": "Sdílení"
+    },
+    "companyDetails": {
+      "title": "Základní údaje o firmě",
+      "namePlaceholder": "Název vaší firmy",
+      "nameLabel": "Název firmy",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "+420 123 456 789",
+      "industryLabel": "Obor podnikání",
+      "descriptionLabel": "Popis firmy",
+      "descriptionPlaceholder": "Stručný popis vaší firmy...",
+      "addressStreetLabel": "Ulice a číslo",
+      "addressCityLabel": "Město",
+      "addressZipLabel": "PSČ",
+      "logoLabel": "Logo firmy",
+      "logoOptional": "(volitelné)"
+    },
+    "firstService": {
+      "title": "Vaše první služba",
+      "tip": "Tip: Další služby přidáte kdykoliv v Nastavení",
+      "useTemplate": "Použít šablonu",
+      "nameLabel": "Název služby",
+      "namePlaceholder": "např. Střih dámský",
+      "durationLabel": "Délka trvání",
+      "priceLabel": "Cena (Kč)",
+      "descriptionLabel": "Popis (volitelné)",
+      "skipText": "Přidat služby později",
+      "minutes": "min"
+    },
+    "workingHours": {
+      "title": "Pracovní doba",
+      "useDefaults": "Použít výchozí (Po-Pá 9:00-17:00)",
+      "days": {
+        "0": "Neděle",
+        "1": "Pondělí",
+        "2": "Úterý",
+        "3": "Středa",
+        "4": "Čtvrtek",
+        "5": "Pátek",
+        "6": "Sobota"
+      },
+      "activeLabel": "Aktivní",
+      "fromLabel": "Od",
+      "toLabel": "Do"
+    },
+    "shareLink": {
+      "title": "Váš rezervační odkaz je připraven!",
+      "subtitle": "Sdílejte tento odkaz se zákazníky, aby mohli rezervovat online.",
+      "copyLink": "Kopírovat odkaz",
+      "copied": "Zkopírováno!",
+      "downloadQR": "Stáhnout QR kód",
+      "complete": "Dokončit nastavení",
+      "qrCodeAlt": "QR kód rezervačního odkazu"
+    },
+    "industryTypes": {
+      "beauty_salon": "Kadeřnictví / Kosmetika",
+      "barbershop": "Pánský salon",
+      "spa_wellness": "Lázně / Wellness",
+      "fitness_gym": "Fitness / Posilovna",
+      "yoga_pilates": "Jóga / Pilates",
+      "dance_studio": "Taneční studio",
+      "medical_clinic": "Lékař / Zubař",
+      "veterinary": "Veterina",
+      "physiotherapy": "Fyzioterapie",
+      "psychology": "Psycholog / Terapeut",
+      "auto_service": "Autoservis",
+      "cleaning_service": "Úklidová firma",
+      "tutoring": "Doučování",
+      "photography": "Fotografický ateliér",
+      "consulting": "Konzultace",
+      "coworking": "Coworking",
+      "pet_grooming": "Psí salon",
+      "tattoo_piercing": "Tattoo / Piercing",
+      "escape_room": "Escape room",
+      "general": "Ostatní"
+    },
+    "skip": "Přeskočit",
+    "next": "Pokračovat",
+    "back": "Zpět",
+    "saving": "Ukládám...",
+    "checklist": {
+      "title": "Průvodce nastavením",
+      "progress": "{completed} z {total} dokončeno",
+      "dismiss": "Skrýt",
+      "companyProfile": {
+        "label": "Vyplnit profil firmy",
+        "description": "Přidejte telefon, popis a adresu"
+      },
+      "firstService": {
+        "label": "Přidat první službu",
+        "description": "Vytvořte službu, kterou si zákazníci mohou objednat"
+      },
+      "workingHours": {
+        "label": "Nastavit pracovní dobu",
+        "description": "Určete, kdy jste k dispozici pro rezervace"
+      },
+      "firstBooking": {
+        "label": "Přijmout první rezervaci",
+        "description": "Sdílejte svůj rezervační odkaz se zákazníky"
+      },
+      "notifications": {
+        "label": "Zapnout upozornění",
+        "description": "Nastavte email nebo SMS připomínky"
+      }
+    },
+    "welcomeBanner": {
+      "title": "Vítejte v ScheduleBox!",
+      "description": "Dokončete nastavení a začněte přijímat rezervace",
+      "action": "Spustit průvodce"
+    }
+  },
+  "emptyStates": {
+    "bookings": {
+      "title": "Zatím žádné rezervace",
+      "description": "Sdílejte svůj rezervační odkaz se zákazníky a přijměte první rezervaci",
+      "action": "Sdílet rezervační odkaz",
+      "secondaryAction": "Vytvořit rezervaci ručně"
+    },
+    "customers": {
+      "title": "Zatím žádní zákazníci",
+      "description": "Zákazníci se automaticky přidají při první rezervaci, nebo je můžete přidat ručně",
+      "action": "Přidat zákazníka"
+    },
+    "services": {
+      "title": "Zatím žádné služby",
+      "description": "Přidejte služby, které nabízíte, aby si je zákazníci mohli objednat online",
+      "action": "Přidat službu",
+      "secondaryAction": "Použít šablonu oboru"
+    },
+    "employees": {
+      "title": "Zatím žádní zaměstnanci",
+      "description": "Pracujete sami? Není potřeba přidávat zaměstnance. Pokud máte tým, přidejte je zde.",
+      "action": "Přidat zaměstnance"
+    },
+    "analytics": {
+      "title": "Zatím žádná data pro analýzu",
+      "description": "Analytika se začne zobrazovat po vašich prvních rezervacích",
+      "action": "Sdílet rezervační odkaz"
+    },
+    "calendar": {
+      "title": "Kalendář je prázdný",
+      "description": "Vaše rezervace se zde zobrazí, jakmile je přijmete",
+      "action": "Vytvořit rezervaci",
+      "secondaryAction": "Nastavit pracovní dobu"
+    }
   },
   "landing": {
     "meta": {

@@ -254,10 +254,15 @@
         "employee": "Employee",
         "customer": "Customer",
         "notes": "Notes",
+        "price": "Price",
         "confirmBooking": "Confirm Booking",
         "slotTaken": "This time slot is no longer available. Please select a different time.",
         "bookingSuccess": "Booking created successfully",
-        "bookingError": "Error creating booking"
+        "bookingError": "Error creating booking",
+        "bookingConfirmed": "Booking Confirmed!",
+        "thankYou": "Thank you for your booking",
+        "addToCalendar": "Add to Calendar",
+        "backToBookings": "Back to Bookings"
       }
     }
   },
@@ -721,8 +726,16 @@
       "fallbackMessage": "AI capacity prediction will be available once the AI service is connected.",
       "noData": "Capacity forecast will be available after collecting enough booking data.",
       "errorMessage": "Failed to load capacity forecast. Please try again later.",
-      "utilization": { "low": "low", "medium": "medium", "high": "high" },
-      "priority": { "low": "low", "medium": "medium", "high": "high" },
+      "utilization": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "priority": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
       "suggestionTypes": {
         "extend_hours": "extend hours",
         "reduce_hours": "reduce hours",
@@ -974,6 +987,157 @@
     "forbidden": "Access forbidden",
     "networkError": "Network error",
     "serverError": "Server error"
+  },
+  "onboarding": {
+    "steps": {
+      "company": "Company",
+      "service": "Service",
+      "hours": "Working Hours",
+      "share": "Share"
+    },
+    "companyDetails": {
+      "title": "Company Details",
+      "namePlaceholder": "Your business name",
+      "nameLabel": "Business Name",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+420 123 456 789",
+      "industryLabel": "Industry",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Brief description of your business...",
+      "addressStreetLabel": "Street address",
+      "addressCityLabel": "City",
+      "addressZipLabel": "ZIP code",
+      "logoLabel": "Company logo",
+      "logoOptional": "(optional)"
+    },
+    "firstService": {
+      "title": "Your First Service",
+      "tip": "Tip: You can add more services later in Settings",
+      "useTemplate": "Use template",
+      "nameLabel": "Service name",
+      "namePlaceholder": "e.g. Women's haircut",
+      "durationLabel": "Duration",
+      "priceLabel": "Price (CZK)",
+      "descriptionLabel": "Description (optional)",
+      "skipText": "Add services later",
+      "minutes": "min"
+    },
+    "workingHours": {
+      "title": "Working Hours",
+      "useDefaults": "Use defaults (Mon-Fri 9:00-17:00)",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "activeLabel": "Active",
+      "fromLabel": "From",
+      "toLabel": "To"
+    },
+    "shareLink": {
+      "title": "Your booking link is ready!",
+      "subtitle": "Share this link with customers so they can book online.",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "downloadQR": "Download QR code",
+      "complete": "Complete setup",
+      "qrCodeAlt": "QR code for booking link"
+    },
+    "industryTypes": {
+      "beauty_salon": "Hair / Beauty Salon",
+      "barbershop": "Barbershop",
+      "spa_wellness": "Spa / Wellness",
+      "fitness_gym": "Fitness / Gym",
+      "yoga_pilates": "Yoga / Pilates",
+      "dance_studio": "Dance Studio",
+      "medical_clinic": "Medical / Dental",
+      "veterinary": "Veterinary",
+      "physiotherapy": "Physiotherapy",
+      "psychology": "Psychologist / Therapist",
+      "auto_service": "Auto Service",
+      "cleaning_service": "Cleaning Service",
+      "tutoring": "Tutoring",
+      "photography": "Photography Studio",
+      "consulting": "Consulting",
+      "coworking": "Coworking",
+      "pet_grooming": "Pet Grooming",
+      "tattoo_piercing": "Tattoo / Piercing",
+      "escape_room": "Escape Room",
+      "general": "Other"
+    },
+    "skip": "Skip for now",
+    "next": "Continue",
+    "back": "Back",
+    "saving": "Saving...",
+    "checklist": {
+      "title": "Setup Progress",
+      "progress": "{completed} of {total} complete",
+      "dismiss": "Dismiss",
+      "companyProfile": {
+        "label": "Complete company profile",
+        "description": "Add phone, description, and address"
+      },
+      "firstService": {
+        "label": "Add your first service",
+        "description": "Create a service customers can book"
+      },
+      "workingHours": {
+        "label": "Set working hours",
+        "description": "Define when you're available for bookings"
+      },
+      "firstBooking": {
+        "label": "Get your first booking",
+        "description": "Share your booking link with customers"
+      },
+      "notifications": {
+        "label": "Enable notifications",
+        "description": "Set up email or SMS reminders"
+      }
+    },
+    "welcomeBanner": {
+      "title": "Welcome to ScheduleBox!",
+      "description": "Complete your setup to start accepting bookings",
+      "action": "Start setup"
+    }
+  },
+  "emptyStates": {
+    "bookings": {
+      "title": "No bookings yet",
+      "description": "Share your booking link with customers to get your first booking",
+      "action": "Share booking link",
+      "secondaryAction": "Create booking manually"
+    },
+    "customers": {
+      "title": "No customers yet",
+      "description": "Customers are added automatically when they book, or you can add them manually",
+      "action": "Add customer"
+    },
+    "services": {
+      "title": "No services yet",
+      "description": "Add the services you offer so customers can book them online",
+      "action": "Add service",
+      "secondaryAction": "Use industry template"
+    },
+    "employees": {
+      "title": "No team members yet",
+      "description": "Working solo? No need to add employees. If you have a team, add them here.",
+      "action": "Add employee"
+    },
+    "analytics": {
+      "title": "No analytics data yet",
+      "description": "Analytics will appear after your first bookings come in",
+      "action": "Share booking link"
+    },
+    "calendar": {
+      "title": "Calendar is empty",
+      "description": "Your bookings will appear here once customers start booking",
+      "action": "Create booking",
+      "secondaryAction": "Set working hours"
+    }
   },
   "landing": {
     "meta": {
