@@ -47,6 +47,8 @@ export function OnboardingChecklist() {
 
   // Don't render until mounted (prevents hydration mismatch) or if dismissed
   if (!mounted || dismissed) return null;
+  // Wizard takes priority: hide checklist until onboarding is complete
+  if (companySettings?.onboarding_completed === false) return null;
 
   const progressPercent = (completedCount / totalCount) * 100;
 
