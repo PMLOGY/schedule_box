@@ -7,15 +7,15 @@ export async function HeroSection() {
   const t = await getTranslations('landing.hero');
 
   return (
-    <section className="py-16 md:py-24 lg:py-32">
+    <section className="overflow-hidden py-16 md:py-24 lg:py-32">
       <div className="mx-auto max-w-6xl px-4">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Left column — text */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               {t('badge')}
             </span>
-            <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl xl:text-6xl">
               {t('headline')}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">{t('subheadline')}</p>
@@ -32,7 +32,7 @@ export async function HeroSection() {
           {/* Right column — live widget */}
           <div
             id="demo"
-            className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards"
+            className="max-w-full overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards"
             style={{ animationDelay: '200ms' }}
           >
             <LiveWidgetPreview />

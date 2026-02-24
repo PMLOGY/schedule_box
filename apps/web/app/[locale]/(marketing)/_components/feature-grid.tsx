@@ -31,9 +31,11 @@ export function FeatureGrid() {
   const t = useTranslations('landing.features');
 
   return (
-    <section id="features" className="py-16 md:py-24 bg-muted/50">
+    <section id="features" className="overflow-hidden py-16 md:py-24 bg-muted/50">
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">{t('title')}</h2>
+        <h2 className="text-center text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
+          {t('title')}
+        </h2>
         <motion.div
           className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
           variants={container}

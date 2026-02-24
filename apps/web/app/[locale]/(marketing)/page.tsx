@@ -3,6 +3,7 @@ import { routing } from '@/lib/i18n/routing';
 import type { Metadata } from 'next';
 import { HeroSection } from './_components/hero-section';
 import { FeatureGrid } from './_components/feature-grid';
+import { SocialProof } from './_components/social-proof';
 import { TrustBadges } from './_components/trust-badges';
 
 export function generateStaticParams() {
@@ -43,6 +44,7 @@ export default async function MarketingHomePage({
     <>
       <HeroSection />
       <FeatureGrid />
+      <SocialProof />
       <TrustBadges />
     </>
   );
