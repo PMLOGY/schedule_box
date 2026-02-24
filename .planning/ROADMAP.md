@@ -140,6 +140,15 @@ Plans:
 
 **Requirements:** ORG-01, ORG-02, ORG-03, ORG-04, ORG-05, ORG-06
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 30-01-PLAN.md — DB schema (organizations + organization_members tables, companies.organization_id FK) + shared types + Drizzle relations + migration
+- [ ] 30-02-PLAN.md — JWT context-switch endpoint (POST /auth/switch-location) + org-scope helpers + Zod schemas + integration test for cross-org 403 rejection
+- [ ] 30-03-PLAN.md — Organization CRUD API (create org, add/edit/deactivate locations, add/remove members) with plan-gated location limits
+- [ ] 30-04-PLAN.md — Location switcher UI in header + organization settings page (location + member management) + navigation update
+- [ ] 30-05-PLAN.md — Organization dashboard (per-location metrics) + cross-location customer search (email-based dedup)
+
 **Success Criteria:**
 
 1. A franchise owner can create an organization, add multiple company locations to it, and switch between locations using a dropdown in the dashboard header; after switching, all data shown (bookings, customers, revenue) is scoped exclusively to the selected location.
@@ -147,8 +156,6 @@ Plans:
 3. A `location_manager` assigned to a single location can log in and manage that location's bookings, staff, and services but cannot see any data from other locations in the organization.
 4. A franchise owner can add a new location, edit existing location details, and deactivate a location from the organization settings page; deactivating a location soft-disables it without deleting any historical data.
 5. Customers who have visited multiple locations within an organization appear as a single customer record when searched from organization-level views, preventing inflated CRM counts.
-
-**Plan estimates:** 4-5 plans (DB schema: organizations + organization_members tables + companies.organization_id FK, JWT context-switch endpoint + RBAC middleware, location switcher UI + organization settings CRUD, organization dashboard with per-location metrics, cross-location customer visibility)
 
 **Research flag:** JWT context-switch security boundary has no documented precedent in this codebase. An integration test must verify that switching to a company owned by a different organization is rejected with 403 before merging any multi-location code to main.
 
@@ -230,7 +237,7 @@ Plans:
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 28. Subscription Billing | v1.3 | 0/5 | Planned | — |
 | 29. Usage Limits | v1.3 | 0/3 | Planned | — |
-| 30. Multi-Location Orgs | v1.3 | — | Pending | — |
+| 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
 | 31. Analytics | v1.3 | — | Pending | — |
 | 32. Frontend Polish | v1.3 | — | Pending | — |
 
@@ -242,3 +249,4 @@ Plans:
 *v1.3 roadmap created: 2026-02-24*
 *Phase 28 planned: 2026-02-24*
 *Phase 29 planned: 2026-02-24*
+*Phase 30 planned: 2026-02-24*
