@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28, roadmap created
+**Current focus:** v1.3 Revenue & Growth — Phase 28 planned, ready to execute
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** — (not started)
-- **Status:** Roadmap created, ready for Phase 28 planning
-- **Last activity:** 2026-02-24 — v1.3 roadmap created (5 phases, 32 requirements mapped)
+- **Plan:** 5 plans in 4 waves (01: schema+client, 02: API+service, 04+05: UI+invoices, 03: scheduler)
+- **Status:** Phase 28 planned and verified, ready for execution
+- **Last activity:** 2026-02-24 — Phase 28 planned (5 plans, 4 waves, verified with 1 revision)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -51,4 +51,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
 
 ---
-*Last updated: 2026-02-24 — v1.3 roadmap created, Phase 28 ready to plan*
+*Last updated: 2026-02-24 — Phase 28 planned (5 plans, 4 waves), ready to execute*
