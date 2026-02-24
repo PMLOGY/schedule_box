@@ -1,431 +1,542 @@
-# Feature Landscape: ScheduleBox v1.2 — Product Readiness
+# Feature Landscape: ScheduleBox v1.3 — Revenue & Growth
 
-**Domain:** AI-powered Scheduling SaaS — Demo Readiness & Product Polish
-**Researched:** 2026-02-21
-**Confidence:** MEDIUM-HIGH (AI model training practices HIGH via official docs; UX patterns MEDIUM via multiple web sources; market/competitor analysis MEDIUM via indirect sources)
+**Domain:** AI-powered Scheduling SaaS — Subscription Billing, Multi-Location, Usage Gating, Analytics, Design Polish
+**Researched:** 2026-02-24
+**Confidence:** MEDIUM-HIGH overall (Comgate recurring API specifics LOW — docs are behind auth; SaaS patterns HIGH from multiple verified sources; CZ/SK billing law MEDIUM from official sources)
 
 ---
 
 ## Context
 
-ScheduleBox v1.1 shipped a working platform (booking, payments, CRM, notifications, monitoring). v1.2 is about making it **sellable**: the sales team needs a product that looks finished and can close SMB owners in a demo.
+ScheduleBox v1.2 shipped a fully functional, demo-ready product. v1.3 is about turning it into a **revenue-generating SaaS business**:
+
+- Pricing tiers exist on the landing page but are **not enforced** — everyone gets all features
+- Comgate is integrated for one-time booking payments but **not for subscriptions**
+- The system has one company per account — no concept of **multiple locations**
+- Analytics exist but show **booking data only** — no SaaS/business health metrics
+- The UI works but lacks the **visual polish** expected from a premium CZK 2,990/month product
 
 **What already exists (do not rebuild):**
-- Full booking engine: wizard, calendar, availability, double-booking prevention
-- Payment processing (Comgate), CRM, loyalty program, automation builder
-- 7 AI model endpoints returning heuristic fallbacks (no real ML yet)
-- Email/SMS notifications, DKIM/DMARC, monitoring/alerting
-- Admin dashboard with analytics, employee/resource/service management
-- Public booking widget and marketplace
-- i18n (cs/sk/en), WCAG accessibility
-
-**What's missing for "demo-ready":**
-1. Real AI models (endpoints exist but return fake confidence=0.4)
-2. Polished booking UX (functional but clunky)
-3. A landing page that converts SMB owners (none exists)
-4. Onboarding flow for new businesses (cold-start is painful)
+- Booking engine, availability, double-booking prevention
+- Comgate one-time payment + webhook infrastructure
+- CRM, loyalty program, coupons, gift cards
+- 7 AI/ML models (no-show, CLV, pricing, capacity, health score, reminder timing, upselling)
+- Onboarding wizard with industry templates
+- Marketing landing page with pricing tiers (Free/490/1490/2990 Kč)
+- i18n (cs/en/sk), full notification system (email + SMS)
+- RabbitMQ event infrastructure, Drizzle ORM, PostgreSQL RLS
 
 ---
 
-## Category 1: Real AI Models
+## Category 1: Subscription Billing
 
-### Table Stakes (AI Category)
+### How Competing Platforms Handle This
 
-Features that make the AI endpoints credible. With heuristic fallbacks, confidence=0.4 and "fallback: true" in API responses — visible in demos.
+**Calendly/Acuity pattern:** Monthly credit card auto-charge with instant plan activation. Upgrade activates immediately with proration. Downgrade schedules for end of period. Failed payment triggers 3–4 retry attempts over 14 days before account downgrade.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|-------------|-----------|-------|
-| **Trained no-show predictor** | "AI-powered" is the core value prop; heuristic fallbacks are a liability in demos | HIGH | XGBoost classifier, 11 feature columns already defined. Training script exists (`scripts/train_no_show.py`). Needs real or synthetic training data + model.joblib file loaded at startup. Min ~500 samples for meaningful accuracy. |
-| **Trained CLV predictor** | Customer lifetime value underpins loyalty tier assignment and marketing segmentation | HIGH | scikit-learn regression, `scripts/train_clv.py` exists. Pairs with loyalty program already built. |
-| **Trained pricing optimizer state** | Thompson Sampling bandit exists but has no learned state — always returns midpoint price | MEDIUM | Not a trained model; needs to persist state (`pricing_optimizer.json`) across restarts and accumulate signal from bookings. Redis-based state accumulation. |
-| **Health score calculator** (already works) | Pure RFM heuristic, no ML needed — already returns meaningful results | LOW | Already functional per `model_loader.py`. Just needs UI surface. |
-| **Model versioning in responses** | "model_version: heuristic" kills trust in demos | LOW | Replace with "model_version: v1.0.0" when trained model loads. Already in code, just needs model files. |
-| **No-show risk on booking list** | Owners need to see which bookings are high-risk today | MEDIUM | Surface no-show probability from AI in booking management UI. Color-coded badge: red (>50%), yellow (30-50%), green (<30%). |
+**Fresha pattern:** Usage-based (zero subscription) — charges per transaction. Not applicable to ScheduleBox's subscription model.
 
-### Differentiators (AI Category)
+**Reservio/Reservanto (CZ market):** Monthly SEPA or card payment. Invoice emailed on each charge. Czech companies require IČO on invoice and 10-year retention.
 
-Features that make ScheduleBox's AI tangible and demonstrable.
+### Table Stakes
+
+Features users expect when paying a subscription. Missing = trust is broken immediately.
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **Comgate recurring payment initiation** | First-party Czech payment gateway — avoids needing Stripe or other foreign gateways | HIGH | Existing Comgate integration (Phase 21). Requires Comgate account-level approval for recurring feature. New API params: `recurrence=ON`, `recurrenceCycle=MONTH`. |
+| **Subscription lifecycle state machine** | Plans must move through: `trialing → active → past_due → canceled → paused` | HIGH | New DB table `company_subscriptions`. Must integrate with existing `companies.plan` column. |
+| **Automatic monthly charge** | Background job debits saved card on renewal date | HIGH | Existing RabbitMQ queue for async jobs. New cron scheduler or pg-cron. |
+| **Failed payment dunning** | Smart retry (day 1, 3, 7, 14) + email notifications. Standard 14-day grace period. | MEDIUM | Existing notification worker + email infrastructure. New dunning state tracking. |
+| **Grace period enforcement** | Account stays functional during grace period but shows persistent banner. Hard lock after 14 days. | MEDIUM | Must integrate with tier enforcement (Category 3). |
+| **Plan upgrade / downgrade UI** | Settings page with current plan, upgrade CTA, downgrade with end-of-period scheduling | MEDIUM | Existing settings pages. Upgrade → Comgate payment. Downgrade → schedule change. |
+| **Proration on upgrade** | Mid-period upgrade charges only remaining days on new plan. Standard expectation. | MEDIUM | New billing math utility. Comgate doesn't handle proration — must calculate and charge delta. |
+| **Subscription invoice PDF** | Czech law: invoice within 15 days, must include IČO, VAT if applicable, stored 10 years | HIGH | Existing invoice PDF generation (Phase 6). New invoice type: `subscription`. Czech VAT: 21% standard, 12% reduced. |
+| **Cancellation flow** | Self-serve cancel with confirmation + "reasons" survey. Access until period end. | LOW | UI only, minimal backend state change. |
+| **Payment history page** | List of all charges with PDF download, status (paid/failed/refunded) | LOW | Existing payments table. New filter for subscription-type charges. |
+
+### Differentiators
+
+Features that set ScheduleBox apart in the CZ/SK market for billing.
 
 | Feature | Value Proposition | Complexity | Notes |
-|---------|------------------|-----------|-------|
-| **AI insights panel on dashboard** | "Your AI found 3 high-risk bookings today" — concrete, actionable, demoes well | MEDIUM | Dashboard widget: daily digest of no-show risks, revenue optimization suggestions from pricing model, capacity alerts. Calls existing `/api/v1/predictions/*` endpoints. |
-| **Proactive SMS for high-risk bookings** | AI prediction + automatic action = real value vs manual process | MEDIUM | When no-show probability > 0.7, auto-queue additional SMS reminder 2h before booking. Pairs with notification worker already built. Configurable threshold in settings. |
-| **Synthetic training data pipeline** | Ships trained models on day 1 without real customer data | HIGH | Training scripts already generate 500 synthetic samples. Improve synthetic generation to 2000+ samples with realistic Czech/Slovak business patterns (salon, fitness, medical). Run training in CI, commit model files to repo or store in R2. |
-| **Confidence indicator transparency** | Show owners "AI confidence: 82%" vs "heuristic fallback" — honest system builds trust | LOW | Already in API responses. Surface in UI. When confidence < 0.5, show "Insufficient data — add more bookings to improve predictions." |
-| **Capacity forecast chart** | "Your busiest hour is Tuesday 11am — open more slots" = actionable intelligence | HIGH | Prophet-based forecaster (`models/capacity.py`) exists but returns empty list without trained model. Train with synthetic weekly patterns. Display as heatmap or bar chart in AI dashboard. |
+|---------|-----------------|-----------|-------|
+| **Annual plan with 2 months free** | Industry-standard LTV boost. "Pay 10 months, get 12." | MEDIUM | Annual billing cycle in Comgate. Significant MRR/ARR improvement. Target 30% annual adoption. |
+| **Trial-to-paid conversion flow** | Contextual upgrade prompts at friction points (booking #48 of 50 limit, etc.) | MEDIUM | Requires usage metering (Category 3). Most effective: prompt at 80% limit consumption, not at hard stop. |
+| **Čeština na faktuře** | Invoice text in Czech with proper legal terminology. Required by Czech B2B buyers. | LOW | Template change only. Already have i18n. |
+| **Pause subscription** | For seasonal businesses (ski instructors, summer camps). Pause 1–3 months, card not charged. | MEDIUM | CZ/SK SMB market is seasonally heavy. Reduces churn vs. cancelation. New subscription state. |
 
-### Anti-Features (AI Category)
+### Anti-Features
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|--------------|----------------|-------------|
-| **Real-time ML inference on every booking create** | "AI should score immediately" | Adds 200-400ms latency to booking creation; customer-facing flows must be <100ms | Score asynchronously via RabbitMQ event after booking created; display on booking detail page |
-| **Custom AI model per company** | Enterprise differentiation | Each company needs >10K bookings for meaningful per-tenant models; SMBs have 50-500 bookings | Single global model trained on all anonymized data, personalized via customer history features |
-| **Natural language booking via chat** | Looks impressive in demos | Requires LLM integration, voice/text parsing, calendar conflict resolution — 3+ months to build reliably | Use existing voice router (already scaffolded) with OpenAI; defer to v2.0 |
-| **AI-generated email content** | "Personalized at scale" | Hallucination risk for appointment details (wrong time, wrong service); high trust requirement | Templated emails with AI-suggested subject lines only; existing notification templates are safer |
+Features to explicitly NOT build in v1.3.
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|-------------|----------|-------------------|
+| **Per-booking revenue share (Fresha model)** | Vendor lock-in through payment dependency destroys trust. SMB owners hate unpredictable costs. | Fixed subscription only |
+| **Multi-currency billing** | CZK/EUR complexity; Comgate handles CZK natively. EUR adds accounting complexity for CZ entities. | CZK only in v1.3 |
+| **Complex proration edge cases** | Mid-month upgrade + addon + partial refund logic creates bugs. Start simple. | Immediate upgrade charge = full month of difference. Refine in v1.4. |
+| **Stripe/PayPal for subscriptions** | Comgate is the chosen CZ gateway; adding a second billing system creates split state | Comgate recurring only |
+
+### User Flows
+
+**New Subscription (from Free):**
+1. User hits tier limit (e.g., booking 51 of 50) → contextual upgrade modal appears
+2. Modal shows plan comparison with current usage highlighted
+3. User selects Essential/Growth/AI-Powered plan
+4. Redirect to Comgate payment page (first charge + recurring consent)
+5. Comgate webhook fires → subscription activated → plan column updated → welcome email sent
+
+**Monthly Renewal (background):**
+1. Cron job runs on renewal_date
+2. Comgate recurring charge API called with stored recurrence token
+3. Success → subscription renewed, invoice generated + emailed
+4. Failure → retry schedule begins (day 1, 3, 7, 14)
+5. Retry 4 fails → subscription enters `past_due` → user emailed → grace period starts
+6. Day 14 past_due → account locked to Free tier, data preserved
+
+**Upgrade (Active Subscriber):**
+1. User clicks "Upgrade" in Settings → Plan
+2. Shows proration calculation ("You'll be charged X Kč today for the remaining 14 days")
+3. Confirm → immediate Comgate charge for delta
+4. Plan updated instantly, new features unlocked
+
+**Downgrade:**
+1. User selects lower plan
+2. "Your plan changes to [X] on [renewal date]. Until then, you keep current features."
+3. Scheduled plan change recorded. No immediate charge change.
+4. On renewal date: lower plan charge, features adjusted
+
+### Complexity Assessment
+
+| Aspect | Complexity | Reason |
+|--------|-----------|--------|
+| Comgate recurring API integration | HIGH | Requires separate account approval; limited public docs; must handle async webhook flow |
+| Subscription state machine | HIGH | 6+ states, edge cases with concurrent upgrades/dunning |
+| Proration math | MEDIUM | Custom calculation since Comgate doesn't prorate |
+| Czech invoice compliance | MEDIUM | PDF template change + IČO/DIČ fields |
+| UI (settings/upgrade flow) | LOW-MEDIUM | Standard modal/page patterns; shadcn components available |
 
 ---
 
-## Category 2: Premium Booking UX
+## Category 2: Multi-Location / Franchise Management
 
-### Table Stakes (UX Category)
+### How Competing Platforms Handle This
 
-Features where Calendly/Reservio set the baseline expectation. SMB owners have tried these tools; ScheduleBox must meet the bar.
+**Fresha:** Each location is a separate "workspace" that shares the same account login. Owner switches between locations via top-level dropdown. Separate bank accounts per location (Fresha's unique feature). Analytics filterable by location or aggregated.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|-------------|-----------|-------|
-| **Instant slot feedback** | When clicking a date, available times should appear without page reload or >300ms spinner | LOW | Already using React Query — check if slots are being cached or showing loading states. If spinner >300ms, add skeleton loader. |
-| **Mobile-first calendar picker** | 40%+ Czech users on iOS (based on regional estimates); tap targets must be ≥44px | MEDIUM | Existing date picker needs audit: cell padding, thumb-friendly spacing, no hover-only states. Test on real iPhone/Android device. |
-| **Clear unavailability display** | Booked/blocked slots must look obviously different from available ones — not just grayed | LOW | Color contrast AA compliance + strikethrough or hatching pattern, not just opacity change. |
-| **Progress indicator in booking wizard** | Calendly shows "Step 2 of 4" — users need to know how far they are | LOW | Stepper component with step names (Service → Staff → Time → Details → Payment). |
-| **Transparent total before payment** | 76.6% of users abandon at unexpected charges; show total (price + any fees) before payment redirect | LOW | Display total in step before Comgate redirect. Already calculated, just needs UI surfacing. |
-| **Guest checkout (no account required)** | Requiring account creation before booking kills conversion | LOW | Public booking widget already works without login. Verify no auth wall exists in the widget flow. |
-| **Booking confirmation page** | After payment, user needs clear "You're booked!" with all details | LOW | Confirmation page already exists — audit content: service, staff, date/time, location, cancellation policy, add-to-calendar button. |
-| **Add to calendar (Google/Apple/Outlook)** | Standard expectation post-booking; every competitor has it | LOW | Generate `.ics` file from booking data. Single API endpoint returning ICS content-type. No external library needed. |
-| **Cancellation self-service link** | Businesses get support tickets when customers can't cancel; email must include cancel link | LOW | Cancellation link in confirmation email already exists — verify it works end-to-end and shows proper confirmation screen. |
+**Pabau:** Role-based access per location. Practice managers see their location; head office sees all. Consolidated reporting with location filter. Client records are global (accessible from any branch).
 
-### Differentiators (UX Category)
+**Homebase/FranConnect (franchise-first):** Central admin ("franchisor") controls brand standards, menus, pricing ranges. Location manager ("franchisee") operates within those constraints. Separate P&L per location with roll-up reporting.
 
-Features that make the booking experience feel noticeably better than Reservio/Bookio.
+**AppMaster/small chain pattern (5-50 branches):** Location is a first-class entity with its own staff, services, working hours, and resources. Customers book at a specific location. Central admin can view/manage all locations.
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **Location entity** | A company can have 1-N locations. Each location has own address, hours, staff, services, resources | HIGH | New DB: `locations` table. RLS must scope to location within company. Existing `companies` → `locations` → everything else hierarchy. |
+| **Location switcher UI** | Owner switches active location via top-nav dropdown. Single login, multiple locations. | MEDIUM | Global state change (Zustand). All subsequent data queries scoped to selected location. |
+| **Per-location working hours** | Location A: Mon-Fri, Location B: Tue-Sat | LOW | Existing `working_hours` table needs `location_id` FK |
+| **Per-location staff assignment** | Staff assigned to 1 or more locations. Staff calendar shows only their assigned locations. | MEDIUM | Existing `employees` table needs `location_id` (M:N join table). |
+| **Per-location services with pricing overrides** | Base service defined at company level. Location can override price (e.g., Prague branch charges more). | MEDIUM | New `location_service_overrides` table. Fallback to company-level service if no override. |
+| **Central admin role** | "Franchisor" or chain owner can see all locations, manage settings, view aggregated analytics | HIGH | New role in RBAC: `chain_admin`. Existing RBAC infrastructure. |
+| **Location manager role** | Location manager can only manage their assigned location(s). Cannot see other locations' data. | HIGH | New role: `location_manager`. RLS update to enforce location_id scope. |
+| **Aggregated analytics** | Owner dashboard shows total revenue, bookings across ALL locations + breakdown by location | HIGH | Existing analytics queries need GROUP BY location_id + roll-up view. |
+| **Customer location history** | Customer who visits multiple branches has unified profile | MEDIUM | Existing `customers` table is already company-scoped (cross-location). No change needed. |
+| **Booking at specific location** | Public booking widget shows "Choose location" step first | MEDIUM | Existing booking widget needs location selection step prepended. |
+
+### Differentiators
 
 | Feature | Value Proposition | Complexity | Notes |
-|---------|------------------|-----------|-------|
-| **Staff photo + bio on booking widget** | Customers choose their preferred stylist/therapist by face — personal connection drives bookings | MEDIUM | Extend employee entity to include photo URL (R2 upload) and short bio. Display in staff selection step of booking wizard. |
-| **Real-time slot count indicator** | "Only 2 slots left today" creates urgency and is factually accurate | LOW | Count available slots in the selected time window; show if <= 3. Prevents overbooking anxiety. |
-| **Micro-animations on booking confirmation** | Calendly's checkmark animation makes the booking feel complete and satisfying | LOW | Framer Motion or CSS animation on booking success state. 0.3s fade-in + scale on the success icon. |
-| **Smart time slot grouping** | Group available times by "Morning", "Afternoon", "Evening" instead of a raw 30-item scrollable list | LOW | Client-side grouping of time slots by hour ranges. Makes the UX scan-friendly. |
-| **Inline service description expand** | Show service details on click/tap without leaving the page — reduce "what does this include?" uncertainty | LOW | Accordion expand on service card. Shows duration, price, what's included, any prep instructions. |
-| **Automatic timezone detection** | Czech/Slovak customers booking for international clients — show slots in correct timezone | MEDIUM | Use `Intl.DateTimeFormat().resolvedOptions().timeZone` on client. Store booking in UTC (already), display in detected TZ. |
-| **Buffer time visibility for customers** | "Next available after this: 2pm" — shows buffer time is respected, builds trust | LOW | After showing a slot, show when the provider is next free. Already tracked in availability engine. |
+|---------|-----------------|-----------|-------|
+| **Separate payout accounts per location** | Fresha does this — critical for franchise where each franchisee owns their branch financially | HIGH | Comgate supports multiple merchant accounts. Each location has own bank account for payouts. Complex implementation. |
+| **Cross-location booking** | "Book at whichever branch has availability" — single customer UI shows all branches' slots | HIGH | Requires availability engine to query across locations simultaneously. Already built for single-location. |
+| **Location performance benchmarking** | "Branch Prague is 23% above chain average for revenue per booking" | MEDIUM | Dashboard comparison component. Analytics data already collected if location_id tracked. |
+| **Template propagation** | Central admin pushes service catalog changes to all branches at once | MEDIUM | Admin action: "Apply to all locations". Useful for price increases, new service rollouts. |
+| **Branch-level AI insights** | No-show predictor per location (each branch may have different customer behavior) | HIGH | AI models would need per-location training. Complex. Probably v1.4. |
 
-### Anti-Features (UX Category)
+### Anti-Features
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|--------------|----------------|-------------|
-| **Live chat during booking** | Reduce abandonment via support | Requires staffing or chatbot; most questions answered by service description | Improve service descriptions and inline FAQ; add "Questions? Call us" phone link in widget footer |
-| **Waiting list / standby queue** | Fill cancellations automatically | Double-booking risk if slot fills while notifying waitlist; complex race conditions | Simple "notify me if slot opens" email opt-in; staff manually confirm from dashboard |
-| **Social login (Google/Facebook) on public widget** | Reduce friction | Requires OAuth in public/untrusted context, GDPR consent complexity for third-party cookies | Email-only confirmation works fine for appointment booking; OAuth for dashboard only |
-| **Multi-step upsell flow inside booking** | Revenue maximization | Adds steps and friction to booking completion; Czech/Slovak SMBs have simpler service catalogs | Show "customers also book" suggestions only on confirmation page, after booking is complete |
+| Anti-Feature | Why Avoid | What to Do Instead |
+|-------------|----------|-------------------|
+| **Full white-label per location** | Each branch having completely different branding = unmanageable. SMBs with 5-50 branches want consistency. | Company-level branding, location-specific name/address only |
+| **Separate billing per location** | Subscription billing at branch level creates 5-50 billing relationships. Nightmare for SMB. | Single subscription at company level covers all locations. Tier limits scale with locations (e.g., Growth = up to 5 locations). |
+| **Full franchise royalty management** | Revenue share calculations, franchise fee collection = enterprise ERP territory. Out of scope. | Revenue reporting only. Let owners do their own accounting. |
+| **Inter-location staff time tracking** | Staff traveling between branches → complex scheduling math | Staff is assigned to specific locations. Cross-location assignments are manual. |
+
+### User Flows
+
+**Setting Up a Second Location:**
+1. Settings → Locations → "Add Location"
+2. Enter name, address, working hours for new branch
+3. System creates new location record, generates public booking URL: `/book/[company-slug]/[location-slug]`
+4. Admin assigns existing staff to location (or invites new staff for that branch)
+5. Optionally clone service catalog from existing location with price overrides
+6. New location immediately available in location switcher and analytics
+
+**Chain Admin Daily Use:**
+1. Login → landing on "All Locations" aggregate dashboard
+2. See total: bookings today (across all), revenue this month, utilization %
+3. Click location name → drill into single-location view
+4. Staff management, schedule management operate on selected location's data
+5. Analytics report with "Compare Locations" toggle
+
+**Location Manager Daily Use:**
+1. Login → automatically scoped to their assigned location(s)
+2. Cannot see other locations' data (RLS enforced)
+3. Same booking/staff/analytics UI but single-location only
+4. Cannot change subscription plan (chain admin only)
+
+### Complexity Assessment
+
+| Aspect | Complexity | Reason |
+|--------|-----------|--------|
+| Location entity + DB migration | HIGH | Cascading FK changes across most tables (bookings, staff, services, resources, hours) |
+| RLS updates for location scoping | HIGH | Every RLS policy must now scope to location_id within company_id |
+| Aggregated analytics queries | HIGH | Cross-location GROUP BY with roll-up; performance-sensitive |
+| UI location switcher | MEDIUM | Zustand global state; context propagation throughout app |
+| Cross-location booking widget | HIGH | Availability engine query fan-out |
+| Per-location payout accounts | HIGH | Comgate multi-merchant configuration; not standard |
 
 ---
 
-## Category 3: Landing Page
+## Category 3: Usage Limits and Tier Gating
 
-### Table Stakes (Landing Page Category)
+### How Competing Platforms Handle This
 
-Elements that every SaaS landing page must have to not look amateur. SMB owners will judge ScheduleBox's quality by how its own website looks.
+**Calendly pattern:** Free = 1 active event type. Soft-limit with persistent banner. Hitting limit shows modal with upgrade CTA. No hard block for most features — the upgrade prompt is the enforcement.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|-------------|-----------|-------|
-| **Hero section with clear value proposition** | "What does this do for me in 5 seconds?" — SMB owners are busy and skeptical | LOW | Headline formula: "[Outcome] for [Business type] without [Pain]". Example: "Plné rezervace. Žádné telefony. Pro salóny, kliniky a studia." Single primary CTA: "Začít zdarma" (no credit card). |
-| **Live/interactive booking widget demo** | Show don't tell; embed the actual ScheduleBox widget with test company data | MEDIUM | Embed public widget (`/[company_slug]`) with a demo company pre-seeded. SMB owner sees the exact customer experience immediately. |
-| **Social proof section** | Trust barrier is the #1 conversion killer for new SaaS; 37% average conversion lift from social proof | LOW | 3 testimonials minimum (real or realistic beta user quotes), number of bookings processed (use a realistic growing counter), company logos if any pilot customers exist. |
-| **Pricing section** | SMB owners decide on price before anything else; hiding it reduces trust | LOW | 3 tiers: Free (limited bookings), Starter (CZK 299/mo), Pro (CZK 699/mo). "No credit card required" on free tier CTA. Annual discount (2 months free). |
-| **Features section** | Explain capabilities concisely; use icons not walls of text | LOW | 6 feature cards with icons: Online Booking, AI No-Show Prevention, Payments, Team Management, Analytics, Notifications. |
-| **Mobile performance** | 82.9% of landing page traffic is mobile; 1s load = 3x conversion vs 5s load | MEDIUM | Static/SSR landing page. No client-side JS for above-the-fold content. Optimize images with next/image. Target Lighthouse score >90. |
-| **Czech-language copy** | Primary market is Czech/Slovak SMBs; English-only = immediately disqualified | LOW | All landing page copy in Czech. Language toggle for Slovak (sk) variant. URL: schedulebox.cz (not .com). |
+**Acuity pattern:** Calendars = staff count. At limit, "Add Staff Member" button shows lock icon + upgrade required. Feature access checked server-side at API level, not just UI.
 
-### Differentiators (Landing Page Category)
+**Stripe/SaaS standard (2025):** Hybrid model — hard limits for resource-cost features (e.g., SMS credits, AI API calls), soft limits with prompts for productivity features (event types, bookings count). 80% threshold triggers first warning, 100% triggers upgrade prompt, 110% triggers hard lock.
 
-Features that make the landing page stand out and convert better than generic SaaS templates.
+**Industry consensus:** Hard limit at Free tier (no payment method captured, must prevent abuse). Soft limit with grace for paid tiers (customer has paid in good faith, brief over-limit is acceptable). Always allow data access even when over-limit.
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **Server-side entitlement check** | UI-only gating is trivially bypassed. All tier limits must be enforced in API middleware. | HIGH | New `entitlements` middleware in Next.js API routes. Checks company plan before processing request. |
+| **Booking count metering** | Free: 50 bookings/month. Count tracked in DB. API rejects booking #51. | MEDIUM | New `monthly_booking_count` field or view on `companies`. Reset on 1st of month. |
+| **Staff count limit** | Free: 1, Essential: 3, Growth: 10, AI-Powered: unlimited | MEDIUM | Check on staff creation API. Existing `employees` table count. |
+| **Location count limit** | Free: 1, Essential: 1, Growth: 5, AI-Powered: unlimited | MEDIUM | Check on location creation API (Category 2 dependency). |
+| **AI feature gating** | AI features available only on Growth+ or AI-Powered tier | LOW | Add tier check to existing `/api/ai/*` route middleware. Already structured as separate routes. |
+| **Upgrade prompt on limit hit** | When user hits a limit, show upgrade modal (not just a generic error) | MEDIUM | New `UpgradeModal` component. Must pass context: "You've used 50/50 bookings this month." |
+| **Usage visible to user** | "38 of 50 bookings used this month" in dashboard | LOW | Query against metered field. Display in dashboard sidebar/banner. |
+| **80% threshold warning** | Proactive: at 40/50 bookings, show yellow banner "Running low on bookings" | LOW | Computed property. Banner component in layout. |
+
+### Differentiators
 
 | Feature | Value Proposition | Complexity | Notes |
-|---------|------------------|-----------|-------|
-| **Industry-specific hero variants** | "For hair salons" / "For fitness studios" / "For medical clinics" — relevance beats generic | MEDIUM | `/salony`, `/fitness`, `/kliniky` landing page variants with industry-specific screenshots and testimonials. One shared component, different copy/images. |
-| **ROI calculator** | "Save 3 hours/week and reduce no-shows by 30%" — concrete number makes value tangible | MEDIUM | Simple inputs: number of bookings/week, average booking value, current no-show rate. Outputs: hours saved, revenue recovered. Pure client-side JS calculation. |
-| **"See it in 60 seconds" video** | Interactive demos increase engagement 30-40% longer; video converts skeptical SMB owners | HIGH | Screen recording of: sign up → add service → share booking link → customer books → owner sees booking + AI risk score. Under 90 seconds. No voiceover needed (captions in Czech). |
-| **Trust badge row** | GDPR compliant, Czech hosting, bank-level security — addresses local market concerns | LOW | Static badge row below hero: "GDPR compliant", "CZ/SK support", "Comgate payments", "Bank-level security". |
-| **Competitor comparison table** | SMB owners google "Reservio alternative" — capture this intent | MEDIUM | Side-by-side vs Reservio and Bookio. Columns: Price, AI features, No-show prediction, Czech support, Free tier. ScheduleBox wins on AI and price. |
+|---------|-----------------|-----------|-------|
+| **Contextual upgrade prompts** | "You've reached your Free limit. Owners like you upgrade to Essential to handle seasonal peaks." | MEDIUM | User-segment-aware copy. Industry detected during onboarding (wizard already exists). Copy variation by industry segment. Conversion lift of ~32% vs generic prompts (Mixpanel data). |
+| **AI-gated feature preview** | Free/Essential users can _see_ AI features (greyed out) with "Try for 14 days" CTA. Shows value before asking for money. | MEDIUM | Show AI section in sidebar with lock icon. Click → trial activation or upgrade prompt. Better than hiding features entirely. |
+| **Usage reset notification** | "Your booking count reset to 0. You have 50 bookings available this month!" Email on 1st of month. | LOW | Simple cron + notification template. Reduces churn from accidental limit-anxiety. |
+| **Overage option (paid tiers)** | Growth tier can purchase extra bookings: 100 additional bookings for 99 Kč. | HIGH | New metered billing concept on top of subscription. Comgate one-time charge via existing infrastructure. Complex to implement correctly. |
 
-### Anti-Features (Landing Page Category)
+### Anti-Features
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|--------------|----------------|-------------|
-| **"Request a demo" as primary CTA** | Enterprise SaaS norm | SMBs self-serve; a demo request adds a 24-48h delay and kills momentum | Primary CTA is "Start free" (instant); secondary CTA is "See a 3-min tour" (the video) |
-| **Long scrolling testimonial carousel** | More social proof = more trust | Carousel UX is broken on mobile; autoplay distracts attention from CTA | Static 3-card testimonial grid; no carousel |
-| **Chat widget on landing page** | Capture leads who have questions | Adds >100KB JS, slows page, bot responses feel impersonal for local market | Prominent WhatsApp/email contact link in nav for Czech/Slovak-style direct communication |
-| **Cookie consent banner with full analytics** | GDPR compliance requirement | Full analytics setup (GA4 + Facebook Pixel + Hotjar) can be done later; complexity slows launch | Simple first-party analytics only at launch (Next.js + server-side logging); add third-party analytics post-launch |
+| Anti-Feature | Why Avoid | What to Do Instead |
+|-------------|----------|-------------------|
+| **Surprise hard-lock without warning** | User hits limit mid-appointment, gets error, customer can't book. Terrible UX. Trust destroyed. | Show warnings at 80%, 90%, 100%. Only hard-lock after 14-day grace. |
+| **Feature flag without UI explanation** | Button just disappears or is grayed out with no explanation. User thinks it's a bug. | Always show locked features with lock icon + tier label + "Upgrade to [Plan]" tooltip. |
+| **Retroactive limit enforcement** | Removing existing bookings/staff/data when downgrading. | Read-only state: can view existing data, cannot add new. E.g., downgrade from 3 staff to 1 limit: existing 3 staff records kept, cannot add 4th. |
+| **Per-API-call billing (metered billing)** | "You called the AI API 847 times this month. That's 847 Kč." — SMB owners panic at variable costs. | Flat tier with generous limits. AI API calls are internal, not exposed as a cost driver. |
+
+### User Flows
+
+**Hitting the Free Booking Limit:**
+1. User creates booking #51 → API returns `HTTP 402` with `{ error: "LIMIT_REACHED", code: "BOOKING_LIMIT_MONTHLY", limit: 50, plan: "free" }`
+2. Frontend catches 402 → shows UpgradeModal: "You've reached your 50 booking limit for this month"
+3. Modal shows plan comparison focused on booking limits
+4. CTA: "Upgrade to Essential — 490 Kč/month, unlimited bookings"
+5. Click → subscription flow (Category 1)
+
+**Accessing Locked AI Feature (Essential Tier):**
+1. User navigates to AI Tools → No-show Predictor
+2. Page renders with feature preview (blurred/locked overlay)
+3. Banner: "No-show Predictor is available on Growth plan (1,490 Kč/month)"
+4. CTA button: "Upgrade to Growth"
+5. Optional: "Start 14-day free trial" (trial of AI tier)
+
+**Entitlement Middleware Flow (backend):**
+```
+POST /api/v1/bookings
+→ auth middleware (verify JWT)
+→ entitlement middleware:
+   - get company.plan, company.subscription_status
+   - if plan === 'free': count this month's bookings
+   - if count >= 50: return 402 BOOKING_LIMIT_MONTHLY
+   - if subscription_status === 'past_due': allow but add warning header
+→ booking creation handler
+```
+
+### Complexity Assessment
+
+| Aspect | Complexity | Reason |
+|--------|-----------|--------|
+| Entitlement middleware | MEDIUM | Straightforward but must cover all relevant API routes |
+| Booking count metering | LOW | COUNT query scoped to company + month; cached in Redis |
+| Upgrade modal + copy | MEDIUM | Multiple states, context-aware copy, plan comparison data |
+| 402 error handling frontend | MEDIUM | Must catch in all forms/actions that create resources |
+| AI feature preview/lock UI | LOW | CSS overlay + conditional render |
+| Overage billing | HIGH | New billing concept; defer to v1.4 |
 
 ---
 
-## Category 4: Onboarding Flow
+## Category 4: Analytics Dashboards
 
-### Table Stakes (Onboarding Category)
+### How Competing Platforms Handle This
 
-Steps that every scheduling SaaS must guide new businesses through. Without these, cold-start churn is >70% within 48h.
+**Fresha analytics:** Owner sees: revenue by day/week/month, top services by revenue, top staff by revenue, client retention rate, new vs returning clients, bookings by source. Filterable by location and date range.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|-------------|-----------|-------|
-| **Business setup wizard (4 steps max)** | Calendly's aha moment = first booking link shared; SMB owners need equivalent aha moment | MEDIUM | 4-step wizard: (1) Company details + logo, (2) Add first service (name, duration, price), (3) Set working hours, (4) Share booking link. Completable in <5 minutes. |
-| **"Your booking link is ready" moment** | The aha moment for scheduling SaaS is when the owner sees their live booking page | LOW | After wizard step 4, show the actual booking URL (`/[slug]`) and a QR code. "Share this link with your first customer." Clear copy-to-clipboard button. |
-| **Onboarding checklist with progress bar** | Checklists increase completion by 21% when first action shows "25% done" | LOW | Persistent sidebar or dashboard widget showing: ✓ Profile complete, ✓ First service added, □ First booking received, □ Payment method set up, □ SMS notifications on. Dismissible after all complete. |
-| **Empty states with action prompts** | Empty booking list should guide, not confuse; "No bookings yet — here's how to get your first one" | LOW | Every empty state has: illustration, headline, 1 primary action button, 1 contextual tip. No raw empty tables. |
-| **Demo company data option** | "Load sample data" lets owners explore the full dashboard before committing | LOW | One-click seed with realistic Czech business: "Beauty Studio Praha", 3 services, 10 past bookings, 5 customers, AI predictions active. Clearly labeled "Demo data — remove anytime." |
+**Acuity/Calendly:** Simpler — booking count, no-show rate, top event types. Revenue only if payment collected.
 
-### Differentiators (Onboarding Category)
+**Mindbody (enterprise):** Full P&L dashboard, class attendance trends, membership metrics, marketing attribution. Complex but the gold standard for fitness/wellness.
 
-Features that make new business owners feel immediately successful.
+**SaaS platform metrics (ChartMogul/Baremetrics pattern):** MRR, ARR, new MRR, churned MRR, expansion MRR, net revenue retention, plan distribution, churn rate by cohort. These are **operator-level** metrics (ScheduleBox internal), not the booking analytics shown to SMB owners.
+
+**Two distinct dashboards are needed:**
+1. **Business owner dashboard** — booking/revenue/customer analytics for SMB owners using ScheduleBox
+2. **Platform admin dashboard** — SaaS metrics for ScheduleBox operators (MRR, churn, plan distribution)
+
+### Table Stakes — Business Owner Dashboard
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **Revenue over time chart** | Core SMB KPI. Weekly/monthly/yearly. Line chart with comparison to prior period. | MEDIUM | Existing bookings + payments tables. Query by date range, aggregate by day/week. |
+| **Bookings count + cancellation rate** | "How busy am I? How many cancel?" — first thing owners ask | LOW | Existing booking status column. COUNT with GROUP BY status. |
+| **No-show rate** | Directly measures AI impact on business. Also shows value of no-show predictor. | LOW | Existing booking.status='no_show'. Simple ratio. |
+| **Top services by revenue** | "Which service makes me the most money?" | LOW | JOIN bookings + services, SUM amount, ORDER BY desc. |
+| **Top staff by revenue/bookings** | "Who's my best employee?" — important for commission structures | LOW | JOIN bookings + employees, aggregate. |
+| **New vs returning customer ratio** | Customer retention health. "Am I growing new business or just serving regulars?" | MEDIUM | First-booking date per customer. More complex query. |
+| **Occupancy rate** | "What % of my available slots are actually booked?" Peak hours visibility. | HIGH | Must compare booked slots to total available slots (working hours - blocked time). Complex. |
+| **Peak hours heatmap** | "When am I busiest?" — for staffing decisions | MEDIUM | COUNT bookings by hour of day, day of week. Heat map visualization. |
+| **Date range filter** | Today / This week / This month / Last month / Custom range | LOW | Standard dashboard filter, applied to all charts |
+| **Export to CSV** | Owners want data for their accountant | LOW | Existing pattern from customer export (Phase 8). |
+
+### Differentiators — Business Owner Dashboard
 
 | Feature | Value Proposition | Complexity | Notes |
-|---------|------------------|-----------|-------|
-| **"First booking" celebration screen** | Positive reinforcement when first real booking arrives — memorable moment | LOW | Toast notification + modal: "Vaše první rezervace! [Customer name] si rezervoval [Service] na [Date]." Confetti animation. Share button for social media. |
-| **Contextual tooltips on first visit** | Show what each dashboard element does without overwhelming — trigger on first page visit only | LOW | Use a library like Driver.js (5KB) or custom tooltip sequence. Dismiss after first interaction. Never repeat. |
-| **Industry template presets** | "I'm a hair salon" → pre-fills services (Střih, Barvení, Melír) with typical Czech prices | MEDIUM | 8 industry templates: salón, fitness, masáže, kosmetika, lékař, zubař, tutoring, fotografie. Each has 3-5 pre-filled services with CZK pricing, typical duration, buffer times. |
-| **Booking widget installation guide** | Show owners exactly how to add the booking button to their website/Facebook | LOW | Step-by-step with screenshots for: copy embed code → paste in WordPress/Webflow/Wix. Include Facebook "Book Now" button setup guide. |
-| **First 7-day email sequence** | Product-led emails reduce churn; send contextual tips based on what they haven't done yet | MEDIUM | Day 1: "Your booking link is live" + how to share. Day 3: "Enable SMS reminders" if not done. Day 5: "Add your team" if still solo. Day 7: "Your AI is learning — here's what it knows." Triggered by actual usage state. |
+|---------|-----------------|-----------|-------|
+| **AI prediction overlay** | Revenue chart shows "predicted next week: X Kč" as dotted line. Makes AI model value tangible. | HIGH | Requires trained demand forecasting model (from Phase 23). Overlay on existing chart. |
+| **No-show $ impact** | "Your AI prevented 12 no-shows this month, saving you estimated 3,600 Kč" | MEDIUM | (avg booking value) × (reduced no-show count). Gamified AI impact metric. CZ market loves this. |
+| **Staff performance comparison** | Bar chart: staff side-by-side on revenue, bookings, avg rating. With benchmark. | MEDIUM | Multiple metrics per staff. Benchmark line. Standard chart library. |
+| **Customer cohort retention** | "Of customers who first visited in January, 67% came back in February" | HIGH | True cohort analysis. Complex SQL with window functions. Meaningful only once platform has usage history. |
+| **Multi-location comparison** (v1.3 dependency) | "Prague branch: 94,500 Kč / Brno branch: 67,200 Kč this month" side-by-side | MEDIUM | Requires Category 2 (multi-location) to be built first. |
 
-### Anti-Features (Onboarding Category)
+### Table Stakes — Platform Admin Dashboard (ScheduleBox Operators)
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|--------------|----------------|-------------|
-| **Mandatory phone verification at signup** | Reduce spam/fake accounts | Every extra verification step costs 7% conversion; Czech SMBs are trust-based not anonymous | Email verification only; add phone number collection in payment setup flow where it's expected |
-| **Long product tour (>5 steps)** | Teach all features at once | Long tours are ignored; users click through without reading; 2025 standard is contextual triggers | First-visit checklist + contextual tooltips triggered by first visit to each section |
-| **Forced service pricing (can't skip)** | Ensure complete profile | Owners who don't know pricing yet abandon; price can be set later | Allow "Free / Price on consultation" as valid option; never block progress for optional fields |
-| **"Connect your Google Calendar" as step 1** | Power feature for sync | OAuth consent screen terrifies non-technical SMB owners; 40%+ drop-off | Make calendar sync an optional enhancement, promoted in step 5+; not required for basic function |
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **MRR / ARR tracking** | Core SaaS health metric. Sum of all active subscription charges. | MEDIUM | Requires Category 1 (subscriptions) first. Sum of company_subscriptions.amount_czk where status='active'. |
+| **New MRR this month** | New subscriptions started × their monthly value | LOW | Filter subscriptions by created_at in current month |
+| **Churned MRR** | Subscriptions canceled × their monthly value. Churn rate % | LOW | Subscriptions where status changed to 'canceled' in period |
+| **Plan distribution** | How many companies on each plan. Visualizes upgrade funnel. | LOW | COUNT companies GROUP BY plan |
+| **Total companies / active companies** | Total registered vs active (at least 1 booking in 30 days) | LOW | Simple aggregate queries |
+| **Failed payment rate** | % of renewal attempts that fail. High rate = dunning problem. | LOW | Requires subscription billing (Category 1) |
+
+### Anti-Features — Analytics
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|-------------|----------|-------------------|
+| **Real-time dashboard (WebSocket)** | SMBs don't need live updates. Booking comes in every few hours. Over-engineering. | 5-minute cache. Refresh button. |
+| **OLAP / data warehouse** | ScheduleBox at CZ/SK scale (500-5000 customers) doesn't need BigQuery or Snowflake. | Optimized PostgreSQL queries + materialized views + Redis cache. |
+| **Custom report builder** | Drag-and-drop analytics = months of engineering. SMB owners won't use it. | Fixed, opinionated reports. Date range filter. Export to CSV. |
+| **Revenue recognition (GAAP)** | Deferred revenue, ASC 606 — enterprise accounting territory. | Cash basis reporting only. Show what was charged when. |
+| **Competitor intelligence in this phase** | Feature already documented in spec (Phase 12) but is low ROI. | Exclude from v1.3 scope. AI feature but not analytics category. |
+
+### User Flows
+
+**Owner Analytics Daily Check:**
+1. Dashboard → Analytics (or dedicated /analytics page)
+2. Default view: "This Month" date range
+3. Above-fold: Revenue total, bookings count, new customers, occupancy rate (4 KPI cards)
+4. Below-fold: Revenue chart (bar/line, day by day), Top Services table, Top Staff table
+5. Peak hours heatmap (bottom section)
+6. Filter: dropdown for date range → charts re-query automatically
+
+**Multi-Location Analytics:**
+1. Analytics page → Location dropdown: "All Locations" (default) / "Prague" / "Brno"
+2. "All Locations" = aggregated view with location breakdown table below charts
+3. Single location = same view as current single-location dashboard
+
+### Complexity Assessment
+
+| Aspect | Complexity | Reason |
+|--------|-----------|--------|
+| Revenue + booking charts | LOW-MEDIUM | Standard SQL aggregation. Already partial analytics in place. |
+| Occupancy rate | HIGH | Requires computing available slots from working hours, excluding blocked time |
+| Cohort retention analysis | HIGH | Window function SQL, only meaningful with sufficient data history |
+| AI prediction overlay | HIGH | Depends on trained forecasting model (Phase 23 output) |
+| Platform admin dashboard | MEDIUM | Depends on subscription billing existing first (Category 1) |
+| Multi-location analytics | HIGH | Depends on Category 2 (locations) being implemented |
 
 ---
 
-## Feature Dependencies
+## Category 5: Frontend / Design System Polish
+
+### How Competing Platforms Handle This
+
+**Calendly 2024-2025:** Polished "product-led" aesthetic. Clean white with strategic purple accents. Heavy use of white space. Every button has hover state, disabled state, loading state. Motion is purposeful (200ms ease transitions). Top-tier typography hierarchy (Inter font, clear H1/H2/body contrast).
+
+**Fresha:** Dark sidebar, light content area. Consistent 8px grid. Color-coded status badges (green=confirmed, yellow=pending, red=canceled). The booking calendar is pixel-perfect.
+
+**Mangomint/Pabau (premium positioning):** $300-500/month tier pricing is justified visually. Every component feels intentional. Empty states have illustrations + CTAs. Loading skeletons instead of spinners. Responsive across tablet (salon owners use iPads).
+
+**shadcn/ui + Tailwind (2025 best practice):** Design tokens (CSS variables) as single source of truth. Component-level Storybook documentation. Dark mode via `class="dark"`. Consistent spacing via `space-y-*`, `gap-*` Tailwind utilities. No hardcoded colors.
+
+### Table Stakes
+
+| Feature | Why Expected | Complexity | Dependencies on Existing Features |
+|---------|-------------|-----------|----------------------------------|
+| **Consistent color palette enforcement** | Single CSS variable set drives all component colors. No rogue `#3B82F6` hardcoded. | LOW | Audit existing `globals.css`. Enforce via Tailwind config `theme.extend.colors`. |
+| **Loading states on all async actions** | Every button click that triggers API call shows spinner or loading text. No double-submit. | MEDIUM | Systematic audit of all form/button components. Add `disabled + loading` states. Currently inconsistent. |
+| **Empty states with CTAs** | "You have no bookings yet" + "Create your first booking" button. Every list view. | LOW | 5-8 components to add. shadcn `EmptyState` pattern. |
+| **Error states on forms** | Inline validation errors on all form fields. Not just red borders — text explaining the error. | MEDIUM | Existing Zod validation returns errors. Frontend must surface them consistently. |
+| **Toast notification consistency** | Success/error/warning toasts use the same component (shadcn Sonner). Not mix of alert types. | LOW | Audit and standardize. Already have toast infrastructure. |
+| **Mobile responsiveness (tablet-first)** | Salon owners use iPads. Calendar and booking list must work on 768px screen. | MEDIUM | Test and fix current breakpoints. Calendar component most problematic. |
+| **Typography hierarchy** | H1 → H2 → H3 → body → caption — all consistent sizes, weights, line-heights. | LOW | CSS variable or Tailwind typography config. |
+| **Button state completeness** | Every button: default, hover, active, disabled, loading. Consistent across all buttons. | MEDIUM | Systematic audit. shadcn Button component already has these variants; must be used consistently. |
+| **Skeleton loaders over spinners** | Page-level loading uses content skeletons (maintains layout). Spinners only for actions. | MEDIUM | Replace spinner patterns on main list pages (bookings, customers, analytics). |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-----------------|-----------|-------|
+| **Dark mode** | Tech-forward SMB owners (barbershops, fitness studios) strongly prefer dark UI. Already documented in spec. | MEDIUM | Tailwind `dark:` classes + CSS variable flip. shadcn already supports `class="dark"`. System preference detection. |
+| **Micro-animations on state changes** | Booking status change: subtle fade transition. List item delete: slide-out animation. | LOW-MEDIUM | Tailwind `transition-*` utilities. Framer Motion for complex cases. Perceived quality increase. |
+| **Command palette (⌘K)** | Power users (owners who know keyboard shortcuts) love this. Modern SaaS standard. | MEDIUM | shadcn `cmdk` package. Search across bookings, customers, services. Navigate without mouse. |
+| **Onboarding progress indicator** | New users see "Setup Progress: 3/5 steps complete" in sidebar. Clear path to activation. | LOW | Existing onboarding wizard (Phase 27). Progress persistence in user profile. |
+| **Branded color customization** | Business can set their brand color used in booking widget and customer-facing emails. | MEDIUM | CSS variable override per company. Complicates dark mode interaction. |
+
+### Anti-Features
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|-------------|----------|-------------------|
+| **Full Figma design system documentation** | Internal dev tool. Doesn't ship product. | Code-only component standards. Comments in components. |
+| **Custom icon library** | Building proprietary icons = months of work. Lucide React (already used by shadcn) is comprehensive. | Stick with Lucide React. Use consistent icon sizes (16/20/24px). |
+| **Complex animation library** | Lottie/GSAP for loading animations = unnecessary dependency and bundle size. | CSS transitions + Tailwind. Framer Motion only for 2-3 key interactions. |
+| **Full Storybook setup** | Valuable but time-consuming. SMB SaaS at this stage needs shipping, not documentation. | README component usage notes. Add Storybook in v1.4 when team grows. |
+| **Complete accessibility audit** | WCAG 2.1 AA full audit = specialist work. | Maintain keyboard navigation and aria-labels on interactive elements. Screen reader basics only. |
+
+### User Flows (Design Audit Focus)
+
+**Highest-Impact Polish Areas (evidence-based priority):**
+
+1. **Booking creation flow** — Entry point for primary value. Any friction here = customer dissatisfaction. Audit: wizard steps, slot selection, confirmation page.
+
+2. **Dashboard (first screen after login)** — First impression daily. Must be scannable in 5 seconds. Audit: KPI cards, chart, today's appointments list.
+
+3. **Settings / Plan page** — Where subscription decisions happen. Must feel premium and trustworthy to justify CZK 2,990/month.
+
+4. **Public booking widget** — Customer-facing. Embeds on owner's website. Must work flawlessly and match owner's brand.
+
+5. **Mobile calendar view** — Salon owners check their schedule on mobile constantly. Must be pixel-perfect at 375px.
+
+### Complexity Assessment
+
+| Aspect | Complexity | Reason |
+|--------|-----------|--------|
+| Loading/error state audit | MEDIUM | Systematic but low-creativity work. All routes/forms must be touched. |
+| Empty states | LOW | New component, add to 5-8 pages. |
+| Dark mode | MEDIUM | CSS variable flip straightforward; must verify all custom styles use variables. |
+| Mobile calendar fix | MEDIUM-HIGH | Calendar grid is notoriously tricky at small viewports. |
+| Command palette | MEDIUM | cmdk library makes it fast; indexing data for search adds complexity. |
+| Typography/spacing | LOW | Config change + audit. |
+
+---
+
+## Cross-Category Feature Dependencies
 
 ```
-Real AI Models
-  ├─ requires: Training data (synthetic OR real bookings)
-  │  └─ requires: `scripts/train_no_show.py` executed, model.joblib stored in MODEL_DIR
-  │     └─ requires: MODEL_DIR configured in AI service environment
-  │
-  ├─ enables: No-show risk badge on booking list
-  │  └─ enables: Proactive SMS for high-risk bookings
-  │     └─ requires: Notification worker credentials (already in v1.1)
-  │
-  └─ enables: AI insights panel on dashboard
-     └─ requires: Trained no-show model + Trained capacity forecaster
+Category 1 (Billing) → Category 3 (Usage Gating)
+   Billing must exist to enforce plan-based limits meaningfully.
+   Without billing, limits are enforced but no upgrade path exists.
 
-Landing Page
-  ├─ requires: Live demo company seeded in production DB
-  │  └─ requires: Demo booking widget working at /[demo-slug]
-  │
-  ├─ requires: Pricing page with real plan limits enforced
-  │  └─ requires: Plan limits in DB schema (if not yet implemented)
-  │
-  └─ enhances: Onboarding flow (landing page drives signups)
+Category 2 (Multi-Location) → Category 4 (Analytics)
+   Multi-location analytics requires location entity to exist.
+   Build location DB schema first, analytics aggregation second.
 
-Onboarding Wizard
-  ├─ requires: Company creation API (already exists)
-  ├─ requires: Service creation API (already exists)
-  ├─ requires: Working hours API (already exists)
-  └─ enables: Industry template presets
-     └─ requires: Template seed data per industry
+Category 1 (Billing) → Category 4 (Platform Admin Dashboard)
+   MRR/ARR dashboard requires subscription records to exist.
 
-Premium Booking UX
-  ├─ requires: Booking widget already functional (exists in v1.1)
-  ├─ add-to-calendar requires: ICS generation endpoint (new)
-  └─ staff photos requires: R2 file upload already in place (v1.1)
+Category 3 (Usage Gating) → Category 1 (Billing)
+   Upgrade prompts (gating) must route to subscription flow (billing).
+   Both must exist for the loop to close.
+
+Category 5 (Design Polish) — independent, but:
+   Plan/settings page polish should happen after billing is built
+   (you're polishing the page that shows subscription state).
 ```
 
-### Dependency Notes
-
-- **AI models before AI dashboard widget:** The dashboard widget calls prediction endpoints. If models still return `confidence: 0.4, fallback: true`, the widget shows untrustworthy data. Train models first.
-- **Demo company before landing page:** The live widget embed in the landing page hero requires a real seeded demo company in the production database.
-- **Onboarding wizard is independent:** Can be built in parallel with AI models and landing page. No external dependencies beyond existing APIs.
-- **ICS calendar file does NOT require external service:** Generate from booking data server-side. Simple RFC 5545 format.
-
----
-
-## MVP Definition
-
-### Launch With (v1.2.0 — Demo-Ready)
-
-These features transform the product from "works" to "sells."
-
-- [x] **Trained no-show model** — eliminates `confidence: 0.4` in demos; 500 synthetic samples minimum; run `train_no_show.py` and commit model file
-- [x] **No-show risk badge on booking list** — makes AI tangible and visible; color-coded badge on every booking row
-- [x] **Business setup wizard** — 4 steps, <5 minutes, ends with live booking link; required before any other dashboard section
-- [x] **Empty states with action prompts** — every empty table/list needs an action-oriented empty state
-- [x] **Hero section + pricing page** — Czech-language landing page with live widget embed, 3-tier pricing
-- [x] **Onboarding checklist** — 5-item checklist on dashboard, dismissible, tracks completion
-- [x] **Mobile booking UX audit** — calendar tap targets, slot grouping, progress stepper, loading states
-- [x] **Add-to-calendar button** — ICS file endpoint, add to booking confirmation page and email
-
-### Add After Validation (v1.2.x)
-
-Add when first 10 paying customers give feedback.
-
-- [ ] **Industry template presets** — reduces setup time; trigger: if >30% of new signups don't complete wizard
-- [ ] **AI insights dashboard widget** — daily AI digest; trigger: trained models deployed and stable
-- [ ] **Proactive SMS for high-risk bookings** — trigger: no-show rate data available from real bookings
-- [ ] **ROI calculator on landing page** — trigger: if landing page conversion < 3%
-- [ ] **"First booking" celebration screen** — trigger: after 5+ owners confirm they received their first booking
-- [ ] **First 7-day email sequence** — trigger: when churn at day 7 exceeds 50%
-
-### Future Consideration (v2.0)
-
-Defer until product-market fit is established.
-
-- [ ] **Natural language / voice booking** — OpenAI integration; defer until base features stable
-- [ ] **Per-tenant AI models** — requires >10K bookings per company; defer until top 5 customers hit this threshold
-- [ ] **Competitor comparison page** — high content maintenance; defer until market position clearer
-- [ ] **Capacity forecast chart** — Prophet model requires more training data than no-show model; defer until real booking data accumulates
-- [ ] **Video product tour** — requires professional recording; defer until copy and UX are finalized
+**Recommended build order within v1.3:**
+1. Category 1 — Subscription Billing (enables everything else)
+2. Category 3 — Usage Gating (pairs with billing to close the upgrade loop)
+3. Category 2 — Multi-Location (independent, highest complexity, most value for Growth tier upsell)
+4. Category 4 — Analytics (parallel with multi-location; platform dashboard after billing)
+5. Category 5 — Design Polish (ongoing, highest priority on pages that subscription/billing build touches)
 
 ---
 
-## Feature Prioritization Matrix
+## MVP Recommendation
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| Trained no-show model | HIGH | MEDIUM | P1 |
-| Business setup wizard | HIGH | MEDIUM | P1 |
-| No-show risk badge | HIGH | LOW | P1 |
-| Empty states | HIGH | LOW | P1 |
-| Landing page hero + pricing | HIGH | MEDIUM | P1 |
-| Mobile booking UX audit | HIGH | LOW | P1 |
-| Onboarding checklist | MEDIUM | LOW | P1 |
-| Add-to-calendar | MEDIUM | LOW | P1 |
-| AI insights dashboard widget | HIGH | MEDIUM | P2 |
-| Industry template presets | MEDIUM | MEDIUM | P2 |
-| Staff photos in widget | MEDIUM | LOW | P2 |
-| Proactive SMS for high-risk | HIGH | LOW | P2 |
-| Smart time slot grouping | MEDIUM | LOW | P2 |
-| Real-time slot count indicator | LOW | LOW | P2 |
-| ROI calculator | MEDIUM | MEDIUM | P2 |
-| First 7-day email sequence | HIGH | MEDIUM | P2 |
-| Capacity forecast chart | MEDIUM | HIGH | P3 |
-| Industry landing page variants | MEDIUM | MEDIUM | P3 |
-| Natural language booking | HIGH | HIGH | P3 |
-| Per-tenant AI models | MEDIUM | HIGH | P3 |
+**Must have for v1.3 launch (revenue generation depends on these):**
 
-**Priority key:**
-- P1: Must have for demo-ready launch (v1.2.0)
-- P2: Should have, add after first paying customers (v1.2.x)
-- P3: Nice to have, future consideration (v2.0+)
+1. Comgate recurring subscription integration (Category 1 — core)
+2. Subscription lifecycle state machine (Category 1 — core)
+3. Monthly renewal job + dunning email flow (Category 1 — core)
+4. Booking count entitlement check + upgrade prompt (Category 3 — core)
+5. Staff count + AI feature gating (Category 3 — core)
+6. Revenue + bookings analytics dashboard (Category 4 — owner)
+7. Loading/empty/error state audit (Category 5 — polish)
 
----
+**Should have for v1.3 (increases tier adoption and retention):**
 
-## Competitor Feature Analysis
+8. Proration on upgrade + invoice PDF (Category 1)
+9. Multi-location entity + location switcher (Category 2)
+10. Central admin + location manager roles (Category 2)
+11. Peak hours heatmap + top staff/service charts (Category 4)
+12. Dark mode + skeleton loaders (Category 5)
 
-| Feature | Calendly | Reservio | Bookio | ScheduleBox v1.2 Approach |
-|---------|----------|----------|--------|--------------------------|
-| **AI no-show prediction** | No (smart routing only) | No | No | YES — XGBoost trained model, visible risk badge |
-| **Dynamic pricing** | No | No | No | YES — Thompson Sampling bandit (needs state seeding) |
-| **Mobile booking UX** | Excellent (Calendly gold standard) | Good | Good | Target: match Calendly — 44px touch targets, slot grouping |
-| **Onboarding speed** | Excellent — 3-step wizard, live in 2 min | Good — more steps | Average — complex setup | Target: 4-step wizard, <5 min, industry templates |
-| **Czech/Slovak language** | No | YES (Czech company) | YES (Slovak company) | YES — primary market; home advantage |
-| **Local payment (Comgate)** | No | Yes (card only) | Yes (card only) | YES — full Comgate: cards, bank transfer, Google Pay, Apple Pay |
-| **Free tier** | Yes (basic) | Yes (limited) | Yes (limited) | YES — meaningful free tier to capture trial |
-| **Landing page quality** | Excellent | Good | Good | Target: professional Czech-language page with live embed |
-| **Embedded widget** | Yes | Yes | Yes | YES — already built, needs UX polish |
-| **Add-to-calendar** | YES | YES | YES | Yes — ICS endpoint (needs building) |
-| **Staff selection in booking** | YES | YES | YES | YES — exists; add photos for premium feel |
+**Defer to v1.4 (complex, lower immediate revenue impact):**
 
-**Key finding:** ScheduleBox's AI features (no-show, dynamic pricing, CLV) are unique in this competitive set. No competitor offers genuine ML-based predictions. This is the primary differentiator — but only if the models are actually trained and results are visibly surfaced in the UI.
+- Cross-location booking (Category 2) — very high complexity
+- Per-location payout accounts (Category 2) — Comgate multi-merchant complexity
+- Customer cohort retention analysis (Category 4) — needs data history to be meaningful
+- Overage billing (Category 3) — new billing concept
+- Branch-level AI models (Category 2) — requires per-location training data
+- Annual billing cycle (Category 1) — lower urgency than monthly subscription
 
 ---
 
-## AI Model Training Notes
+## CZ/SK Market Considerations
 
-### No-Show Predictor — Training Path
-
-The `scripts/train_no_show.py` script already supports both real-data (API fetch from `/api/internal/features/training/no-show`) and synthetic data (500 samples, `random_state=42`).
-
-**What "real AI" requires for v1.2:**
-1. Run `train_no_show.py` with 500 synthetic samples (already works)
-2. Store `no_show_predictor.joblib` in `MODEL_DIR` (configured in AI service config)
-3. Restart AI service → `model_loader.py` loads it → responses show `confidence: 0.82, fallback: false`
-
-**Key features driving no-show prediction accuracy** (from medical scheduling literature, ~86% accuracy benchmark):
-- Lead time (single most influential factor — longer > 60 days = higher no-show)
-- Prior no-show history (strongest predictor per patient/customer studies)
-- Payment status (paid bookings = lower no-show rate)
-- First visit vs returning customer
-- Day of week and time of day
-- Service duration and price
-
-All 11 of these are already in `FEATURE_COLUMNS`. The model architecture is correct.
-
-### Pricing Optimizer — State Seeding
-
-The Thompson Sampling bandit does not need training — it learns online. But it needs:
-1. An initial state JSON file with balanced priors (already supported in `PricingOptimizer.__init__`)
-2. A Redis key for persistent state between service restarts
-3. A feedback signal when a booking is completed at a given price (API endpoint or RabbitMQ consumer)
-
-Without the feedback loop, the bandit never learns. This is the gap, not the model itself.
-
-### Capacity Forecaster — Minimum Data Requirement
-
-Facebook Prophet requires sufficient historical time-series data. With synthetic data:
-- Generate 6 months of synthetic hourly booking counts with realistic Czech business patterns (busy Tuesday-Friday 9am-5pm, slow Monday mornings, weekend variation by business type)
-- Train using `scripts/train_capacity.py` (verify this exists — structure follows train_no_show.py pattern)
-- Store `capacity_forecaster.joblib` in MODEL_DIR
-
-**Confidence level:** MEDIUM — Prophet's cold-start with synthetic data may produce low-quality forecasts. Better to defer the capacity chart to v1.2.x when real booking data exists, rather than show inaccurate forecasts.
-
----
-
-## Booking UX Audit Checklist
-
-These specific items need verification (not assumptions) in the existing codebase:
-
-### Public Booking Widget (`/[company_slug]/`)
-- [ ] Calendar cell tap targets: minimum 44x44px on mobile
-- [ ] Loading states: skeleton loaders, not blank white screen during API calls
-- [ ] Error states: clear messages when slots load fails, with retry button
-- [ ] Timezone: displayed in customer's local timezone (or company timezone if set)
-- [ ] Staff display: photo optional, name mandatory, buffer time respected
-- [ ] Progress stepper: shows current step and total steps
-- [ ] Pre-payment total display: shows full price before Comgate redirect
-- [ ] Confirmation page: all booking details + add-to-calendar + cancellation link
-
-### Dashboard Booking Management
-- [ ] No-show risk badge: visible on booking row (after AI model trained)
-- [ ] Filters work: by date, status, service, employee
-- [ ] Mobile responsive: table scrolls, not cut off
-- [ ] Action buttons: confirm, cancel, reschedule — all functional
+| Consideration | Impact | Notes |
+|--------------|--------|-------|
+| **Czech invoice requirements** | HIGH | IČO mandatory on B2B invoices. 15-day issuance window. 10-year retention. Already have PDF generation — extend it. |
+| **Comgate is not Stripe** | HIGH | No built-in subscription management, proration, or dunning. All must be custom-built. Recurring feature requires account-level approval from Comgate. |
+| **GDPR on subscription data** | MEDIUM | Payment method tokens stored at Comgate — not in ScheduleBox DB (correct). Subscription records must be deletable per GDPR right-to-erasure (preserve for 10 years if invoice exists — legal conflict to resolve). |
+| **CZK pricing psychology** | MEDIUM | SMB owners compare to Reservio (250-1500 Kč) and Reservanto (200-800 Kč). Essential at 490 Kč is competitive. Growth at 1,490 Kč needs clear AI/multi-staff justification. |
+| **Seasonal business model** | MEDIUM | Ski instructors, summer camps, event photographers = high churn in off-season. Subscription pause feature (Category 1 differentiator) directly addresses this and reduces Czech/Slovak churn. |
+| **Preference for phone/face-to-face support** | LOW | Czech SMBs don't self-serve billing issues. In-app chat or email support link on billing pages reduces involuntary churn. |
+| **Slovak market VAT** | LOW | Slovak VAT is 20% (not Czech 21%). If billing Slovak companies, VAT rate must be configurable per company country. |
 
 ---
 
 ## Sources
 
-### AI/ML — No-Show Prediction
-- [PMC: Real-Time Analytics and AI for No-Show Appointments (UAE study, 86% accuracy)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11729783/)
-- [Medical Economics: AI predicts no-shows with 90% accuracy (healow model)](https://www.medicaleconomics.com/view/can-ai-predict-no-shows-before-they-happen-this-new-model-says-yes)
-- [npj Digital Medicine: Machine learning for pediatric no-show prediction](https://www.nature.com/articles/s41746-022-00594-w)
-- [JMIR: Enhancing prediction of missed appointments](https://medinform.jmir.org/2024/1/e48273)
-- [AAPC: Can machine learning predict no-shows?](https://www.aapc.com/blog/93112-can-machine-learning-predict-patient-no-shows/)
-
-### Booking UX
-- [ralabs.org: Booking UX Best Practices 2025](https://ralabs.org/blog/booking-ux-best-practices/)
-- [Medium (Sara Jahanbakhsh): UX Friction in Mobile Booking — Case Study, Jul 2025](https://medium.com/@Sara-Jahanbakhsh/case-study-ux-friction-in-mobile-booking-f30a236fe88f)
-- [Eleken: Calendar UI Examples + UX Tips](https://www.eleken.co/blog-posts/calendar-ui-examples)
-- [Movers Development: Landing page trust signals that multiply booking rates](https://moversdev.com/landing-page-trust-signals-that-multiply-booking-rates/)
-- [Aubergine: Calendly Redesign Case Study](https://www.aubergine.co/insights/ux-re-design-experiments-elevating-calendlys-one-on-one-event-type-feature)
-
-### Landing Page
-- [Unbounce: 27 best SaaS landing pages + tips](https://unbounce.com/conversion-rate-optimization/the-state-of-saas-landing-pages/)
-- [Magic UI: 7 SaaS Landing Page Best Practices 2025](https://magicui.design/blog/saas-landing-page-best-practices)
-- [Heyflow: SaaS landing page best practices](https://heyflow.com/blog/saas-landing-page-best-practices/)
-- [Klientboost: 51 High-Converting SaaS Landing Pages 2025](https://www.klientboost.com/landing-pages/saas-landing-page/)
-
-### Onboarding
-- [Calendly Onboarding Checklist — UserOnboarding.Academy](https://useronboarding.academy/user-onboarding-inspirations/calendly)
-- [ProductLed: SaaS Onboarding Best Practices 2025](https://productled.com/blog/5-best-practices-for-better-saas-user-onboarding)
-- [Flowjam: SaaS Onboarding Best Practices 2025 Guide](https://www.flowjam.com/blog/saas-onboarding-best-practices-2025-guide-checklist)
-- [Userpilot: Aha Moment Examples for SaaS](https://userpilot.com/blog/aha-moment-examples/)
-- [Candu: Best SaaS Onboarding Examples 2025](https://www.candu.ai/blog/best-saas-onboarding-examples-checklist-practices-for-2025)
-- [UserGuiding: Onboarding Wizard Examples](https://userguiding.com/blog/what-is-an-onboarding-wizard-with-examples)
-
-### Competitor Analysis
-- [Reservio 2025 Highlights](https://www.reservio.com/blog/building-reservio/2025-highlights)
-- [GetApp: Reservio 2026](https://www.getapp.com/customer-management-software/a/reservio/)
-- [ROI Index: Bookio vs Reservio comparison (Slovak)](https://roi-index.com/blog/porovnanie-rezervacnych-systemov-bookio-a-reservio/)
-- [Acuity Scheduling Features](https://acuityscheduling.com/features)
-- [Calendly vs Acuity 2026](https://koalendar.com/blog/calendly-vs-acuity)
-
-### Smart Pricing / Capacity
-- [Newbook: Dynamic Pricing & AI](https://www.newbook.cloud/price-optimization/)
-- [Dialzara: Top 10 AI Tools for No-Show Prediction 2024](https://dialzara.com/blog/top-10-ai-tools-for-no-show-prediction-2024)
-- [OnceHub: Better Appointment Scheduling With AI](https://www.oncehub.com/blog/ai-schedule-maker)
-
----
-
-*Feature research for: ScheduleBox v1.2 — AI Service, UI Polish, Landing Page, Onboarding*
-*Researched: 2026-02-21*
+- [Comgate Recurring Payments](https://help.comgate.cz/docs/en/recurring-payments) — MEDIUM confidence (docs require auth to access full detail)
+- [Comgate Payment Methods Overview](https://apidoc.comgate.cz/en/metody-platebni-brany/) — MEDIUM confidence
+- [Fresha Multi-Location Management](https://www.fresha.com/blog/easy-ways-to-manage-multiple-locations) — HIGH confidence (official blog)
+- [Pabau Multi-Location Scheduling](https://pabau.com/blog/multi-location-scheduling-software/) — HIGH confidence (official platform)
+- [Stigg — Beyond Metering (Usage Limits)](https://www.stigg.io/blog-posts/beyond-metering-the-only-guide-youll-ever-need-to-implement-usage-based-pricing) — HIGH confidence (authoritative technical guide)
+- [Appcues — Freemium Upgrade Prompts](https://www.appcues.com/blog/best-freemium-upgrade-prompts) — MEDIUM confidence (industry blog with case studies)
+- [Stripe — Upgrade/Downgrade Subscriptions](https://docs.stripe.com/billing/subscriptions/upgrade-downgrade) — HIGH confidence (official docs)
+- [Chargebee — Proration](https://www.chargebee.com/subscription-management/handle-prorations/) — HIGH confidence (billing platform docs)
+- [Kinde — Dunning Strategies](https://kinde.com/learn/billing/churn/dunning-strategies-for-saas-email-flows-and-retry-logic/) — MEDIUM confidence
+- [Engageware — Appointment Analytics](https://engageware.com/blog/the-hidden-value-of-appointment-scheduling-analytics/) — MEDIUM confidence
+- [Eurofiscalis — Czech Invoice Requirements](https://www.eurofiscalis.com/en/invoicing-in-czech-republic/) — HIGH confidence (official tax advisory)
+- [Shadn/ui Design Tokens](https://shadisbaih.medium.com/building-a-scalable-design-system-with-shadcn-ui-tailwind-css-and-design-tokens-031474b03690) — MEDIUM confidence
+- [SaaS KPIs Dashboard — HubiFi](https://www.hubifi.com/blog/saas-kpi-dashboard-metrics) — MEDIUM confidence
+- [VisionWrights — Multi-Location Analytics](https://visionwrights.com/blog/multi-location-analytics-what-franchise-operators-need) — MEDIUM confidence
