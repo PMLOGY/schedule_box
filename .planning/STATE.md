@@ -5,15 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness SHIPPED — planning next milestone
+**Current focus:** v1.3 Revenue & Growth — defining requirements
 
 ## Current Position
 
-- **Milestone:** v1.2 Product Readiness — SHIPPED
-- **Status:** All 3 milestones complete (v1.0, v1.1, v1.2)
-- **Last activity:** 2026-02-24 — v1.2 milestone archived
+- **Milestone:** v1.3 Revenue & Growth
+- **Phase:** Not started (defining requirements)
+- **Plan:** —
+- **Status:** Defining requirements
+- **Last activity:** 2026-02-24 — Milestone v1.3 started
 
-Progress: [██████████] 100% (v1.0 + v1.1 + v1.2 shipped)
+Progress: [░░░░░░░░░░] 0%
 
 ## What's Done
 
@@ -22,11 +24,11 @@ Progress: [██████████] 100% (v1.0 + v1.1 + v1.2 shipped)
 **v1.1 shipped** (33 requirements, 7 phases, 22 plans). All complete 2026-02-20, Twilio + Comgate credentials configured 2026-02-24.
 
 **v1.2 shipped** (34 requirements, 5 phases, 20 plans). Completed 2026-02-24:
-- Phase 23: AI training pipeline — 6 feature extraction endpoints, Prophet/XGBoost/scikit-learn, Redis persistence, Railway deployment, weekly retraining CI
-- Phase 24: AI-powered UI — no-show risk badges, AI insights panel, onboarding state progress indicator
-- Phase 25: Czech marketing landing page — live widget demo, 3-tier pricing, privacy/terms, ECA 2022 cookie consent
-- Phase 26: Booking UX polish — react-big-calendar (MIT), mobile 44px tap targets, ICS export, Motion animations
-- Phase 27: Onboarding wizard — 4-step setup, 8 industry templates, demo data seeder, Driver.js tour, dashboard checklist
+- Phase 23: AI training pipeline
+- Phase 24: AI-powered UI
+- Phase 25: Czech marketing landing page
+- Phase 26: Booking UX polish
+- Phase 27: Onboarding wizard
 
 ## Decisions
 
@@ -45,4 +47,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
 
 ---
-*Last updated: 2026-02-24 — v1.2 milestone archived*
+*Last updated: 2026-02-24 — Milestone v1.3 started*

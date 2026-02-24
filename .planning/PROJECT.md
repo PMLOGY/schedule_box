@@ -26,6 +26,17 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
+## Current Milestone: v1.3 Revenue & Growth
+
+**Goal:** Enable ScheduleBox to generate recurring revenue through subscription billing, support franchise businesses with multi-location management, and deliver a professional frontend that justifies paid tiers.
+
+**Target features:**
+- Comgate recurring subscription billing for 4 pricing tiers with plan management
+- Usage limits enforcement per tier with upgrade prompts
+- Multi-location franchise support (5-50 locations) with centralized management and role-based access
+- Analytics and reporting — revenue dashboards, booking trends, aggregate cross-location reporting
+- Frontend polish — dashboard redesign, design system harmonization, landing page upgrade
+
 ## Current State
 
 **v1.2 Product Readiness shipped** (2026-02-24). All three milestones complete:
@@ -69,7 +80,7 @@ Freemium with 4 tiers:
 - ✓ ONB-01..07 — Onboarding wizard, QR code, checklist, empty states, demo data, Driver.js, templates — v1.2
 
 ### Active
-See `.planning/REQUIREMENTS.md` for next milestone requirements (when defined).
+See `.planning/REQUIREMENTS.md` for v1.3 requirements.
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
@@ -103,4 +114,4 @@ See `.planning/REQUIREMENTS.md` for next milestone requirements (when defined).
 
 ---
 
-_Last updated: 2026-02-24 after v1.2 milestone completion_
+_Last updated: 2026-02-24 after v1.3 milestone start_
