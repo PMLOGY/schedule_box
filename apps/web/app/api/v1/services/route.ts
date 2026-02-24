@@ -13,6 +13,7 @@ import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse, createdResponse } from '@/lib/utils/response';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { serviceCreateSchema, serviceQuerySchema } from '@/validations/service';
+import { checkServiceLimit } from '@/lib/usage/usage-service';
 
 /**
  * List services
@@ -108,6 +109,9 @@ export const POST = createRouteHandler({
 
     // Get company scope
     const { companyId } = await findCompanyId(user.sub);
+
+    // Check service limit for company's plan tier
+    await checkServiceLimit(companyId);
 
     // Extract resource_ids before creating service
     const { resource_ids, ...serviceData } = body;

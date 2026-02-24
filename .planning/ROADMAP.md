@@ -169,6 +169,15 @@ Plans:
 
 **Requirements:** ANLYT-01, ANLYT-02, ANLYT-03, ANLYT-04, ANLYT-05, ANLYT-06, ANLYT-07, ANLYT-08
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 31-01-PLAN.md — Revenue & booking analytics API routes (payment methods, top services, peak hours, cancellations, customer retention)
+- [ ] 31-02-PLAN.md — Employee utilization API + analytics_snapshots schema + BullMQ hourly refresh scheduler
+- [ ] 31-03-PLAN.md — Platform admin dashboard API (MRR, churn, plan distribution) + cross-location organization analytics API
+- [ ] 31-04-PLAN.md — Analytics UI enhancement (6 new chart components, extended analytics page with all sections)
+- [ ] 31-05-PLAN.md — Admin dashboard page + organization analytics page + customer report PDF/CSV export + navigation update
+
 **Success Criteria:**
 
 1. A business owner can open the analytics dashboard and see daily/weekly/monthly revenue charts, payment method breakdown, top services by revenue, booking volume trends, and peak hours heatmap — all updating when the date range filter is changed.
@@ -178,9 +187,7 @@ Plans:
 5. An owner can export their revenue, bookings, or customer report as a PDF or CSV file from the analytics page.
 6. Analytics queries complete in under 2 seconds for standard date ranges (up to 90 days) because data is served from a materialized view that is refreshed hourly by a BullMQ job, not computed live on every request.
 
-**Plan estimates:** 4-5 plans (DB: materialized view + revenue_snapshots table + BullMQ refresh job, revenue + booking analytics API routes, employee + customer retention analytics, cross-location org analytics + platform admin dashboard, analytics UI components + export)
-
-**Research flag:** Occupancy rate calculation is HIGH complexity (requires working hours minus blocked time divided by average service duration). Scope this explicitly in phase planning and be prepared to ship an approximation or defer to v1.4.
+**Occupancy rate decision:** V1 ships a booking fill rate approximation (bookings * avgDuration / employees * workingDays * 480min) instead of the full working-hours-minus-blocked-time calculation. Precise occupancy deferred to v1.4.
 
 ---
 
@@ -238,7 +245,7 @@ Plans:
 | 28. Subscription Billing | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 29. Usage Limits | v1.3 | 0/3 | Planned | — |
 | 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
-| 31. Analytics | v1.3 | — | Pending | — |
+| 31. Analytics | v1.3 | 0/5 | Planned | — |
 | 32. Frontend Polish | v1.3 | — | Pending | — |
 
 ---
@@ -250,3 +257,4 @@ Plans:
 *Phase 28 planned: 2026-02-24*
 *Phase 29 planned: 2026-02-24*
 *Phase 30 planned: 2026-02-24*
+*Phase 31 planned: 2026-02-24*
