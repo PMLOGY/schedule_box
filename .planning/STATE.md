@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-04 complete, Plan 05+ pending)
+**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-05 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 31 — Analytics & Reporting
-- **Plan:** 04 complete, 05+ pending
-- **Status:** Plan 04 complete (analytics UI charts and enhanced page)
-- **Last activity:** 2026-02-24 — Plan 31-04 complete (6 chart components, enhanced analytics page)
+- **Plan:** 05 complete, 06+ pending
+- **Status:** Plan 05 complete (admin dashboard, org analytics, customer export)
+- **Last activity:** 2026-02-24 — Plan 31-05 complete (admin dashboard, org analytics pages, customer PDF/CSV export)
 
-Progress: [####------] 40% (4/? plans)
+Progress: [#####-----] 50% (5/? plans)
 
 ## What's Done
 
@@ -58,6 +58,7 @@ Progress: [####------] 40% (4/? plans)
 - Plan 02 complete: Employee utilization API (per-employee bookings, revenue, occupancy approximation), analytics_snapshots table, BullMQ hourly snapshot scheduler
 - Plan 03 complete: Admin SaaS health metrics API (MRR/ARR/churn/plan distribution/signup trends) + cross-location organization analytics API for franchise owners
 - Plan 04 complete: 6 analytics chart components (PieChart, BarChart, LineChart, CSS heatmap, composite panel) + enhanced analytics page with 8+ card sections
+- Plan 05 complete: Admin dashboard page (MRR/churn/plan distribution charts), organization analytics page (per-location breakdown), customer PDF/CSV export, 6-button export toolbar
 
 ## Decisions
 
@@ -126,6 +127,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - PeakHoursHeatmap uses CSS flexbox grid (not Recharts) for better heatmap UX
 - CustomerRetentionPanel is composite (stats + badges + CLV histogram), not single chart
 - Pie chart labels use built-in name/percent props (avoids PieLabelRenderProps type issue)
+- Admin dashboard page uses direct role guard (useAuthStore role !== admin) with Access Denied card
+- Customer retention data flattened from nested API response before passing to export toolbar
+- Customer PDF route reuses same DB queries as customer-retention analytics API for consistency
 
 ## Blockers
 
@@ -158,6 +162,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 31 Plan 02 | 2 tasks | 4 files | 5 min |
 | Phase 31 Plan 03 | 2 tasks | 2 files | 3 min |
 | Phase 31 Plan 04 | 2 tasks | 8 files | 6 min |
+| Phase 31 Plan 05 | 2 tasks | 18 files | 13 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 31 Plans 01-04 complete. Plan 05 pending (export reports).*
+*Last updated: 2026-02-24 — Phase 31 Plans 01-05 complete. Plan 06+ pending.*
