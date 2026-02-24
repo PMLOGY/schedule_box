@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 01 complete, executing Plan 02
+**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 02 complete, executing Plan 03/04
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** 5 plans in 4 waves (01: complete, 02: next, 04+05: UI+invoices, 03: scheduler)
-- **Status:** Plan 01 complete, ready for Plan 02
-- **Last activity:** 2026-02-24 — Phase 28 Plan 01 executed (schema + Comgate recurring + billing types)
+- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 04+05: UI+invoices, 03: scheduler)
+- **Status:** Plan 02 complete, ready for Plan 03/04
+- **Last activity:** 2026-02-24 — Phase 28 Plan 02 executed (billing API routes + service layer)
 
-Progress: [##░░░░░░░░] 20% (1/5 plans)
+Progress: [####░░░░░░] 40% (2/5 plans)
 
 ## What's Done
 
@@ -34,6 +34,7 @@ Progress: [##░░░░░░░░] 20% (1/5 plans)
 
 **v1.3 Phase 28 in progress:**
 - Plan 01 complete: Subscription schema (3 tables), Comgate recurring client, billing types/config
+- Plan 02 complete: 7 billing API routes + subscription service layer with state machine
 
 ## Decisions
 
@@ -45,6 +46,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Separate subscription_invoices table (existing invoices has NOT NULL bookingId FK)
 - PostgreSQL SEQUENCE for globally unique subscription invoice numbering
 - sellerSnapshot JSONB for Czech law invoice compliance
+- Upgrade proration uses chargeRecurringPayment (server-side) for existing subscribers, initComgatePayment only for new
+- Downgrade scheduled at period end (not immediate), stored in cancelAtPeriodEnd + event metadata
+- Webhook idempotency via subscription_events table (separate from processed_webhooks)
+- Plans endpoint is public (no auth), all other billing routes require SETTINGS_MANAGE permission
 
 ## Blockers
 
@@ -61,6 +66,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
 
 | Phase 28 Plan 01 | 2 tasks | 9 files | 5 min |
+| Phase 28 Plan 02 | 2 tasks | 8 files | 7 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 28 Plan 01 complete (schema + Comgate recurring + billing types)*
+*Last updated: 2026-02-24 — Phase 28 Plan 02 complete (billing API routes + subscription service layer)*
