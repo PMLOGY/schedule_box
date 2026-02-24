@@ -113,3 +113,23 @@ export type {
   CompetitorScrapeInput,
   CompetitorQueryInput,
 } from './ai-voice-intelligence';
+
+// Billing & Subscription types (Phase 28)
+export type {
+  SubscriptionPlan,
+  SubscriptionStatus,
+  BillingCycle,
+  PlanFeatures,
+  PlanConfig,
+} from './billing';
+export {
+  PLAN_CONFIG,
+  VALID_SUBSCRIPTION_TRANSITIONS,
+  isValidTransition,
+  getVatRate,
+  calculateProration,
+  getPlanPrice,
+  DUNNING_GRACE_PERIOD_DAYS,
+  DUNNING_MAX_RETRIES,
+  TRIAL_PERIOD_DAYS,
+} from './billing';
