@@ -19,3 +19,36 @@
 
 ---
 
+## v1.1 Production Hardening (Shipped: 2026-02-21)
+
+**Phases completed:** 7 phases, 22 plans
+
+**Key accomplishments:**
+- Testing foundation: Vitest unit tests (80%+ coverage), Testcontainers integration tests, Playwright E2E tests
+- Email delivery via SMTP with SPF/DKIM, SMS delivery via Twilio Messaging Service with Alpha Sender ID
+- Comgate payment processing with production credentials and webhook verification
+- Monitoring: email bounce rates, SMS cost alerts, payment webhook failure logging, CI coverage gates
+
+**Stats:**
+- Phases 16-22 (2026-02-20 → 2026-02-24)
+- Twilio + Comgate credentials configured 2026-02-24
+
+---
+
+## v1.2 Product Readiness (Shipped: 2026-02-24)
+
+**Phases completed:** 5 phases (23-27), 20 plans, 41 tasks
+
+**Key accomplishments:**
+- Complete AI training pipeline: 6 feature extraction endpoints, Prophet/XGBoost/scikit-learn models, Redis state persistence, Railway deployment with weekly retraining CI
+- AI-powered UI surfaces: no-show risk badges on booking list, AI insights dashboard panel, onboarding state progress indicator for new companies
+- Czech marketing landing page with live widget demo, 3-tier pricing, privacy/terms pages, ECA 2022 cookie consent
+- Booking UX polish: react-big-calendar migration (MIT), mobile 44px tap targets, Morning/Afternoon/Evening slot grouping, RFC 5545 ICS export, Motion confirmation animations
+- Complete onboarding flow: 4-step business setup wizard, 8 industry templates with Czech service names, demo data seeder, Driver.js contextual tour, dashboard checklist widget
+
+**Stats:**
+- 47 commits over 4 days (2026-02-21 → 2026-02-24)
+- 34 requirements delivered with 100% coverage
+- All 5 phases verified with zero critical deviations
+
+---
