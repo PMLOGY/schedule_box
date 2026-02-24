@@ -1214,6 +1214,37 @@
       "title": "Vitajte v ScheduleBox!",
       "description": "Dokončite nastavenie a začnite prijímať rezervácie",
       "action": "Spustiť sprievodcu"
+    },
+    "demoData": {
+      "promptTitle": "Chcete vidieť ScheduleBox v akcii?",
+      "promptDescription": "Načítajte demo dáta: Beauty Studio Praha — 3 služby, 5 zákazníkov, 10 rezervácií",
+      "loadButton": "Načítať demo dáta",
+      "loadingButton": "Načítanie...",
+      "info": "Demo dáta sú jasne označené a možno ich kedykoľvek odstrániť",
+      "activeBanner": "Demo dáta aktívne",
+      "activeCompany": "Beauty Studio Praha",
+      "removeButton": "Odstrániť demo dáta",
+      "removeConfirm": "Naozaj chcete odstrániť všetky demo dáta?",
+      "success": "Demo dáta úspešne načítané",
+      "removed": "Demo dáta odstránené"
+    },
+    "tour": {
+      "navigation": {
+        "title": "Navigácia",
+        "description": "Tu nájdete všetky sekcie — rezervácie, zákazníkov, služby, analýzu a nastavenia"
+      },
+      "overview": {
+        "title": "Prehľad",
+        "description": "Vaše kľúčové metriky — dnešné rezervácie, mesačné tržby, noví zákazníci"
+      },
+      "quickActions": {
+        "title": "Rýchle akcie",
+        "description": "Rýchlo vytvorte rezerváciu, pridajte zákazníka alebo otvorte kalendár"
+      },
+      "nextBtn": "Ďalej",
+      "prevBtn": "Späť",
+      "doneBtn": "Hotovo",
+      "closeBtn": "Zavrieť"
     }
   },
   "emptyStates": {

@@ -75,7 +75,7 @@ Each task was committed atomically:
 1. **Task 1: Create ICS generator utility and API endpoint** - `ad429ae` (feat)
 2. **Task 2: Create animated booking confirmation with add-to-calendar button** - `d24daf3` (feat)
 
-**Plan metadata:** TBD (docs: complete plan)
+**Plan metadata:** `596ec5f` (docs: complete plan)
 
 ## Files Created/Modified
 

@@ -1102,6 +1102,37 @@
       "title": "Welcome to ScheduleBox!",
       "description": "Complete your setup to start accepting bookings",
       "action": "Start setup"
+    },
+    "demoData": {
+      "promptTitle": "Want to see ScheduleBox in action?",
+      "promptDescription": "Load demo data: Beauty Studio Praha — 3 services, 5 customers, 10 bookings",
+      "loadButton": "Load demo data",
+      "loadingButton": "Loading...",
+      "info": "Demo data is clearly labeled and can be removed anytime",
+      "activeBanner": "Demo data active",
+      "activeCompany": "Beauty Studio Praha",
+      "removeButton": "Remove demo data",
+      "removeConfirm": "Are you sure you want to remove all demo data?",
+      "success": "Demo data loaded successfully",
+      "removed": "Demo data removed"
+    },
+    "tour": {
+      "navigation": {
+        "title": "Navigation",
+        "description": "Find all sections here — bookings, customers, services, analytics, and settings"
+      },
+      "overview": {
+        "title": "Dashboard Overview",
+        "description": "Your key metrics — today's bookings, monthly revenue, new customers"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "description": "Quickly create a booking, add a customer, or open the calendar"
+      },
+      "nextBtn": "Next",
+      "prevBtn": "Previous",
+      "doneBtn": "Done",
+      "closeBtn": "Close"
     }
   },
   "emptyStates": {
