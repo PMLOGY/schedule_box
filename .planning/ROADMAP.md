@@ -119,9 +119,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 29-01-PLAN.md — Redis booking counter infrastructure + plan-limits helper + GET /api/v1/usage endpoint
-- [ ] 29-02-PLAN.md — Server-side limit enforcement in POST handlers (bookings, employees, services) with 402 responses
-- [ ] 29-03-PLAN.md — Usage dashboard widget with progress bars + upgrade modal + Czech/English translations
+- [x] 29-01-PLAN.md — Redis booking counter infrastructure + plan-limits helper + GET /api/v1/usage endpoint
+- [x] 29-02-PLAN.md — Server-side limit enforcement in POST handlers (bookings, employees, services) with 402 responses
+- [x] 29-03-PLAN.md — Usage dashboard widget with progress bars + upgrade modal + Czech/English translations
 
 **Success Criteria:**
 
@@ -248,7 +248,7 @@ Plans:
 | 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 28. Subscription Billing | v1.3 | 5/5 | Complete | 2026-02-24 |
-| 29. Usage Limits | v1.3 | 0/3 | Planned | — |
+| 29. Usage Limits | v1.3 | 3/3 | Complete | 2026-02-24 |
 | 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
 | 31. Analytics | v1.3 | 0/5 | Planned | — |
 | 32. Frontend Polish | v1.3 | 0/3 | Planned | — |

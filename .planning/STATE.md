@@ -43,6 +43,8 @@ Progress: [###-------] 30% (3/? plans)
 - Plan 01 complete: Usage counting infrastructure (Redis booking counters, DB employee/service counts, plan-limits helper, GET /api/v1/usage endpoint)
 - Plan 02 complete: Server-side limit enforcement on POST /api/v1/bookings, /employees, /services (402 PLAN_LIMIT_EXCEEDED + Redis counter increment)
 - Plan 03 complete: Usage dashboard UI (UsageWidget with progress bars, UpgradeModal with plan comparison, useUsageQuery hook, cs/en/sk translations)
+- Gap closure: Wired UpgradeModal globally via MutationCache 402 interceptor in providers.tsx
+- Verified: 7/7 must-haves, 5 requirements (LIMIT-01..05)
 
 **v1.3 Phase 30 in progress:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
