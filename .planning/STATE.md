@@ -21,7 +21,7 @@ Progress: [██████████] 100% (v1.2: 19/19 plans)
 
 **v1.0 shipped** (103 requirements, 15 phases, 101 plans). Deployed to Railway 2026-02-15.
 
-**v1.1 shipped** (33 requirements, 7 phases, 20 plans). All code complete 2026-02-20. Twilio + Comgate human checkpoints deferred.
+**v1.1 shipped** (33 requirements, 7 phases, 22 plans). All complete 2026-02-20, Twilio + Comgate credentials configured 2026-02-24.
 
 **v1.2 roadmap created** (2026-02-21):
 - 5 phases mapped (23-27): AI Service, AI UI, Landing Page, Booking UX, Onboarding
@@ -131,4 +131,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 27-04 | 1 | 7min | 7min |
 
 ---
-*Last updated: 2026-02-24 after Phase 27 Plan 04 complete (industry templates + apply-template API + picker UI)*
+*Last updated: 2026-02-24 — Phases 20 + 21 closed (Twilio/Comgate credentials configured)*

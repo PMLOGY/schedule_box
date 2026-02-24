@@ -43,11 +43,11 @@
 - [x] Phase 17: Integration Testing (3/3 plans) — completed 2026-02-20
 - [x] Phase 18: E2E Testing (3/3 plans) — completed 2026-02-20
 - [x] Phase 19: Email Delivery (4/4 plans) — completed 2026-02-20
-- [x] Phase 20: SMS Delivery (2/3 plans, Twilio setup deferred) — completed 2026-02-20
-- [x] Phase 21: Payment Processing (2/3 plans, Comgate setup deferred) — completed 2026-02-20
+- [x] Phase 20: SMS Delivery (3/3 plans) — completed 2026-02-24
+- [x] Phase 21: Payment Processing (3/3 plans) — completed 2026-02-24
 - [x] Phase 22: Monitoring & Alerts (2/2 plans) — completed 2026-02-20
 
-**Note:** Plans 20-03 (Twilio account setup) and 21-03 (Comgate production credentials) are human checkpoints deferred to when external accounts are ready. All code work is complete.
+**Note:** Twilio (Phase 20-03) and Comgate (Phase 21-03) credentials configured 2026-02-24. All plans complete.
 
 </details>
 
@@ -197,8 +197,8 @@ Plans:
 | 17. Integration Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 18. E2E Testing | v1.1 | 3/3 | Complete | 2026-02-20 |
 | 19. Email Delivery | v1.1 | 4/4 | Complete | 2026-02-20 |
-| 20. SMS Delivery | v1.1 | 2/3 | Code complete (Twilio setup deferred) | 2026-02-20 |
-| 21. Payment Processing | v1.1 | 2/3 | Code complete (Comgate setup deferred) | 2026-02-20 |
+| 20. SMS Delivery | v1.1 | 3/3 | Complete | 2026-02-24 |
+| 21. Payment Processing | v1.1 | 3/3 | Complete | 2026-02-24 |
 | 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
 | 23. AI Service | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 24. AI-Powered UI | v1.2 | 2/2 | Complete | 2026-02-24 |
