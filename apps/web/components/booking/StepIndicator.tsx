@@ -33,11 +33,11 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
 
           return (
             <div key={step.key} className="flex items-center flex-1">
-              {/* Step Circle */}
+              {/* Step Circle — 44px minimum for mobile tap targets */}
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors',
+                    'flex h-11 w-11 items-center justify-center rounded-full border-2 transition-colors',
                     {
                       'border-primary bg-primary text-primary-foreground': isCompleted || isCurrent,
                       'border-muted bg-background text-muted-foreground':
@@ -51,7 +51,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                     <span className="text-sm font-semibold">{stepNumber}</span>
                   )}
                 </div>
-                {/* Step Label - hidden on mobile */}
+                {/* Desktop step label */}
                 <span
                   className={cn('mt-2 text-sm font-medium hidden md:block', {
                     'text-foreground': isCurrent,
@@ -74,6 +74,15 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
             </div>
           );
         })}
+      </div>
+
+      {/* Mobile: "Step X of Y — Step Name" */}
+      <div className="md:hidden text-center mt-3">
+        <p className="text-sm font-medium text-foreground">
+          {t('booking.wizard.stepXofY', { current: currentStep, total: 4 })}
+          {' \u2014 '}
+          {t(steps[currentStep - 1].label)}
+        </p>
       </div>
     </div>
   );

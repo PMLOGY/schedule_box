@@ -202,6 +202,7 @@
       "noBookings": "Žádné rezervace"
     },
     "wizard": {
+      "stepXofY": "Krok {current} ze {total}",
       "steps": {
         "service": "Služba",
         "datetime": "Datum a čas",
@@ -223,7 +224,10 @@
         "selectDate": "Vyberte datum",
         "availableSlots": "Dostupné časy",
         "noSlotsAvailable": "Pro vybrané datum nejsou dostupné žádné termíny",
-        "loading": "Načítání dostupnosti..."
+        "loading": "Načítání dostupnosti...",
+        "morning": "Dopoledne",
+        "afternoon": "Odpoledne",
+        "evening": "Večer"
       },
       "step3": {
         "title": "Informace o zákazníkovi",

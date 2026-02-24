@@ -202,6 +202,7 @@
       "noBookings": "No bookings"
     },
     "wizard": {
+      "stepXofY": "Step {current} of {total}",
       "steps": {
         "service": "Service",
         "datetime": "Date & Time",
@@ -223,7 +224,10 @@
         "selectDate": "Select date",
         "availableSlots": "Available times",
         "noSlotsAvailable": "No available times for selected date",
-        "loading": "Loading availability..."
+        "loading": "Loading availability...",
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
       },
       "step3": {
         "title": "Customer Information",
