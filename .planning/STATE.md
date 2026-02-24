@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 32 in progress (Plans 01-02 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 32 in progress (Plans 01-02 complete, 03 awaiting visual verification)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 32 — Frontend Polish
-- **Plan:** 02 complete, 03+ pending
-- **Status:** Plan 02 complete (skeleton loading states, error boundary)
-- **Last activity:** 2026-02-24 — Plan 32-02 complete (PageSkeleton 5 variants, TableSkeleton, dashboard error.tsx, 16 route loading.tsx files)
+- **Plan:** 03 auto tasks complete, checkpoint:human-verify pending
+- **Status:** Plan 03 code complete — dashboard redesign + landing page testimonials + responsive fixes committed. Awaiting human visual verification (Task 3).
+- **Last activity:** 2026-02-24 — Plan 32-03 Tasks 1-2 complete (dashboard KPI/chart/bookings grid, landing page social proof, responsive audit)
 
-Progress: [##--------] 20% (2/? plans)
+Progress: [##--------] 20% (2/? plans, plan 03 in checkpoint)
 
 ## What's Done
 
@@ -63,6 +63,7 @@ Progress: [##--------] 20% (2/? plans)
 **v1.3 Phase 32 in progress:**
 - Plan 01 complete: next-themes dark mode, ThemeProvider wrapping app, ThemeToggle in header/navbar, shadow/color CSS tokens, all hardcoded light-only colors replaced with semantic tokens
 - Plan 02 complete: PageSkeleton (5 variants), TableSkeleton, dashboard error.tsx boundary, 16 route-specific loading.tsx files replacing all Loader2 spinners
+- Plan 03 in progress: Dashboard redesign (KPI row, RevenueMiniChart, RecentBookings, inline QuickActions), landing page SocialProof testimonials, responsive overflow fixes — awaiting human visual verification
 
 ## Decisions
 
@@ -143,6 +144,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Plain `<a>` tag (not i18n Link) for dashboard link in error.tsx to avoid router context issues in error boundary
 - Billing loading uses dashboard variant (mixed content: subscription card + plan grid + invoice table)
 - Calendar loading is custom skeleton (not PageSkeleton variant) for full-height calendar placeholder
+- Revenue chart uses synthetic daily distribution from analytics totals (no daily-revenue API endpoint)
+- No-show rate KPI trend inverted: positive noShowChange displayed as negative trend (increase = bad)
+- Marketing layout overflow-x-hidden as defense-in-depth for mobile horizontal scroll prevention
+- UsageWidget kept in dashboard below AI Insights (not removed during redesign)
 
 ## Blockers
 
@@ -180,4 +185,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 32 Plan 02 | 2 tasks | 19 files | 16 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 32 Plans 01-02 complete. Plan 03+ pending.*
+*Last updated: 2026-02-24 — Phase 32 Plans 01-02 complete. Plan 03 auto tasks done, awaiting human visual verification.*
