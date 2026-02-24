@@ -16,10 +16,11 @@
 import nodemailer from 'nodemailer';
 
 // Module-level transporter — created once on import for connection reuse
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false, // STARTTLS on port 587 (not implicit TLS)
+  port: smtpPort,
+  secure: smtpPort === 465, // true for implicit TLS (465), false for STARTTLS (587)
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
