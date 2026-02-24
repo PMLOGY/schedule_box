@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 24 complete, ready for Phase 26
+**Current focus:** v1.2 Product Readiness — Phase 26 in progress (Plan 03 complete)
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 26 of 27 (Booking UX Polish) **NEXT**
-- **Plan:** 1 of 4 in current phase — Plan 01 complete (from prior session)
-- **Status:** Phase 24 verified — ready to continue Phase 26
-- **Last activity:** 2026-02-24 — Phase 24 executed and verified (2/2 plans, 8/8 must-haves passed)
+- **Phase:** 26 of 27 (Booking UX Polish) **IN PROGRESS**
+- **Plan:** 3 of 4 in current phase — Plan 03 complete
+- **Status:** Phase 26 Plan 03 complete — ready for Plan 04
+- **Last activity:** 2026-02-24 — Phase 26 Plan 03 executed (mobile UX polish: 44px tap targets, time-of-day grouping)
 
-Progress: [██████░░░░] 63% (v1.2: 12/19 plans)
+Progress: [███████░░░] 74% (v1.2: 14/19 plans)
 
 ## What's Done
 
@@ -48,11 +48,19 @@ Progress: [██████░░░░] 63% (v1.2: 12/19 plans)
 - Plan 02: AI insights API route (GET /api/v1/ai/insights), useAiInsightsQuery hook, AiInsightsPanel, AiOnboardingState, dashboard integration, i18n cs/en/sk
 - Verification: 8/8 must-haves passed, 4 human verification items (visual/interactive)
 
+**Phase 26 in progress** (2026-02-24) — Booking UX Polish:
+- Plan 01: Visual regression test infrastructure for booking embed (Playwright, CI)
+- Plan 03: StepIndicator 44px tap targets, mobile "Step X of Y" label, AvailabilityGrid Morning/Afternoon/Evening grouping, layout-matching skeleton loaders, i18n cs/en/sk
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 26-03: Lucide icons (Sun/CloudSun/Moon) for time-of-day headers instead of emoji (per project no-emoji rule)
+- Phase 26-03: Mobile step indicator shows consolidated "Step X of Y - Step Name" line (md:hidden) while desktop keeps individual step labels
+- Phase 26-03: Time periods: Morning <12:00, Afternoon 12:00-16:59, Evening 17:00+ (standard Czech business convention)
+- Phase 26-03: useMemo for slot filtering, employee counting, and time grouping to prevent unnecessary recalculations
 - Phase 24-02: drizzle-orm db.execute<T> requires T extends Record<string, unknown> — row interfaces use extends pattern
 - Phase 24-02: AiInsightsPanel degrades to null on error (non-critical), Skeleton on loading — no error boundary needed
 - Phase 24-02: Server-side suggestions generated from booking counts; no client-side computation
@@ -82,7 +90,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 12/19 | - | - |
+| v1.2 (23-27) | 14/19 | - | - |
+| 26-03 | 1 | 5min | 5min |
 
 ---
-*Last updated: 2026-02-24 after Phase 24 execution complete and verified (8/8 must-haves passed)*
+*Last updated: 2026-02-24 after Phase 26 Plan 03 complete (mobile UX polish: 44px tap targets, time-of-day grouping, skeleton loaders)*
