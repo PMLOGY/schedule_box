@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 32 in progress (Plan 01 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 32 in progress (Plans 01-02 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 32 — Frontend Polish
-- **Plan:** 01 complete, 02+ pending
-- **Status:** Plan 01 complete (dark mode, design tokens, ThemeToggle)
-- **Last activity:** 2026-02-24 — Plan 32-01 complete (next-themes dark mode, ThemeProvider, ThemeToggle, semantic color tokens, hardcoded colors replaced)
+- **Plan:** 02 complete, 03+ pending
+- **Status:** Plan 02 complete (skeleton loading states, error boundary)
+- **Last activity:** 2026-02-24 — Plan 32-02 complete (PageSkeleton 5 variants, TableSkeleton, dashboard error.tsx, 16 route loading.tsx files)
 
-Progress: [#---------] 10% (1/? plans)
+Progress: [##--------] 20% (2/? plans)
 
 ## What's Done
 
@@ -62,6 +62,7 @@ Progress: [#---------] 10% (1/? plans)
 
 **v1.3 Phase 32 in progress:**
 - Plan 01 complete: next-themes dark mode, ThemeProvider wrapping app, ThemeToggle in header/navbar, shadow/color CSS tokens, all hardcoded light-only colors replaced with semantic tokens
+- Plan 02 complete: PageSkeleton (5 variants), TableSkeleton, dashboard error.tsx boundary, 16 route-specific loading.tsx files replacing all Loader2 spinners
 
 ## Decisions
 
@@ -139,6 +140,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 - ThemeToggle uses mounted-state pattern (useState + useEffect) to avoid hydration mismatch
 - Shadow CSS variables (not Tailwind arbitrary values) for dark mode shadow adaptation
 - Stat card green trend uses dark:text-green-400 variant instead of text-success for visual consistency
+- Plain `<a>` tag (not i18n Link) for dashboard link in error.tsx to avoid router context issues in error boundary
+- Billing loading uses dashboard variant (mixed content: subscription card + plan grid + invoice table)
+- Calendar loading is custom skeleton (not PageSkeleton variant) for full-height calendar placeholder
 
 ## Blockers
 
@@ -173,6 +177,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 31 Plan 04 | 2 tasks | 8 files | 6 min |
 | Phase 31 Plan 05 | 2 tasks | 18 files | 13 min |
 | Phase 32 Plan 01 | 2 tasks | 11 files | 8 min |
+| Phase 32 Plan 02 | 2 tasks | 19 files | 16 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 32 Plan 01 complete. Plan 02+ pending.*
+*Last updated: 2026-02-24 — Phase 32 Plans 01-02 complete. Plan 03+ pending.*
