@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 27 Plan 02 complete, ready for Plan 03
+**Current focus:** v1.2 Product Readiness — Phase 27 Plan 03 complete, ready for Plan 04
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
 - **Phase:** 27 of 27 (Onboarding Wizard) **IN PROGRESS**
-- **Plan:** 2 of 4 in current phase — Plan 02 complete
-- **Status:** Phase 27 Plan 02 complete — ready for Plan 03 (booking link sharing / viral loop)
-- **Last activity:** 2026-02-24 — Phase 27 Plan 02 executed (onboarding checklist + 6 empty states)
+- **Plan:** 3 of 4 in current phase — Plan 03 complete
+- **Status:** Phase 27 Plan 03 complete — ready for Plan 04 (booking link sharing / viral loop)
+- **Last activity:** 2026-02-24 — Phase 27 Plan 03 executed (demo data seeder + Driver.js tour)
 
-Progress: [█████████░] 95% (v1.2: 18/19 plans)
+Progress: [█████████░] 97% (v1.2: 19/19 plans)
 
 ## What's Done
 
@@ -57,12 +57,16 @@ Progress: [█████████░] 95% (v1.2: 18/19 plans)
 **Phase 27 in progress** (2026-02-24) — Onboarding Wizard:
 - Plan 01: 4-step setup wizard (company details, first service, working hours, share link), QR code generation, industry defaults, onboarding_completed flag
 - Plan 02: Dashboard onboarding checklist widget (5 items + progress bar + dismissal), 6 action-oriented empty states (bookings/customers/services/employees/analytics/calendar)
+- Plan 03: Demo data seeder (Beauty Studio Praha: 3 services, 5 customers, 10 bookings), DemoDataCard dashboard widget, Driver.js 3-step contextual tour with localStorage persistence
 
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 27-03: Demo data tagged in company.settings JSONB (demo_data + demo_data_ids with ID arrays) — no extra table needed for transient demo content
+- Phase 27-03: DashboardTour in layout (not page) — persists across sub-routes without re-mounting; tour localStorage key prefixed with company UUID for multi-tenant sessions
+- Phase 27-03: driver.js onDestroyed + onCloseClick both set localStorage — handles natural completion and early close
 - Phase 27-02: Checklist uses router.push() via button elements — avoids next-intl typed route constraints on Link href
 - Phase 27-02: localStorage dismissal key prefixed with company UUID for multi-tenant browser sessions
 - Phase 27-02: Calendar empty state uses separate useBookingsQuery({limit:1}) in page — no BookingCalendar internals modified
@@ -117,6 +121,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 26-04 | 1 | 7min | 7min |
 | 27-01 | 1 | 9min | 9min |
 | 27-02 | 1 | 11min | 11min |
+| 27-03 | 1 | 7min | 7min |
 
 ---
-*Last updated: 2026-02-24 after Phase 27 Plan 02 complete (dashboard checklist widget + 6 empty states)*
+*Last updated: 2026-02-24 after Phase 27 Plan 03 complete (demo data seeder + Driver.js dashboard tour)*
