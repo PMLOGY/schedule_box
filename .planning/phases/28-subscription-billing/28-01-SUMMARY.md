@@ -136,6 +136,14 @@ None - no external service configuration required. (Note: Comgate recurring must
 - State machine transitions ready for subscription lifecycle management
 - Custom SQL migration must be applied before any subscription data is inserted
 
+## Self-Check: PASSED
+
+- All 9 files verified present on disk
+- Commit 67bd776 (Task 1) verified in git log
+- Commit 7f9aae6 (Task 2) verified in git log
+- pnpm --filter @schedulebox/database type-check: PASS
+- pnpm --filter @schedulebox/shared type-check: PASS
+
 ---
 
 _Phase: 28-subscription-billing_
