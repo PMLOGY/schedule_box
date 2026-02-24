@@ -23,7 +23,8 @@
     "to": "do",
     "of": "z",
     "page": "Stránka",
-    "entries": "záznamov"
+    "entries": "záznamov",
+    "actions": "Akcie"
   },
   "auth": {
     "login": {

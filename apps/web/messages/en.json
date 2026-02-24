@@ -23,7 +23,8 @@
     "to": "to",
     "of": "of",
     "page": "Page",
-    "entries": "entries"
+    "entries": "entries",
+    "actions": "Actions"
   },
   "auth": {
     "login": {

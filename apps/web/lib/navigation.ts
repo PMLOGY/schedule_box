@@ -12,6 +12,7 @@ import {
   Zap,
   Award,
   Brain,
+  Building2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -94,6 +95,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/marketing',
     icon: Megaphone,
     roles: ['owner', 'manager'],
+  },
+  {
+    key: 'organization',
+    href: '/organization',
+    icon: Building2,
+    roles: ['owner'],
   },
   {
     key: 'settings',
