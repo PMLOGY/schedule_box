@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28 complete (all 5 plans), ready for Phase 29
+**Current focus:** v1.3 Revenue & Growth — Phase 29 in progress (Plan 01 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
-- **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 03: complete, 04: complete, 05: complete)
-- **Status:** Phase 28 verified (5/5 must-haves), ready for Phase 29
-- **Last activity:** 2026-02-24 — Phase 28 verified (5/5 automated, 4 items human-needed)
+- **Phase:** 29 — Usage Limits & Enforcement
+- **Plan:** 01 complete, 02-03 pending
+- **Status:** Plan 01 complete (usage counting infrastructure)
+- **Last activity:** 2026-02-24 — Plan 29-01 complete (usage-service, plan-limits, GET /api/v1/usage)
 
-Progress: [##########] 100% (5/5 plans)
+Progress: [###-------] 33% (1/3 plans)
 
 ## What's Done
 
@@ -38,6 +38,9 @@ Progress: [##########] 100% (5/5 plans)
 - Plan 05 complete: Subscription invoice service (SEQUENCE numbering, Czech VAT PDF, list/download API)
 - Plan 04 complete: Billing portal UI (plan comparison grid, subscription management, invoice history, payment polling)
 - Plan 03 complete: BullMQ billing scheduler (daily renewal, Comgate recurring, invoice creation, dunning workflow, 4 Czech email templates)
+
+**v1.3 Phase 29 in progress:**
+- Plan 01 complete: Usage counting infrastructure (Redis booking counters, DB employee/service counts, plan-limits helper, GET /api/v1/usage endpoint)
 
 ## Decisions
 
@@ -63,6 +66,11 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Direct DB invoice creation in worker (SEQUENCE + VAT + sellerSnapshot) instead of internal HTTP API
 - Used upsertJobScheduler (BullMQ 5.16+) instead of deprecated Queue.add with repeat
 
+**Phase 29 decisions:**
+- Fail-open on Redis errors: booking counts fall back to DB COUNT query rather than blocking bookings
+- percentUsed capped at 100 with warning flag at >= 80% threshold
+- Redis key TTL set on first increment to auto-expire at end of billing month
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
@@ -82,6 +90,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 05 | 2 tasks | 3 files | 4 min |
 | Phase 28 Plan 04 | 3 tasks | 4 files | 6 min |
 | Phase 28 Plan 03 | 2 tasks | 8 files | 5 min |
+| Phase 29 Plan 01 | 2 tasks | 3 files | 4 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 28 verified (5/5 must-haves, 25 artifacts, 7 requirements). Ready for Phase 29.*
+*Last updated: 2026-02-24 — Phase 29 Plan 01 complete (usage counting infrastructure). Plans 02-03 pending.*
