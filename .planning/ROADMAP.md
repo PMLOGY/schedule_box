@@ -121,10 +121,10 @@ Plans:
 **Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 25-01-PLAN.md — Marketing route group layout, navbar, footer with legal info, i18n messages, Motion install (Wave 1)
-- [ ] 25-02-PLAN.md — Hero section with live widget embed + feature grid + trust badges (Wave 2)
-- [ ] 25-03-PLAN.md — Pricing page (3 tiers) + social proof section (Wave 2)
-- [ ] 25-04-PLAN.md — Czech privacy policy, terms of service, cookie consent implementation (Wave 2)
+- [x] 25-01-PLAN.md — Marketing route group layout, navbar, footer with legal info, i18n messages, Motion install (Wave 1)
+- [x] 25-02-PLAN.md — Hero section with live widget embed + feature grid + trust badges (Wave 2)
+- [x] 25-03-PLAN.md — Pricing page (3 tiers) + social proof section (Wave 2)
+- [x] 25-04-PLAN.md — Czech privacy policy, terms of service, cookie consent implementation (Wave 2)
 
 ---
 
@@ -144,10 +144,10 @@ Plans:
 **Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 26-01-PLAN.md — Embed widget visual regression baseline + shadcn/ui diff audit (Wave 1)
-- [ ] 26-02-PLAN.md — react-big-calendar upgrade with drag-and-drop + shadcn theme integration (Wave 2)
-- [ ] 26-03-PLAN.md — Mobile UX audit: tap targets, slot grouping, progress stepper, skeleton loaders (Wave 2)
-- [ ] 26-04-PLAN.md — ICS calendar endpoint + Motion micro-animations on booking confirmation (Wave 2)
+- [x] 26-01-PLAN.md — Embed widget visual regression baseline + shadcn/ui diff audit (Wave 1)
+- [x] 26-02-PLAN.md — react-big-calendar upgrade with drag-and-drop + shadcn theme integration (Wave 2)
+- [x] 26-03-PLAN.md — Mobile UX audit: tap targets, slot grouping, progress stepper, skeleton loaders (Wave 2)
+- [x] 26-04-PLAN.md — ICS calendar endpoint + Motion micro-animations on booking confirmation (Wave 2)
 
 ---
 
@@ -202,8 +202,8 @@ Plans:
 | 22. Monitoring & Alerts | v1.1 | 2/2 | Complete | 2026-02-20 |
 | 23. AI Service | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 24. AI-Powered UI | v1.2 | 2/2 | Complete | 2026-02-24 |
-| 25. Landing Page | v1.2 | 0/4 | Planned | - |
-| 26. Booking UX Polish | v1.2 | 0/4 | Planned | - |
+| 25. Landing Page | v1.2 | 4/4 | Complete | 2026-02-21 |
+| 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 0/4 | Planning complete | - |
 
 ---
