@@ -12,8 +12,8 @@ See: .planning/PROJECT.md (updated 2026-02-24)
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
 - **Plan:** 5 plans in 4 waves (01: complete, 02: complete, 03: complete, 04: complete, 05: complete)
-- **Status:** Phase 28 complete, ready for Phase 29
-- **Last activity:** 2026-02-24 — Phase 28 Plan 03 executed (billing scheduler + dunning + invoice emails)
+- **Status:** Phase 28 verified (5/5 must-haves), ready for Phase 29
+- **Last activity:** 2026-02-24 — Phase 28 verified (5/5 automated, 4 items human-needed)
 
 Progress: [##########] 100% (5/5 plans)
 
@@ -66,7 +66,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
-- **[NEW] Comgate recurring activation** — must contact Comgate support for merchant 498621 before Phase 28 implementation begins. Recurring is not auto-enabled; timeline is unknown (days to weeks). This blocks Phase 28 entirely.
+- **[DEFERRED] Comgate recurring activation** — code complete (Phase 28), but live recurring payments require contacting Comgate support for merchant 498621. Can test in sandbox without activation.
 - **[RESOLVED] Subscription plan name canonicalization** — CHECK constraint updated in schema + $type annotation. Custom SQL migration created for existing DB rows. Seed file updated.
 
 ## Performance Metrics
@@ -84,4 +84,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 03 | 2 tasks | 8 files | 5 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 28 Plan 03 complete (billing scheduler + dunning + invoice emails). Phase 28 fully complete.*
+*Last updated: 2026-02-24 — Phase 28 verified (5/5 must-haves, 25 artifacts, 7 requirements). Ready for Phase 29.*

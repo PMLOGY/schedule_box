@@ -90,11 +90,11 @@
 **Plans:** 5 plans
 
 Plans:
-- [ ] 28-01-PLAN.md — DB schema (subscriptions, subscription_invoices, subscription_events) + CHECK constraint migration + Comgate recurring client + billing types
-- [ ] 28-02-PLAN.md — Billing API endpoints (plans, subscribe, subscription, upgrade, downgrade, status, webhook) + subscription service layer
-- [ ] 28-03-PLAN.md — BullMQ renewal scheduler + dunning automation + Czech email templates
-- [ ] 28-04-PLAN.md — Billing portal UI (plan comparison, subscription management, invoice history)
-- [ ] 28-05-PLAN.md — Invoice PDF generation (SEQUENCE numbering, Czech VAT compliance) + invoice API routes
+- [x] 28-01-PLAN.md — DB schema (subscriptions, subscription_invoices, subscription_events) + CHECK constraint migration + Comgate recurring client + billing types
+- [x] 28-02-PLAN.md — Billing API endpoints (plans, subscribe, subscription, upgrade, downgrade, status, webhook) + subscription service layer
+- [x] 28-03-PLAN.md — BullMQ renewal scheduler + dunning automation + Czech email templates
+- [x] 28-04-PLAN.md — Billing portal UI (plan comparison, subscription management, invoice history)
+- [x] 28-05-PLAN.md — Invoice PDF generation (SEQUENCE numbering, Czech VAT compliance) + invoice API routes
 
 **Success Criteria:**
 
@@ -235,7 +235,7 @@ Plans:
 | 25. Landing Page | v1.2 | 4/4 | Complete | 2026-02-21 |
 | 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
-| 28. Subscription Billing | v1.3 | 0/5 | Planned | — |
+| 28. Subscription Billing | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 29. Usage Limits | v1.3 | 0/3 | Planned | — |
 | 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
 | 31. Analytics | v1.3 | — | Pending | — |
