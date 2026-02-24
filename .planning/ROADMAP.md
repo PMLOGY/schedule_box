@@ -249,7 +249,7 @@ Plans:
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
 | 28. Subscription Billing | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 29. Usage Limits | v1.3 | 3/3 | Complete | 2026-02-24 |
-| 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
+| 30. Multi-Location Orgs | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 31. Analytics | v1.3 | 0/5 | Planned | — |
 | 32. Frontend Polish | v1.3 | 0/3 | Planned | — |
 
