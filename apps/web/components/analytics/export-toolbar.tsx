@@ -8,6 +8,15 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { downloadCSV, downloadBlob, formatCSVDate } from '@/lib/export/csv-exporter';
 
+interface CustomerRetentionData {
+  repeatRate: number;
+  totalCustomers: number;
+  repeatCustomers: number;
+  churned: number;
+  atRisk: number;
+  active: number;
+}
+
 interface ExportToolbarProps {
   revenueData:
     | Array<{
@@ -25,15 +34,23 @@ interface ExportToolbarProps {
         total: number;
       }>
     | undefined;
+  customerRetentionData?: CustomerRetentionData | undefined;
   days: number;
   isLoading: boolean;
 }
 
-export function ExportToolbar({ revenueData, bookingData, days, isLoading }: ExportToolbarProps) {
+export function ExportToolbar({
+  revenueData,
+  bookingData,
+  customerRetentionData,
+  days,
+  isLoading,
+}: ExportToolbarProps) {
   const t = useTranslations('analytics.export');
   const locale = useLocale();
   const [isExportingRevenuePdf, setIsExportingRevenuePdf] = useState(false);
   const [isExportingBookingsPdf, setIsExportingBookingsPdf] = useState(false);
+  const [isExportingCustomerPdf, setIsExportingCustomerPdf] = useState(false);
 
   const handleRevenueCSV = () => {
     try {
@@ -73,6 +90,52 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
       }));
 
       const filename = `bookings-${new Date().toISOString().split('T')[0]}`;
+      downloadCSV(csvData, filename);
+      toast.success(t('success'));
+    } catch (error) {
+      console.error('CSV export error:', error);
+      toast.error(t('error'));
+    }
+  };
+
+  const handleCustomerCSV = () => {
+    try {
+      if (!customerRetentionData) {
+        toast.error(t('error'));
+        return;
+      }
+
+      const metricLabel = locale === 'en' ? 'Metric' : 'Metrika';
+      const valueLabel = locale === 'en' ? 'Value' : 'Hodnota';
+
+      const csvData = [
+        {
+          [metricLabel]: locale === 'en' ? 'Repeat Booking Rate' : 'Mira opakovanosti',
+          [valueLabel]: `${(customerRetentionData.repeatRate * 100).toFixed(1)}%`,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Total Customers' : 'Celkem zakazniku',
+          [valueLabel]: customerRetentionData.totalCustomers,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Repeat Customers' : 'Opakujici zakaznici',
+          [valueLabel]: customerRetentionData.repeatCustomers,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Active' : 'Aktivni',
+          [valueLabel]: customerRetentionData.active,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'At Risk' : 'Ohrozeni',
+          [valueLabel]: customerRetentionData.atRisk,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Churned' : 'Odchozeni',
+          [valueLabel]: customerRetentionData.churned,
+        },
+      ];
+
+      const filename = `customers-${new Date().toISOString().split('T')[0]}`;
       downloadCSV(csvData, filename);
       toast.success(t('success'));
     } catch (error) {
@@ -136,6 +199,30 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
     }
   };
 
+  const handleCustomerPDF = async () => {
+    try {
+      setIsExportingCustomerPdf(true);
+
+      const response = await fetchPdfWithAuth(
+        `/api/v1/reports/customers/pdf?days=${days}&locale=${locale}`,
+      );
+
+      if (!response.ok) {
+        throw new Error('PDF generation failed');
+      }
+
+      const blob = await response.blob();
+      const filename = `customer-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      downloadBlob(blob, filename);
+      toast.success(t('success'));
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error(t('error'));
+    } finally {
+      setIsExportingCustomerPdf(false);
+    }
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Button
@@ -176,6 +263,26 @@ export function ExportToolbar({ revenueData, bookingData, days, isLoading }: Exp
       >
         <FileText className="mr-2 h-4 w-4" />
         {isExportingBookingsPdf ? t('downloading') : t('bookingsPDF')}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleCustomerCSV}
+        disabled={isLoading || !customerRetentionData}
+      >
+        <Download className="mr-2 h-4 w-4" />
+        {t('customerCSV')}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleCustomerPDF}
+        disabled={isLoading || !customerRetentionData || isExportingCustomerPdf}
+      >
+        <FileText className="mr-2 h-4 w-4" />
+        {isExportingCustomerPdf ? t('downloading') : t('customerPDF')}
       </Button>
     </div>
   );

@@ -421,6 +421,8 @@
       "bookingsCSV": "Rezervácie CSV",
       "revenuePDF": "Tržby PDF",
       "bookingsPDF": "Rezervácie PDF",
+      "customerCSV": "Zákazníci CSV",
+      "customerPDF": "Zákazníci PDF",
       "downloading": "Sťahovanie...",
       "success": "Export bol úspešne stiahnutý",
       "error": "Chyba pri exporte dát",

@@ -421,6 +421,8 @@
       "bookingsCSV": "Bookings CSV",
       "revenuePDF": "Revenue PDF",
       "bookingsPDF": "Bookings PDF",
+      "customerCSV": "Customers CSV",
+      "customerPDF": "Customers PDF",
       "downloading": "Downloading...",
       "success": "Export downloaded successfully",
       "error": "Error exporting data",

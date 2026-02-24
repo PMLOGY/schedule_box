@@ -124,6 +124,18 @@ export default function AnalyticsPage() {
         <ExportToolbar
           revenueData={revenueData}
           bookingData={bookingData}
+          customerRetentionData={
+            retentionData
+              ? {
+                  repeatRate: retentionData.repeatBooking.repeatRate,
+                  totalCustomers: retentionData.repeatBooking.totalCustomers,
+                  repeatCustomers: retentionData.repeatBooking.repeatCustomers,
+                  churned: retentionData.churn.churned,
+                  atRisk: retentionData.churn.atRisk,
+                  active: retentionData.churn.active,
+                }
+              : undefined
+          }
           days={days}
           isLoading={isLoadingAny}
         />
