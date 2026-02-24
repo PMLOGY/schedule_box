@@ -655,6 +655,23 @@
   },
   "ai": {
     "title": "AI Optimization",
+    "riskBadge": {
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk",
+      "unknown": "Not scored",
+      "tooltipPrefix": "Risk"
+    },
+    "riskDetail": {
+      "title": "AI no-show prediction",
+      "probability": "No-show probability",
+      "confidence": "AI confidence",
+      "highAction": "High risk -- consider sending an SMS reminder",
+      "mediumAction": "Medium risk -- we recommend confirming attendance",
+      "lowAction": "Low risk -- no action needed",
+      "fallbackNote": "AI service is temporarily unavailable. Default value shown.",
+      "notScored": "This booking has not been scored by AI yet."
+    },
     "pricing": {
       "title": "Dynamic Pricing",
       "description": "AI price optimization adjusts service prices within a 30% range based on demand, time of day and capacity utilization.",

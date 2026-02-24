@@ -653,6 +653,23 @@
   },
   "ai": {
     "title": "AI optimalizácia",
+    "riskBadge": {
+      "high": "Vysoke riziko",
+      "medium": "Stredne riziko",
+      "low": "Nizke riziko",
+      "unknown": "Nehodnotene",
+      "tooltipPrefix": "Riziko"
+    },
+    "riskDetail": {
+      "title": "AI predikcia nedostavenia",
+      "probability": "Pravdepodobnost nedostavenia",
+      "confidence": "Spolahlivost AI",
+      "highAction": "Vysoke riziko -- zvazite zaslanie SMS pripomienky",
+      "mediumAction": "Stredne riziko -- odporucame potvrdit ucast",
+      "lowAction": "Nizke riziko -- ziadna akcia nie je potrebna",
+      "fallbackNote": "AI sluzba je docasne nedostupna. Zobrazena je predvolena hodnota.",
+      "notScored": "Tato rezervacia este nebola vyhodnotena AI."
+    },
     "pricing": {
       "title": "Dynamické ceny",
       "description": "AI optimalizácia cien upravuje ceny služieb v rozmedzí 30 % na základe dopytu, dennej doby a vyťaženia kapacity.",
