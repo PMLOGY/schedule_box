@@ -15,6 +15,13 @@
       "when": 1770988608600,
       "tag": "0001_colossal_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771967314256,
+      "tag": "0002_fluffy_iceman",
+      "breakpoints": true
     }
   ]
 }
