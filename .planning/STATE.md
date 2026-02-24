@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28 planned, ready to execute
+**Current focus:** v1.3 Revenue & Growth — Phase 28 Plan 01 complete, executing Plan 02
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** 5 plans in 4 waves (01: schema+client, 02: API+service, 04+05: UI+invoices, 03: scheduler)
-- **Status:** Phase 28 planned and verified, ready for execution
-- **Last activity:** 2026-02-24 — Phase 28 planned (5 plans, 4 waves, verified with 1 revision)
+- **Plan:** 5 plans in 4 waves (01: complete, 02: next, 04+05: UI+invoices, 03: scheduler)
+- **Status:** Plan 01 complete, ready for Plan 02
+- **Last activity:** 2026-02-24 — Phase 28 Plan 01 executed (schema + Comgate recurring + billing types)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [##░░░░░░░░] 20% (1/5 plans)
 
 ## What's Done
 
@@ -32,15 +32,25 @@ Progress: [░░░░░░░░░░] 0%
 
 **v1.3 roadmap created** (32 requirements, 5 phases: 28-32). Phases defined 2026-02-24.
 
+**v1.3 Phase 28 in progress:**
+- Plan 01 complete: Subscription schema (3 tables), Comgate recurring client, billing types/config
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
+
+**Phase 28 decisions:**
+- Plan pricing from docs: Free 0, Essential 490, Growth 1490, AI-Powered 2990 CZK/month
+- Annual = 10 months (2 months free): 4900/14900/29900 CZK
+- Separate subscription_invoices table (existing invoices has NOT NULL bookingId FK)
+- PostgreSQL SEQUENCE for globally unique subscription invoice numbering
+- sellerSnapshot JSONB for Czech law invoice compliance
 
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
 - **[NEW] Comgate recurring activation** — must contact Comgate support for merchant 498621 before Phase 28 implementation begins. Recurring is not auto-enabled; timeline is unknown (days to weeks). This blocks Phase 28 entirely.
-- **[NEW] Subscription plan name canonicalization** — DB has `free/starter/professional/enterprise`; v1.3 targets `free/essential/growth/ai_powered`. The CHECK constraint on `companies.subscription_plan` must be resolved before Phase 28 schema migration runs.
+- **[RESOLVED] Subscription plan name canonicalization** — CHECK constraint updated in schema + $type annotation. Custom SQL migration created for existing DB rows. Seed file updated.
 
 ## Performance Metrics
 
@@ -50,5 +60,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.1 | 7 | 22 | 5 days (2026-02-15 → 2026-02-21) |
 | v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
 
+| Phase 28 Plan 01 | 2 tasks | 9 files | 5 min |
+
 ---
-*Last updated: 2026-02-24 — Phase 28 planned (5 plans, 4 waves), ready to execute*
+*Last updated: 2026-02-24 — Phase 28 Plan 01 complete (schema + Comgate recurring + billing types)*
