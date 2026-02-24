@@ -1,12 +1,13 @@
 /**
  * Scheduler Orchestrator
- * Starts all schedulers (reminder scheduler + billing scheduler + automation engine)
+ * Starts all schedulers (reminder + billing + analytics)
  */
 
 import type { Queue, Worker } from 'bullmq';
 import type { ConnectionOptions } from 'bullmq';
 import { startReminderScheduler } from './reminder-scheduler.js';
 import { startBillingScheduler } from './billing-scheduler.js';
+import { startAnalyticsScheduler } from './analytics-scheduler.js';
 
 /**
  * Queues interface
@@ -25,6 +26,8 @@ export interface SchedulerResources {
   reminderWorker: Worker;
   billingQueue: Queue;
   billingWorker: Worker;
+  analyticsQueue: Queue;
+  analyticsWorker: Worker;
 }
 
 /**
@@ -49,6 +52,10 @@ export async function startSchedulers(
     redisConnection,
   );
 
+  // Start analytics scheduler (hourly snapshot refresh)
+  const { queue: analyticsQueue, worker: analyticsWorker } =
+    await startAnalyticsScheduler(redisConnection);
+
   console.log('[Schedulers] All schedulers started successfully');
 
   return {
@@ -56,5 +63,7 @@ export async function startSchedulers(
     reminderWorker,
     billingQueue,
     billingWorker,
+    analyticsQueue,
+    analyticsWorker,
   };
 }

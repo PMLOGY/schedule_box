@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 30 in progress (Plans 01-04 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plan 01 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
-- **Phase:** 30 — Multi-Location Organizations
-- **Plan:** 04 complete (pending checkpoint verification), 05+ pending
-- **Status:** Plan 04 auto tasks complete, awaiting human-verify checkpoint
-- **Last activity:** 2026-02-24 — Plan 30-04 complete (location switcher UI, org settings pages, navigation)
+- **Phase:** 31 — Analytics & Reporting
+- **Plan:** 01 complete, 02+ pending
+- **Status:** Plan 01 complete (5 analytics API routes)
+- **Last activity:** 2026-02-24 — Plan 31-01 complete (payment-methods, top-services, peak-hours, cancellations, customer-retention APIs)
 
-Progress: [####------] 40% (4/? plans)
+Progress: [#---------] 10% (1/? plans)
 
 ## What's Done
 
@@ -46,11 +46,14 @@ Progress: [####------] 40% (4/? plans)
 - Gap closure: Wired UpgradeModal globally via MutationCache 402 interceptor in providers.tsx
 - Verified: 7/7 must-haves, 5 requirements (LIMIT-01..05)
 
-**v1.3 Phase 30 in progress:**
+**v1.3 Phase 30 complete:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
 - Plan 02 complete: JWT context switch endpoint (POST /api/v1/auth/switch-location, validateLocationAccess security gate, cross-org rejection integration tests, org-scope query helpers, Zod schemas)
 - Plan 03 complete: Organization CRUD API (GET/POST orgs, GET/PUT org detail, location CRUD with plan limits, member management with role gating, PaymentRequiredError 402)
 - Plan 04 complete: Location switcher dropdown in header, organization overview page with location cards, organization settings page with location/member CRUD, sidebar navigation update
+
+**v1.3 Phase 31 in progress:**
+- Plan 01 complete: 5 analytics API routes (payment-methods, top-services, peak-hours, cancellations, customer-retention) with Drizzle raw SQL aggregation
 
 ## Decisions
 
@@ -100,6 +103,12 @@ See `.planning/PROJECT.md` Key Decisions section.
 - LocationSwitcher renders null when user has no org or only 1 location
 - DELETE member endpoint uses direct fetch() because apiClient.delete doesn't support request body
 
+**Phase 31 decisions:**
+- Customer retention uses CUSTOMERS_READ permission (not BOOKINGS_READ) since it queries customer table
+- CLV buckets: 0-500, 500-2000, 2000-5000, 5000-10000, 10000+ CZK ranges
+- Peak hours returns sparse matrix — frontend fills gaps with zeros for 7x24 grid
+- Customer retention omits days param — operates on pre-computed customer aggregate fields
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
@@ -126,6 +135,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 30 Plan 02 | 3 tasks | 6 files | 8 min |
 | Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
 | Phase 30 Plan 04 | 2 tasks | 9 files | 7 min |
+| Phase 31 Plan 01 | 2 tasks | 5 files | 3 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 30 Plan 04 complete (location switcher, org settings pages). Plans 01-04 done.*
+*Last updated: 2026-02-24 — Phase 31 Plan 01 complete (5 analytics API routes). Phase 31 in progress.*
