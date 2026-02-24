@@ -397,6 +397,9 @@ importers:
       '@schedulebox/events':
         specifier: workspace:*
         version: link:../../packages/events
+      '@schedulebox/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       amqplib:
         specifier: ^0.10.4
         version: 0.10.9
