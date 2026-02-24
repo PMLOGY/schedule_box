@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plan 01 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 31 in progress (Plans 01-03 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 31 — Analytics & Reporting
-- **Plan:** 01 complete, 02+ pending
-- **Status:** Plan 01 complete (5 analytics API routes)
-- **Last activity:** 2026-02-24 — Plan 31-01 complete (payment-methods, top-services, peak-hours, cancellations, customer-retention APIs)
+- **Plan:** 03 complete, 04+ pending
+- **Status:** Plan 03 complete (admin analytics + org analytics APIs)
+- **Last activity:** 2026-02-24 — Plan 31-03 complete (admin SaaS health metrics, cross-location org analytics)
 
-Progress: [#---------] 10% (1/? plans)
+Progress: [###-------] 30% (3/? plans)
 
 ## What's Done
 
@@ -54,6 +54,7 @@ Progress: [#---------] 10% (1/? plans)
 
 **v1.3 Phase 31 in progress:**
 - Plan 01 complete: 5 analytics API routes (payment-methods, top-services, peak-hours, cancellations, customer-retention) with Drizzle raw SQL aggregation
+- Plan 03 complete: Admin SaaS health metrics API (MRR/ARR/churn/plan distribution/signup trends) + cross-location organization analytics API for franchise owners
 
 ## Decisions
 
@@ -108,6 +109,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - CLV buckets: 0-500, 500-2000, 2000-5000, 5000-10000, 10000+ CZK ranges
 - Peak hours returns sparse matrix — frontend fills gaps with zeros for 7x24 grid
 - Customer retention omits days param — operates on pre-computed customer aggregate fields
+- Admin route uses direct role check (user.role === 'admin') instead of RBAC permissions
+- Churn rate approximation: (churned in period) / (current active + churned) as period-start estimate
+- Occupancy V1 uses 60-min avg booking, 480-min workday, 5/7 working days per period
+- Organization analytics deduplicates customers by customerId across locations (not by email)
 
 ## Blockers
 
