@@ -5,6 +5,7 @@
  */
 
 export * from './auth';
+export * from './organizations';
 export * from './customers';
 export * from './services';
 export * from './employees';

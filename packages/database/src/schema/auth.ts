@@ -64,6 +64,7 @@ export const companies = pgTable(
     suspendedAt: timestamp('suspended_at', { withTimezone: true }),
     featuresEnabled: jsonb('features_enabled').default({}),
     settings: jsonb('settings').default({}),
+    organizationId: integer('organization_id'),
     busyAppearanceEnabled: boolean('busy_appearance_enabled').default(false),
     busyAppearancePercent: smallint('busy_appearance_percent').default(0),
     isActive: boolean('is_active').default(true),
@@ -85,6 +86,7 @@ export const companies = pgTable(
     ),
     // idx_companies_slug removed: covered by companies_slug_unique
     subscriptionIdx: index('idx_companies_subscription').on(table.subscriptionPlan),
+    organizationIdx: index('idx_companies_organization').on(table.organizationId),
   }),
 );
 
