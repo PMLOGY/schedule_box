@@ -57,7 +57,7 @@ export function LoginForm() {
     try {
       await login(values.email, values.password);
       // On success, redirect to dashboard
-      router.push('/');
+      router.push('/dashboard');
     } catch (error) {
       // Handle MFA challenge
       if (error && typeof error === 'object' && 'code' in error) {

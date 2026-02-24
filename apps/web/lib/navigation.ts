@@ -25,7 +25,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   {
     key: 'dashboard',
-    href: '/',
+    href: '/dashboard',
     icon: LayoutDashboard,
     roles: ['owner', 'manager', 'employee'],
   },
