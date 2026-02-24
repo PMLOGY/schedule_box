@@ -59,6 +59,9 @@ Progress: [████████░░] 84% (v1.2: 16/19 plans)
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 26-04: ICS generated without external library -- pure string templating for RFC 5545 (avoids dependency for ~100 LOC)
+- Phase 26-04: Calendar endpoint public (no JWT) -- booking UUID (122-bit entropy) as unguessable auth token
+- Phase 26-04: Manual SQL joins in calendar route for precise field selection over Drizzle relational syntax
 - Phase 26-02: react-big-calendar replaces FullCalendar (MIT vs premium license for commercial SaaS)
 - Phase 26-02: CalendarView component (resource-timeline mock data) replaced with placeholder -- dead code
 - Phase 26-02: React Query replaces FullCalendar event source for calendar data fetching
@@ -95,9 +98,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 15/19 | - | - |
+| v1.2 (23-27) | 16/19 | - | - |
 | 26-02 | 1 | 7min | 7min |
 | 26-03 | 1 | 5min | 5min |
+| 26-04 | 1 | 7min | 7min |
 
 ---
-*Last updated: 2026-02-24 after Phase 26 Plan 02 complete (react-big-calendar migration with DnD rescheduling and shadcn theme)*
+*Last updated: 2026-02-24 after Phase 26 complete (4/4 plans, ICS calendar export + confirmation animation)*
