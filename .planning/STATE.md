@@ -51,6 +51,7 @@ Progress: [###-------] 30% (3/? plans)
 - Plan 02 complete: JWT context switch endpoint (POST /api/v1/auth/switch-location, validateLocationAccess security gate, cross-org rejection integration tests, org-scope query helpers, Zod schemas)
 - Plan 03 complete: Organization CRUD API (GET/POST orgs, GET/PUT org detail, location CRUD with plan limits, member management with role gating, PaymentRequiredError 402)
 - Plan 04 complete: Location switcher dropdown in header, organization overview page with location cards, organization settings page with location/member CRUD, sidebar navigation update
+- Plan 05 complete: Org dashboard API with per-location metrics (bookings + revenue), cross-location customer API with email-based dedup, dashboard UI with KPI cards, customer search UI with debounce and pagination
 
 **v1.3 Phase 31 in progress:**
 - Plan 01 complete: 5 analytics API routes (payment-methods, top-services, peak-hours, cancellations, customer-retention) with Drizzle raw SQL aggregation
@@ -103,6 +104,11 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Full page reload after location switch (window.location.reload) for clean TanStack Query cache reset
 - LocationSwitcher renders null when user has no org or only 1 location
 - DELETE member endpoint uses direct fetch() because apiClient.delete doesn't support request body
+- Raw SQL via db.execute() for cross-company dashboard metrics (correlated subqueries per company avoid N+1)
+- DISTINCT ON (COALESCE(email, phone, uuid::text)) for customer dedup: email preferred, phone fallback, uuid unique
+- Occupancy percent returned as null (to be refined in Phase 31 Analytics)
+- Payment status filtered as 'paid' (not 'completed') matching payments CHECK constraint
+- Array.from() to convert Drizzle RowList to standard array (RowList lacks .rows property)
 
 **Phase 31 decisions:**
 - Customer retention uses CUSTOMERS_READ permission (not BOOKINGS_READ) since it queries customer table
@@ -140,6 +146,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 30 Plan 02 | 3 tasks | 6 files | 8 min |
 | Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
 | Phase 30 Plan 04 | 2 tasks | 9 files | 7 min |
+| Phase 30 Plan 05 | 2 tasks | 8 files | 12 min |
 | Phase 31 Plan 01 | 2 tasks | 5 files | 3 min |
 | Phase 31 Plan 03 | 2 tasks | 2 files | 3 min |
 
