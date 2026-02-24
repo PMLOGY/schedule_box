@@ -77,7 +77,7 @@ export const GET = createRouteHandler({
     // workingDaysInPeriod = min(days, days * 5/7) (business day approximation)
     // occupancyPercent = (bookingCount * avgServiceDuration) / (workingDaysInPeriod * 480 minutes)
     // 480 = 8 hours working day in minutes
-    const workingDaysInPeriod = Math.max(1, Math.floor(days * 5 / 7));
+    const workingDaysInPeriod = Math.max(1, Math.floor((days * 5) / 7));
     const totalWorkingMinutes = workingDaysInPeriod * 480;
 
     const employeeStats = results.map((row) => {
