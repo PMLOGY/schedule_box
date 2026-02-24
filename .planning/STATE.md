@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 25 complete, ready for Phase 26
+**Current focus:** v1.2 Product Readiness — Phase 24 Plan 02 complete, ready for Plan 03
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
 - **Phase:** 24 of 27 (AI-Powered UI) **IN PROGRESS**
-- **Plan:** 1 of N in current phase — Plan 01 complete
-- **Status:** Phase 24 Plan 01 complete — no-show risk badges in booking list + detail panel
-- **Last activity:** 2026-02-24 — Phase 24 Plan 01 executed (NoShowRiskBadge + NoShowRiskDetail components, 7-column booking table, i18n cs/en/sk)
+- **Plan:** 2 of N in current phase — Plan 02 complete
+- **Status:** Phase 24 Plan 02 complete — AI insights dashboard panel with onboarding state
+- **Last activity:** 2026-02-24 — Phase 24 Plan 02 executed (AI insights API route, useAiInsightsQuery, AiInsightsPanel, AiOnboardingState, dashboard integration, i18n cs/en/sk)
 
-Progress: [█████░░░░░] 53% (v1.2: 11/19 plans)
+Progress: [█████░░░░░] 58% (v1.2: 12/19 plans)
 
 ## What's Done
 
@@ -43,11 +43,18 @@ Progress: [█████░░░░░] 53% (v1.2: 11/19 plans)
 - Plan 03: Pricing page with 3-tier cards (Free/299/699 CZK), annual toggle, social proof section (3 placeholder testimonials)
 - Plan 04: Privacy policy page (8 GDPR sections), terms of service page (8 commercial sections), cookie consent banner (Czech ECA 2022 compliant, strict opt-in)
 
+**Phase 24 in progress** — AI-Powered UI:
+- Plan 01: NoShowRiskBadge + NoShowRiskDetail components, 7-column booking table, i18n cs/en/sk
+- Plan 02: AI insights API route (GET /api/v1/ai/insights), useAiInsightsQuery hook, AiInsightsPanel, AiOnboardingState, dashboard integration, i18n cs/en/sk
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 24-02: drizzle-orm db.execute<T> requires T extends Record<string, unknown> — row interfaces use extends pattern
+- Phase 24-02: AiInsightsPanel degrades to null on error (non-critical), Skeleton on loading — no error boundary needed
+- Phase 24-02: Server-side suggestions generated from booking counts; no client-side computation
 - Phase 24-01: NoShowRiskBadge shows raw % in badge text + full label in tooltip; TooltipProvider scoped per-badge; NoShowRiskDetail includes own Separator for encapsulation
 - Phase 24-01: Risk column added as 7th column in booking table (between Status and Price); colSpan updated 6->7
 - v1.2 phase ordering: AI first (unblocks UI), Landing Page before Booking UX (drives traffic), Onboarding last (layers on everything)
@@ -74,8 +81,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 10/19 | - | - |
+| v1.2 (23-27) | 12/19 | - | - |
 
 ---
-*Last updated: 2026-02-24 after Phase 24 Plan 01 execution complete (2/2 tasks, TypeScript clean)*
-
+*Last updated: 2026-02-24 after Phase 24 Plan 02 execution complete (2/2 tasks, TypeScript clean)*
