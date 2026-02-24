@@ -41,6 +41,7 @@ Progress: [#---------] 10% (1/? plans)
 
 **v1.3 Phase 29 in progress:**
 - Plan 01 complete: Usage counting infrastructure (Redis booking counters, DB employee/service counts, plan-limits helper, GET /api/v1/usage endpoint)
+- Plan 02 complete: Server-side limit enforcement on POST /api/v1/bookings, /employees, /services (402 PLAN_LIMIT_EXCEEDED + Redis counter increment)
 
 **v1.3 Phase 30 in progress:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
@@ -73,6 +74,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Fail-open on Redis errors: booking counts fall back to DB COUNT query rather than blocking bookings
 - percentUsed capped at 100 with warning flag at >= 80% threshold
 - Redis key TTL set on first increment to auto-expire at end of billing month
+- Fire-and-forget pattern for Redis booking counter increment (booking succeeds even if Redis is down)
+- Limit check placed after auth+company resolution but before any DB writes (minimal wasted work)
 
 **Phase 30 decisions:**
 - companies.organizationId defined as plain integer (no FK reference in Drizzle) to avoid circular import; FK enforced via migration SQL
@@ -99,7 +102,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 04 | 3 tasks | 4 files | 6 min |
 | Phase 28 Plan 03 | 2 tasks | 8 files | 5 min |
 | Phase 29 Plan 01 | 2 tasks | 3 files | 4 min |
+| Phase 29 Plan 02 | 2 tasks | 3 files | 3 min |
 | Phase 30 Plan 01 | 3 tasks | 7 files | 7 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 30 Plan 01 complete (organization schema). Ready for Plan 02 (org API).*
+*Last updated: 2026-02-24 — Phase 29 Plan 02 complete (API route limit enforcement). Phase 30 Plan 01 also complete (organization schema).*

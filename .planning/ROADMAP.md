@@ -199,6 +199,13 @@ Plans:
 
 **Requirements:** UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 32-01-PLAN.md — Dark mode infrastructure (next-themes, ThemeProvider, toggle) + design system token harmonization (shadows, success/warning colors) + hardcoded color fixes
+- [ ] 32-02-PLAN.md — Loading/empty/error states audit (16 loading.tsx skeletons, shared PageSkeleton/TableSkeleton, dashboard error.tsx)
+- [ ] 32-03-PLAN.md — Dashboard redesign (KPI row, revenue chart, recent bookings) + landing page testimonials + responsive audit + human verification
+
 **Success Criteria:**
 
 1. Every data-fetching page in the dashboard shows a skeleton loader while loading and a descriptive empty state with an action CTA when no data exists; no page shows a blank white area or spinner-only state.
@@ -206,8 +213,6 @@ Plans:
 3. Dark mode is available via a manual toggle and respects the user's system preference on first load; all dashboard, settings, and analytics pages are correctly styled in both light and dark themes.
 4. All dashboard and marketing pages pass a responsive design review at 375px (mobile), 768px (tablet), and 1280px (desktop) breakpoints without horizontal scroll or overlapping elements.
 5. The design system is consistent across all pages: spacing, typography, color palette, border radii, and shadow system follow a single token set with no one-off overrides.
-
-**Plan estimates:** 3 plans (loading/empty/error states audit, dark mode + design system harmonization, dashboard redesign + landing page upgrade + responsive audit)
 
 ---
 
@@ -246,7 +251,7 @@ Plans:
 | 29. Usage Limits | v1.3 | 0/3 | Planned | — |
 | 30. Multi-Location Orgs | v1.3 | 0/5 | Planned | — |
 | 31. Analytics | v1.3 | 0/5 | Planned | — |
-| 32. Frontend Polish | v1.3 | — | Pending | — |
+| 32. Frontend Polish | v1.3 | 0/3 | Planned | — |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -258,3 +263,4 @@ Plans:
 *Phase 29 planned: 2026-02-24*
 *Phase 30 planned: 2026-02-24*
 *Phase 31 planned: 2026-02-24*
+*Phase 32 planned: 2026-02-24*
