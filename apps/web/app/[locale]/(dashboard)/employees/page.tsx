@@ -38,6 +38,7 @@ import {
   type Employee,
 } from '@/hooks/use-employees-query';
 import { useServicesQuery } from '@/hooks/use-services-query';
+import { EmployeesEmptyState } from '@/components/onboarding/empty-states/employees-empty';
 
 export default function EmployeesPage() {
   const t = useTranslations('employees');
@@ -166,8 +167,8 @@ export default function EmployeesPage() {
               </TableRow>
             ) : !data || data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  {t('noEmployees')}
+                <TableCell colSpan={6} className="p-0">
+                  <EmployeesEmptyState onAddEmployee={() => setDialogOpen(true)} />
                 </TableCell>
               </TableRow>
             ) : (

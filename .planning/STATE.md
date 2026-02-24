@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 26 complete, ready for Phase 27
+**Current focus:** v1.2 Product Readiness — Phase 27 Plan 01 complete, ready for Plan 02
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 26 of 27 (Booking UX Polish) **COMPLETE**
-- **Plan:** 4 of 4 in current phase — all plans complete
-- **Status:** Phase 26 complete — ready for Phase 27
-- **Last activity:** 2026-02-24 — Phase 26 Plan 04 executed (ICS calendar export + confirmation animation)
+- **Phase:** 27 of 27 (Onboarding Wizard) **IN PROGRESS**
+- **Plan:** 1 of 4 in current phase — Plan 01 complete
+- **Status:** Phase 27 Plan 01 complete — ready for Plan 02 (dashboard redirect integration)
+- **Last activity:** 2026-02-24 — Phase 27 Plan 01 executed (4-step onboarding wizard + QR code)
 
-Progress: [████████░░] 84% (v1.2: 16/19 plans)
+Progress: [████████░░] 89% (v1.2: 17/19 plans)
 
 ## What's Done
 
@@ -48,6 +48,9 @@ Progress: [████████░░] 84% (v1.2: 16/19 plans)
 - Plan 02: AI insights API route (GET /api/v1/ai/insights), useAiInsightsQuery hook, AiInsightsPanel, AiOnboardingState, dashboard integration, i18n cs/en/sk
 - Verification: 8/8 must-haves passed, 4 human verification items (visual/interactive)
 
+**Phase 27 in progress** (2026-02-24) — Onboarding Wizard:
+- Plan 01: 4-step setup wizard (company details, first service, working hours, share link), QR code generation, industry defaults, onboarding_completed flag
+
 **Phase 26 complete** (2026-02-24) — Booking UX Polish:
 - Plan 01: Visual regression test infrastructure for booking embed (Playwright, CI)
 - Plan 02: Replaced FullCalendar with react-big-calendar (MIT), DnD rescheduling, shadcn CSS theme, CalendarToolbar view names updated
@@ -59,6 +62,10 @@ Progress: [████████░░] 84% (v1.2: 16/19 plans)
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 27-01: Switch (radix-ui/react-switch) used instead of Checkbox for working hours day toggles — radix-ui/react-checkbox not installed
+- Phase 27-01: Each step component calls its own API endpoint directly (fetch) — self-contained, matches booking-wizard pattern
+- Phase 27-01: Industry template pre-fills as static constant map (20 types) — no API round-trip for template data
+- Phase 27-01: WorkingHoursStep initializes from industry-specific defaults (beauty/fitness/medical/default groups)
 - Phase 26-04: ICS generated without external library -- pure string templating for RFC 5545 (avoids dependency for ~100 LOC)
 - Phase 26-04: Calendar endpoint public (no JWT) -- booking UUID (122-bit entropy) as unguessable auth token
 - Phase 26-04: Manual SQL joins in calendar route for precise field selection over Drizzle relational syntax
@@ -98,10 +105,11 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 16/19 | - | - |
+| v1.2 (23-27) | 17/19 | - | - |
 | 26-02 | 1 | 7min | 7min |
 | 26-03 | 1 | 5min | 5min |
 | 26-04 | 1 | 7min | 7min |
+| 27-01 | 1 | 9min | 9min |
 
 ---
-*Last updated: 2026-02-24 after Phase 26 complete (4/4 plans, ICS calendar export + confirmation animation)*
+*Last updated: 2026-02-24 after Phase 27 Plan 01 complete (4-step onboarding wizard with QR code)*

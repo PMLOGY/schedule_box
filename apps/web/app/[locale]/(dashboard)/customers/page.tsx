@@ -32,6 +32,7 @@ import {
   type Customer,
 } from '@/hooks/use-customers-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
+import { CustomersEmptyState } from '@/components/onboarding/empty-states/customers-empty';
 
 export default function CustomersPage() {
   const t = useTranslations('customers');
@@ -162,8 +163,8 @@ export default function CustomersPage() {
               </TableRow>
             ) : !data || data.data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  {t('noCustomers')}
+                <TableCell colSpan={7} className="p-0">
+                  <CustomersEmptyState onAddCustomer={() => setDialogOpen(true)} />
                 </TableCell>
               </TableRow>
             ) : (

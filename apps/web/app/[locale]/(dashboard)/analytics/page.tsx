@@ -11,6 +11,7 @@ import { KpiComparisonCards } from '@/components/analytics/kpi-comparison-cards'
 import { ExportToolbar } from '@/components/analytics/export-toolbar';
 import { useRevenueAnalytics } from '@/hooks/use-revenue-analytics';
 import { useBookingAnalytics, useAnalyticsOverview } from '@/hooks/use-booking-analytics';
+import { AnalyticsEmptyState } from '@/components/onboarding/empty-states/analytics-empty';
 
 // Dynamic imports for charts to prevent SSR hydration issues
 const RevenueChart = dynamic(
@@ -88,7 +89,7 @@ export default function AnalyticsPage() {
       ) : overview ? (
         <KpiComparisonCards overview={overview} />
       ) : (
-        <div className="text-center py-8 text-muted-foreground">{t('noData')}</div>
+        <AnalyticsEmptyState />
       )}
 
       {/* Revenue Chart */}

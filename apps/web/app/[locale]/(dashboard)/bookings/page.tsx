@@ -28,6 +28,7 @@ import { useBookingsQuery } from '@/hooks/use-bookings-query';
 import BookingStatusBadge from '@/components/booking/BookingStatusBadge';
 import BookingDetailPanel from '@/components/booking/BookingDetailPanel';
 import { NoShowRiskBadge } from '@/components/ai/NoShowRiskBadge';
+import { BookingsEmptyState } from '@/components/onboarding/empty-states/bookings-empty';
 import type { BookingStatus } from '@schedulebox/shared/types';
 
 export default function BookingsPage() {
@@ -144,8 +145,8 @@ export default function BookingsPage() {
                 </TableRow>
               ) : !data || data.data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    {t('noBookings')}
+                  <TableCell colSpan={7} className="p-0">
+                    <BookingsEmptyState />
                   </TableCell>
                 </TableRow>
               ) : (

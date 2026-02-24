@@ -39,6 +39,7 @@ import {
   type Service,
 } from '@/hooks/use-services-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
+import { ServicesEmptyState } from '@/components/onboarding/empty-states/services-empty';
 
 interface ServiceFormData {
   name: string;
@@ -248,8 +249,8 @@ export default function ServicesPage() {
               </TableRow>
             ) : !data || data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  {t('noServices')}
+                <TableCell colSpan={7} className="p-0">
+                  <ServicesEmptyState onAddService={() => setDialogOpen(true)} />
                 </TableCell>
               </TableRow>
             ) : (
