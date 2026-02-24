@@ -22,6 +22,7 @@ import { employees, employeeServices, workingHours, workingHoursOverrides } from
 import { resources, resourceTypes, serviceResources } from './resources';
 import { bookings, bookingResources, availabilitySlots } from './bookings';
 import { payments, invoices } from './payments';
+import { subscriptions, subscriptionInvoices, subscriptionEvents } from './subscriptions';
 import { coupons, couponUsage } from './coupons';
 import { giftCards, giftCardTransactions } from './gift-cards';
 import {
@@ -76,6 +77,8 @@ export const companiesRelations = relations(companies, ({ many }) => ({
   tags: many(tags),
   workingHours: many(workingHours),
   workingHoursOverrides: many(workingHoursOverrides),
+  subscriptions: many(subscriptions),
+  subscriptionInvoices: many(subscriptionInvoices),
 }));
 
 // ============================================================================
@@ -685,6 +688,37 @@ export const competitorMonitorsRelations = relations(competitorMonitors, ({ one 
   company: one(companies, {
     fields: [competitorMonitors.companyId],
     references: [companies.id],
+  }),
+}));
+
+// ============================================================================
+// SUBSCRIPTIONS RELATIONS
+// ============================================================================
+
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+  company: one(companies, {
+    fields: [subscriptions.companyId],
+    references: [companies.id],
+  }),
+  invoices: many(subscriptionInvoices),
+  events: many(subscriptionEvents),
+}));
+
+export const subscriptionInvoicesRelations = relations(subscriptionInvoices, ({ one }) => ({
+  company: one(companies, {
+    fields: [subscriptionInvoices.companyId],
+    references: [companies.id],
+  }),
+  subscription: one(subscriptions, {
+    fields: [subscriptionInvoices.subscriptionId],
+    references: [subscriptions.id],
+  }),
+}));
+
+export const subscriptionEventsRelations = relations(subscriptionEvents, ({ one }) => ({
+  subscription: one(subscriptions, {
+    fields: [subscriptionEvents.subscriptionId],
+    references: [subscriptions.id],
   }),
 }));
 

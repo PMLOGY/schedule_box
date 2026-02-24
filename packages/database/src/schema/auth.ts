@@ -53,7 +53,9 @@ export const companies = pgTable(
     currency: varchar('currency', { length: 3 }).default('CZK'),
     timezone: varchar('timezone', { length: 50 }).default('Europe/Prague'),
     locale: varchar('locale', { length: 10 }).default('cs-CZ'),
-    subscriptionPlan: varchar('subscription_plan', { length: 20 }).default('free'),
+    subscriptionPlan: varchar('subscription_plan', { length: 20 })
+      .default('free')
+      .$type<'free' | 'essential' | 'growth' | 'ai_powered'>(),
     subscriptionValidUntil: timestamp('subscription_valid_until', { withTimezone: true }),
     industryType: varchar('industry_type', { length: 50 }).default('general'),
     industryConfig: jsonb('industry_config').default({}),
@@ -71,7 +73,7 @@ export const companies = pgTable(
   (table) => ({
     subscriptionPlanCheck: check(
       'subscription_plan_check',
-      sql`${table.subscriptionPlan} IN ('free', 'starter', 'professional', 'enterprise')`,
+      sql`${table.subscriptionPlan} IN ('free', 'essential', 'growth', 'ai_powered')`,
     ),
     industryTypeCheck: check(
       'industry_type_check',
