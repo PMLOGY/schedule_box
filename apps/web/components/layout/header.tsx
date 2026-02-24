@@ -7,6 +7,7 @@ import { UserMenu } from './user-menu';
 import { MobileNav } from './mobile-nav';
 import { LocationSwitcher } from './location-switcher';
 import { LocaleSwitcher } from '@/components/i18n/locale-switcher';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 
@@ -18,7 +19,7 @@ export function Header() {
     <>
       <header
         role="banner"
-        className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-6"
+        className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-6"
       >
         <div className="flex items-center gap-4">
           <Button
@@ -35,6 +36,7 @@ export function Header() {
         </div>
         <div className="flex items-center gap-3">
           <LocaleSwitcher />
+          <ThemeToggle />
           <UserMenu />
         </div>
       </header>

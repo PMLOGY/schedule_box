@@ -105,16 +105,16 @@ export function DemoDataCard() {
         </div>
       ) : (
         // State 1: No demo data loaded
-        <Card className="border-dashed border-gray-200 bg-gray-50/50">
+        <Card className="border-dashed border-border bg-muted/50">
           <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100">
                 <Database className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">{t('promptTitle')}</p>
-                <p className="mt-0.5 text-sm text-gray-500">{t('promptDescription')}</p>
-                <p className="mt-1 text-xs text-gray-400">{t('info')}</p>
+                <p className="text-sm font-medium text-foreground">{t('promptTitle')}</p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{t('promptDescription')}</p>
+                <p className="mt-1 text-xs text-muted-foreground/70">{t('info')}</p>
               </div>
             </div>
             <Button

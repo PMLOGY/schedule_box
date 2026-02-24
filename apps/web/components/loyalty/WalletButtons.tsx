@@ -107,7 +107,7 @@ export function WalletButtons({
         onClick={handleGoogleWallet}
         isLoading={isGoogleLoading}
         disabled={isGoogleLoading}
-        className="rounded-lg bg-white text-gray-800 border border-gray-300 hover:bg-gray-50 px-5 py-3 h-auto text-sm font-medium"
+        className="rounded-lg bg-background text-foreground border border-border hover:bg-accent px-5 py-3 h-auto text-sm font-medium"
         variant="outline"
       >
         {!isGoogleLoading && <GoogleWalletIcon className="w-5 h-5" />}

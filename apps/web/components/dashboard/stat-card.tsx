@@ -41,7 +41,7 @@ export function StatCard({ title, value, trend, icon: Icon, formatter }: StatCar
         <div className="text-2xl font-bold">{formatValue(value, formatter)}</div>
         {trend !== undefined && (
           <p
-            className={`flex items-center text-xs ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            className={`flex items-center text-xs ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}
           >
             {trend >= 0 ? (
               <ArrowUp className="mr-1 h-3 w-3" />
