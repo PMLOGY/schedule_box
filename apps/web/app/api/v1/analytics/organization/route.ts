@@ -105,10 +105,7 @@ export const GET = createRouteHandler({
       })
       .from(companies)
       .where(
-        and(
-          eq(companies.organizationId, membership.organizationId),
-          eq(companies.isActive, true),
-        ),
+        and(eq(companies.organizationId, membership.organizationId), eq(companies.isActive, true)),
       );
 
     if (orgCompanies.length === 0) {
@@ -183,21 +180,12 @@ export const GET = createRouteHandler({
         count: sql<number>`COUNT(*)`,
       })
       .from(employees)
-      .where(
-        and(
-          inArray(employees.companyId, companyIds),
-          eq(employees.isActive, true),
-        ),
-      )
+      .where(and(inArray(employees.companyId, companyIds), eq(employees.isActive, true)))
       .groupBy(employees.companyId);
 
-    const employeeCountMap = new Map(
-      employeeCounts.map((e) => [e.companyId, Number(e.count)]),
-    );
+    const employeeCountMap = new Map(employeeCounts.map((e) => [e.companyId, Number(e.count)]));
 
-    const locationStatsMap = new Map(
-      locationStats.map((s) => [s.companyId, s]),
-    );
+    const locationStatsMap = new Map(locationStats.map((s) => [s.companyId, s]));
 
     // Build per-location response
     // Occupancy approximation V1: (completedBookings * avgDuration) / (employees * workingDays * 480)
@@ -212,9 +200,14 @@ export const GET = createRouteHandler({
 
       // Occupancy = (completedBookings * avgDuration) / (employees * workingDays * 480 min/day)
       const totalCapacityMin = empCount * workingDays * 480;
-      const occupancyApprox = totalCapacityMin > 0
-        ? Math.min(100, Math.round(((completedBookings * avgBookingDurationMin) / totalCapacityMin) * 10000) / 100)
-        : 0;
+      const occupancyApprox =
+        totalCapacityMin > 0
+          ? Math.min(
+              100,
+              Math.round(((completedBookings * avgBookingDurationMin) / totalCapacityMin) * 10000) /
+                100,
+            )
+          : 0;
 
       return {
         companyId: company.uuid,
