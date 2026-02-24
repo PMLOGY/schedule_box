@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type CalendarView = 'resourceTimelineDay' | 'resourceTimelineWeek' | 'dayGridMonth';
+type CalendarView = 'day' | 'week' | 'month' | 'agenda';
 
 interface CalendarState {
   view: CalendarView;
@@ -15,7 +15,7 @@ interface CalendarState {
 }
 
 export const useCalendarStore = create<CalendarState>((set) => ({
-  view: 'resourceTimelineDay',
+  view: 'day',
   selectedDate: new Date(),
   selectedEmployeeIds: [],
   showCancelled: false,
