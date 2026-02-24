@@ -3,6 +3,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { SkipLink } from '@/components/accessibility/skip-link';
 import { NavigationProgress } from '@/components/layout/navigation-progress';
+import { DashboardTour } from '@/components/onboarding/driver-tour';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </main>
         </div>
       </div>
+      {/* Dashboard tour — driver.js contextual tooltips on first visit after onboarding.
+          Renders nothing visually; only triggers the driver.js overlay. */}
+      <DashboardTour />
     </AuthGuard>
   );
 }

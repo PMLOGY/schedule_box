@@ -195,12 +195,14 @@
         "service": "Service",
         "employee": "Employee",
         "status": "Status",
+        "risk": "Risk",
         "price": "Price",
         "actions": "Actions"
       },
       "noBookings": "No bookings"
     },
     "wizard": {
+      "stepXofY": "Step {current} of {total}",
       "steps": {
         "service": "Service",
         "datetime": "Date & Time",
@@ -222,7 +224,10 @@
         "selectDate": "Select date",
         "availableSlots": "Available times",
         "noSlotsAvailable": "No available times for selected date",
-        "loading": "Loading availability..."
+        "loading": "Loading availability...",
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
       },
       "step3": {
         "title": "Customer Information",
@@ -249,10 +254,15 @@
         "employee": "Employee",
         "customer": "Customer",
         "notes": "Notes",
+        "price": "Price",
         "confirmBooking": "Confirm Booking",
         "slotTaken": "This time slot is no longer available. Please select a different time.",
         "bookingSuccess": "Booking created successfully",
-        "bookingError": "Error creating booking"
+        "bookingError": "Error creating booking",
+        "bookingConfirmed": "Booking Confirmed!",
+        "thankYou": "Thank you for your booking",
+        "addToCalendar": "Add to Calendar",
+        "backToBookings": "Back to Bookings"
       }
     }
   },
@@ -655,6 +665,23 @@
   },
   "ai": {
     "title": "AI Optimization",
+    "riskBadge": {
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk",
+      "unknown": "Not scored",
+      "tooltipPrefix": "Risk"
+    },
+    "riskDetail": {
+      "title": "AI no-show prediction",
+      "probability": "No-show probability",
+      "confidence": "AI confidence",
+      "highAction": "High risk -- consider sending an SMS reminder",
+      "mediumAction": "Medium risk -- we recommend confirming attendance",
+      "lowAction": "Low risk -- no action needed",
+      "fallbackNote": "AI service is temporarily unavailable. Default value shown.",
+      "notScored": "This booking has not been scored by AI yet."
+    },
     "pricing": {
       "title": "Dynamic Pricing",
       "description": "AI price optimization adjusts service prices within a 30% range based on demand, time of day and capacity utilization.",
@@ -699,13 +726,36 @@
       "fallbackMessage": "AI capacity prediction will be available once the AI service is connected.",
       "noData": "Capacity forecast will be available after collecting enough booking data.",
       "errorMessage": "Failed to load capacity forecast. Please try again later.",
-      "utilization": { "low": "low", "medium": "medium", "high": "high" },
-      "priority": { "low": "low", "medium": "medium", "high": "high" },
+      "utilization": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
+      "priority": {
+        "low": "low",
+        "medium": "medium",
+        "high": "high"
+      },
       "suggestionTypes": {
         "extend_hours": "extend hours",
         "reduce_hours": "reduce hours",
         "add_employee": "add employee"
       }
+    },
+    "insights": {
+      "title": "AI Overview",
+      "subtitle": "Today's predictions and recommendations",
+      "highRiskToday": "{count} bookings with high no-show risk",
+      "noHighRisk": "No high-risk bookings for today",
+      "totalToday": "{count} bookings today",
+      "viewAll": "View all bookings",
+      "suggestion": "Suggestion"
+    },
+    "onboarding": {
+      "title": "AI features activate after 10 bookings",
+      "description": "ScheduleBox learns from your bookings. After reaching 10 bookings, AI will start predicting no-show risk and optimizing your business.",
+      "progress": "{count} of 10 bookings",
+      "almostThere": "Just {remaining} more bookings and AI will activate!"
     }
   },
   "loyalty": {
@@ -937,5 +987,309 @@
     "forbidden": "Access forbidden",
     "networkError": "Network error",
     "serverError": "Server error"
+  },
+  "onboarding": {
+    "steps": {
+      "company": "Company",
+      "service": "Service",
+      "hours": "Working Hours",
+      "share": "Share"
+    },
+    "companyDetails": {
+      "title": "Company Details",
+      "namePlaceholder": "Your business name",
+      "nameLabel": "Business Name",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+420 123 456 789",
+      "industryLabel": "Industry",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Brief description of your business...",
+      "addressStreetLabel": "Street address",
+      "addressCityLabel": "City",
+      "addressZipLabel": "ZIP code",
+      "logoLabel": "Company logo",
+      "logoOptional": "(optional)"
+    },
+    "firstService": {
+      "title": "Your First Service",
+      "tip": "Tip: You can add more services later in Settings",
+      "useTemplate": "Use template",
+      "nameLabel": "Service name",
+      "namePlaceholder": "e.g. Women's haircut",
+      "durationLabel": "Duration",
+      "priceLabel": "Price (CZK)",
+      "descriptionLabel": "Description (optional)",
+      "skipText": "Add services later",
+      "minutes": "min"
+    },
+    "workingHours": {
+      "title": "Working Hours",
+      "useDefaults": "Use defaults (Mon-Fri 9:00-17:00)",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "activeLabel": "Active",
+      "fromLabel": "From",
+      "toLabel": "To"
+    },
+    "shareLink": {
+      "title": "Your booking link is ready!",
+      "subtitle": "Share this link with customers so they can book online.",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "downloadQR": "Download QR code",
+      "complete": "Complete setup",
+      "qrCodeAlt": "QR code for booking link"
+    },
+    "industryTypes": {
+      "beauty_salon": "Hair / Beauty Salon",
+      "barbershop": "Barbershop",
+      "spa_wellness": "Spa / Wellness",
+      "fitness_gym": "Fitness / Gym",
+      "yoga_pilates": "Yoga / Pilates",
+      "dance_studio": "Dance Studio",
+      "medical_clinic": "Medical / Dental",
+      "veterinary": "Veterinary",
+      "physiotherapy": "Physiotherapy",
+      "psychology": "Psychologist / Therapist",
+      "auto_service": "Auto Service",
+      "cleaning_service": "Cleaning Service",
+      "tutoring": "Tutoring",
+      "photography": "Photography Studio",
+      "consulting": "Consulting",
+      "coworking": "Coworking",
+      "pet_grooming": "Pet Grooming",
+      "tattoo_piercing": "Tattoo / Piercing",
+      "escape_room": "Escape Room",
+      "general": "Other"
+    },
+    "skip": "Skip for now",
+    "next": "Continue",
+    "back": "Back",
+    "saving": "Saving...",
+    "checklist": {
+      "title": "Setup Progress",
+      "progress": "{completed} of {total} complete",
+      "dismiss": "Dismiss",
+      "companyProfile": {
+        "label": "Complete company profile",
+        "description": "Add phone, description, and address"
+      },
+      "firstService": {
+        "label": "Add your first service",
+        "description": "Create a service customers can book"
+      },
+      "workingHours": {
+        "label": "Set working hours",
+        "description": "Define when you're available for bookings"
+      },
+      "firstBooking": {
+        "label": "Get your first booking",
+        "description": "Share your booking link with customers"
+      },
+      "notifications": {
+        "label": "Enable notifications",
+        "description": "Set up email or SMS reminders"
+      }
+    },
+    "welcomeBanner": {
+      "title": "Welcome to ScheduleBox!",
+      "description": "Complete your setup to start accepting bookings",
+      "action": "Start setup"
+    },
+    "demoData": {
+      "promptTitle": "Want to see ScheduleBox in action?",
+      "promptDescription": "Load demo data: Beauty Studio Praha — 3 services, 5 customers, 10 bookings",
+      "loadButton": "Load demo data",
+      "loadingButton": "Loading...",
+      "info": "Demo data is clearly labeled and can be removed anytime",
+      "activeBanner": "Demo data active",
+      "activeCompany": "Beauty Studio Praha",
+      "removeButton": "Remove demo data",
+      "removeConfirm": "Are you sure you want to remove all demo data?",
+      "success": "Demo data loaded successfully",
+      "removed": "Demo data removed"
+    },
+    "tour": {
+      "navigation": {
+        "title": "Navigation",
+        "description": "Find all sections here — bookings, customers, services, analytics, and settings"
+      },
+      "overview": {
+        "title": "Dashboard Overview",
+        "description": "Your key metrics — today's bookings, monthly revenue, new customers"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "description": "Quickly create a booking, add a customer, or open the calendar"
+      },
+      "nextBtn": "Next",
+      "prevBtn": "Previous",
+      "doneBtn": "Done",
+      "closeBtn": "Close"
+    },
+    "templates": {
+      "title": "Industry Templates",
+      "subtitle": "Choose your industry and we'll pre-fill services, prices, and working hours",
+      "servicesCount": "{count} services",
+      "priceFrom": "from {price} CZK",
+      "applying": "Applying template...",
+      "applied": "Template applied! Services and working hours configured.",
+      "useTemplate": "Use industry template",
+      "orCreateOwn": "or create your own service"
+    }
+  },
+  "emptyStates": {
+    "bookings": {
+      "title": "No bookings yet",
+      "description": "Share your booking link with customers to get your first booking",
+      "action": "Share booking link",
+      "secondaryAction": "Create booking manually"
+    },
+    "customers": {
+      "title": "No customers yet",
+      "description": "Customers are added automatically when they book, or you can add them manually",
+      "action": "Add customer"
+    },
+    "services": {
+      "title": "No services yet",
+      "description": "Add the services you offer so customers can book them online",
+      "action": "Add service",
+      "secondaryAction": "Use industry template"
+    },
+    "employees": {
+      "title": "No team members yet",
+      "description": "Working solo? No need to add employees. If you have a team, add them here.",
+      "action": "Add employee"
+    },
+    "analytics": {
+      "title": "No analytics data yet",
+      "description": "Analytics will appear after your first bookings come in",
+      "action": "Share booking link"
+    },
+    "calendar": {
+      "title": "Calendar is empty",
+      "description": "Your bookings will appear here once customers start booking",
+      "action": "Create booking",
+      "secondaryAction": "Set working hours"
+    }
+  },
+  "landing": {
+    "meta": {
+      "homeTitle": "ScheduleBox — Online Booking System for Czech Businesses",
+      "homeDescription": "AI-powered booking system for salons, fitness centers, and services. Online bookings 24/7, SMS reminders, payments via Comgate. Try for free.",
+      "pricingTitle": "Pricing — ScheduleBox",
+      "pricingDescription": "Transparent pricing with no surprises. Choose the plan that fits your business.",
+      "privacyTitle": "Privacy Policy — ScheduleBox",
+      "termsTitle": "Terms of Service — ScheduleBox"
+    },
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "login": "Sign in",
+      "cta": "Start for free"
+    },
+    "hero": {
+      "badge": "AI-powered booking system",
+      "headline": "Online bookings for your business",
+      "subheadline": "Automate bookings, reduce no-shows, and increase revenue with an intelligent system designed for Czech businesses.",
+      "cta": "Start for free",
+      "ctaSecondary": "View demo",
+      "widgetTitle": "Booking widget preview"
+    },
+    "features": {
+      "title": "Everything you need to manage bookings",
+      "aiPrediction": "AI Predictions",
+      "aiPredictionDesc": "Predict demand and optimize pricing with machine learning.",
+      "onlineBooking": "Online Booking 24/7",
+      "onlineBookingDesc": "Customers book anytime through your own website widget.",
+      "notifications": "Smart Notifications",
+      "notificationsDesc": "Automatic SMS and email reminders reduce no-shows by 35%.",
+      "payments": "Online Payments",
+      "paymentsDesc": "Accept payments via Comgate — cards, bank transfers, Apple Pay.",
+      "crm": "CRM & Loyalty Program",
+      "crmDesc": "Track customer history and reward loyal clients.",
+      "analytics": "Analytics & Reports",
+      "analyticsDesc": "Clear charts of revenue, occupancy, and employee performance."
+    },
+    "trust": {
+      "gdpr": "GDPR Compliant",
+      "hosting": "Czech Hosting",
+      "payment": "Comgate Payments",
+      "security": "Bank-level Security"
+    },
+    "pricing": {
+      "title": "Transparent pricing with no surprises",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualSaving": "Save 2 months",
+      "currency": "CZK/mo",
+      "cta": "Start for free",
+      "free": {
+        "name": "Free",
+        "description": "For starting entrepreneurs"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For growing businesses"
+      },
+      "business": {
+        "name": "Business",
+        "description": "For large establishments"
+      },
+      "mostPopular": "Most Popular",
+      "features": {
+        "onlineBooking": "Online booking 24/7",
+        "basicCalendar": "Basic calendar",
+        "emailNotifications": "Email notifications",
+        "oneStaff": "1 staff member",
+        "fiftyBookings": "50 bookings/month",
+        "everythingFree": "Everything in Free",
+        "smsReminders": "SMS reminders",
+        "payments": "Online payments",
+        "crm": "CRM & loyal customers",
+        "fiveStaff": "5 staff members",
+        "unlimitedBookings": "Unlimited bookings",
+        "everythingPro": "Everything in Pro",
+        "aiPredictions": "AI predictions & recommendations",
+        "dynamicPricing": "Dynamic pricing",
+        "apiAccess": "API access",
+        "unlimitedStaff": "Unlimited staff members",
+        "prioritySupport": "Priority support"
+      }
+    },
+    "social": {
+      "title": "Businesses that trust us",
+      "placeholder": "Customer reviews will be added before launch."
+    },
+    "cookie": {
+      "message": "This website uses cookies to ensure the best experience. Learn more in our",
+      "accept": "Accept",
+      "reject": "Reject",
+      "privacyLink": "privacy policy"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated"
+    },
+    "footer": {
+      "product": "Product",
+      "legal": "Legal",
+      "contact": "Contact",
+      "privacyLink": "Privacy Policy",
+      "termsLink": "Terms of Service",
+      "copyright": "© {year} ScheduleBox. All rights reserved.",
+      "registryNote": "Registered in the Commercial Register maintained by the Municipal Court in Prague."
+    }
   }
 }

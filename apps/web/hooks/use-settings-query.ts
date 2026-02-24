@@ -16,6 +16,8 @@ export interface CompanySettings {
   timezone: string;
   subscription_plan: string;
   created_at: string;
+  onboarding_completed: boolean | null;
+  industry_type: string | null;
 }
 
 export interface WorkingHour {

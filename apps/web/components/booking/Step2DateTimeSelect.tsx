@@ -118,10 +118,27 @@ export function Step2DateTimeSelect() {
           <div>
             <h3 className="font-medium mb-3">{t('availableSlots')}</h3>
             {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
+              <div className="space-y-6">
+                {/* Morning group skeleton */}
+                <div className="space-y-3">
+                  <Skeleton className="h-5 w-24" />
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                    <Skeleton className="h-12" />
+                    <Skeleton className="h-12" />
+                    <Skeleton className="h-12" />
+                    <Skeleton className="h-12 hidden sm:block" />
+                    <Skeleton className="h-12 hidden md:block" />
+                  </div>
+                </div>
+                {/* Afternoon group skeleton */}
+                <div className="space-y-3">
+                  <Skeleton className="h-5 w-24" />
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                    <Skeleton className="h-12" />
+                    <Skeleton className="h-12" />
+                    <Skeleton className="h-12" />
+                  </div>
+                </div>
               </div>
             ) : isError ? (
               <div className="text-center py-8">

@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { BookingStatus } from '@schedulebox/shared/types';
 import BookingStatusBadge from './BookingStatusBadge';
+import { NoShowRiskDetail } from '@/components/ai/NoShowRiskDetail';
 
 /** Booking shape matching the actual API snake_case response */
 interface BookingDetail {
@@ -262,6 +263,9 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
                   )}
                 </div>
               </div>
+
+              {/* AI No-Show Prediction */}
+              <NoShowRiskDetail probability={booking.noShowProbability} />
 
               {/* Action Buttons */}
               <div className="pt-4 space-y-2">

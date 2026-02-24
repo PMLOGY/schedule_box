@@ -31,6 +31,7 @@ COPY --from=builder /install /usr/local
 # Copy application code
 COPY ./app ./app
 COPY ./models ./models
+COPY ./scripts ./scripts
 
 # Create non-root user
 RUN addgroup --system --gid 1001 aiuser && \

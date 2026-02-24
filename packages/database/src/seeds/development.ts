@@ -749,6 +749,59 @@ async function seed() {
     console.log(`   ✅ Created ${paymentCount} payments\n`);
 
     // ========================================================================
+    // NOTIFICATION TEMPLATES (SMS confirmation for all companies)
+    // ========================================================================
+    console.log('📱 Seeding notification templates...');
+    let templateCount = 0;
+
+    for (const company of companies) {
+      const smsTemplates = [
+        {
+          type: 'booking_confirmation',
+          channel: 'sms',
+          subject: null,
+          bodyTemplate:
+            '{{company_name}}: Rezervace {{service_name}} dne {{formatDate booking_date}} v {{formatTime booking_time}} potvrzena.',
+        },
+        {
+          type: 'booking_reminder',
+          channel: 'sms',
+          subject: null,
+          bodyTemplate:
+            '{{company_name}}: Zitra v {{formatTime booking_time}} — {{service_name}}. Tesime se!',
+        },
+        {
+          type: 'booking_cancellation',
+          channel: 'sms',
+          subject: null,
+          bodyTemplate:
+            '{{company_name}}: Rezervace {{service_name}} dne {{formatDate booking_date}} byla zrusena.',
+        },
+      ];
+
+      for (const t of smsTemplates) {
+        try {
+          await db
+            .insert(schema.notificationTemplates)
+            .values({
+              companyId: company.id,
+              type: t.type,
+              channel: t.channel,
+              subject: t.subject,
+              bodyTemplate: t.bodyTemplate,
+              isActive: true,
+            })
+            .returning();
+          templateCount++;
+        } catch {
+          // Skip duplicates (unique constraint)
+        }
+      }
+    }
+
+    console.log(`   ✅ Created ${templateCount} notification templates\n`);
+
+    // ========================================================================
     // VALIDATION
     // ========================================================================
     console.log('✅ Validating seed data...\n');

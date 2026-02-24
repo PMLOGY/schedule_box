@@ -7,6 +7,8 @@ import { Link } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { CalendarToolbar } from '@/components/calendar/calendar-toolbar';
 import { Button } from '@/components/ui/button';
+import { CalendarEmptyState } from '@/components/onboarding/empty-states/calendar-empty';
+import { useBookingsQuery } from '@/hooks/use-bookings-query';
 
 const BookingCalendar = dynamic(() => import('@/components/booking/BookingCalendar'), {
   ssr: false,
@@ -21,6 +23,14 @@ export default function CalendarPage() {
   const t = useTranslations('calendar');
   const tBooking = useTranslations('booking');
 
+  // Check if any bookings exist — show empty state for fresh accounts
+  const { data: bookingsCheck, isLoading: isCheckingBookings } = useBookingsQuery({
+    page: 1,
+    limit: 1,
+  });
+
+  const hasNoBookings = !isCheckingBookings && bookingsCheck && bookingsCheck.data.length === 0;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -33,7 +43,7 @@ export default function CalendarPage() {
         </Button>
       </div>
       <CalendarToolbar />
-      <BookingCalendar />
+      {hasNoBookings ? <CalendarEmptyState /> : <BookingCalendar />}
     </div>
   );
 }

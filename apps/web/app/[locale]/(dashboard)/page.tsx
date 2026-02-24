@@ -1,17 +1,62 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter, Link } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { DashboardGrid } from '@/components/dashboard/dashboard-grid';
 import { QuickActions } from '@/components/dashboard/quick-actions';
+import { AiInsightsPanel } from '@/components/ai/AiInsightsPanel';
+import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
+import { DemoDataCard } from '@/components/onboarding/demo-data-card';
+import { useOnboardingRedirect } from '@/hooks/use-onboarding';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
+  const tOnboarding = useTranslations('onboarding');
+  const router = useRouter();
+  const { shouldRedirect, isLoading } = useOnboardingRedirect();
+
+  // Redirect to /onboarding when wizard has not been completed
+  useEffect(() => {
+    if (!isLoading && shouldRedirect) {
+      router.replace('/onboarding' as Parameters<typeof router.replace>[0]);
+    }
+  }, [shouldRedirect, isLoading, router]);
+
+  // Prevent flash of dashboard content before redirect status is known
+  if (isLoading) return null;
+
+  // Welcome banner: redirect is in progress; show friendly card instead of full dashboard
+  if (shouldRedirect) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Card className="max-w-md w-full text-center">
+          <CardContent className="pt-8 pb-8 space-y-4">
+            <h1 className="text-2xl font-bold">{tOnboarding('welcomeBanner.title')}</h1>
+            <p className="text-muted-foreground">{tOnboarding('welcomeBanner.description')}</p>
+            <Button asChild>
+              <Link href="/onboarding">{tOnboarding('welcomeBanner.action')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       <PageHeader title={t('title')} />
+      {/* Onboarding checklist widget — shows setup progress for new users.
+          Renders conditionally (auto-hides when dismissed via localStorage). */}
+      <OnboardingChecklist />
+      {/* Demo data card — lets new owners explore ScheduleBox with sample data.
+          Shows after onboarding is completed; hidden until then. */}
+      <DemoDataCard />
       <DashboardGrid />
+      <AiInsightsPanel />
       <QuickActions />
     </div>
   );

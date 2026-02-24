@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -11,6 +12,7 @@ import { useBookingWizard } from '@/stores/booking-wizard.store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { BookingConfirmationSuccess } from './BookingConfirmationSuccess';
 
 interface CustomerResponse {
   id: number;
@@ -28,6 +30,7 @@ export function Step4Confirmation() {
   const tStep1 = useTranslations('booking.wizard.step1');
   const { data, prevStep, setSubmitting, setError, setStep, reset } = useBookingWizard();
   const router = useRouter();
+  const [bookingResult, setBookingResult] = useState<{ uuid: string } | null>(null);
 
   const createBookingMutation = useMutation({
     mutationFn: async () => {
@@ -59,11 +62,11 @@ export function Step4Confirmation() {
       setSubmitting(true);
       setError(null);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       setSubmitting(false);
       toast.success(t('bookingSuccess'));
-      reset();
-      router.push('/bookings');
+      // Show success animation instead of immediate redirect
+      setBookingResult({ uuid: result.uuid || '' });
     },
     onError: (error: Error & { statusCode?: number; code?: string }) => {
       setSubmitting(false);
@@ -95,6 +98,32 @@ export function Step4Confirmation() {
   const formattedDateTime = data.startTime
     ? format(new Date(data.startTime), 'EEEE, d. MMMM yyyy', { locale: cs })
     : '';
+
+  // Show animated success state after booking creation
+  if (bookingResult) {
+    return (
+      <div className="space-y-6">
+        <BookingConfirmationSuccess
+          bookingUuid={bookingResult.uuid}
+          serviceName={`${data.serviceName ?? ''} (${data.serviceDuration} min)`}
+          dateTime={`${formattedDateTime} ${data.displayTime ?? ''}`.trim()}
+          employeeName={data.employeeName ?? undefined}
+          price={data.servicePrice ?? undefined}
+        />
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            onClick={() => {
+              reset();
+              router.push('/bookings');
+            }}
+          >
+            {t('backToBookings')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

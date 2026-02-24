@@ -1,38 +1,66 @@
 /**
  * Booking Calendar Component
  *
- * FullCalendar wrapper for displaying and managing bookings.
- * Uses FullCalendar's event source function for reliable event loading
- * during date navigation. Supports day/week/month views, drag-drop
- * rescheduling, and event click for details.
+ * react-big-calendar wrapper for displaying and managing bookings.
+ * Uses React Query for data fetching and supports day/week/month views,
+ * drag-drop rescheduling, and event click for details.
+ *
+ * Replaces FullCalendar (premium license required for resource-timeline).
+ * react-big-calendar is MIT-licensed.
  */
 
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import csLocale from '@fullcalendar/core/locales/cs';
-import type { EventDropArg, EventClickArg, EventInput } from '@fullcalendar/core';
+import React, { useMemo, useState, useCallback } from 'react';
+import { Calendar, dateFnsLocalizer, type CalendarProps } from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
+import {
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  startOfDay,
+  endOfDay,
+  startOfMonth,
+  endOfMonth,
+  subDays,
+  addDays,
+} from 'date-fns';
+import { cs } from 'date-fns/locale/cs';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
+import { useQuery } from '@tanstack/react-query';
 import { useCalendarStore } from '@/stores/calendar.store';
 import { useRescheduleBooking } from '@/hooks/use-reschedule-booking';
 import { apiClient } from '@/lib/api-client';
-import type { Booking } from '@schedulebox/shared/types';
-import type { PaginatedResponse } from '@schedulebox/shared/types';
+import type { Booking, PaginatedResponse } from '@schedulebox/shared/types';
 import BookingDetailPanel from './BookingDetailPanel';
 import '../../styles/calendar.css';
 
-/**
- * Map calendar store view to FullCalendar view names
- * Note: Resource timeline views require premium license, using standard views for MVP
- */
-const VIEW_MAP = {
-  resourceTimelineDay: 'timeGridDay',
-  resourceTimelineWeek: 'timeGridWeek',
-  dayGridMonth: 'dayGridMonth',
-} as const;
+// date-fns localizer for Czech locale
+const locales = { cs };
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+// Create DnD-enhanced Calendar with proper generic typing
+const DnDCalendar = withDragAndDrop<CalendarEvent>(
+  Calendar as unknown as React.ComponentType<CalendarProps<CalendarEvent>>,
+);
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  resource?: string;
+  booking: Booking;
+  isDraggable: boolean;
+}
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#F59E0B',
@@ -44,8 +72,39 @@ const STATUS_COLORS: Record<string, string> = {
 
 const DRAGGABLE_STATUSES = ['pending', 'confirmed'];
 
+/**
+ * Compute visible date range based on the current calendar view and selected date.
+ */
+function computeDateRange(view: string, selectedDate: Date) {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  switch (view) {
+    case 'day': {
+      const dayStart = startOfDay(selectedDate);
+      const dayEnd = endOfDay(selectedDate);
+      return { dateFrom: toDateStr(dayStart), dateTo: toDateStr(dayEnd) };
+    }
+    case 'week': {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const weekEnd = addDays(weekStart, 6);
+      return { dateFrom: toDateStr(weekStart), dateTo: toDateStr(weekEnd) };
+    }
+    case 'month': {
+      // Add padding days for month view (shows days from adjacent months)
+      const monthStart = subDays(startOfMonth(selectedDate), 7);
+      const monthEnd = addDays(endOfMonth(selectedDate), 7);
+      return { dateFrom: toDateStr(monthStart), dateTo: toDateStr(monthEnd) };
+    }
+    default: {
+      // Agenda / fallback: show 30 days from selected date
+      const agendaEnd = addDays(selectedDate, 30);
+      return { dateFrom: toDateStr(selectedDate), dateTo: toDateStr(agendaEnd) };
+    }
+  }
+}
+
 export default function BookingCalendar() {
-  const calendarRef = useRef<FullCalendar>(null);
   const { view, selectedDate, selectedEmployeeIds, showCancelled } = useCalendarStore();
 
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
@@ -53,120 +112,83 @@ export default function BookingCalendar() {
 
   const rescheduleMutation = useRescheduleBooking();
 
-  // Use refs for values accessed inside the event source callback
-  // so the callback itself stays stable (no dependency changes)
-  const showCancelledRef = useRef(showCancelled);
-  showCancelledRef.current = showCancelled;
-
-  /**
-   * FullCalendar event source function.
-   * Called by FullCalendar whenever the visible date range changes
-   * (including after gotoDate/changeView). FullCalendar handles caching
-   * via lazyFetching (default: true) — old events stay visible while
-   * new ones load, preventing the "disappearing events" issue.
-   */
-  const fetchEvents = useCallback(
-    (
-      fetchInfo: { start: Date; end: Date },
-      successCallback: (events: EventInput[]) => void,
-      failureCallback: (error: Error) => void,
-    ) => {
-      // Format dates in local timezone (YYYY-MM-DD) to match server expectations
-      const pad = (n: number) => String(n).padStart(2, '0');
-      const s = fetchInfo.start;
-      const e = fetchInfo.end;
-      const dateFrom = `${s.getFullYear()}-${pad(s.getMonth() + 1)}-${pad(s.getDate())}`;
-      const dateTo = `${e.getFullYear()}-${pad(e.getMonth() + 1)}-${pad(e.getDate())}`;
-
-      apiClient
-        .get<PaginatedResponse<Booking>>('/bookings', {
-          date_from: dateFrom,
-          date_to: dateTo,
-          limit: 100,
-        })
-        .then((response) => {
-          let bookingList = response.data;
-
-          // Filter cancelled bookings client-side
-          if (!showCancelledRef.current) {
-            bookingList = bookingList.filter((b) => b.status !== 'cancelled');
-          }
-
-          const events: EventInput[] = bookingList.map((booking) => ({
-            id: String(booking.id),
-            title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
-            start: booking.startTime,
-            end: booking.endTime,
-            backgroundColor: STATUS_COLORS[booking.status] ?? '#3B82F6',
-            borderColor: 'transparent',
-            editable: DRAGGABLE_STATUSES.includes(booking.status),
-            extendedProps: { booking },
-            resourceId: booking.employee ? String(booking.employee.id) : undefined,
-          }));
-
-          successCallback(events);
-        })
-        .catch((err) => {
-          failureCallback(err instanceof Error ? err : new Error(String(err)));
-        });
-    },
-    [],
+  // Compute visible date range based on view
+  const { dateFrom, dateTo } = useMemo(
+    () => computeDateRange(view, selectedDate),
+    [view, selectedDate],
   );
 
-  // Refetch events when filter state changes (cancelled toggle, employee filter)
-  useEffect(() => {
-    calendarRef.current?.getApi()?.refetchEvents();
-  }, [showCancelled, selectedEmployeeIds]);
+  // Fetch bookings for the visible date range
+  const { data: bookingsData } = useQuery({
+    queryKey: ['bookings', 'calendar', dateFrom, dateTo],
+    queryFn: () =>
+      apiClient.get<PaginatedResponse<Booking>>('/bookings', {
+        date_from: dateFrom,
+        date_to: dateTo,
+        limit: 200,
+      }),
+  });
 
-  // Sync calendar view with store and force refetch to clear stale cache
-  useEffect(() => {
-    const calendarApi = calendarRef.current?.getApi();
-    if (!calendarApi) return;
+  // Transform bookings into calendar events with client-side filtering
+  const calendarEvents: CalendarEvent[] = useMemo(() => {
+    let bookingList = bookingsData?.data ?? [];
 
-    const fullCalendarView = VIEW_MAP[view];
-    if (calendarApi.view.type !== fullCalendarView) {
-      calendarApi.changeView(fullCalendarView);
-      calendarApi.refetchEvents();
+    // Filter cancelled bookings
+    if (!showCancelled) {
+      bookingList = bookingList.filter((b) => b.status !== 'cancelled');
     }
-  }, [view]);
 
-  // Sync calendar date with store and force refetch to clear stale cache
-  useEffect(() => {
-    const calendarApi = calendarRef.current?.getApi();
-    if (!calendarApi) return;
-    calendarApi.gotoDate(selectedDate);
-    calendarApi.refetchEvents();
-  }, [selectedDate]);
+    // Filter by selected employees
+    if (selectedEmployeeIds.length > 0) {
+      bookingList = bookingList.filter(
+        (b) => b.employee && selectedEmployeeIds.includes(String(b.employee.id)),
+      );
+    }
+
+    return bookingList.map((booking) => ({
+      id: String(booking.id),
+      title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
+      start: new Date(booking.startTime),
+      end: new Date(booking.endTime),
+      resource: booking.employee ? String(booking.employee.id) : undefined,
+      booking,
+      isDraggable: DRAGGABLE_STATUSES.includes(booking.status),
+    }));
+  }, [bookingsData, showCancelled, selectedEmployeeIds]);
 
   // Handle drag-drop rescheduling
-  const handleEventDrop = (info: EventDropArg) => {
-    const bookingId = info.event.id;
-    const newStartTime = info.event.start?.toISOString();
+  const handleEventDrop = useCallback(
+    ({ event, start }: { event: CalendarEvent; start: string | Date }) => {
+      if (!event.isDraggable) return;
 
-    if (!newStartTime || !bookingId) {
-      info.revert();
-      return;
-    }
-
-    rescheduleMutation.mutate({
-      bookingId,
-      startTime: newStartTime,
-      revertFn: info.revert,
-    });
-  };
-
-  // Handle event resize (duration change)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleEventResize = (info: any) => {
-    info.revert();
-  };
+      const newStart = start instanceof Date ? start : new Date(start);
+      rescheduleMutation.mutate({
+        bookingId: event.id,
+        startTime: newStart.toISOString(),
+      });
+    },
+    [rescheduleMutation],
+  );
 
   // Handle event click to open detail panel
-  const handleEventClick = (info: EventClickArg) => {
-    const bookingId = info.event.id;
-    setSelectedBookingId(bookingId);
+  const handleSelectEvent = useCallback((event: CalendarEvent) => {
+    setSelectedBookingId(event.id);
     setDetailPanelOpen(true);
-  };
+  }, []);
+
+  // Event styling based on booking status
+  const eventPropGetter = useCallback(
+    (event: CalendarEvent) => ({
+      style: {
+        backgroundColor: STATUS_COLORS[event.booking.status] ?? '#3B82F6',
+        borderRadius: '0.375rem',
+        border: 'none',
+        fontSize: '0.875rem',
+        padding: '2px 4px',
+      },
+    }),
+    [],
+  );
 
   const handleCloseDetailPanel = () => {
     setDetailPanelOpen(false);
@@ -176,37 +198,28 @@ export default function BookingCalendar() {
   return (
     <>
       <div className="relative rounded-lg border bg-card p-4">
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView={VIEW_MAP[view]}
-          initialDate={selectedDate}
-          events={fetchEvents}
-          headerToolbar={false}
-          slotMinTime="06:00:00"
-          slotMaxTime="22:00:00"
-          slotDuration="00:15:00"
-          snapDuration="00:15:00"
-          editable={true}
-          selectable={true}
-          lazyFetching={true}
-          eventDrop={handleEventDrop}
-          eventResize={handleEventResize}
-          eventClick={handleEventClick}
-          height="auto"
-          locales={[csLocale]}
-          locale="cs"
-          allDaySlot={false}
-          nowIndicator={true}
-          eventTimeFormat={{
-            hour: '2-digit',
-            minute: '2-digit',
-            meridiem: false,
-          }}
-          slotLabelFormat={{
-            hour: '2-digit',
-            minute: '2-digit',
-            meridiem: false,
+        <DnDCalendar
+          localizer={localizer}
+          events={calendarEvents}
+          view={view}
+          date={selectedDate}
+          onView={(newView) => useCalendarStore.getState().setView(newView as typeof view)}
+          onNavigate={(date) => useCalendarStore.getState().setSelectedDate(date)}
+          onEventDrop={handleEventDrop}
+          onSelectEvent={handleSelectEvent}
+          eventPropGetter={eventPropGetter}
+          draggableAccessor={(event) => (event as CalendarEvent).isDraggable}
+          min={new Date(0, 0, 0, 6, 0, 0)}
+          max={new Date(0, 0, 0, 22, 0, 0)}
+          step={15}
+          timeslots={4}
+          toolbar={false}
+          culture="cs"
+          style={{ minHeight: 600 }}
+          formats={{
+            timeGutterFormat: 'HH:mm',
+            eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
+              `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
           }}
         />
       </div>

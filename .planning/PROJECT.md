@@ -26,23 +26,17 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v1.1 Production Hardening
-
-**Goal:** Make ScheduleBox production-ready with real email/SMS delivery, payment processing, and test coverage so it's reliable for real customers.
-
-**Target features:**
-- Email notifications via SMTP (booking confirmations, reminders, password resets)
-- SMS notifications via Twilio (booking reminders)
-- Comgate payment gateway production setup
-- Unit & integration tests for critical paths (auth, bookings, payments)
-- Integration setup documentation and environment configuration
-
 ## Current State
-- **v1.0 shipped:** 2026-02-12, deployed to Railway 2026-02-15
-- **Codebase:** ~62,000 LOC (50k TypeScript, 6k Python, 5k YAML/JSON)
-- **322+ commits** across 15 phases, 101 plans
-- **Deployed:** Railway (web + notification worker + PostgreSQL + Redis + RabbitMQ)
-- **Test coverage:** 0% (unit/integration tests not yet written)
+
+**v1.2 Product Readiness shipped** (2026-02-24). All three milestones complete:
+- **v1.0** (2026-02-12): Full-stack platform with 49 tables, ~94 API endpoints, 7 AI models, deployed to Railway
+- **v1.1** (2026-02-21): Testing foundation (243 unit + 31 integration + 10 E2E), email/SMS delivery, Comgate payments, monitoring
+- **v1.2** (2026-02-24): AI training pipeline, AI-powered UI, Czech landing page, booking UX polish, onboarding wizard
+
+**Codebase:** ~65,000 LOC (52k TypeScript, 6k Python, 5k YAML/JSON)
+**Tests:** 243 unit + 31 integration + 10 E2E, 80% CI coverage gate
+**Deployed:** Railway (web + notification worker + PostgreSQL + Redis + RabbitMQ)
+**Integrations:** Twilio SMS (Alpha Sender ID), Comgate payments (merchant 498621), SMTP email
 
 ## Requirements
 
@@ -63,16 +57,28 @@ Freemium with 4 tiers:
 - ✓ POL-01..05 — Analytics, i18n, accessibility, performance, export — v1.0
 - ✓ AI3-01..03 — Voice booking, follow-up generator, competitor intelligence — v1.0
 - ✓ OPS-01..06 — Kubernetes, monitoring, tracing, load testing, security audit, beta playbook — v1.0
+- ✓ TEST-01..04, ITEST-01..06, E2E-01..06 — Testing foundation, integration, E2E — v1.1
+- ✓ EMAIL-01..05 — SMTP delivery with SPF/DKIM — v1.1
+- ✓ SMS-01..04 — Twilio Messaging Service with Alpha Sender ID — v1.1
+- ✓ PAY-01..04 — Comgate production credentials and webhook verification — v1.1
+- ✓ MON-01..04 — Email/SMS/payment monitoring, CI coverage gates — v1.1
+- ✓ AI-01..08 — AI training pipeline, models, Redis persistence, Railway deployment, retraining CI — v1.2
+- ✓ AIUI-01..05 — No-show risk badges, AI insights panel, confidence transparency, onboarding state — v1.2
+- ✓ LAND-01..07 — Marketing landing page, pricing, Czech legal compliance, cookie consent — v1.2
+- ✓ BUX-01..07 — Visual regression, react-big-calendar, mobile UX, ICS export, animations — v1.2
+- ✓ ONB-01..07 — Onboarding wizard, QR code, checklist, empty states, demo data, Driver.js, templates — v1.2
 
 ### Active
-See `.planning/REQUIREMENTS.md` for v1.1 requirements.
+See `.planning/REQUIREMENTS.md` for next milestone requirements (when defined).
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
 - Video chat integration — uses external providers (Zoom/Meet/Teams)
 - Offline mode — real-time booking is core value
 - Multi-language AI models — Czech/Slovak only for v1
-- Mobile native app — deferred, PWA covers mobile use cases
+- Per-tenant AI models — SMBs have 50-500 bookings, need >10K for meaningful per-tenant training
+- Voice/NL booking — 3+ months to build reliably, defer to v2.0
+- Capacity forecast chart — Prophet needs real data, not synthetic, to be credible
 
 ## Key Decisions
 1. Next.js 14 monorepo with standalone microservices for AI/notifications — ✓ Good
@@ -85,6 +91,11 @@ See `.planning/REQUIREMENTS.md` for v1.1 requirements.
 8. Opossum circuit breaker — prevents cascading failures from AI timeouts — ✓ Good
 9. Bitnami Helm charts for stateful services — production-grade defaults — ✓ Good
 10. k6 over JMeter/Gatling — modern JS DSL, better CI integration — ✓ Good
+11. react-big-calendar (not FullCalendar) — MIT license for commercial SaaS — ✓ Good (v1.2)
+12. Motion (not GSAP) — MIT license, React-native integration — ✓ Good (v1.2)
+13. Driver.js (not react-joyride) — smaller bundle, fewer bugs — ✓ Good (v1.2)
+14. Twilio Messaging Service with Alpha Sender ID — no phone number needed, one-way SMS — ✓ Good (v1.1)
+15. Models baked into Docker image (not R2) — simple for v1.2 scale — ⚠️ Revisit if deploys >5min
 
 ## Team
 - Multi-agent development with Claude Code
@@ -92,4 +103,4 @@ See `.planning/REQUIREMENTS.md` for v1.1 requirements.
 
 ---
 
-_Last updated: 2026-02-15 after v1.1 milestone start_
+_Last updated: 2026-02-24 after v1.2 milestone completion_

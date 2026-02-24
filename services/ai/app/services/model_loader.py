@@ -7,12 +7,20 @@ If model files are not found, the service starts in degraded mode with
 heuristic-only predictions and fallback optimization responses.
 """
 
+import json as json_lib
 import logging
 import os
+import warnings
 
 import joblib
+import sklearn
+import xgboost
+from sklearn.exceptions import InconsistentVersionWarning
 
 from ..config import settings
+
+# Promote sklearn version warnings to errors for strict validation (AI-05)
+warnings.simplefilter("error", InconsistentVersionWarning)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +35,40 @@ _models: dict = {
     "reminder_timing": None,
 }
 _models_loaded: bool = False
+_prophet_warmed_up: bool = False
+
+
+def _validate_model_versions(meta_path: str, model_name: str) -> None:
+    """
+    Validate trained model library versions against the running environment.
+    Raises RuntimeError on version mismatch (AI-05 requirement).
+    """
+    if not os.path.exists(meta_path):
+        logger.warning(f"No version sidecar found at {meta_path} — skipping validation")
+        return
+
+    with open(meta_path) as f:
+        meta = json_lib.load(f)
+
+    trained_sklearn = meta.get("sklearn_version")
+    trained_xgboost = meta.get("xgboost_version")
+    running_sklearn = sklearn.__version__
+    running_xgboost = xgboost.__version__
+
+    if trained_sklearn and trained_sklearn != running_sklearn:
+        raise RuntimeError(
+            f"Model version mismatch for {model_name}: "
+            f"trained with sklearn={trained_sklearn}, "
+            f"running sklearn={running_sklearn}. "
+            f"Retrain or pin dependency versions."
+        )
+    if trained_xgboost and trained_xgboost != running_xgboost:
+        raise RuntimeError(
+            f"Model version mismatch for {model_name}: "
+            f"trained with xgboost={trained_xgboost}, "
+            f"running xgboost={running_xgboost}. "
+            f"Retrain or pin dependency versions."
+        )
 
 
 async def load_models() -> None:
@@ -60,6 +102,8 @@ async def load_models() -> None:
     # Load no-show model
     no_show_path = os.path.join(model_dir, "no_show_v1.0.0.joblib")
     try:
+        no_show_meta = os.path.join(model_dir, "no_show_v1.0.0.meta.json")
+        _validate_model_versions(no_show_meta, "no_show")
         if os.path.exists(no_show_path):
             raw_model = joblib.load(no_show_path)
             _models["no_show"] = NoShowPredictor(model=raw_model)
@@ -76,6 +120,8 @@ async def load_models() -> None:
     # Load CLV model
     clv_path = os.path.join(model_dir, "clv_v1.0.0.joblib")
     try:
+        clv_meta = os.path.join(model_dir, "clv_v1.0.0.meta.json")
+        _validate_model_versions(clv_meta, "clv")
         if os.path.exists(clv_path):
             raw_model = joblib.load(clv_path)
             _models["clv"] = CLVPredictor(model=raw_model)
@@ -115,28 +161,32 @@ async def load_models() -> None:
         _models["upselling"] = UpsellRecommender(similarity_matrix=None)
         logger.warning(f"Failed to load upselling model: {e} - using popularity fallback")
 
-    # Load pricing model (MAB state from JSON)
-    pricing_path = os.path.join(model_dir, "pricing_state.json")
+    # Load pricing model (MAB state from Redis — NOT filesystem)
     try:
-        if os.path.exists(pricing_path):
-            _models["pricing"] = PricingOptimizer.load_state(pricing_path)
-            logger.info(f"Pricing model loaded from {pricing_path}")
+        from .pricing_redis import load_pricing_state
+
+        pricing_state = await load_pricing_state()
+        if pricing_state:
+            _models["pricing"] = PricingOptimizer(state=pricing_state)
+            logger.info(f"Pricing model loaded from Redis ({len(pricing_state)} contexts)")
         else:
             _models["pricing"] = PricingOptimizer(state={})
-            logger.warning(
-                f"Pricing state file not found at {pricing_path} - using cold-start MAB"
-            )
+            logger.warning("No pricing state in Redis - using cold-start MAB")
     except Exception as e:
         _models["pricing"] = PricingOptimizer(state={})
-        logger.warning(f"Failed to load pricing model: {e} - using cold-start MAB")
+        logger.warning(f"Failed to load pricing state from Redis: {e} - using cold-start MAB")
 
-    # Load capacity model (Prophet model from joblib)
-    capacity_path = os.path.join(model_dir, "capacity_v1.0.0.joblib")
+    # Load capacity model (Prophet model from JSON — NOT joblib)
+    capacity_path = os.path.join(model_dir, "capacity_v1.0.0.json")
     try:
         if os.path.exists(capacity_path):
-            raw_model = joblib.load(capacity_path)
-            _models["capacity"] = CapacityForecaster(model=raw_model)
-            logger.info(f"Capacity model loaded from {capacity_path}")
+            from prophet.serialize import model_from_json
+
+            with open(capacity_path, "r") as f:
+                prophet_data = json_lib.load(f)
+            prophet_model = model_from_json(prophet_data)
+            _models["capacity"] = CapacityForecaster(model=prophet_model)
+            logger.info(f"Capacity model loaded from {capacity_path} (Prophet JSON)")
         else:
             _models["capacity"] = CapacityForecaster(model=None)
             logger.warning(
@@ -238,3 +288,28 @@ def get_reminder_timing_model():
 def is_models_loaded() -> bool:
     """Returns True if at least health_score model is ready."""
     return _models_loaded
+
+
+async def warmup_prophet() -> None:
+    """Run a throwaway prediction to warm up Prophet's Stan backend."""
+    global _prophet_warmed_up
+    import asyncio
+
+    capacity_model = _models.get("capacity")
+    if capacity_model and capacity_model.model:
+        try:
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, capacity_model.forecast, 1)
+            _prophet_warmed_up = True
+            logger.info("Prophet warmup prediction complete")
+        except Exception as e:
+            logger.warning(f"Prophet warmup failed (non-fatal): {e}")
+            _prophet_warmed_up = True  # Don't block health check forever
+    else:
+        _prophet_warmed_up = True  # No Prophet model loaded
+        logger.info("Prophet warmup skipped (no capacity model loaded)")
+
+
+def is_prophet_warmed_up() -> bool:
+    """Returns True if Prophet warmup is complete (or no Prophet model loaded)."""
+    return _prophet_warmed_up

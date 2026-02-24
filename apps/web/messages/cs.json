@@ -195,12 +195,14 @@
         "service": "Služba",
         "employee": "Zaměstnanec",
         "status": "Stav",
+        "risk": "Riziko",
         "price": "Cena",
         "actions": "Akce"
       },
       "noBookings": "Žádné rezervace"
     },
     "wizard": {
+      "stepXofY": "Krok {current} ze {total}",
       "steps": {
         "service": "Služba",
         "datetime": "Datum a čas",
@@ -222,7 +224,10 @@
         "selectDate": "Vyberte datum",
         "availableSlots": "Dostupné časy",
         "noSlotsAvailable": "Pro vybrané datum nejsou dostupné žádné termíny",
-        "loading": "Načítání dostupnosti..."
+        "loading": "Načítání dostupnosti...",
+        "morning": "Dopoledne",
+        "afternoon": "Odpoledne",
+        "evening": "Večer"
       },
       "step3": {
         "title": "Informace o zákazníkovi",
@@ -249,10 +254,15 @@
         "employee": "Zaměstnanec",
         "customer": "Zákazník",
         "notes": "Poznámky",
+        "price": "Cena",
         "confirmBooking": "Potvrdit rezervaci",
         "slotTaken": "Tento termín již není dostupný. Prosím vyberte jiný.",
         "bookingSuccess": "Rezervace byla úspěšně vytvořena",
-        "bookingError": "Chyba při vytváření rezervace"
+        "bookingError": "Chyba při vytváření rezervace",
+        "bookingConfirmed": "Rezervace potvrzena!",
+        "thankYou": "Děkujeme za vaši rezervaci",
+        "addToCalendar": "Přidat do kalendáře",
+        "backToBookings": "Zpět na rezervace"
       }
     }
   },
@@ -655,6 +665,23 @@
   },
   "ai": {
     "title": "AI optimalizace",
+    "riskBadge": {
+      "high": "Vysoke riziko",
+      "medium": "Stredni riziko",
+      "low": "Nizke riziko",
+      "unknown": "Neohodnoceno",
+      "tooltipPrefix": "Riziko"
+    },
+    "riskDetail": {
+      "title": "AI predikce nedostaveni",
+      "probability": "Pravdepodobnost nedostaveni",
+      "confidence": "Spolehlivost AI",
+      "highAction": "Vysoke riziko -- zvazte zaslani SMS pripominky",
+      "mediumAction": "Stredni riziko -- doporucujeme potvrdit ucast",
+      "lowAction": "Nizke riziko -- zadna akce neni potreba",
+      "fallbackNote": "AI sluzba je docasne nedostupna. Zobrazena je vychozi hodnota.",
+      "notScored": "Tato rezervace jeste nebyla vyhodnocena AI."
+    },
     "pricing": {
       "title": "Dynamické ceny",
       "description": "AI optimalizace cen upravuje ceny služeb v rozmezí 30 % na základě poptávky, denní doby a vytížení kapacity.",
@@ -699,13 +726,36 @@
       "fallbackMessage": "AI predikce kapacity bude dostupná po připojení AI služby.",
       "noData": "Predikce kapacity bude k dispozici po nasbírání dostatečného množství dat o rezervacích.",
       "errorMessage": "Nepodařilo se načíst predikci kapacity. Zkuste to prosím později.",
-      "utilization": { "low": "nízké", "medium": "střední", "high": "vysoké" },
-      "priority": { "low": "nízká", "medium": "střední", "high": "vysoká" },
+      "utilization": {
+        "low": "nízké",
+        "medium": "střední",
+        "high": "vysoké"
+      },
+      "priority": {
+        "low": "nízká",
+        "medium": "střední",
+        "high": "vysoká"
+      },
       "suggestionTypes": {
         "extend_hours": "prodloužit hodiny",
         "reduce_hours": "zkrátit hodiny",
         "add_employee": "přidat zaměstnance"
       }
+    },
+    "insights": {
+      "title": "AI prehled",
+      "subtitle": "Dnesni predikce a doporuceni",
+      "highRiskToday": "{count} rezervaci s vysokym rizikem nedostaveni",
+      "noHighRisk": "Zadne vysoko rizikove rezervace na dnes",
+      "totalToday": "{count} rezervaci na dnes",
+      "viewAll": "Zobrazit vsechny rezervace",
+      "suggestion": "Doporuceni"
+    },
+    "onboarding": {
+      "title": "AI funkce se aktivuji po 10 rezervacich",
+      "description": "ScheduleBox se uci z vasich rezervaci. Po dosazeni 10 rezervaci zacne AI predikovat riziko nedostaveni a optimalizovat vase podnikani.",
+      "progress": "{count} z 10 rezervaci",
+      "almostThere": "Jeste {remaining} rezervaci a AI se aktivuje!"
     }
   },
   "loyalty": {
@@ -937,5 +987,309 @@
     "forbidden": "Přístup zakázán",
     "networkError": "Chyba sítě",
     "serverError": "Chyba serveru"
+  },
+  "onboarding": {
+    "steps": {
+      "company": "Firma",
+      "service": "Služba",
+      "hours": "Pracovní doba",
+      "share": "Sdílení"
+    },
+    "companyDetails": {
+      "title": "Základní údaje o firmě",
+      "namePlaceholder": "Název vaší firmy",
+      "nameLabel": "Název firmy",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "+420 123 456 789",
+      "industryLabel": "Obor podnikání",
+      "descriptionLabel": "Popis firmy",
+      "descriptionPlaceholder": "Stručný popis vaší firmy...",
+      "addressStreetLabel": "Ulice a číslo",
+      "addressCityLabel": "Město",
+      "addressZipLabel": "PSČ",
+      "logoLabel": "Logo firmy",
+      "logoOptional": "(volitelné)"
+    },
+    "firstService": {
+      "title": "Vaše první služba",
+      "tip": "Tip: Další služby přidáte kdykoliv v Nastavení",
+      "useTemplate": "Použít šablonu",
+      "nameLabel": "Název služby",
+      "namePlaceholder": "např. Střih dámský",
+      "durationLabel": "Délka trvání",
+      "priceLabel": "Cena (Kč)",
+      "descriptionLabel": "Popis (volitelné)",
+      "skipText": "Přidat služby později",
+      "minutes": "min"
+    },
+    "workingHours": {
+      "title": "Pracovní doba",
+      "useDefaults": "Použít výchozí (Po-Pá 9:00-17:00)",
+      "days": {
+        "0": "Neděle",
+        "1": "Pondělí",
+        "2": "Úterý",
+        "3": "Středa",
+        "4": "Čtvrtek",
+        "5": "Pátek",
+        "6": "Sobota"
+      },
+      "activeLabel": "Aktivní",
+      "fromLabel": "Od",
+      "toLabel": "Do"
+    },
+    "shareLink": {
+      "title": "Váš rezervační odkaz je připraven!",
+      "subtitle": "Sdílejte tento odkaz se zákazníky, aby mohli rezervovat online.",
+      "copyLink": "Kopírovat odkaz",
+      "copied": "Zkopírováno!",
+      "downloadQR": "Stáhnout QR kód",
+      "complete": "Dokončit nastavení",
+      "qrCodeAlt": "QR kód rezervačního odkazu"
+    },
+    "industryTypes": {
+      "beauty_salon": "Kadeřnictví / Kosmetika",
+      "barbershop": "Pánský salon",
+      "spa_wellness": "Lázně / Wellness",
+      "fitness_gym": "Fitness / Posilovna",
+      "yoga_pilates": "Jóga / Pilates",
+      "dance_studio": "Taneční studio",
+      "medical_clinic": "Lékař / Zubař",
+      "veterinary": "Veterina",
+      "physiotherapy": "Fyzioterapie",
+      "psychology": "Psycholog / Terapeut",
+      "auto_service": "Autoservis",
+      "cleaning_service": "Úklidová firma",
+      "tutoring": "Doučování",
+      "photography": "Fotografický ateliér",
+      "consulting": "Konzultace",
+      "coworking": "Coworking",
+      "pet_grooming": "Psí salon",
+      "tattoo_piercing": "Tattoo / Piercing",
+      "escape_room": "Escape room",
+      "general": "Ostatní"
+    },
+    "skip": "Přeskočit",
+    "next": "Pokračovat",
+    "back": "Zpět",
+    "saving": "Ukládám...",
+    "checklist": {
+      "title": "Průvodce nastavením",
+      "progress": "{completed} z {total} dokončeno",
+      "dismiss": "Skrýt",
+      "companyProfile": {
+        "label": "Vyplnit profil firmy",
+        "description": "Přidejte telefon, popis a adresu"
+      },
+      "firstService": {
+        "label": "Přidat první službu",
+        "description": "Vytvořte službu, kterou si zákazníci mohou objednat"
+      },
+      "workingHours": {
+        "label": "Nastavit pracovní dobu",
+        "description": "Určete, kdy jste k dispozici pro rezervace"
+      },
+      "firstBooking": {
+        "label": "Přijmout první rezervaci",
+        "description": "Sdílejte svůj rezervační odkaz se zákazníky"
+      },
+      "notifications": {
+        "label": "Zapnout upozornění",
+        "description": "Nastavte email nebo SMS připomínky"
+      }
+    },
+    "welcomeBanner": {
+      "title": "Vítejte v ScheduleBox!",
+      "description": "Dokončete nastavení a začněte přijímat rezervace",
+      "action": "Spustit průvodce"
+    },
+    "demoData": {
+      "promptTitle": "Chcete vidět ScheduleBox v akci?",
+      "promptDescription": "Načtěte demo data: Beauty Studio Praha — 3 služby, 5 zákazníků, 10 rezervací",
+      "loadButton": "Načíst demo data",
+      "loadingButton": "Načítání...",
+      "info": "Demo data jsou jasně označena a lze je kdykoliv odstranit",
+      "activeBanner": "Demo data aktivní",
+      "activeCompany": "Beauty Studio Praha",
+      "removeButton": "Odstranit demo data",
+      "removeConfirm": "Opravdu chcete odstranit všechna demo data?",
+      "success": "Demo data úspěšně načtena",
+      "removed": "Demo data odstraněna"
+    },
+    "tour": {
+      "navigation": {
+        "title": "Navigace",
+        "description": "Zde najdete všechny sekce — rezervace, zákazníky, služby, analýzu a nastavení"
+      },
+      "overview": {
+        "title": "Přehled",
+        "description": "Vaše klíčové metriky — dnešní rezervace, měsíční tržby, noví zákazníci"
+      },
+      "quickActions": {
+        "title": "Rychlé akce",
+        "description": "Rychle vytvořte rezervaci, přidejte zákazníka nebo otevřete kalendář"
+      },
+      "nextBtn": "Další",
+      "prevBtn": "Zpět",
+      "doneBtn": "Hotovo",
+      "closeBtn": "Zavřít"
+    },
+    "templates": {
+      "title": "Šablony oborů",
+      "subtitle": "Vyberte obor a předvyplníme služby, ceny a pracovní dobu",
+      "servicesCount": "{count} služeb",
+      "priceFrom": "od {price} Kč",
+      "applying": "Aplikuji šablonu...",
+      "applied": "Šablona aplikována! Služby a pracovní doba nastaveny.",
+      "useTemplate": "Použít šablonu oboru",
+      "orCreateOwn": "nebo vytvořte vlastní službu"
+    }
+  },
+  "emptyStates": {
+    "bookings": {
+      "title": "Zatím žádné rezervace",
+      "description": "Sdílejte svůj rezervační odkaz se zákazníky a přijměte první rezervaci",
+      "action": "Sdílet rezervační odkaz",
+      "secondaryAction": "Vytvořit rezervaci ručně"
+    },
+    "customers": {
+      "title": "Zatím žádní zákazníci",
+      "description": "Zákazníci se automaticky přidají při první rezervaci, nebo je můžete přidat ručně",
+      "action": "Přidat zákazníka"
+    },
+    "services": {
+      "title": "Zatím žádné služby",
+      "description": "Přidejte služby, které nabízíte, aby si je zákazníci mohli objednat online",
+      "action": "Přidat službu",
+      "secondaryAction": "Použít šablonu oboru"
+    },
+    "employees": {
+      "title": "Zatím žádní zaměstnanci",
+      "description": "Pracujete sami? Není potřeba přidávat zaměstnance. Pokud máte tým, přidejte je zde.",
+      "action": "Přidat zaměstnance"
+    },
+    "analytics": {
+      "title": "Zatím žádná data pro analýzu",
+      "description": "Analytika se začne zobrazovat po vašich prvních rezervacích",
+      "action": "Sdílet rezervační odkaz"
+    },
+    "calendar": {
+      "title": "Kalendář je prázdný",
+      "description": "Vaše rezervace se zde zobrazí, jakmile je přijmete",
+      "action": "Vytvořit rezervaci",
+      "secondaryAction": "Nastavit pracovní dobu"
+    }
+  },
+  "landing": {
+    "meta": {
+      "homeTitle": "ScheduleBox — Online rezervační systém pro české firmy",
+      "homeDescription": "AI-powered rezervační systém pro salony, fitness centra a služby. Online rezervace 24/7, SMS připomínky, platby přes Comgate. Vyzkoušejte zdarma.",
+      "pricingTitle": "Ceník — ScheduleBox",
+      "pricingDescription": "Transparentní ceny bez překvapení. Vyberte si tarif, který vyhovuje vašemu podnikání.",
+      "privacyTitle": "Zásady ochrany osobních údajů — ScheduleBox",
+      "termsTitle": "Obchodní podmínky — ScheduleBox"
+    },
+    "nav": {
+      "features": "Funkce",
+      "pricing": "Ceny",
+      "login": "Přihlásit se",
+      "cta": "Začít zdarma"
+    },
+    "hero": {
+      "badge": "AI-powered rezervační systém",
+      "headline": "Online rezervace pro vaše podnikání",
+      "subheadline": "Automatizujte rezervace, snižte absence a zvyšte tržby s inteligentním systémem navrženým pro české firmy.",
+      "cta": "Začít zdarma",
+      "ctaSecondary": "Zobrazit demo",
+      "widgetTitle": "Ukázka rezervačního widgetu"
+    },
+    "features": {
+      "title": "Vše, co potřebujete pro správu rezervací",
+      "aiPrediction": "AI predikce",
+      "aiPredictionDesc": "Předvídejte poptávku a optimalizujte ceny pomocí strojového učení.",
+      "onlineBooking": "Online rezervace 24/7",
+      "onlineBookingDesc": "Zákazníci si rezervují kdykoliv přes váš vlastní widget na webu.",
+      "notifications": "Chytré notifikace",
+      "notificationsDesc": "Automatické SMS a emailové připomínky snižují absence o 35 %.",
+      "payments": "Online platby",
+      "paymentsDesc": "Přijímejte platby přes Comgate — karty, bankovní převody, Apple Pay.",
+      "crm": "CRM a věrnostní program",
+      "crmDesc": "Sledujte historii zákazníků a odměňujte věrné klienty.",
+      "analytics": "Analytika a reporty",
+      "analyticsDesc": "Přehledné grafy tržeb, obsazenosti a výkonu zaměstnanců."
+    },
+    "trust": {
+      "gdpr": "GDPR compliant",
+      "hosting": "Hosting v ČR",
+      "payment": "Platby přes Comgate",
+      "security": "Bankovní zabezpečení"
+    },
+    "pricing": {
+      "title": "Transparentní ceny bez překvapení",
+      "monthly": "Měsíčně",
+      "annual": "Ročně",
+      "annualSaving": "Ušetříte 2 měsíce",
+      "currency": "Kč/měs",
+      "cta": "Začít zdarma",
+      "free": {
+        "name": "Free",
+        "description": "Pro začínající podnikatele"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Pro rostoucí firmy"
+      },
+      "business": {
+        "name": "Business",
+        "description": "Pro velké provozovny"
+      },
+      "mostPopular": "Nejoblíbenější",
+      "features": {
+        "onlineBooking": "Online rezervace 24/7",
+        "basicCalendar": "Základní kalendář",
+        "emailNotifications": "Emailové notifikace",
+        "oneStaff": "1 zaměstnanec",
+        "fiftyBookings": "50 rezervací/měsíc",
+        "everythingFree": "Vše z Free",
+        "smsReminders": "SMS připomínky",
+        "payments": "Online platby",
+        "crm": "CRM a věrní zákazníci",
+        "fiveStaff": "5 zaměstnanců",
+        "unlimitedBookings": "Neomezené rezervace",
+        "everythingPro": "Vše z Pro",
+        "aiPredictions": "AI predikce a doporučení",
+        "dynamicPricing": "Dynamické ceny",
+        "apiAccess": "API přístup",
+        "unlimitedStaff": "Neomezený počet zaměstnanců",
+        "prioritySupport": "Prioritní podpora"
+      }
+    },
+    "social": {
+      "title": "Firmy, které nám důvěřují",
+      "placeholder": "Recenze zákazníků budou doplněny před spuštěním."
+    },
+    "cookie": {
+      "message": "Tento web používá cookies pro zajištění nejlepšího zážitku. Více informací najdete v našich",
+      "accept": "Přijmout",
+      "reject": "Odmítnout",
+      "privacyLink": "zásadách ochrany osobních údajů"
+    },
+    "privacy": {
+      "title": "Zásady ochrany osobních údajů",
+      "lastUpdated": "Poslední aktualizace"
+    },
+    "terms": {
+      "title": "Obchodní podmínky",
+      "lastUpdated": "Poslední aktualizace"
+    },
+    "footer": {
+      "product": "Produkt",
+      "legal": "Právní",
+      "contact": "Kontakt",
+      "privacyLink": "Ochrana osobních údajů",
+      "termsLink": "Obchodní podmínky",
+      "copyright": "© {year} ScheduleBox. Všechna práva vyhrazena.",
+      "registryNote": "Zapsáno v obchodním rejstříku vedeném Městským soudem v Praze."
+    }
   }
 }

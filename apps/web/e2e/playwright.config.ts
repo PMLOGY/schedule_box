@@ -23,6 +23,12 @@ export default defineConfig({
     : [['html', { open: 'on-failure' }]],
   outputDir: './test-results',
 
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01, // 1% tolerance for anti-aliasing
+    },
+  },
+
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -61,6 +67,26 @@ export default defineConfig({
         storageState: path.join(__dirname, 'playwright/.auth/user.json'),
       },
       dependencies: ['setup'],
+    },
+
+    // Visual regression projects: public embed widget, no auth needed
+    {
+      name: 'visual-regression-desktop',
+      testMatch: /.*visual.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+      // No dependencies — embed widget is public, no auth needed
+    },
+    {
+      name: 'visual-regression-mobile',
+      testMatch: /.*visual.*\.spec\.ts/,
+      use: {
+        ...devices['iPhone 13'],
+        viewport: { width: 390, height: 844 },
+      },
+      // No dependencies — embed widget is public, no auth needed
     },
   ],
 
