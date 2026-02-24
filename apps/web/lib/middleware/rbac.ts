@@ -37,6 +37,8 @@ export const PERMISSIONS = {
   MARKETPLACE_MANAGE: 'marketplace.manage',
   AI_USE: 'ai.use',
   WHITELABEL_MANAGE: 'whitelabel.manage',
+  ORGANIZATIONS_MANAGE: 'organizations.manage',
+  ORGANIZATIONS_READ: 'organizations.read',
 } as const;
 
 /**

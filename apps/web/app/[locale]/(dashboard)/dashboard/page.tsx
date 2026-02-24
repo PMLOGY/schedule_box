@@ -10,6 +10,7 @@ import { AiInsightsPanel } from '@/components/ai/AiInsightsPanel';
 import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
 import { DemoDataCard } from '@/components/onboarding/demo-data-card';
 import { useOnboardingRedirect } from '@/hooks/use-onboarding';
+import { UsageWidget } from '@/components/dashboard/usage-widget';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -56,6 +57,7 @@ export default function DashboardPage() {
           Shows after onboarding is completed; hidden until then. */}
       <DemoDataCard />
       <DashboardGrid />
+      <UsageWidget />
       <AiInsightsPanel />
       <QuickActions />
     </div>
