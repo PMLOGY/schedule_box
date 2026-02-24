@@ -5,7 +5,7 @@
 - **v1.0 ScheduleBox Platform** — Phases 1-15 (shipped 2026-02-12)
 - **v1.1 Production Hardening** — Phases 16-22 (shipped 2026-02-21)
 - **v1.2 Product Readiness** — Phases 23-27 (shipped 2026-02-24)
-- **v1.3 Revenue & Growth** — Phases 28-32 (in progress)
+- **v1.3 Revenue & Growth** — Phases 28-32 (shipped 2026-02-25)
 
 ## Phases
 
@@ -143,11 +143,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 30-01-PLAN.md — DB schema (organizations + organization_members tables, companies.organization_id FK) + shared types + Drizzle relations + migration
-- [ ] 30-02-PLAN.md — JWT context-switch endpoint (POST /auth/switch-location) + org-scope helpers + Zod schemas + integration test for cross-org 403 rejection
-- [ ] 30-03-PLAN.md — Organization CRUD API (create org, add/edit/deactivate locations, add/remove members) with plan-gated location limits
-- [ ] 30-04-PLAN.md — Location switcher UI in header + organization settings page (location + member management) + navigation update
-- [ ] 30-05-PLAN.md — Organization dashboard (per-location metrics) + cross-location customer search (email-based dedup)
+- [x] 30-01-PLAN.md — DB schema (organizations + organization_members tables, companies.organization_id FK) + shared types + Drizzle relations + migration
+- [x] 30-02-PLAN.md — JWT context-switch endpoint (POST /auth/switch-location) + org-scope helpers + Zod schemas + integration test for cross-org 403 rejection
+- [x] 30-03-PLAN.md — Organization CRUD API (create org, add/edit/deactivate locations, add/remove members) with plan-gated location limits
+- [x] 30-04-PLAN.md — Location switcher UI in header + organization settings page (location + member management) + navigation update
+- [x] 30-05-PLAN.md — Organization dashboard (per-location metrics) + cross-location customer search (email-based dedup)
 
 **Success Criteria:**
 
@@ -172,11 +172,11 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 31-01-PLAN.md — Revenue & booking analytics API routes (payment methods, top services, peak hours, cancellations, customer retention)
-- [ ] 31-02-PLAN.md — Employee utilization API + analytics_snapshots schema + BullMQ hourly refresh scheduler
-- [ ] 31-03-PLAN.md — Platform admin dashboard API (MRR, churn, plan distribution) + cross-location organization analytics API
-- [ ] 31-04-PLAN.md — Analytics UI enhancement (6 new chart components, extended analytics page with all sections)
-- [ ] 31-05-PLAN.md — Admin dashboard page + organization analytics page + customer report PDF/CSV export + navigation update
+- [x] 31-01-PLAN.md — Revenue & booking analytics API routes (payment methods, top services, peak hours, cancellations, customer retention)
+- [x] 31-02-PLAN.md — Employee utilization API + analytics_snapshots schema + BullMQ hourly refresh scheduler
+- [x] 31-03-PLAN.md — Platform admin dashboard API (MRR, churn, plan distribution) + cross-location organization analytics API
+- [x] 31-04-PLAN.md — Analytics UI enhancement (6 new chart components, extended analytics page with all sections)
+- [x] 31-05-PLAN.md — Admin dashboard page + organization analytics page + customer report PDF/CSV export + navigation update
 
 **Success Criteria:**
 
@@ -202,9 +202,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 32-01-PLAN.md — Dark mode infrastructure (next-themes, ThemeProvider, toggle) + design system token harmonization (shadows, success/warning colors) + hardcoded color fixes
-- [ ] 32-02-PLAN.md — Loading/empty/error states audit (16 loading.tsx skeletons, shared PageSkeleton/TableSkeleton, dashboard error.tsx)
-- [ ] 32-03-PLAN.md — Dashboard redesign (KPI row, revenue chart, recent bookings) + landing page testimonials + responsive audit + human verification
+- [x] 32-01-PLAN.md — Dark mode infrastructure (next-themes, ThemeProvider, toggle) + design system token harmonization (shadows, success/warning colors) + hardcoded color fixes
+- [x] 32-02-PLAN.md — Loading/empty/error states audit (16 loading.tsx skeletons, shared PageSkeleton/TableSkeleton, dashboard error.tsx)
+- [x] 32-03-PLAN.md — Dashboard redesign (KPI row, revenue chart, recent bookings) + landing page testimonials + responsive audit + human verification
 
 **Success Criteria:**
 
@@ -250,8 +250,8 @@ Plans:
 | 28. Subscription Billing | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 29. Usage Limits | v1.3 | 3/3 | Complete | 2026-02-24 |
 | 30. Multi-Location Orgs | v1.3 | 5/5 | Complete | 2026-02-24 |
-| 31. Analytics | v1.3 | 0/5 | Planned | — |
-| 32. Frontend Polish | v1.3 | 0/3 | Planned | — |
+| 31. Analytics | v1.3 | 5/5 | Complete | 2026-02-25 |
+| 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
 
 ---
 *Roadmap created: 2026-02-10*
