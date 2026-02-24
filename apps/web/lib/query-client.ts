@@ -6,6 +6,10 @@ let onLimitError:
   | ((details: { resource: string; current: number; limit: number; plan: string }) => void)
   | null = null;
 
+export function getOnLimitError() {
+  return onLimitError;
+}
+
 export function setOnLimitError(
   cb:
     | ((details: { resource: string; current: number; limit: number; plan: string }) => void)

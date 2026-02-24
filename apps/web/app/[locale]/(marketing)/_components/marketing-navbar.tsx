@@ -34,8 +34,11 @@ export async function MarketingNavbar() {
             <LocaleSwitcher />
           </div>
           <ThemeToggle />
-          <Button asChild size="sm">
+          <Button asChild variant="ghost" size="sm">
             <Link href="/register">{t('cta')}</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/login">{t('login')}</Link>
           </Button>
         </div>
       </div>
