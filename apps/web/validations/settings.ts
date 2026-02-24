@@ -24,6 +24,8 @@ export const companyUpdateSchema = z.object({
   timezone: z.string().optional(),
   busy_appearance_enabled: z.boolean().optional(),
   busy_appearance_percent: z.number().int().min(0).max(50).optional(),
+  onboarding_completed: z.boolean().optional(),
+  industry_type: z.string().optional(),
 });
 
 /**

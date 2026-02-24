@@ -43,6 +43,8 @@ export const GET = createRouteHandler({
         subscription_plan: companies.subscriptionPlan,
         busy_appearance_enabled: companies.busyAppearanceEnabled,
         busy_appearance_percent: companies.busyAppearancePercent,
+        onboarding_completed: companies.onboardingCompleted,
+        industry_type: companies.industryType,
         settings: companies.settings,
         created_at: companies.createdAt,
       })
@@ -87,6 +89,9 @@ export const PUT = createRouteHandler({
       updateData.busyAppearanceEnabled = body!.busy_appearance_enabled;
     if (body!.busy_appearance_percent !== undefined)
       updateData.busyAppearancePercent = body!.busy_appearance_percent;
+    if (body!.onboarding_completed !== undefined)
+      updateData.onboardingCompleted = body!.onboarding_completed;
+    if (body!.industry_type !== undefined) updateData.industryType = body!.industry_type;
 
     // Update company
     const [updatedCompany] = await db
@@ -110,6 +115,8 @@ export const PUT = createRouteHandler({
         subscription_plan: companies.subscriptionPlan,
         busy_appearance_enabled: companies.busyAppearanceEnabled,
         busy_appearance_percent: companies.busyAppearancePercent,
+        onboarding_completed: companies.onboardingCompleted,
+        industry_type: companies.industryType,
         settings: companies.settings,
         created_at: companies.createdAt,
       });

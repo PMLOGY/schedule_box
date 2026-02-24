@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 26 in progress (Plan 03 complete)
+**Current focus:** v1.2 Product Readiness — Phase 26 complete, ready for Phase 27
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 26 of 27 (Booking UX Polish) **IN PROGRESS**
-- **Plan:** 3 of 4 in current phase — Plan 03 complete
-- **Status:** Phase 26 Plan 03 complete — ready for Plan 04
-- **Last activity:** 2026-02-24 — Phase 26 Plan 03 executed (mobile UX polish: 44px tap targets, time-of-day grouping)
+- **Phase:** 26 of 27 (Booking UX Polish) **COMPLETE**
+- **Plan:** 4 of 4 in current phase — all plans complete
+- **Status:** Phase 26 complete — ready for Phase 27
+- **Last activity:** 2026-02-24 — Phase 26 Plan 04 executed (ICS calendar export + confirmation animation)
 
-Progress: [███████░░░] 74% (v1.2: 14/19 plans)
+Progress: [████████░░] 84% (v1.2: 16/19 plans)
 
 ## What's Done
 
@@ -48,15 +48,20 @@ Progress: [███████░░░] 74% (v1.2: 14/19 plans)
 - Plan 02: AI insights API route (GET /api/v1/ai/insights), useAiInsightsQuery hook, AiInsightsPanel, AiOnboardingState, dashboard integration, i18n cs/en/sk
 - Verification: 8/8 must-haves passed, 4 human verification items (visual/interactive)
 
-**Phase 26 in progress** (2026-02-24) — Booking UX Polish:
+**Phase 26 complete** (2026-02-24) — Booking UX Polish:
 - Plan 01: Visual regression test infrastructure for booking embed (Playwright, CI)
+- Plan 02: Replaced FullCalendar with react-big-calendar (MIT), DnD rescheduling, shadcn CSS theme, CalendarToolbar view names updated
 - Plan 03: StepIndicator 44px tap targets, mobile "Step X of Y" label, AvailabilityGrid Morning/Afternoon/Evening grouping, layout-matching skeleton loaders, i18n cs/en/sk
+- Plan 04: RFC 5545 ICS calendar export endpoint, Motion fade-in + scale confirmation animation, add-to-calendar button, i18n cs/en/sk
 
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 26-02: react-big-calendar replaces FullCalendar (MIT vs premium license for commercial SaaS)
+- Phase 26-02: CalendarView component (resource-timeline mock data) replaced with placeholder -- dead code
+- Phase 26-02: React Query replaces FullCalendar event source for calendar data fetching
 - Phase 26-03: Lucide icons (Sun/CloudSun/Moon) for time-of-day headers instead of emoji (per project no-emoji rule)
 - Phase 26-03: Mobile step indicator shows consolidated "Step X of Y - Step Name" line (md:hidden) while desktop keeps individual step labels
 - Phase 26-03: Time periods: Morning <12:00, Afternoon 12:00-16:59, Evening 17:00+ (standard Czech business convention)
@@ -90,8 +95,9 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 14/19 | - | - |
+| v1.2 (23-27) | 15/19 | - | - |
+| 26-02 | 1 | 7min | 7min |
 | 26-03 | 1 | 5min | 5min |
 
 ---
-*Last updated: 2026-02-24 after Phase 26 Plan 03 complete (mobile UX polish: 44px tap targets, time-of-day grouping, skeleton loaders)*
+*Last updated: 2026-02-24 after Phase 26 Plan 02 complete (react-big-calendar migration with DnD rescheduling and shadcn theme)*
