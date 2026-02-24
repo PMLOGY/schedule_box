@@ -1366,5 +1366,37 @@
       "action": "Vytvoriť rezerváciu",
       "secondaryAction": "Nastaviť pracovnú dobu"
     }
+  },
+  "usage": {
+    "widget": {
+      "title": "Využitie plánu",
+      "bookings": "Rezervácie tento mesiac",
+      "employees": "Zamestnanci",
+      "services": "Služby",
+      "unlimited": "Neobmedzené",
+      "of": "z",
+      "upgrade": "Upgradovať plán",
+      "warning": "Blížite sa k limitu plánu. Zvážte upgrade pre viac kapacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Limit plánu dosiahnutý",
+      "description": {
+        "bookings": "Dosiahli ste mesačného limitu {current}/{limit} rezervácií na pláne {plan}.",
+        "employees": "Dosiahli ste limitu {current}/{limit} zamestnancov na pláne {plan}.",
+        "services": "Dosiahli ste limitu {current}/{limit} služieb na pláne {plan}."
+      },
+      "comparePlans": "Porovnanie plánov",
+      "viewPlans": "Zobraziť plány",
+      "close": "Zavrieť",
+      "bookingsPerMonth": "Rezervácií/mesiac",
+      "employeesLimit": "Zamestnancov",
+      "servicesLimit": "Služieb"
+    }
   }
 }

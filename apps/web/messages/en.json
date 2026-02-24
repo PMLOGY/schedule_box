@@ -1440,5 +1440,37 @@
       "pastDue": "Your payment has failed. Please update your payment details.",
       "pendingDowngrade": "Plan will be downgraded to {plan} at the end of the period"
     }
+  },
+  "usage": {
+    "widget": {
+      "title": "Plan Usage",
+      "bookings": "Bookings this month",
+      "employees": "Employees",
+      "services": "Services",
+      "unlimited": "Unlimited",
+      "of": "of",
+      "upgrade": "Upgrade Plan",
+      "warning": "Approaching plan limit. Consider upgrading for more capacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Plan Limit Reached",
+      "description": {
+        "bookings": "You have reached the monthly limit of {current}/{limit} bookings on the {plan} plan.",
+        "employees": "You have reached the limit of {current}/{limit} employees on the {plan} plan.",
+        "services": "You have reached the limit of {current}/{limit} services on the {plan} plan."
+      },
+      "comparePlans": "Plan Comparison",
+      "viewPlans": "View Plans",
+      "close": "Close",
+      "bookingsPerMonth": "Bookings/month",
+      "employeesLimit": "Employees",
+      "servicesLimit": "Services"
+    }
   }
 }

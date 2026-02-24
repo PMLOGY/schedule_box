@@ -1440,5 +1440,37 @@
       "pastDue": "Vaše platba se nezdařila. Aktualizujte platební údaje.",
       "pendingDowngrade": "Na konci období bude plán snížen na {plan}"
     }
+  },
+  "usage": {
+    "widget": {
+      "title": "Využití plánu",
+      "bookings": "Rezervace tento měsíc",
+      "employees": "Zaměstnanci",
+      "services": "Služby",
+      "unlimited": "Neomezeno",
+      "of": "z",
+      "upgrade": "Upgradovat plán",
+      "warning": "Blížíte se limitu plánu. Zvažte upgrade pro více kapacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Limit plánu dosažen",
+      "description": {
+        "bookings": "Dosáhli jste měsíčního limitu {current}/{limit} rezervací na plánu {plan}.",
+        "employees": "Dosáhli jste limitu {current}/{limit} zaměstnanců na plánu {plan}.",
+        "services": "Dosáhli jste limitu {current}/{limit} služeb na plánu {plan}."
+      },
+      "comparePlans": "Porovnání plánů",
+      "viewPlans": "Zobrazit plány",
+      "close": "Zavřít",
+      "bookingsPerMonth": "Rezervací/měsíc",
+      "employeesLimit": "Zaměstnanců",
+      "servicesLimit": "Služeb"
+    }
   }
 }
