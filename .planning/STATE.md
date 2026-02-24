@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — defining requirements
+**Current focus:** v1.3 Revenue & Growth — Phase 28, roadmap created
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
-- **Phase:** Not started (defining requirements)
-- **Plan:** —
-- **Status:** Defining requirements
-- **Last activity:** 2026-02-24 — Milestone v1.3 started
+- **Phase:** 28 — Subscription Billing Infrastructure
+- **Plan:** — (not started)
+- **Status:** Roadmap created, ready for Phase 28 planning
+- **Last activity:** 2026-02-24 — v1.3 roadmap created (5 phases, 32 requirements mapped)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -30,6 +30,8 @@ Progress: [░░░░░░░░░░] 0%
 - Phase 26: Booking UX polish
 - Phase 27: Onboarding wizard
 
+**v1.3 roadmap created** (32 requirements, 5 phases: 28-32). Phases defined 2026-02-24.
+
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
@@ -37,6 +39,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 ## Blockers
 
 - Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
+- **[NEW] Comgate recurring activation** — must contact Comgate support for merchant 498621 before Phase 28 implementation begins. Recurring is not auto-enabled; timeline is unknown (days to weeks). This blocks Phase 28 entirely.
+- **[NEW] Subscription plan name canonicalization** — DB has `free/starter/professional/enterprise`; v1.3 targets `free/essential/growth/ai_powered`. The CHECK constraint on `companies.subscription_plan` must be resolved before Phase 28 schema migration runs.
 
 ## Performance Metrics
 
@@ -47,4 +51,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
 
 ---
-*Last updated: 2026-02-24 — Milestone v1.3 started*
+*Last updated: 2026-02-24 — v1.3 roadmap created, Phase 28 ready to plan*

@@ -5,6 +5,7 @@
 - **v1.0 ScheduleBox Platform** — Phases 1-15 (shipped 2026-02-12)
 - **v1.1 Production Hardening** — Phases 16-22 (shipped 2026-02-21)
 - **v1.2 Product Readiness** — Phases 23-27 (shipped 2026-02-24)
+- **v1.3 Revenue & Growth** — Phases 28-32 (in progress)
 
 ## Phases
 
@@ -66,6 +67,124 @@
 
 ---
 
+## v1.3 Revenue & Growth (Phases 28-32)
+
+**Milestone goal:** Enable ScheduleBox to generate recurring revenue through subscription billing, enforce plan tiers, support franchise businesses with multi-location management, and deliver analytics dashboards and frontend polish that justify paid tier pricing.
+
+**Requirements:** 32 total (BILL-01..07, LIMIT-01..05, ORG-01..06, ANLYT-01..08, UI-01..06)
+
+**Build order rationale:** Billing infrastructure is the unlock for all other features. Usage limits need billing as their upgrade destination. Multi-location is architecturally independent but must precede cross-location analytics. Analytics depends on subscription records (MRR) and the org model (cross-location). Frontend polish runs last on pages built in earlier phases.
+
+**Business blocker:** Comgate recurring payments require manual activation by contacting Comgate support for merchant account 498621. This must be initiated before Phase 28 implementation begins. Timeline is unknown (days to weeks).
+
+---
+
+### Phase 28: Subscription Billing Infrastructure
+
+**Goal:** Companies can subscribe to a paid plan, pay via Comgate recurring, auto-renew monthly, and receive compliant invoice PDFs.
+
+**Dependencies:** None (first phase). Prerequisite: Comgate recurring activation confirmed on merchant 498621.
+
+**Requirements:** BILL-01, BILL-02, BILL-03, BILL-04, BILL-05, BILL-06, BILL-07
+
+**Success Criteria:**
+
+1. A company owner can select a paid plan, complete the first Comgate payment with `initRecurring=true`, and see their account immediately reflect the new plan with a next renewal date.
+2. On each billing cycle date, the BullMQ renewal job automatically charges the company via Comgate recurring without any owner action; the subscription state transitions from `active` to `active` with an updated period.
+3. When a Comgate payment fails, the subscription transitions to `past_due` and the owner receives a dunning email; after 14 days without successful payment, the account downgrades to Free automatically.
+4. An owner can upgrade or downgrade their plan from the billing portal; upgrades take effect immediately with prorated charge for the remaining period; downgrades take effect at end of current period.
+5. After each billing cycle, the owner receives a PDF invoice by email and can download all past invoices from the billing portal; invoices comply with Czech VAT requirements (IČO, DÍČ, sequential numbering, correct VAT rate).
+
+**Plan estimates:** 4-5 plans (DB schema + migration, Comgate recurring client extension + webhook handler, BullMQ renewal job + dunning, billing portal UI, invoice PDF generation)
+
+**Research flag:** MEDIUM confidence on Comgate recurring REST parameter names — verify `initRecurring` field name in sandbox before building the renewal job. Contact Comgate support for merchant 498621 recurring activation before implementation starts.
+
+---
+
+### Phase 29: Usage Limits and Tier Enforcement
+
+**Goal:** Plan tier limits are enforced server-side on every booking, employee, and service creation, with visible usage meters and contextual upgrade prompts.
+
+**Dependencies:** Phase 28 (billing must exist so upgrade prompts have a real destination and plan state is readable).
+
+**Requirements:** LIMIT-01, LIMIT-02, LIMIT-03, LIMIT-04, LIMIT-05
+
+**Success Criteria:**
+
+1. A Free plan company that has reached 50 bookings in the current billing period receives an HTTP 402 response when attempting to create booking 51; the frontend shows an upgrade modal with plan comparison rather than a generic error.
+2. A Free plan company that tries to add a 4th employee or a 6th service is blocked with an upgrade prompt; the block is enforced at the API level and cannot be bypassed by removing the frontend check.
+3. An owner on any plan can see a usage widget in the dashboard showing current bookings consumed vs. their tier limit with a visual progress bar; the widget shows a warning banner when consumption reaches 80% of the limit.
+4. Plan limits match documented tier values: Free 50 bookings/month, Essential 500, Growth 2,000, AI-Powered unlimited; these values are defined in a single configuration file and not scattered across multiple check locations.
+
+**Plan estimates:** 3 plans (Redis counter infrastructure + tier limits config, server-side limit checks in POST handlers, usage dashboard widget + upgrade modal)
+
+---
+
+### Phase 30: Multi-Location Organizations
+
+**Goal:** Franchise owners can manage multiple business locations under one organization, switch location context in the dashboard, and assign location-level managers.
+
+**Dependencies:** Phase 28 (subscription plan gates how many locations a company can create).
+
+**Requirements:** ORG-01, ORG-02, ORG-03, ORG-04, ORG-05, ORG-06
+
+**Success Criteria:**
+
+1. A franchise owner can create an organization, add multiple company locations to it, and switch between locations using a dropdown in the dashboard header; after switching, all data shown (bookings, customers, revenue) is scoped exclusively to the selected location.
+2. A user with `franchise_owner` role can see all locations in the organization dashboard with key metrics (bookings, revenue, occupancy) per location on a single screen without switching context.
+3. A `location_manager` assigned to a single location can log in and manage that location's bookings, staff, and services but cannot see any data from other locations in the organization.
+4. A franchise owner can add a new location, edit existing location details, and deactivate a location from the organization settings page; deactivating a location soft-disables it without deleting any historical data.
+5. Customers who have visited multiple locations within an organization appear as a single customer record when searched from organization-level views, preventing inflated CRM counts.
+
+**Plan estimates:** 4-5 plans (DB schema: organizations + organization_members tables + companies.organization_id FK, JWT context-switch endpoint + RBAC middleware, location switcher UI + organization settings CRUD, organization dashboard with per-location metrics, cross-location customer visibility)
+
+**Research flag:** JWT context-switch security boundary has no documented precedent in this codebase. An integration test must verify that switching to a company owned by a different organization is rejected with 403 before merging any multi-location code to main.
+
+---
+
+### Phase 31: Analytics and Reporting
+
+**Goal:** Business owners can view revenue and booking analytics across configurable date ranges, franchise owners see cross-location aggregates, and platform admins monitor SaaS health metrics.
+
+**Dependencies:** Phase 28 (MRR/ARR platform admin metrics require subscription records). Phase 30 (cross-location analytics requires the organization model to be live).
+
+**Requirements:** ANLYT-01, ANLYT-02, ANLYT-03, ANLYT-04, ANLYT-05, ANLYT-06, ANLYT-07, ANLYT-08
+
+**Success Criteria:**
+
+1. A business owner can open the analytics dashboard and see daily/weekly/monthly revenue charts, payment method breakdown, top services by revenue, booking volume trends, and peak hours heatmap — all updating when the date range filter is changed.
+2. A business owner can see employee utilization: bookings per employee, utilization percentage, and revenue attributed to each employee on a bar chart.
+3. A franchise owner can view an aggregate analytics screen showing organization-level totals for revenue, bookings, and occupancy, with a drill-down to per-location breakdown.
+4. A platform admin can access an admin dashboard showing MRR, churn rate, plan distribution across all companies, active company count, and new signup trends — without this data being accessible to regular business owners.
+5. An owner can export their revenue, bookings, or customer report as a PDF or CSV file from the analytics page.
+6. Analytics queries complete in under 2 seconds for standard date ranges (up to 90 days) because data is served from a materialized view that is refreshed hourly by a BullMQ job, not computed live on every request.
+
+**Plan estimates:** 4-5 plans (DB: materialized view + revenue_snapshots table + BullMQ refresh job, revenue + booking analytics API routes, employee + customer retention analytics, cross-location org analytics + platform admin dashboard, analytics UI components + export)
+
+**Research flag:** Occupancy rate calculation is HIGH complexity (requires working hours minus blocked time divided by average service duration). Scope this explicitly in phase planning and be prepared to ship an approximation or defer to v1.4.
+
+---
+
+### Phase 32: Frontend Polish and Design System
+
+**Goal:** The dashboard, billing, and analytics pages feel professional and responsive across all devices, with consistent loading states, dark mode support, and a harmonized design system.
+
+**Dependencies:** Phases 28-31 (polishes pages built in earlier phases; billing portal and analytics pages must exist before their states can be audited).
+
+**Requirements:** UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
+
+**Success Criteria:**
+
+1. Every data-fetching page in the dashboard shows a skeleton loader while loading and a descriptive empty state with an action CTA when no data exists; no page shows a blank white area or spinner-only state.
+2. The dashboard has a professional grid layout with a KPI summary row (revenue, bookings, customers, no-show rate), data visualization cards, and quick action buttons visible without scrolling on a 1280px desktop screen.
+3. Dark mode is available via a manual toggle and respects the user's system preference on first load; all dashboard, settings, and analytics pages are correctly styled in both light and dark themes.
+4. All dashboard and marketing pages pass a responsive design review at 375px (mobile), 768px (tablet), and 1280px (desktop) breakpoints without horizontal scroll or overlapping elements.
+5. The design system is consistent across all pages: spacing, typography, color palette, border radii, and shadow system follow a single token set with no one-off overrides.
+
+**Plan estimates:** 3 plans (loading/empty/error states audit, dark mode + design system harmonization, dashboard redesign + landing page upgrade + responsive audit)
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -97,9 +216,15 @@
 | 25. Landing Page | v1.2 | 4/4 | Complete | 2026-02-21 |
 | 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
+| 28. Subscription Billing | v1.3 | — | Pending | — |
+| 29. Usage Limits | v1.3 | — | Pending | — |
+| 30. Multi-Location Orgs | v1.3 | — | Pending | — |
+| 31. Analytics | v1.3 | — | Pending | — |
+| 32. Frontend Polish | v1.3 | — | Pending | — |
 
 ---
 *Roadmap created: 2026-02-10*
 *v1.0 shipped: 2026-02-12*
 *v1.1 shipped: 2026-02-21*
 *v1.2 shipped: 2026-02-24*
+*v1.3 roadmap created: 2026-02-24*

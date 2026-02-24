@@ -82,45 +82,45 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BILL-01 | TBD | Pending |
-| BILL-02 | TBD | Pending |
-| BILL-03 | TBD | Pending |
-| BILL-04 | TBD | Pending |
-| BILL-05 | TBD | Pending |
-| BILL-06 | TBD | Pending |
-| BILL-07 | TBD | Pending |
-| LIMIT-01 | TBD | Pending |
-| LIMIT-02 | TBD | Pending |
-| LIMIT-03 | TBD | Pending |
-| LIMIT-04 | TBD | Pending |
-| LIMIT-05 | TBD | Pending |
-| ORG-01 | TBD | Pending |
-| ORG-02 | TBD | Pending |
-| ORG-03 | TBD | Pending |
-| ORG-04 | TBD | Pending |
-| ORG-05 | TBD | Pending |
-| ORG-06 | TBD | Pending |
-| ANLYT-01 | TBD | Pending |
-| ANLYT-02 | TBD | Pending |
-| ANLYT-03 | TBD | Pending |
-| ANLYT-04 | TBD | Pending |
-| ANLYT-05 | TBD | Pending |
-| ANLYT-06 | TBD | Pending |
-| ANLYT-07 | TBD | Pending |
-| ANLYT-08 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
+| BILL-01 | Phase 28 | Pending |
+| BILL-02 | Phase 28 | Pending |
+| BILL-03 | Phase 28 | Pending |
+| BILL-04 | Phase 28 | Pending |
+| BILL-05 | Phase 28 | Pending |
+| BILL-06 | Phase 28 | Pending |
+| BILL-07 | Phase 28 | Pending |
+| LIMIT-01 | Phase 29 | Pending |
+| LIMIT-02 | Phase 29 | Pending |
+| LIMIT-03 | Phase 29 | Pending |
+| LIMIT-04 | Phase 29 | Pending |
+| LIMIT-05 | Phase 29 | Pending |
+| ORG-01 | Phase 30 | Pending |
+| ORG-02 | Phase 30 | Pending |
+| ORG-03 | Phase 30 | Pending |
+| ORG-04 | Phase 30 | Pending |
+| ORG-05 | Phase 30 | Pending |
+| ORG-06 | Phase 30 | Pending |
+| ANLYT-01 | Phase 31 | Pending |
+| ANLYT-02 | Phase 31 | Pending |
+| ANLYT-03 | Phase 31 | Pending |
+| ANLYT-04 | Phase 31 | Pending |
+| ANLYT-05 | Phase 31 | Pending |
+| ANLYT-06 | Phase 31 | Pending |
+| ANLYT-07 | Phase 31 | Pending |
+| ANLYT-08 | Phase 31 | Pending |
+| UI-01 | Phase 32 | Pending |
+| UI-02 | Phase 32 | Pending |
+| UI-03 | Phase 32 | Pending |
+| UI-04 | Phase 32 | Pending |
+| UI-05 | Phase 32 | Pending |
+| UI-06 | Phase 32 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 32 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 32
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 
 _Requirements defined: 2026-02-24_
-_Last updated: 2026-02-24 after initial definition_
+_Last updated: 2026-02-24 after roadmap creation (all 32 requirements mapped)_
