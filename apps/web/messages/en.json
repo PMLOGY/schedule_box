@@ -87,6 +87,7 @@
     "pricing": "Pricing",
     "optimization": "Optimization",
     "marketing": "Marketing",
+    "organization": "Organization",
     "settings": "Settings",
     "templates": "Templates",
     "rewards": "Rewards Catalog",
@@ -1472,5 +1473,58 @@
       "employeesLimit": "Employees",
       "servicesLimit": "Services"
     }
+  },
+  "organization": {
+    "title": "Organization",
+    "description": "Manage your multi-location organization",
+    "switchError": "Failed to switch location",
+    "overview": "Overview",
+    "settings": "Settings",
+    "noOrganization": "No Organization",
+    "noOrgDescription": "You don't belong to an organization yet.",
+    "createOrg": "Create Organization",
+    "upgradeRequired": "Multi-location organizations require a Growth or AI-Powered plan.",
+    "upgradePlan": "Upgrade Plan",
+    "locationCount": "{count} locations",
+    "memberCount": "{count} members",
+    "locations": "Locations",
+    "members": "Members",
+    "locationsUsed": "{count}/{max} locations used",
+    "addLocation": "Add Location",
+    "editLocation": "Edit Location",
+    "deactivateLocation": "Deactivate Location",
+    "deactivateConfirm": "Deactivating a location hides it from customers but preserves all historical data. Continue?",
+    "deactivateSuccess": "Location deactivated successfully",
+    "locationAdded": "Location added successfully",
+    "locationUpdated": "Location updated successfully",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "removeConfirm": "Are you sure you want to remove this member from the organization?",
+    "memberAdded": "Member added successfully",
+    "memberRemoved": "Member removed successfully",
+    "fields": {
+      "name": "Name",
+      "slug": "Slug",
+      "email": "Email",
+      "phone": "Phone",
+      "addressStreet": "Street",
+      "addressCity": "City",
+      "addressZip": "ZIP Code",
+      "role": "Role",
+      "userEmail": "User Email",
+      "location": "Location",
+      "status": "Status"
+    },
+    "roles": {
+      "franchise_owner": "Franchise Owner",
+      "location_manager": "Location Manager"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "orgName": "Organization Name",
+    "createOrgDescription": "Create a new multi-location organization to manage multiple business locations.",
+    "create": "Create"
   }
 }

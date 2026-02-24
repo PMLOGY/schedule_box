@@ -10,6 +10,7 @@ export interface User {
   role: string;
   companyId: string; // UUID
   companyName: string;
+  organizationId?: string; // Organization UUID if user belongs to org
 }
 
 interface LoginApiResponse {
@@ -33,6 +34,17 @@ interface RefreshApiResponse {
   expires_in: number;
 }
 
+interface SwitchLocationResponse {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  company: {
+    uuid: string;
+    name: string;
+    slug: string;
+  };
+}
+
 interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -42,6 +54,7 @@ interface AuthState {
   setUser: (user: User | null) => void;
   setAccessToken: (token: string | null) => void;
   refreshToken: () => Promise<void>;
+  switchLocation: (companyUuid: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -102,6 +115,23 @@ export const useAuthStore = create<AuthState>()(
           // Refresh failed - clear state
           get().logout();
         }
+      },
+
+      switchLocation: async (companyUuid: string) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+
+        const response = await apiClient.post<SwitchLocationResponse>('/auth/switch-location', {
+          company_uuid: companyUuid,
+        });
+        set({
+          accessToken: response.access_token,
+          user: {
+            ...currentUser,
+            companyId: response.company.uuid,
+            companyName: response.company.name,
+          },
+        });
       },
     }),
     {

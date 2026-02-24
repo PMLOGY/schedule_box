@@ -87,6 +87,7 @@
     "pricing": "Cenotvorba",
     "optimization": "Optimalizácia",
     "marketing": "Marketing",
+    "organization": "Organizácia",
     "settings": "Nastavenia",
     "templates": "Šablóny",
     "rewards": "Katalóg odmien",
@@ -1398,5 +1399,58 @@
       "employeesLimit": "Zamestnancov",
       "servicesLimit": "Služieb"
     }
+  },
+  "organization": {
+    "title": "Organizácia",
+    "description": "Správa vašej organizácie s viacerými pobočkami",
+    "switchError": "Nepodarilo sa prepnúť pobočku",
+    "overview": "Prehľad",
+    "settings": "Nastavenia",
+    "noOrganization": "Žiadna organizácia",
+    "noOrgDescription": "Zatiaľ nepatríte do žiadnej organizácie.",
+    "createOrg": "Vytvoriť organizáciu",
+    "upgradeRequired": "Organizácie s viacerými pobočkami vyžadujú tarif Growth alebo AI-Powered.",
+    "upgradePlan": "Zmeniť tarif",
+    "locationCount": "{count} pobočiek",
+    "memberCount": "{count} členov",
+    "locations": "Pobočky",
+    "members": "Členovia",
+    "locationsUsed": "{count}/{max} pobočiek využitých",
+    "addLocation": "Pridať pobočku",
+    "editLocation": "Upraviť pobočku",
+    "deactivateLocation": "Deaktivovať pobočku",
+    "deactivateConfirm": "Deaktivácia pobočky ju skryje zákazníkom, ale zachová všetky historické dáta. Pokračovať?",
+    "deactivateSuccess": "Pobočka bola deaktivovaná",
+    "locationAdded": "Pobočka bola pridaná",
+    "locationUpdated": "Pobočka bola aktualizovaná",
+    "addMember": "Pridať člena",
+    "removeMember": "Odobrať člena",
+    "removeConfirm": "Naozaj chcete odobrať tohto člena z organizácie?",
+    "memberAdded": "Člen bol pridaný",
+    "memberRemoved": "Člen bol odobratý",
+    "fields": {
+      "name": "Názov",
+      "slug": "Slug",
+      "email": "E-mail",
+      "phone": "Telefón",
+      "addressStreet": "Ulica",
+      "addressCity": "Mesto",
+      "addressZip": "PSČ",
+      "role": "Rola",
+      "userEmail": "E-mail používateľa",
+      "location": "Pobočka",
+      "status": "Stav"
+    },
+    "roles": {
+      "franchise_owner": "Vlastník franšízy",
+      "location_manager": "Manažér pobočky"
+    },
+    "status": {
+      "active": "Aktívna",
+      "inactive": "Neaktívna"
+    },
+    "orgName": "Názov organizácie",
+    "createOrgDescription": "Vytvorte novú organizáciu s viacerými pobočkami na správu viacerých obchodných miest.",
+    "create": "Vytvoriť"
   }
 }
