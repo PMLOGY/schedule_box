@@ -75,3 +75,5 @@ See `.planning/PROJECT.md` Key Decisions section.
 
 ---
 *Last updated: 2026-02-24 after Phase 23 Plan 05 SUMMARY.md created retroactively (Phase 26 Plan 01 remains current position)*
+| Phase 23-ai-service-training-pipeline P04 | 5 | 2 tasks | 6 files |
+
