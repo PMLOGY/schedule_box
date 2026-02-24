@@ -724,6 +724,21 @@
         "reduce_hours": "reduce hours",
         "add_employee": "add employee"
       }
+    },
+    "insights": {
+      "title": "AI Overview",
+      "subtitle": "Today's predictions and recommendations",
+      "highRiskToday": "{count} bookings with high no-show risk",
+      "noHighRisk": "No high-risk bookings for today",
+      "totalToday": "{count} bookings today",
+      "viewAll": "View all bookings",
+      "suggestion": "Suggestion"
+    },
+    "onboarding": {
+      "title": "AI features activate after 10 bookings",
+      "description": "ScheduleBox learns from your bookings. After reaching 10 bookings, AI will start predicting no-show risk and optimizing your business.",
+      "progress": "{count} of 10 bookings",
+      "almostThere": "Just {remaining} more bookings and AI will activate!"
     }
   },
   "loyalty": {

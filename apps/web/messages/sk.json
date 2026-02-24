@@ -722,6 +722,21 @@
         "reduce_hours": "skrátiť hodiny",
         "add_employee": "pridať zamestnanca"
       }
+    },
+    "insights": {
+      "title": "AI prehlad",
+      "subtitle": "Dnesne predikcie a odporucania",
+      "highRiskToday": "{count} rezervacii s vysokym rizikom nedostavenia",
+      "noHighRisk": "Ziadne vysoko rizikove rezervacie na dnes",
+      "totalToday": "{count} rezervacii na dnes",
+      "viewAll": "Zobrazit vsetky rezervacie",
+      "suggestion": "Odporucanie"
+    },
+    "onboarding": {
+      "title": "AI funkcie sa aktivuju po 10 rezervaciach",
+      "description": "ScheduleBox sa uci z vasich rezervacii. Po dosiahnutí 10 rezervacii zacne AI predikovat riziko nedostavenia a optimalizovat vase podnikanie.",
+      "progress": "{count} z 10 rezervacii",
+      "almostThere": "Este {remaining} rezervacii a AI sa aktivuje!"
     }
   },
   "loyalty": {
