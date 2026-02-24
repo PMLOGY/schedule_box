@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 30 in progress (Plan 01 complete)
+**Current focus:** v1.3 Revenue & Growth — Phase 30 in progress (Plans 01-03 complete)
 
 ## Current Position
 
 - **Milestone:** v1.3 Revenue & Growth
 - **Phase:** 30 — Multi-Location Organizations
-- **Plan:** 01 complete, 02+ pending
-- **Status:** Plan 01 complete (organization schema and types)
-- **Last activity:** 2026-02-24 — Plan 30-01 complete (organizations/org_members tables, shared types, migration)
+- **Plan:** 03 complete, 04+ pending
+- **Status:** Plan 03 complete (organization CRUD API)
+- **Last activity:** 2026-02-24 — Plan 30-03 complete (org CRUD API, location management, member management)
 
-Progress: [#---------] 10% (1/? plans)
+Progress: [###-------] 30% (3/? plans)
 
 ## What's Done
 
@@ -46,6 +46,7 @@ Progress: [#---------] 10% (1/? plans)
 
 **v1.3 Phase 30 in progress:**
 - Plan 01 complete: Organization schema (organizations + organization_members tables, companies.organizationId FK, shared TypeScript types, Drizzle relations, migration 0002)
+- Plan 03 complete: Organization CRUD API (GET/POST orgs, GET/PUT org detail, location CRUD with plan limits, member management with role gating, PaymentRequiredError 402)
 
 ## Decisions
 
@@ -84,6 +85,10 @@ See `.planning/PROJECT.md` Key Decisions section.
 - companies.organizationId defined as plain integer (no FK reference in Drizzle) to avoid circular import; FK enforced via migration SQL
 - organization_members.companyId nullable: null = franchise_owner access to ALL locations, non-null = location_manager scoped to specific company
 - Org roles (franchise_owner, location_manager) stored in org_members.role CHECK constraint, separate from system roles table
+- PaymentRequiredError (402) added to shared errors for subscription plan gating (free/essential blocked from org creation)
+- Subscription plan determines max locations: growth=3, ai_powered=10
+- Location slug uniqueness enforced globally across all companies
+- DELETE on locations = soft-deactivate (isActive=false), preserving all historical data
 
 ## Blockers
 
@@ -108,6 +113,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 29 Plan 02 | 2 tasks | 3 files | 3 min |
 | Phase 29 Plan 03 | 2 tasks | 7 files | 4 min |
 | Phase 30 Plan 01 | 3 tasks | 7 files | 7 min |
+| Phase 30 Plan 03 | 3 tasks | 7 files | 8 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 29 Plan 03 complete (usage dashboard UI). Phase 29 fully complete (3/3 plans). Phase 30 Plan 01 also complete (organization schema).*
+*Last updated: 2026-02-24 — Phase 30 Plan 03 complete (organization CRUD API). Plans 01+03 done, Plan 02 in parallel.*
