@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 27 Plan 03 complete, ready for Plan 04
+**Current focus:** v1.2 Product Readiness — Phase 27 COMPLETE (all 4 plans done)
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 27 of 27 (Onboarding Wizard) **IN PROGRESS**
-- **Plan:** 3 of 4 in current phase — Plan 03 complete
-- **Status:** Phase 27 Plan 03 complete — ready for Plan 04 (booking link sharing / viral loop)
-- **Last activity:** 2026-02-24 — Phase 27 Plan 03 executed (demo data seeder + Driver.js tour)
+- **Phase:** 27 of 27 (Onboarding Wizard) **COMPLETE**
+- **Plan:** 4 of 4 in current phase — Plan 04 complete
+- **Status:** Phase 27 complete — v1.2 roadmap fully executed
+- **Last activity:** 2026-02-24 — Phase 27 Plan 04 executed (industry templates + apply-template API + picker UI)
 
-Progress: [█████████░] 97% (v1.2: 19/19 plans)
+Progress: [██████████] 100% (v1.2: 19/19 plans)
 
 ## What's Done
 
@@ -54,16 +54,22 @@ Progress: [█████████░] 97% (v1.2: 19/19 plans)
 - Plan 03: StepIndicator 44px tap targets, mobile "Step X of Y" label, AvailabilityGrid Morning/Afternoon/Evening grouping, layout-matching skeleton loaders, i18n cs/en/sk
 - Plan 04: RFC 5545 ICS calendar export endpoint, Motion fade-in + scale confirmation animation, add-to-calendar button, i18n cs/en/sk
 
-**Phase 27 in progress** (2026-02-24) — Onboarding Wizard:
+**Phase 27 complete** (2026-02-24) — Onboarding Wizard:
 - Plan 01: 4-step setup wizard (company details, first service, working hours, share link), QR code generation, industry defaults, onboarding_completed flag
 - Plan 02: Dashboard onboarding checklist widget (5 items + progress bar + dismissal), 6 action-oriented empty states (bookings/customers/services/employees/analytics/calendar)
 - Plan 03: Demo data seeder (Beauty Studio Praha: 3 services, 5 customers, 10 bookings), DemoDataCard dashboard widget, Driver.js 3-step contextual tour with localStorage persistence
+- Plan 04: 8 industry template presets (Czech service names, CZK pricing), POST /api/v1/onboarding/apply-template API, IndustryTemplatePicker component, wizard service step integration, cs/en/sk i18n
 
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 27-04: Static TypeScript const for template data (no DB) — no API round-trip for catalog, instant load
+- Phase 27-04: Template application marks wizard steps 2 AND 3 done then calls setStep(4) — skips working hours step when template sets both
+- Phase 27-04: Collapsible picker (closed by default) — avoids overwhelming users who prefer manual entry
+- Phase 27-04: Lucide icon names stored as strings in template data with ICON_MAP lookup in component — decouples data from React imports
+- Phase 27-04: BadRequestError thrown on unknown industry_type — handled by createRouteHandler centralized error handler
 - Phase 27-03: Demo data tagged in company.settings JSONB (demo_data + demo_data_ids with ID arrays) — no extra table needed for transient demo content
 - Phase 27-03: DashboardTour in layout (not page) — persists across sub-routes without re-mounting; tour localStorage key prefixed with company UUID for multi-tenant sessions
 - Phase 27-03: driver.js onDestroyed + onCloseClick both set localStorage — handles natural completion and early close
@@ -115,13 +121,14 @@ See `.planning/PROJECT.md` Key Decisions section.
 |-------|-------|-------|----------|
 | v1.0 (1-15) | 101 | ~12h | ~7min |
 | v1.1 (16-22) | 20 | ~1.8h | ~5.5min |
-| v1.2 (23-27) | 18/19 | - | - |
+| v1.2 (23-27) | 19/19 | - | - |
 | 26-02 | 1 | 7min | 7min |
 | 26-03 | 1 | 5min | 5min |
 | 26-04 | 1 | 7min | 7min |
 | 27-01 | 1 | 9min | 9min |
 | 27-02 | 1 | 11min | 11min |
 | 27-03 | 1 | 7min | 7min |
+| 27-04 | 1 | 7min | 7min |
 
 ---
-*Last updated: 2026-02-24 after Phase 27 Plan 03 complete (demo data seeder + Driver.js dashboard tour)*
+*Last updated: 2026-02-24 after Phase 27 Plan 04 complete (industry templates + apply-template API + picker UI)*
