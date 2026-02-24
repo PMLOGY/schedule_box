@@ -87,15 +87,22 @@
 
 **Requirements:** BILL-01, BILL-02, BILL-03, BILL-04, BILL-05, BILL-06, BILL-07
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 28-01-PLAN.md — DB schema (subscriptions, subscription_invoices, subscription_events) + CHECK constraint migration + Comgate recurring client + billing types
+- [ ] 28-02-PLAN.md — Billing API endpoints (plans, subscribe, subscription, upgrade, downgrade, status, webhook) + subscription service layer
+- [ ] 28-03-PLAN.md — BullMQ renewal scheduler + dunning automation + Czech email templates
+- [ ] 28-04-PLAN.md — Billing portal UI (plan comparison, subscription management, invoice history)
+- [ ] 28-05-PLAN.md — Invoice PDF generation (SEQUENCE numbering, Czech VAT compliance) + invoice API routes
+
 **Success Criteria:**
 
 1. A company owner can select a paid plan, complete the first Comgate payment with `initRecurring=true`, and see their account immediately reflect the new plan with a next renewal date.
 2. On each billing cycle date, the BullMQ renewal job automatically charges the company via Comgate recurring without any owner action; the subscription state transitions from `active` to `active` with an updated period.
 3. When a Comgate payment fails, the subscription transitions to `past_due` and the owner receives a dunning email; after 14 days without successful payment, the account downgrades to Free automatically.
 4. An owner can upgrade or downgrade their plan from the billing portal; upgrades take effect immediately with prorated charge for the remaining period; downgrades take effect at end of current period.
-5. After each billing cycle, the owner receives a PDF invoice by email and can download all past invoices from the billing portal; invoices comply with Czech VAT requirements (IČO, DÍČ, sequential numbering, correct VAT rate).
-
-**Plan estimates:** 4-5 plans (DB schema + migration, Comgate recurring client extension + webhook handler, BullMQ renewal job + dunning, billing portal UI, invoice PDF generation)
+5. After each billing cycle, the owner receives a PDF invoice by email and can download all past invoices from the billing portal; invoices comply with Czech VAT requirements (ICO, DIC, sequential numbering, correct VAT rate).
 
 **Research flag:** MEDIUM confidence on Comgate recurring REST parameter names — verify `initRecurring` field name in sandbox before building the renewal job. Contact Comgate support for merchant 498621 recurring activation before implementation starts.
 
@@ -216,7 +223,7 @@
 | 25. Landing Page | v1.2 | 4/4 | Complete | 2026-02-21 |
 | 26. Booking UX Polish | v1.2 | 4/4 | Complete | 2026-02-24 |
 | 27. Onboarding Wizard | v1.2 | 5/5 | Complete | 2026-02-24 |
-| 28. Subscription Billing | v1.3 | — | Pending | — |
+| 28. Subscription Billing | v1.3 | 0/5 | Planned | — |
 | 29. Usage Limits | v1.3 | — | Pending | — |
 | 30. Multi-Location Orgs | v1.3 | — | Pending | — |
 | 31. Analytics | v1.3 | — | Pending | — |
@@ -228,3 +235,4 @@
 *v1.1 shipped: 2026-02-21*
 *v1.2 shipped: 2026-02-24*
 *v1.3 roadmap created: 2026-02-24*
+*Phase 28 planned: 2026-02-24*
