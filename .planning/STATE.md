@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.2 Product Readiness — Phase 27 COMPLETE (all 4 plans done)
+**Current focus:** v1.2 Product Readiness — Phase 27 COMPLETE + gaps closed (Plan 05 done)
 
 ## Current Position
 
 - **Milestone:** v1.2 Product Readiness
-- **Phase:** 27 of 27 (Onboarding Wizard) **COMPLETE**
-- **Plan:** 4 of 4 in current phase — Plan 04 complete
-- **Status:** Phase 27 complete — v1.2 roadmap fully executed
-- **Last activity:** 2026-02-24 — Phase 27 Plan 04 executed (industry templates + apply-template API + picker UI)
+- **Phase:** 27 of 27 (Onboarding Wizard) **COMPLETE** — all gaps closed
+- **Plan:** 5 of 5 in current phase — Plan 05 complete (gap closure)
+- **Status:** Phase 27 fully complete — all verification gaps resolved — v1.2 roadmap fully executed
+- **Last activity:** 2026-02-24 — Phase 27 Plan 05 executed (gap closure: dashboard redirect + checklist guard)
 
-Progress: [██████████] 100% (v1.2: 19/19 plans)
+Progress: [██████████] 100% (v1.2: 19/19 plans + gap closure complete)
 
 ## What's Done
 
@@ -59,12 +59,16 @@ Progress: [██████████] 100% (v1.2: 19/19 plans)
 - Plan 02: Dashboard onboarding checklist widget (5 items + progress bar + dismissal), 6 action-oriented empty states (bookings/customers/services/employees/analytics/calendar)
 - Plan 03: Demo data seeder (Beauty Studio Praha: 3 services, 5 customers, 10 bookings), DemoDataCard dashboard widget, Driver.js 3-step contextual tour with localStorage persistence
 - Plan 04: 8 industry template presets (Czech service names, CZK pricing), POST /api/v1/onboarding/apply-template API, IndustryTemplatePicker component, wizard service step integration, cs/en/sk i18n
+- Plan 05 (gap closure): Dashboard redirect + welcome banner wired (useOnboardingRedirect), OnboardingChecklist guard added (onboarding_completed), CompanySettings type fixed
 
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section.
 
 **Recent decisions:**
+- Phase 27-05: router.replace (not push) for onboarding redirect — user cannot navigate back to dashboard mid-wizard
+- Phase 27-05: return null while isLoading — prevents flash of full dashboard before redirect status known
+- Phase 27-05: CompanySettings type extended with onboarding_completed and industry_type — API already returns these (auto-fixed)
 - Phase 27-04: Static TypeScript const for template data (no DB) — no API round-trip for catalog, instant load
 - Phase 27-04: Template application marks wizard steps 2 AND 3 done then calls setStep(4) — skips working hours step when template sets both
 - Phase 27-04: Collapsible picker (closed by default) — avoids overwhelming users who prefer manual entry
@@ -129,6 +133,7 @@ See `.planning/PROJECT.md` Key Decisions section.
 | 27-02 | 1 | 11min | 11min |
 | 27-03 | 1 | 7min | 7min |
 | 27-04 | 1 | 7min | 7min |
+| 27-05 | 1 | 3min | 3min |
 
 ---
-*Last updated: 2026-02-24 — Phases 20 + 21 closed (Twilio/Comgate credentials configured)*
+*Last updated: 2026-02-24 — Phase 27 Plan 05 complete (gap closure: dashboard redirect + checklist guard)*
