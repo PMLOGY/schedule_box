@@ -77,6 +77,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 - Redis key TTL set on first increment to auto-expire at end of billing month
 - Fire-and-forget pattern for Redis booking counter increment (booking succeeds even if Redis is down)
 - Limit check placed after auth+company resolution but before any DB writes (minimal wasted work)
+- Usage translations added to flat cs/en/sk.json files under "usage" key (not separate message files)
+- Static plan limits in upgrade modal to avoid importing server-side PLAN_CONFIG in client component
 
 **Phase 30 decisions:**
 - companies.organizationId defined as plain integer (no FK reference in Drizzle) to avoid circular import; FK enforced via migration SQL
@@ -104,7 +106,8 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 28 Plan 03 | 2 tasks | 8 files | 5 min |
 | Phase 29 Plan 01 | 2 tasks | 3 files | 4 min |
 | Phase 29 Plan 02 | 2 tasks | 3 files | 3 min |
+| Phase 29 Plan 03 | 2 tasks | 7 files | 4 min |
 | Phase 30 Plan 01 | 3 tasks | 7 files | 7 min |
 
 ---
-*Last updated: 2026-02-24 — Phase 29 Plan 02 complete (API route limit enforcement). Phase 30 Plan 01 also complete (organization schema).*
+*Last updated: 2026-02-24 — Phase 29 Plan 03 complete (usage dashboard UI). Phase 29 fully complete (3/3 plans). Phase 30 Plan 01 also complete (organization schema).*
