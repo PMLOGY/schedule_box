@@ -1366,5 +1366,79 @@
       "copyright": "© {year} ScheduleBox. Všechna práva vyhrazena.",
       "registryNote": "Zapsáno v obchodním rejstříku vedeném Městským soudem v Praze."
     }
+  },
+  "billing": {
+    "title": "Fakturace a předplatné",
+    "description": "Správa vašeho předplatného a faktur",
+    "currentPlan": "Aktuální plán",
+    "freePlan": "Bezplatný plán",
+    "noPaidSubscription": "Nemáte žádné placené předplatné",
+    "upgradeNow": "Upgradovat",
+    "nextBilling": "Další platba",
+    "monthlyPrice": "Měsíční cena",
+    "billingCycle": "Fakturační cyklus",
+    "monthly": "Měsíčně",
+    "annual": "Ročně",
+    "daysUntilRenewal": "{days} dní do obnovení",
+    "status": {
+      "trialing": "Zkušební",
+      "active": "Aktivní",
+      "past_due": "Po splatnosti",
+      "cancelled": "Zrušeno",
+      "expired": "Vypršelo"
+    },
+    "plans": {
+      "title": "Porovnání plánů",
+      "free": "Free",
+      "essential": "Essential",
+      "growth": "Growth",
+      "ai_powered": "AI-Powered",
+      "perMonth": "/ měsíc",
+      "perYear": "/ rok",
+      "current": "Aktuální",
+      "subscribe": "Předplatit",
+      "upgrade": "Upgradovat",
+      "downgrade": "Snížit plán",
+      "mostPopular": "Nejoblíbenější"
+    },
+    "features": {
+      "bookingsPerMonth": "Rezervací / měsíc",
+      "employees": "Zaměstnanců",
+      "services": "Služeb",
+      "aiFeatures": "AI funkce",
+      "unlimited": "Neomezeno",
+      "included": "Zahrnuto",
+      "notIncluded": "Nezahrnuto"
+    },
+    "invoices": {
+      "title": "Historie faktur",
+      "noInvoices": "Zatím nemáte žádné faktury",
+      "number": "Číslo faktury",
+      "date": "Datum",
+      "period": "Období",
+      "amount": "Částka",
+      "status": "Stav",
+      "download": "Stáhnout PDF",
+      "paid": "Zaplaceno",
+      "issued": "Vystaveno",
+      "failed": "Neúspěšné"
+    },
+    "actions": {
+      "cancelSubscription": "Zrušit předplatné",
+      "cancelConfirm": "Opravdu chcete zrušit předplatné? Plán zůstane aktivní do konce fakturačního období.",
+      "cancelSuccess": "Předplatné bude zrušeno na konci období",
+      "upgradeSuccess": "Plán byl úspěšně upgradován",
+      "upgradeProrationCharged": "Poměrný doplatek byl automaticky stržen z vaší platební metody",
+      "downgradeConfirm": "Snížení plánu bude provedeno na konci aktuálního období. Chcete pokračovat?",
+      "downgradeSuccess": "Snížení plánu bude provedeno na konci období",
+      "paymentPending": "Čekáme na potvrzení platby...",
+      "paymentTimeout": "Platba se zpracovává, zkuste obnovit stránku za chvíli",
+      "paymentActivated": "Předplatné bylo úspěšně aktivováno!",
+      "processing": "Zpracování..."
+    },
+    "warnings": {
+      "pastDue": "Vaše platba se nezdařila. Aktualizujte platební údaje.",
+      "pendingDowngrade": "Na konci období bude plán snížen na {plan}"
+    }
   }
 }

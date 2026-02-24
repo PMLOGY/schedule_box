@@ -1366,5 +1366,79 @@
       "copyright": "© {year} ScheduleBox. All rights reserved.",
       "registryNote": "Registered in the Commercial Register maintained by the Municipal Court in Prague."
     }
+  },
+  "billing": {
+    "title": "Billing & Subscription",
+    "description": "Manage your subscription and invoices",
+    "currentPlan": "Current Plan",
+    "freePlan": "Free Plan",
+    "noPaidSubscription": "You have no paid subscription",
+    "upgradeNow": "Upgrade",
+    "nextBilling": "Next billing",
+    "monthlyPrice": "Monthly price",
+    "billingCycle": "Billing cycle",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "daysUntilRenewal": "{days} days until renewal",
+    "status": {
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Past Due",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "plans": {
+      "title": "Compare Plans",
+      "free": "Free",
+      "essential": "Essential",
+      "growth": "Growth",
+      "ai_powered": "AI-Powered",
+      "perMonth": "/ month",
+      "perYear": "/ year",
+      "current": "Current",
+      "subscribe": "Subscribe",
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade",
+      "mostPopular": "Most Popular"
+    },
+    "features": {
+      "bookingsPerMonth": "Bookings / month",
+      "employees": "Employees",
+      "services": "Services",
+      "aiFeatures": "AI Features",
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included"
+    },
+    "invoices": {
+      "title": "Invoice History",
+      "noInvoices": "You have no invoices yet",
+      "number": "Invoice number",
+      "date": "Date",
+      "period": "Period",
+      "amount": "Amount",
+      "status": "Status",
+      "download": "Download PDF",
+      "paid": "Paid",
+      "issued": "Issued",
+      "failed": "Failed"
+    },
+    "actions": {
+      "cancelSubscription": "Cancel Subscription",
+      "cancelConfirm": "Are you sure you want to cancel? Your plan will remain active until the end of the billing period.",
+      "cancelSuccess": "Subscription will be cancelled at the end of the period",
+      "upgradeSuccess": "Plan upgraded successfully",
+      "upgradeProrationCharged": "Prorated amount was automatically charged to your payment method",
+      "downgradeConfirm": "Downgrade will take effect at the end of the current period. Do you want to continue?",
+      "downgradeSuccess": "Downgrade will take effect at the end of the period",
+      "paymentPending": "Waiting for payment confirmation...",
+      "paymentTimeout": "Payment is being processed, try refreshing the page in a moment",
+      "paymentActivated": "Subscription activated successfully!",
+      "processing": "Processing..."
+    },
+    "warnings": {
+      "pastDue": "Your payment has failed. Please update your payment details.",
+      "pendingDowngrade": "Plan will be downgraded to {plan} at the end of the period"
+    }
   }
 }
