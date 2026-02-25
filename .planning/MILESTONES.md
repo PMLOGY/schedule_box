@@ -52,3 +52,21 @@
 - All 5 phases verified with zero critical deviations
 
 ---
+
+## v1.3 Revenue & Growth (Shipped: 2026-02-25)
+
+**Phases completed:** 5 phases (28-32), 21 plans
+
+**Key accomplishments:**
+- Subscription billing: Comgate recurring payments, subscription state machine, plan upgrade/downgrade, Czech VAT invoice PDFs, BullMQ renewal scheduler with dunning
+- Usage limits: Redis booking counters, server-side limit enforcement (402 responses), usage dashboard widget with upgrade modal
+- Multi-location organizations: organization schema, JWT context switching, location CRUD, location switcher UI, cross-location customer dedup
+- Analytics: 5 analytics API routes, employee utilization, admin SaaS health metrics, 6 chart components, PDF/CSV export
+- Frontend polish: next-themes dark mode, 16 loading.tsx skeletons, dashboard KPI redesign, landing page testimonials
+
+**Stats:**
+- 5 phases over 1 day (2026-02-24 → 2026-02-25)
+- 32 requirements delivered with 100% coverage
+- All 5 phases verified
+
+---
