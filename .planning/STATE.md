@@ -42,6 +42,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **35-01 (Decision 21):** GradientMesh placed outside flex wrapper (position:fixed removes from flow, unaffecting flex layout); sidebar stays bg-background per DASH-05 locked decision; header uses glass-surface-subtle + border-glass replacing bg-background — Radix UI Portals unaffected by header stacking context.
 
+**35-02 (Decision 24):** BookingCalendar NOT wrapped in glass — FullCalendar event popovers use absolute positioning (not Portal), a glass stacking context would clip them. Data tables (bookings, customers) stay in opaque bg-card containers. Split-container pattern: glass Card wraps title/controls; opaque div holds table/calendar.
+
 **36-01 (Decision 22):** MarketingNavbar converted to 'use client' with useTranslations — co-locating MobileNav (Sheet requires client boundary) in same file forces entire module to be client; useTranslations is identical in behavior to getTranslations for this use case. Aurora opacity 60% light / 30% dark keeps animation subtle enough for text legibility.
 
 **36-02 (Decision 23):** Pricing tier glass intensity differentiation via cn() className instead of variant prop — featured Pro tier uses glass-surface (16px), non-featured use glass-surface-subtle (8px). GlassPanel intensity="subtle" on legal pages for readability. Footer uses glass-surface-subtle + border-glass to replace solid bg-muted.
@@ -65,5 +67,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 35 Plan 01 complete + Phase 36 complete (both plans done). Next: Phase 35 Plan 02 (dashboard KPI/stat cards glass) OR Phase 37 Auth+Polish.
+Stopped at: Phase 35 Plan 02 complete — 35-02 executed. All dashboard sub-pages, KPI cards, gradient heading glassed. Next: Phase 37 Auth+Polish.
 Resume file: None
