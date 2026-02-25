@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phase 33: Token Foundation and Background System
+**Current focus:** v1.4 Design Overhaul — Phase 34: Component Glass Variants
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
-- **Phase:** 33 of 37 (Token Foundation and Background System) — COMPLETE
-- **Plan:** 2/2 complete (33-01 + 33-02)
-- **Status:** Phase 33 verified, ready for Phase 34
-- **Last activity:** 2026-02-25 — Phase 33 verified (all DSYS-01..07 requirements met)
+- **Phase:** 34 of 37 (Component Glass Variants) — IN PROGRESS
+- **Plan:** 2/? complete (34-01 done, 34-02 done)
+- **Status:** Phase 33 complete, Phase 34 plan 02 complete
+- **Last activity:** 2026-02-25 — 34-02 complete: GlassPanel + GradientMesh primitives
 
-Progress: [██░░░░░░░░] 20% (v1.4)
+Progress: [███░░░░░░░] 30% (v1.4)
 
 ## What's Done
 
@@ -36,6 +36,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **33-02 (Decision 18):** Hardcoded px blur values (16px/8px/24px) in glass-plugin.ts — never CSS variables; opaque rgba fallback outside @supports guard; Plus Jakarta Sans with latin-ext subset for Czech diacritics.
 
+**34-02 (Decision 19):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
@@ -54,5 +56,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 33 complete, verified. Next: plan Phase 34.
+Stopped at: Phase 34 plan 02 complete (34-02-SUMMARY.md created). Next: Phase 34 plan 03+.
 Resume file: None
