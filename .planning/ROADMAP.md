@@ -151,7 +151,7 @@ Plans:
 
 **Requirements:** DASH-01, DASH-02, DASH-03, DASH-04, DASH-05
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 35-01-PLAN.md — Dashboard layout gradient mesh + stacking context audit + header frosted glass
@@ -175,7 +175,7 @@ Plans:
 
 **Requirements:** MKTG-01, MKTG-02, MKTG-03, MKTG-04, MKTG-05
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 36-01-PLAN.md — Marketing layout gradient mesh + glass navbar + hero section with aurora animation
@@ -199,7 +199,7 @@ Plans:
 
 **Requirements:** AUTH-01, AUTH-02, AUTH-03, POLSH-01, POLSH-02, POLSH-03, POLSH-04, POLSH-05, POLSH-06
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 37-01-PLAN.md — Auth layout glass card + entrance animation + glass dropdowns and tooltips
@@ -254,7 +254,7 @@ Plans:
 | 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
 | 33. Token Foundation | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 34. Component Glass Variants | v1.4 | 2/2 | Complete | 2026-02-25 |
-| 35. Dashboard Glass | v1.4 | TBD | Not started | - |
+| 35. Dashboard Glass | v1.4 | 0/2 | In progress | - |
 | 36. Marketing Glass | v1.4 | TBD | Not started | - |
 | 37. Auth and Polish | v1.4 | TBD | Not started | - |
 
