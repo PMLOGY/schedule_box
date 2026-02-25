@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, Link } from '@/lib/i18n/navigation';
-import { PageHeader } from '@/components/shared/page-header';
 import { DashboardGrid } from '@/components/dashboard/dashboard-grid';
 import { QuickActions } from '@/components/dashboard/quick-actions';
 import { RevenueMiniChart } from '@/components/dashboard/revenue-mini-chart';
@@ -53,7 +52,9 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Header row with quick actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader title={t('title')} />
+        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          {t('title')}
+        </h1>
         <QuickActions />
       </div>
 

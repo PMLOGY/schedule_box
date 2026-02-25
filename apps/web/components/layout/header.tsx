@@ -19,7 +19,7 @@ export function Header() {
     <>
       <header
         role="banner"
-        className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-6"
+        className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-glass px-6 glass-surface-subtle"
       >
         <div className="flex items-center gap-4">
           <Button
