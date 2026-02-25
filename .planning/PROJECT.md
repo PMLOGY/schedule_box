@@ -26,16 +26,18 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v1.3 Revenue & Growth
+## Current Milestone: v1.4 Design Overhaul
 
-**Goal:** Enable ScheduleBox to generate recurring revenue through subscription billing, support franchise businesses with multi-location management, and deliver a professional frontend that justifies paid tiers.
+**Goal:** Transform ScheduleBox from a functional AI-generated-looking app into a premium, distinctive SaaS product through a full visual redesign applying glassmorphism + Behance blue aesthetic across every page.
 
 **Target features:**
-- Comgate recurring subscription billing for 4 pricing tiers with plan management
-- Usage limits enforcement per tier with upgrade prompts
-- Multi-location franchise support (5-50 locations) with centralized management and role-based access
-- Analytics and reporting — revenue dashboards, booking trends, aggregate cross-location reporting
-- Frontend polish — dashboard redesign, design system harmonization, landing page upgrade
+- Design system foundation: new color tokens (#0057FF blue palette), glassmorphism components (frosted glass cards, blur overlays), typography scale, 8px spacing grid
+- Landing page redesign: hero section with glass effects, feature sections, social proof, pricing — stunning first impression
+- Auth pages redesign: glass panel login/register/reset on gradient backgrounds
+- Dashboard & app shell redesign: glass sidebar, KPI cards, navigation, consistent page layouts
+- All app pages: calendar, bookings, customers, analytics, settings, billing — full glassmorphism treatment
+- Dark mode polish: proper glass effects on #191919 base, not just inverted colors
+- Responsive QA: all pages verified at 375px / 768px / 1280px breakpoints
 
 ## Current State
 
@@ -78,9 +80,14 @@ Freemium with 4 tiers:
 - ✓ LAND-01..07 — Marketing landing page, pricing, Czech legal compliance, cookie consent — v1.2
 - ✓ BUX-01..07 — Visual regression, react-big-calendar, mobile UX, ICS export, animations — v1.2
 - ✓ ONB-01..07 — Onboarding wizard, QR code, checklist, empty states, demo data, Driver.js, templates — v1.2
+- ✓ BILL-01..07 — Subscription billing, Comgate recurring, invoices, dunning — v1.3
+- ✓ LIMIT-01..05 — Usage limits, tier enforcement, upgrade prompts — v1.3
+- ✓ ORG-01..06 — Multi-location organizations, context switching, location management — v1.3
+- ✓ ANLYT-01..08 — Analytics, reporting, admin dashboard, exports — v1.3
+- ✓ UI-01..06 — Dark mode, skeletons, dashboard KPIs, responsive polish — v1.3
 
 ### Active
-See `.planning/REQUIREMENTS.md` for v1.3 requirements.
+See `.planning/REQUIREMENTS.md` for v1.4 requirements.
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
@@ -107,6 +114,7 @@ See `.planning/REQUIREMENTS.md` for v1.3 requirements.
 13. Driver.js (not react-joyride) — smaller bundle, fewer bugs — ✓ Good (v1.2)
 14. Twilio Messaging Service with Alpha Sender ID — no phone number needed, one-way SMS — ✓ Good (v1.1)
 15. Models baked into Docker image (not R2) — simple for v1.2 scale — ⚠️ Revisit if deploys >5min
+16. Glassmorphism + Behance blue #0057FF as v1.4 design direction — blend of clean structure with frosted glass effects — Pending
 
 ## Team
 - Multi-agent development with Claude Code
@@ -114,4 +122,4 @@ See `.planning/REQUIREMENTS.md` for v1.3 requirements.
 
 ---
 
-_Last updated: 2026-02-24 after v1.3 milestone start_
+_Last updated: 2026-02-25 after v1.4 milestone start_

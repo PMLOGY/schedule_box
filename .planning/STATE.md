@@ -5,17 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-24)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — COMPLETE (all 5 phases shipped)
+**Current focus:** v1.4 Design Overhaul
 
 ## Current Position
 
-- **Milestone:** v1.3 Revenue & Growth
-- **Phase:** 32 — Frontend Polish (COMPLETE)
-- **Plan:** All plans complete
-- **Status:** All 5 phases (28-32) complete. 32 requirements delivered. Milestone ready for archive.
-- **Last activity:** 2026-02-25 — Phase 32 verified, milestone complete
-
-Progress: [##########] 100% (5/5 phases complete)
+- **Milestone:** v1.4 Design Overhaul
+- **Phase:** Not started (defining requirements)
+- **Plan:** —
+- **Status:** Defining requirements
+- **Last activity:** 2026-02-25 — Milestone v1.4 started
 
 ## What's Done
 
@@ -188,4 +186,4 @@ See `.planning/PROJECT.md` Key Decisions section.
 | Phase 32 Plan 03 | 3 tasks | 6 files | 10 min |
 
 ---
-*Last updated: 2026-02-25 — v1.3 Revenue & Growth milestone complete. All 5 phases (28-32) shipped, 32 requirements delivered.*
+*Last updated: 2026-02-25 — v1.4 Design Overhaul milestone started. Defining requirements.*
