@@ -115,37 +115,39 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <PageHeader title={t('title')} description={t('description')} />
+      {/* Header + Controls wrapped in glass card */}
+      <Card variant="glass" className="p-4 space-y-4">
+        <PageHeader title={t('title')} description={t('description')} />
 
-      {/* Controls: Period selector and Export toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <PeriodSelector value={days} onChange={setDays} />
-        <ExportToolbar
-          revenueData={revenueData}
-          bookingData={bookingData}
-          customerRetentionData={
-            retentionData
-              ? {
-                  repeatRate: retentionData.repeatBooking.repeatRate,
-                  totalCustomers: retentionData.repeatBooking.totalCustomers,
-                  repeatCustomers: retentionData.repeatBooking.repeatCustomers,
-                  churned: retentionData.churn.churned,
-                  atRisk: retentionData.churn.atRisk,
-                  active: retentionData.churn.active,
-                }
-              : undefined
-          }
-          days={days}
-          isLoading={isLoadingAny}
-        />
-      </div>
+        {/* Controls: Period selector and Export toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <PeriodSelector value={days} onChange={setDays} />
+          <ExportToolbar
+            revenueData={revenueData}
+            bookingData={bookingData}
+            customerRetentionData={
+              retentionData
+                ? {
+                    repeatRate: retentionData.repeatBooking.repeatRate,
+                    totalCustomers: retentionData.repeatBooking.totalCustomers,
+                    repeatCustomers: retentionData.repeatBooking.repeatCustomers,
+                    churned: retentionData.churn.churned,
+                    atRisk: retentionData.churn.atRisk,
+                    active: retentionData.churn.active,
+                  }
+                : undefined
+            }
+            days={days}
+            isLoading={isLoadingAny}
+          />
+        </div>
+      </Card>
 
       {/* KPI Comparison Cards */}
       {isLoadingOverview ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i}>
+            <Card key={i} variant="glass">
               <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
@@ -163,7 +165,7 @@ export default function AnalyticsPage() {
       )}
 
       {/* Revenue Chart */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('revenue.title')}</CardTitle>
         </CardHeader>
@@ -181,7 +183,7 @@ export default function AnalyticsPage() {
       {/* NEW: Payment Method Breakdown + Top Services (two-column grid) */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Payment Method Breakdown */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Platebni metody</CardTitle>
           </CardHeader>
@@ -197,7 +199,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Top Services by Revenue */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Nejlepsi sluzby podle trzeb</CardTitle>
           </CardHeader>
@@ -214,7 +216,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Booking Stats Chart */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('bookings.title')}</CardTitle>
         </CardHeader>
@@ -232,7 +234,7 @@ export default function AnalyticsPage() {
       {/* NEW: Peak Hours Heatmap + Cancellation Trends (two-column grid) */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Peak Hours Heatmap */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Vytizenost podle hodin</CardTitle>
           </CardHeader>
@@ -248,7 +250,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Cancellation & No-Show Trends */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Zruseni a nedostaveni se</CardTitle>
           </CardHeader>
@@ -265,7 +267,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* NEW: Employee Utilization (full width) */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Vytizenost zamestnancu</CardTitle>
         </CardHeader>
@@ -281,7 +283,7 @@ export default function AnalyticsPage() {
       </Card>
 
       {/* NEW: Customer Retention Panel (full width) */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Udrzeni zakazniku</CardTitle>
         </CardHeader>

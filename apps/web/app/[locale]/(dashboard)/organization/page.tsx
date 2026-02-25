@@ -102,7 +102,7 @@ export default function OrganizationPage() {
     return (
       <div className="space-y-8">
         <PageHeader title={t('title')} />
-        <Card className="max-w-lg mx-auto text-center">
+        <Card variant="glass" className="max-w-lg mx-auto text-center">
           <CardHeader>
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
               <Building2 className="h-6 w-6 text-muted-foreground" />
@@ -194,7 +194,7 @@ export default function OrganizationPage() {
 
       {/* Stats row */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
+        <Card variant="glass">
           <CardContent className="flex items-center gap-4 pt-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
               <MapPin className="h-5 w-5 text-blue-600" />
@@ -205,7 +205,7 @@ export default function OrganizationPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card variant="glass">
           <CardContent className="flex items-center gap-4 pt-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
               <Users className="h-5 w-5 text-green-600" />
@@ -216,7 +216,7 @@ export default function OrganizationPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card variant="glass">
           <CardContent className="flex items-center gap-4 pt-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
               <Building2 className="h-5 w-5 text-purple-600" />
@@ -243,6 +243,7 @@ export default function OrganizationPage() {
             return (
               <Card
                 key={location.company_uuid}
+                variant="glass"
                 className={`cursor-pointer transition-shadow hover:shadow-md ${
                   isCurrent ? 'ring-2 ring-primary' : ''
                 } ${!location.is_active ? 'opacity-60' : ''}`}

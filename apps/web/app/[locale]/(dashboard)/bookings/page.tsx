@@ -7,6 +7,7 @@ import { Link } from '@/lib/i18n/navigation';
 import { format } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
 import { PageHeader } from '@/components/shared/page-header';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -80,47 +81,49 @@ export default function BookingsPage() {
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <PageHeader title={t('title')} />
-          <Button asChild>
-            <Link href="/bookings/new">
-              <Plus className="h-4 w-4 mr-2" />
-              {tBooking('new.title')}
-            </Link>
-          </Button>
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t('filters.search')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+        <Card variant="glass" className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <PageHeader title={t('title')} />
+            <Button asChild>
+              <Link href="/bookings/new">
+                <Plus className="h-4 w-4 mr-2" />
+                {tBooking('new.title')}
+              </Link>
+            </Button>
           </div>
 
-          <Select
-            value={status ?? 'all'}
-            onValueChange={(value) =>
-              setStatus(value === 'all' ? undefined : (value as BookingStatus))
-            }
-          >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder={t('filters.allStatuses')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
-              <SelectItem value="pending">{tBooking('status.pending')}</SelectItem>
-              <SelectItem value="confirmed">{tBooking('status.confirmed')}</SelectItem>
-              <SelectItem value="completed">{tBooking('status.completed')}</SelectItem>
-              <SelectItem value="cancelled">{tBooking('status.cancelled')}</SelectItem>
-              <SelectItem value="no_show">{tBooking('status.no_show')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          {/* Filters */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('filters.search')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            <Select
+              value={status ?? 'all'}
+              onValueChange={(value) =>
+                setStatus(value === 'all' ? undefined : (value as BookingStatus))
+              }
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder={t('filters.allStatuses')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
+                <SelectItem value="pending">{tBooking('status.pending')}</SelectItem>
+                <SelectItem value="confirmed">{tBooking('status.confirmed')}</SelectItem>
+                <SelectItem value="completed">{tBooking('status.completed')}</SelectItem>
+                <SelectItem value="cancelled">{tBooking('status.cancelled')}</SelectItem>
+                <SelectItem value="no_show">{tBooking('status.no_show')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </Card>
 
         {/* Table */}
         <div className="rounded-lg border bg-card">

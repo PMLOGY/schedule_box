@@ -112,7 +112,7 @@ function CompanyProfileCard() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('companyProfile')}</CardTitle>
         </CardHeader>
@@ -125,7 +125,7 @@ function CompanyProfileCard() {
 
   if (!company) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('companyProfile')}</CardTitle>
         </CardHeader>
@@ -137,7 +137,7 @@ function CompanyProfileCard() {
   }
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <CardTitle>{t('companyProfile')}</CardTitle>
@@ -416,7 +416,7 @@ function WorkingHoursCard() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('workingHours')}</CardTitle>
         </CardHeader>
@@ -428,7 +428,7 @@ function WorkingHoursCard() {
   }
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <CardTitle>{t('workingHours')}</CardTitle>

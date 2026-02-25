@@ -87,7 +87,7 @@ function CurrentSubscriptionCard() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('currentPlan')}</CardTitle>
         </CardHeader>
@@ -104,7 +104,7 @@ function CurrentSubscriptionCard() {
   // No subscription — Free plan
   if (!subscription) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('currentPlan')}</CardTitle>
         </CardHeader>
@@ -131,7 +131,7 @@ function CurrentSubscriptionCard() {
 
   return (
     <>
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('currentPlan')}</CardTitle>
         </CardHeader>
@@ -382,7 +382,7 @@ function PlanComparisonGrid() {
 
   if (plansLoading) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('plans.title')}</CardTitle>
         </CardHeader>
@@ -408,6 +408,7 @@ function PlanComparisonGrid() {
             return (
               <Card
                 key={plan.key}
+                variant="glass"
                 className={`relative flex flex-col ${
                   isCurrentPlan ? 'border-primary ring-2 ring-primary/20' : 'border-border'
                 }`}
@@ -533,7 +534,7 @@ function InvoiceHistoryTable() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>{t('invoices.title')}</CardTitle>
         </CardHeader>
@@ -548,7 +549,7 @@ function InvoiceHistoryTable() {
   }
 
   return (
-    <Card>
+    <Card variant="glass">
       <CardHeader>
         <CardTitle>{t('invoices.title')}</CardTitle>
       </CardHeader>
