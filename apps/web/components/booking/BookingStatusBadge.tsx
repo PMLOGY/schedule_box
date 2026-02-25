@@ -1,7 +1,7 @@
 /**
  * Booking Status Badge Component
  *
- * Displays booking status with color-coded badge.
+ * Displays booking status with color-coded glass badge.
  */
 
 import { useTranslations } from 'next-intl';
@@ -13,27 +13,21 @@ interface BookingStatusBadgeProps {
 }
 
 /**
- * Color mapping for booking statuses
+ * Glass variant mapping for booking statuses
  */
-const STATUS_COLORS: Record<
+const STATUS_VARIANTS: Record<
   BookingStatus,
-  { bg: string; text: string; variant?: 'default' | 'secondary' | 'destructive' | 'outline' }
+  'glass-blue' | 'glass-gray' | 'glass-red' | 'glass-amber' | 'glass-green'
 > = {
-  pending: { bg: 'bg-amber-100', text: 'text-amber-800' },
-  confirmed: { bg: 'bg-blue-100', text: 'text-blue-800' },
-  completed: { bg: 'bg-green-100', text: 'text-green-800' },
-  cancelled: { bg: 'bg-gray-100', text: 'text-gray-800' },
-  no_show: { bg: 'bg-red-100', text: 'text-red-800' },
+  pending: 'glass-amber',
+  confirmed: 'glass-blue',
+  completed: 'glass-green',
+  cancelled: 'glass-gray',
+  no_show: 'glass-red',
 };
 
 export default function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
   const t = useTranslations('booking.status');
 
-  const colors = STATUS_COLORS[status];
-
-  return (
-    <Badge className={`${colors.bg} ${colors.text} border-transparent`} variant="outline">
-      {t(status)}
-    </Badge>
-  );
+  return <Badge variant={STATUS_VARIANTS[status]}>{t(status)}</Badge>;
 }
