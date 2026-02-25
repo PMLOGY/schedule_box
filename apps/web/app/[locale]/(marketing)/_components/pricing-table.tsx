@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -98,7 +99,10 @@ export function PricingTable() {
           return (
             <Card
               key={plan.id}
-              className={`relative flex flex-col ${plan.featured ? 'ring-2 ring-primary' : ''}`}
+              className={cn(
+                'relative flex flex-col',
+                plan.featured ? 'glass-surface ring-2 ring-primary/70' : 'glass-surface-subtle',
+              )}
             >
               {plan.featured && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">

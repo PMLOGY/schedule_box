@@ -31,7 +31,7 @@ export function FeatureGrid() {
   const t = useTranslations('landing.features');
 
   return (
-    <section id="features" className="overflow-hidden py-16 md:py-24 bg-muted/50">
+    <section id="features" className="overflow-hidden py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4">
         <h2 className="text-center text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
           {t('title')}
@@ -47,7 +47,7 @@ export function FeatureGrid() {
             const Icon = feature.icon;
             return (
               <motion.div key={feature.key} variants={item}>
-                <Card className="h-full">
+                <Card variant="glass" className="h-full">
                   <CardContent className="pt-6">
                     <Icon className="h-12 w-12 text-primary" />
                     <h3 className="mt-4 text-lg font-semibold">{t(feature.key)}</h3>
