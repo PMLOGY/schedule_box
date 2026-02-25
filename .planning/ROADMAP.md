@@ -103,7 +103,7 @@
 
 **Requirements:** DSYS-01, DSYS-02, DSYS-03, DSYS-04, DSYS-05, DSYS-06, DSYS-07
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 33-01-PLAN.md — Glass CSS token system + gradient mesh backgrounds + accessibility fallbacks in globals.css
@@ -252,7 +252,7 @@ Plans:
 | 30. Multi-Location Orgs | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 31. Analytics | v1.3 | 5/5 | Complete | 2026-02-25 |
 | 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
-| 33. Token Foundation | v1.4 | TBD | Not started | - |
+| 33. Token Foundation | v1.4 | 0/2 | Planning complete | - |
 | 34. Component Glass Variants | v1.4 | TBD | Not started | - |
 | 35. Dashboard Glass | v1.4 | TBD | Not started | - |
 | 36. Marketing Glass | v1.4 | TBD | Not started | - |
