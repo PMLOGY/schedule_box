@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phase 36: Marketing Glass — Plan 01 COMPLETE
+**Current focus:** v1.4 Design Overhaul — Phase 36: Marketing Glass — Plan 02 COMPLETE
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
 - **Phase:** 36 of 37 (Marketing Glass)
-- **Plan:** 1/? complete (36-01 done)
-- **Status:** 36-01 complete — gradient mesh, glass navbar, aurora hero foundation in place
-- **Last activity:** 2026-02-25 — 36-01 executed, 2 tasks, 4 files modified
+- **Plan:** 2/2 complete (36-01 + 36-02 done — Phase 36 COMPLETE)
+- **Status:** Phase 36 complete — full marketing glass system applied to all components
+- **Last activity:** 2026-02-25 — 36-02 executed, 2 tasks, 7 files modified
 
-Progress: [█████░░░░░] 50% (v1.4)
+Progress: [██████░░░░] 60% (v1.4)
 
 ## What's Done
 
@@ -41,6 +41,9 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 **34-02 (Decision 20):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
 
 **36-01 (Decision 21):** MarketingNavbar converted to 'use client' with useTranslations — co-locating MobileNav (Sheet requires client boundary) in same file forces entire module to be client; useTranslations is identical in behavior to getTranslations for this use case. Aurora opacity 60% light / 30% dark keeps animation subtle enough for text legibility.
+- [Phase 35-dashboard-glass]: 35-01: GradientMesh placed outside flex wrapper (position:fixed removes from flow); sidebar stays bg-background per DASH-05; header uses glass-surface-subtle + border-glass replacing bg-background
+
+**36-02 (Decision 22):** Pricing tier glass intensity differentiation via cn() className instead of variant prop — featured Pro tier uses glass-surface (16px), non-featured use glass-surface-subtle (8px). GlassPanel intensity="subtle" on legal pages for readability. Footer uses glass-surface-subtle + border-glass to replace solid bg-muted.
 
 ## Blockers
 
@@ -56,9 +59,10 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 | v1.2 | 5 | 20 | 4 days |
 | v1.3 | 5 | 21 | 1 day |
 | v1.4 | 5 | TBD | In progress |
+| Phase 35-dashboard-glass P01 | 8 | 2 tasks | 2 files |
 
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 36, Plan 01 complete. Next: 36-02 (features/social proof/pricing glass sections).
+Stopped at: Phase 36 complete (both plans done). Next: Phase 37 Auth+Polish OR Phase 35 Dashboard Glass.
 Resume file: None
