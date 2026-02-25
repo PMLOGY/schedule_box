@@ -127,11 +127,11 @@ Plans:
 
 **Requirements:** COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06
 
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 34-01-PLAN.md — CVA glass variants on Card, Button, Dialog, Badge components
-- [ ] 34-02-PLAN.md — GlassPanel and GradientMesh primitive components
+- [x] 34-01-PLAN.md — CVA glass variants on Card, Button, Dialog, Badge components
+- [x] 34-02-PLAN.md — GlassPanel and GradientMesh primitive components
 
 **Success Criteria** (what must be TRUE):
 
@@ -252,8 +252,8 @@ Plans:
 | 30. Multi-Location Orgs | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 31. Analytics | v1.3 | 5/5 | Complete | 2026-02-25 |
 | 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
-| 33. Token Foundation | v1.4 | 0/2 | Planning complete | - |
-| 34. Component Glass Variants | v1.4 | TBD | Not started | - |
+| 33. Token Foundation | v1.4 | 2/2 | Complete | 2026-02-25 |
+| 34. Component Glass Variants | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 35. Dashboard Glass | v1.4 | TBD | Not started | - |
 | 36. Marketing Glass | v1.4 | TBD | Not started | - |
 | 37. Auth and Polish | v1.4 | TBD | Not started | - |
