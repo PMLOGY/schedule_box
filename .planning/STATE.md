@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phase 36: Marketing Glass — Plan 02 COMPLETE
+**Current focus:** v1.4 Design Overhaul — Phases 35+36 COMPLETE, Phase 37 next
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
-- **Phase:** 36 of 37 (Marketing Glass)
-- **Plan:** 2/2 complete (36-01 + 36-02 done — Phase 36 COMPLETE)
-- **Status:** Phase 36 complete — full marketing glass system applied to all components
-- **Last activity:** 2026-02-25 — 36-02 executed, 2 tasks, 7 files modified
+- **Phase:** 36 of 37 — Phases 35+36 COMPLETE (executed in parallel)
+- **Plan:** 4/4 complete (35-01, 35-02, 36-01, 36-02)
+- **Status:** Phases 35+36 verified (DASH-01..05 + MKTG-01..05 all met)
+- **Last activity:** 2026-02-25 — Phases 35+36 verified in parallel
 
-Progress: [██████░░░░] 60% (v1.4)
+Progress: [████████░░] 80% (v1.4)
 
 ## What's Done
 
@@ -62,10 +62,9 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 | v1.2 | 5 | 20 | 4 days |
 | v1.3 | 5 | 21 | 1 day |
 | v1.4 | 5 | TBD | In progress |
-| Phase 35-dashboard-glass P01 | 8 | 2 tasks | 2 files |
 
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 35 Plan 02 complete — 35-02 executed. All dashboard sub-pages, KPI cards, gradient heading glassed. Next: Phase 37 Auth+Polish.
+Stopped at: Phases 35+36 complete, verified. Next: plan Phase 37 (Auth + Polish).
 Resume file: None

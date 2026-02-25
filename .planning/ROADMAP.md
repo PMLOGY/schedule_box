@@ -254,8 +254,8 @@ Plans:
 | 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
 | 33. Token Foundation | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 34. Component Glass Variants | v1.4 | 2/2 | Complete | 2026-02-25 |
-| 35. Dashboard Glass | v1.4 | 0/2 | In progress | - |
-| 36. Marketing Glass | v1.4 | 0/2 | Planning complete | - |
+| 35. Dashboard Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
+| 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 37. Auth and Polish | v1.4 | TBD | Not started | - |
 
 ---
