@@ -6,6 +6,7 @@
 - **v1.1 Production Hardening** — Phases 16-22 (shipped 2026-02-21)
 - **v1.2 Product Readiness** — Phases 23-27 (shipped 2026-02-24)
 - **v1.3 Revenue & Growth** — Phases 28-32 (shipped 2026-02-25)
+- **v1.4 Design Overhaul** — Phases 33-37 (in progress)
 
 ## Phases
 
@@ -65,154 +66,153 @@
 
 </details>
 
----
-
-## v1.3 Revenue & Growth (Phases 28-32)
+<details>
+<summary>v1.3 Revenue & Growth (Phases 28-32) — SHIPPED 2026-02-25</summary>
 
 **Milestone goal:** Enable ScheduleBox to generate recurring revenue through subscription billing, enforce plan tiers, support franchise businesses with multi-location management, and deliver analytics dashboards and frontend polish that justify paid tier pricing.
 
 **Requirements:** 32 total (BILL-01..07, LIMIT-01..05, ORG-01..06, ANLYT-01..08, UI-01..06)
 
-**Build order rationale:** Billing infrastructure is the unlock for all other features. Usage limits need billing as their upgrade destination. Multi-location is architecturally independent but must precede cross-location analytics. Analytics depends on subscription records (MRR) and the org model (cross-location). Frontend polish runs last on pages built in earlier phases.
+- [x] Phase 28: Subscription Billing Infrastructure (5/5 plans) — completed 2026-02-24
+- [x] Phase 29: Usage Limits and Tier Enforcement (3/3 plans) — completed 2026-02-24
+- [x] Phase 30: Multi-Location Organizations (5/5 plans) — completed 2026-02-24
+- [x] Phase 31: Analytics and Reporting (5/5 plans) — completed 2026-02-25
+- [x] Phase 32: Frontend Polish and Design System (3/3 plans) — completed 2026-02-25
 
-**Business blocker:** Comgate recurring payments require manual activation by contacting Comgate support for merchant account 498621. This must be initiated before Phase 28 implementation begins. Timeline is unknown (days to weeks).
-
----
-
-### Phase 28: Subscription Billing Infrastructure
-
-**Goal:** Companies can subscribe to a paid plan, pay via Comgate recurring, auto-renew monthly, and receive compliant invoice PDFs.
-
-**Dependencies:** None (first phase). Prerequisite: Comgate recurring activation confirmed on merchant 498621.
-
-**Requirements:** BILL-01, BILL-02, BILL-03, BILL-04, BILL-05, BILL-06, BILL-07
-
-**Plans:** 5 plans
-
-Plans:
-- [x] 28-01-PLAN.md — DB schema (subscriptions, subscription_invoices, subscription_events) + CHECK constraint migration + Comgate recurring client + billing types
-- [x] 28-02-PLAN.md — Billing API endpoints (plans, subscribe, subscription, upgrade, downgrade, status, webhook) + subscription service layer
-- [x] 28-03-PLAN.md — BullMQ renewal scheduler + dunning automation + Czech email templates
-- [x] 28-04-PLAN.md — Billing portal UI (plan comparison, subscription management, invoice history)
-- [x] 28-05-PLAN.md — Invoice PDF generation (SEQUENCE numbering, Czech VAT compliance) + invoice API routes
-
-**Success Criteria:**
-
-1. A company owner can select a paid plan, complete the first Comgate payment with `initRecurring=true`, and see their account immediately reflect the new plan with a next renewal date.
-2. On each billing cycle date, the BullMQ renewal job automatically charges the company via Comgate recurring without any owner action; the subscription state transitions from `active` to `active` with an updated period.
-3. When a Comgate payment fails, the subscription transitions to `past_due` and the owner receives a dunning email; after 14 days without successful payment, the account downgrades to Free automatically.
-4. An owner can upgrade or downgrade their plan from the billing portal; upgrades take effect immediately with prorated charge for the remaining period; downgrades take effect at end of current period.
-5. After each billing cycle, the owner receives a PDF invoice by email and can download all past invoices from the billing portal; invoices comply with Czech VAT requirements (ICO, DIC, sequential numbering, correct VAT rate).
-
-**Research flag:** MEDIUM confidence on Comgate recurring REST parameter names — verify `initRecurring` field name in sandbox before building the renewal job. Contact Comgate support for merchant 498621 recurring activation before implementation starts.
+</details>
 
 ---
 
-### Phase 29: Usage Limits and Tier Enforcement
+## v1.4 Design Overhaul (Phases 33-37)
 
-**Goal:** Plan tier limits are enforced server-side on every booking, employee, and service creation, with visible usage meters and contextual upgrade prompts.
+**Milestone goal:** Transform ScheduleBox from a functional AI-generated-looking app into a premium, distinctive SaaS product through a full visual redesign applying glassmorphism and the Behance blue (#0057FF) aesthetic across every page — making the product look worth 2,990 CZK/month.
 
-**Dependencies:** Phase 28 (billing must exist so upgrade prompts have a real destination and plan state is readable).
+**Requirements:** 31 total (DSYS-01..07, COMP-01..06, DASH-01..05, MKTG-01..05, AUTH-01..03, POLSH-01..06)
 
-**Requirements:** LIMIT-01, LIMIT-02, LIMIT-03, LIMIT-04, LIMIT-05
+**Build order rationale:** Tokens before components (CSS variables must exist before any component references them — undefined variables silently produce transparent effects). Components before pages (verify glass system works in isolation before applying to live pages). Dashboard before marketing (higher z-index complexity with calendar popovers, booking drawers, and reservation modals). Auth last (simplest structure, single card). Polish bundled with auth since auth scope is small.
 
-**Plans:** 3 plans
-
-Plans:
-- [x] 29-01-PLAN.md — Redis booking counter infrastructure + plan-limits helper + GET /api/v1/usage endpoint
-- [x] 29-02-PLAN.md — Server-side limit enforcement in POST handlers (bookings, employees, services) with 402 responses
-- [x] 29-03-PLAN.md — Usage dashboard widget with progress bars + upgrade modal + Czech/English translations
-
-**Success Criteria:**
-
-1. A Free plan company that has reached 50 bookings in the current billing period receives an HTTP 402 response when attempting to create booking 51; the frontend shows an upgrade modal with plan comparison rather than a generic error.
-2. A Free plan company that tries to add a 4th employee or a 6th service is blocked with an upgrade prompt; the block is enforced at the API level and cannot be bypassed by removing the frontend check.
-3. An owner on any plan can see a usage widget in the dashboard showing current bookings consumed vs. their tier limit with a visual progress bar; the widget shows a warning banner when consumption reaches 80% of the limit.
-4. Plan limits match documented tier values: Free 50 bookings/month, Essential 500, Growth 2,000, AI-Powered unlimited; these values are defined in a single configuration file and not scattered across multiple check locations.
+**Frontend-only milestone:** No backend, API, database, or RabbitMQ changes in any phase.
 
 ---
 
-### Phase 30: Multi-Location Organizations
+### Phase 33: Token Foundation and Background System
 
-**Goal:** Franchise owners can manage multiple business locations under one organization, switch location context in the dashboard, and assign location-level managers.
+**Goal:** The glass design system infrastructure exists in CSS and Tailwind config, making all subsequent glass effects possible and correctly themed in both light and dark mode.
 
-**Dependencies:** Phase 28 (subscription plan gates how many locations a company can create).
+**Dependencies:** None (first phase of v1.4).
 
-**Requirements:** ORG-01, ORG-02, ORG-03, ORG-04, ORG-05, ORG-06
+**Requirements:** DSYS-01, DSYS-02, DSYS-03, DSYS-04, DSYS-05, DSYS-06, DSYS-07
 
-**Plans:** 5 plans
+**Plans:** TBD
 
 Plans:
-- [x] 30-01-PLAN.md — DB schema (organizations + organization_members tables, companies.organization_id FK) + shared types + Drizzle relations + migration
-- [x] 30-02-PLAN.md — JWT context-switch endpoint (POST /auth/switch-location) + org-scope helpers + Zod schemas + integration test for cross-org 403 rejection
-- [x] 30-03-PLAN.md — Organization CRUD API (create org, add/edit/deactivate locations, add/remove members) with plan-gated location limits
-- [x] 30-04-PLAN.md — Location switcher UI in header + organization settings page (location + member management) + navigation update
-- [x] 30-05-PLAN.md — Organization dashboard (per-location metrics) + cross-location customer search (email-based dedup)
+- [ ] 33-01-PLAN.md — Glass CSS token system + gradient mesh backgrounds + accessibility fallbacks in globals.css
+- [ ] 33-02-PLAN.md — Tailwind config extensions + glass-plugin.ts + Plus Jakarta Sans font swap
 
-**Success Criteria:**
+**Success Criteria** (what must be TRUE):
 
-1. A franchise owner can create an organization, add multiple company locations to it, and switch between locations using a dropdown in the dashboard header; after switching, all data shown (bookings, customers, revenue) is scoped exclusively to the selected location.
-2. A user with `franchise_owner` role can see all locations in the organization dashboard with key metrics (bookings, revenue, occupancy) per location on a single screen without switching context.
-3. A `location_manager` assigned to a single location can log in and manage that location's bookings, staff, and services but cannot see any data from other locations in the organization.
-4. A franchise owner can add a new location, edit existing location details, and deactivate a location from the organization settings page; deactivating a location soft-disables it without deleting any historical data.
-5. Customers who have visited multiple locations within an organization appear as a single customer record when searched from organization-level views, preventing inflated CRM counts.
-
-**Research flag:** JWT context-switch security boundary has no documented precedent in this codebase. An integration test must verify that switching to a company owned by a different organization is rejected with 403 before merging any multi-location code to main.
+1. Applying the `gradient-mesh` class to any layout wrapper produces a visible radial gradient background with colored orbs in both light and dark mode, with distinct orb saturation values for each theme.
+2. Applying `glass-surface`, `glass-surface-subtle`, or `glass-surface-heavy` to any `div` over a gradient background produces a visibly frosted glass panel; the effect is absent on a flat background, confirming the class works correctly by requiring a background behind it.
+3. On a viewport below 768px, the blur intensity of all glass surfaces is automatically reduced (verifiable by inspecting computed styles); no JavaScript is involved in this degradation.
+4. With `prefers-reduced-transparency` enabled in OS accessibility settings, all glass surfaces fall back to opaque card backgrounds; with `prefers-reduced-transparency` off and `@supports (backdrop-filter)` true, glass is active.
+5. All text on any glass surface passes WCAG 4.5:1 contrast ratio when tested with the brightest gradient orb positioned directly behind it, due to the semi-opaque `::before` scrim baked into the `glass-surface` base class.
 
 ---
 
-### Phase 31: Analytics and Reporting
+### Phase 34: Primitive Components and shadcn Variants
 
-**Goal:** Business owners can view revenue and booking analytics across configurable date ranges, franchise owners see cross-location aggregates, and platform admins monitor SaaS health metrics.
+**Goal:** The glass component library is complete and verified: existing shadcn components have opt-in glass variants, and new primitive components exist for layout-level glass usage — all backward compatible with zero changes to existing usage.
 
-**Dependencies:** Phase 28 (MRR/ARR platform admin metrics require subscription records). Phase 30 (cross-location analytics requires the organization model to be live).
+**Dependencies:** Phase 33 (glass tokens and gradient mesh must exist before any component references `var(--glass-bg)` or `glass-surface`).
 
-**Requirements:** ANLYT-01, ANLYT-02, ANLYT-03, ANLYT-04, ANLYT-05, ANLYT-06, ANLYT-07, ANLYT-08
+**Requirements:** COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06
 
-**Plans:** 5 plans
+**Plans:** TBD
 
 Plans:
-- [x] 31-01-PLAN.md — Revenue & booking analytics API routes (payment methods, top services, peak hours, cancellations, customer retention)
-- [x] 31-02-PLAN.md — Employee utilization API + analytics_snapshots schema + BullMQ hourly refresh scheduler
-- [x] 31-03-PLAN.md — Platform admin dashboard API (MRR, churn, plan distribution) + cross-location organization analytics API
-- [x] 31-04-PLAN.md — Analytics UI enhancement (6 new chart components, extended analytics page with all sections)
-- [x] 31-05-PLAN.md — Admin dashboard page + organization analytics page + customer report PDF/CSV export + navigation update
+- [ ] 34-01-PLAN.md — CVA glass variants on Card, Button, Dialog, Badge components
+- [ ] 34-02-PLAN.md — GlassPanel and GradientMesh primitive components
 
-**Success Criteria:**
+**Success Criteria** (what must be TRUE):
 
-1. A business owner can open the analytics dashboard and see daily/weekly/monthly revenue charts, payment method breakdown, top services by revenue, booking volume trends, and peak hours heatmap — all updating when the date range filter is changed.
-2. A business owner can see employee utilization: bookings per employee, utilization percentage, and revenue attributed to each employee on a bar chart.
-3. A franchise owner can view an aggregate analytics screen showing organization-level totals for revenue, bookings, and occupancy, with a drill-down to per-location breakdown.
-4. A platform admin can access an admin dashboard showing MRR, churn rate, plan distribution across all companies, active company count, and new signup trends — without this data being accessible to regular business owners.
-5. An owner can export their revenue, bookings, or customer report as a PDF or CSV file from the analytics page.
-6. Analytics queries complete in under 2 seconds for standard date ranges (up to 90 days) because data is served from a materialized view that is refreshed hourly by a BullMQ job, not computed live on every request.
-
-**Occupancy rate decision:** V1 ships a booking fill rate approximation (bookings * avgDuration / employees * workingDays * 480min) instead of the full working-hours-minus-blocked-time calculation. Precise occupancy deferred to v1.4.
+1. Every existing `<Card />`, `<Button />`, `<Dialog />`, and `<Badge />` in the codebase renders identically to before this phase — no existing usage required a prop change.
+2. `<Card variant="glass" />` renders a frosted glass card with correct border, shadow, and blur values in both light and dark mode; hovering the card transitions to `shadow-glass-hover` with a smooth CSS transition.
+3. `<Dialog />` opened over a gradient background shows a heavy glass panel (glass-surface-heavy) for the content area and a blurred backdrop overlay; existing Dialog usage (booking detail, upgrade modal) remains functional with no prop changes.
+4. `<Badge variant="glass" />` renders booking status pills (Confirmed, Cancelled, No-show) as translucent glass with correct color tints visible in both light and dark mode.
+5. `<GradientMesh />` placed in a layout renders as a `fixed inset-0 -z-10` background that does not create a CSS stacking context, confirmed by verifying that dropdowns and modals in the same layout continue to layer above it correctly.
 
 ---
 
-### Phase 32: Frontend Polish and Design System
+### Phase 35: Dashboard Glass Application
 
-**Goal:** The dashboard, billing, and analytics pages feel professional and responsive across all devices, with consistent loading states, dark mode support, and a harmonized design system.
+**Goal:** The logged-in dashboard experience uses glass throughout — gradient mesh background, glass KPI cards, frosted header — while all data-dense surfaces (tables, calendar cells, chart canvases) remain opaque and every existing overlay (calendar popovers, booking drawers, modals) continues to layer correctly.
 
-**Dependencies:** Phases 28-31 (polishes pages built in earlier phases; billing portal and analytics pages must exist before their states can be audited).
+**Dependencies:** Phase 34 (glass components must exist before pages apply them).
 
-**Requirements:** UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
+**Requirements:** DASH-01, DASH-02, DASH-03, DASH-04, DASH-05
 
-**Plans:** 3 plans
+**Plans:** TBD
 
 Plans:
-- [x] 32-01-PLAN.md — Dark mode infrastructure (next-themes, ThemeProvider, toggle) + design system token harmonization (shadows, success/warning colors) + hardcoded color fixes
-- [x] 32-02-PLAN.md — Loading/empty/error states audit (16 loading.tsx skeletons, shared PageSkeleton/TableSkeleton, dashboard error.tsx)
-- [x] 32-03-PLAN.md — Dashboard redesign (KPI row, revenue chart, recent bookings) + landing page testimonials + responsive audit + human verification
+- [ ] 35-01-PLAN.md — Dashboard layout gradient mesh + stacking context audit + header frosted glass
+- [ ] 35-02-PLAN.md — KPI stat cards glass variant + all dashboard sub-pages glass card wrappers
 
-**Success Criteria:**
+**Success Criteria** (what must be TRUE):
 
-1. Every data-fetching page in the dashboard shows a skeleton loader while loading and a descriptive empty state with an action CTA when no data exists; no page shows a blank white area or spinner-only state.
-2. The dashboard has a professional grid layout with a KPI summary row (revenue, bookings, customers, no-show rate), data visualization cards, and quick action buttons visible without scrolling on a 1280px desktop screen.
-3. Dark mode is available via a manual toggle and respects the user's system preference on first load; all dashboard, settings, and analytics pages are correctly styled in both light and dark themes.
-4. All dashboard and marketing pages pass a responsive design review at 375px (mobile), 768px (tablet), and 1280px (desktop) breakpoints without horizontal scroll or overlapping elements.
-5. The design system is consistent across all pages: spacing, typography, color palette, border radii, and shadow system follow a single token set with no one-off overrides.
+1. The dashboard header is a frosted glass bar (glass-surface-subtle, sticky top-0) that shows a slight blur of content scrolling behind it; the location switcher dropdown and theme toggle inside the header remain fully functional.
+2. The four KPI stat cards on the dashboard home use `Card variant="glass"` and transition to `shadow-glass-hover` on hover; the dashboard welcome heading uses gradient text.
+3. All dashboard sub-pages (calendar, bookings, customers, analytics, settings, billing, organization) wrap their content sections in glass cards, while data tables, calendar cells, and chart canvases inside those pages are explicitly opaque.
+4. The dashboard sidebar remains solid with no glass treatment; sidebar navigation text is legible at all nav-item sizes in both light and dark mode.
+5. All existing interactive overlays — the calendar day popover, booking detail drawer, reservation modal, and dropdown menus — layer correctly above the glass dashboard layout with no z-index clipping or stacking context interference.
+
+---
+
+### Phase 36: Marketing Pages Glass Application
+
+**Goal:** The marketing landing page and secondary pages present a premium, high-conversion glass aesthetic with gradient mesh, glass navigation, glass pricing and feature cards, and animated aurora on the hero — making a prospect's first impression match a 2,990 CZK/month product.
+
+**Dependencies:** Phase 34 (glass components must exist). Phase 35 is not required (marketing and dashboard are independent route groups).
+
+**Requirements:** MKTG-01, MKTG-02, MKTG-03, MKTG-04, MKTG-05
+
+**Plans:** TBD
+
+Plans:
+- [ ] 36-01-PLAN.md — Marketing layout gradient mesh + glass navbar + hero section with aurora animation
+- [ ] 36-02-PLAN.md — Pricing glass cards + testimonials glass cards + footer + privacy/terms pages
+
+**Success Criteria** (what must be TRUE):
+
+1. The marketing layout applies a vibrant gradient mesh background across all marketing pages; the navbar is a glass bar (glass-surface) that replaces the previous solid navigation and remains functional including the mobile slide-over menu.
+2. The landing page hero `<h1>` uses gradient text (blue-to-indigo), and the hero section has a slow-moving aurora animation (15-20s CSS keyframe cycle) visible behind the content without degrading scroll performance.
+3. The pricing section shows the featured Growth tier with `glass-surface` treatment and the other tiers with `glass-surface-subtle`; all CTA buttons (the primary conversion actions) remain solid with no glass treatment.
+4. Testimonials and social proof sections use glass card containers, and the footer and secondary marketing pages (privacy, terms) are styled consistently with the rest of the marketing glass system.
+5. The mobile navigation slide-over opens correctly over the fixed gradient mesh background with no visual clipping or stacking context breakage; the overlay layers above the gradient mesh at all tested breakpoints (375px, 768px).
+
+---
+
+### Phase 37: Auth Pages and Polish Pass
+
+**Goal:** Auth pages present a premium glass card entry experience, and the full v1.4 polish layer is complete — entrance animations, glass shimmer loading, glass interactive components, dark mode QA, and responsive QA — making the product feel complete and deliberate at every interaction.
+
+**Dependencies:** Phase 34 (glass components), Phase 35 (dashboard animations reference dashboard page structure), Phase 36 (polish QA covers marketing pages).
+
+**Requirements:** AUTH-01, AUTH-02, AUTH-03, POLSH-01, POLSH-02, POLSH-03, POLSH-04, POLSH-05, POLSH-06
+
+**Plans:** TBD
+
+Plans:
+- [ ] 37-01-PLAN.md — Auth layout glass card + entrance animation + glass dropdowns and tooltips
+- [ ] 37-02-PLAN.md — Glass shimmer loading skeletons + KPI card entrance animations + dark mode QA + responsive QA
+
+**Success Criteria** (what must be TRUE):
+
+1. The login, register, and reset-password pages show a centered glass card (glass-surface-heavy) on a gradient mesh background; the card slides up and fades in on page load using the Motion library; all form inputs inside the card are opaque with clear focus states.
+2. On the dashboard, the four KPI stat cards animate in with a stagger effect (50ms per card, 300ms ease-out fade and slide) on initial page load; the animation does not replay on tab switch or re-render.
+3. Loading states in glass contexts (dashboard sub-pages, auth card pending state) show a glass shimmer skeleton with a Motion-powered shimmer wave, replacing the flat `PageSkeleton` and `TableSkeleton` components.
+4. shadcn Select and DropdownMenu components in settings and filter contexts show a glass panel style; shadcn Tooltip shows a frosted glass style instead of the default black rectangle.
+5. All glass components on every page are visually correct in dark mode on a #191919 base: opacity values are high enough to be visible (not below 50%), borders are prominent enough to define the glass edge, and gradient orbs have sufficient saturation to be seen through the glass.
+6. All pages pass a responsive review at 375px, 768px, and 1280px: no horizontal scroll, no element overlap, glass blur degradation is active on the 375px viewport, and all interactive elements have adequate tap target sizes.
 
 ---
 
@@ -252,15 +252,16 @@ Plans:
 | 30. Multi-Location Orgs | v1.3 | 5/5 | Complete | 2026-02-24 |
 | 31. Analytics | v1.3 | 5/5 | Complete | 2026-02-25 |
 | 32. Frontend Polish | v1.3 | 3/3 | Complete | 2026-02-25 |
+| 33. Token Foundation | v1.4 | TBD | Not started | - |
+| 34. Component Glass Variants | v1.4 | TBD | Not started | - |
+| 35. Dashboard Glass | v1.4 | TBD | Not started | - |
+| 36. Marketing Glass | v1.4 | TBD | Not started | - |
+| 37. Auth and Polish | v1.4 | TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
 *v1.0 shipped: 2026-02-12*
 *v1.1 shipped: 2026-02-21*
 *v1.2 shipped: 2026-02-24*
-*v1.3 roadmap created: 2026-02-24*
-*Phase 28 planned: 2026-02-24*
-*Phase 29 planned: 2026-02-24*
-*Phase 30 planned: 2026-02-24*
-*Phase 31 planned: 2026-02-24*
-*Phase 32 planned: 2026-02-24*
+*v1.3 shipped: 2026-02-25*
+*v1.4 roadmap created: 2026-02-25*
