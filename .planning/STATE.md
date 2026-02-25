@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
 - **Phase:** 33 of 37 (Token Foundation and Background System)
-- **Plan:** 1 complete — 33-01 done
+- **Plan:** 2 complete — 33-02 done
 - **Status:** In progress
-- **Last activity:** 2026-02-25 — 33-01 complete (glass CSS token foundation)
+- **Last activity:** 2026-02-25 — 33-02 complete (glass Tailwind plugin + Plus Jakarta Sans font)
 
 Progress: [░░░░░░░░░░] 5% (v1.4)
 
@@ -34,6 +34,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **33-01 (Decision 17):** Glass tokens additive under --glass-* namespace; hardcoded pixel blur values throughout (Safari MDN#25914); gradient-mesh base class layout-only to prevent stacking context; position:relative baked into glass-surface classes via @supports guard.
 
+**33-02 (Decision 18):** Hardcoded px blur values (16px/8px/24px) in glass-plugin.ts — never CSS variables; opaque rgba fallback outside @supports guard; Plus Jakarta Sans with latin-ext subset for Czech diacritics.
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
@@ -52,5 +54,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 33-01-PLAN.md (glass CSS token foundation)
+Stopped at: Completed 33-02-PLAN.md (glass Tailwind plugin + Plus Jakarta Sans font)
 Resume file: None
