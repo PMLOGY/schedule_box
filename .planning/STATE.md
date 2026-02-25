@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phase 34: Component Glass Variants — COMPLETE
+**Current focus:** v1.4 Design Overhaul — Phase 36: Marketing Glass — Plan 01 COMPLETE
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
-- **Phase:** 34 of 37 (Component Glass Variants) — COMPLETE
-- **Plan:** 2/2 complete (34-01 + 34-02)
-- **Status:** Phase 34 verified (all COMP-01..06 requirements met)
-- **Last activity:** 2026-02-25 — Phase 34 verified, 9/9 must-haves passed
+- **Phase:** 36 of 37 (Marketing Glass)
+- **Plan:** 1/? complete (36-01 done)
+- **Status:** 36-01 complete — gradient mesh, glass navbar, aurora hero foundation in place
+- **Last activity:** 2026-02-25 — 36-01 executed, 2 tasks, 4 files modified
 
-Progress: [████░░░░░░] 40% (v1.4)
+Progress: [█████░░░░░] 50% (v1.4)
 
 ## What's Done
 
@@ -40,6 +40,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **34-02 (Decision 20):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
 
+**36-01 (Decision 21):** MarketingNavbar converted to 'use client' with useTranslations — co-locating MobileNav (Sheet requires client boundary) in same file forces entire module to be client; useTranslations is identical in behavior to getTranslations for this use case. Aurora opacity 60% light / 30% dark keeps animation subtle enough for text legibility.
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
@@ -58,5 +60,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 34 complete, verified. Next: plan Phases 35 + 36 (can be planned in parallel).
+Stopped at: Phase 36, Plan 01 complete. Next: 36-02 (features/social proof/pricing glass sections).
 Resume file: None
