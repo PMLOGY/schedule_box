@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { TableSkeleton } from '@/components/shared/table-skeleton';
+import { GlassShimmer } from '@/components/shared/glass-shimmer';
 
 interface PageSkeletonProps {
   variant?: 'dashboard' | 'table' | 'cards' | 'form' | 'detail';
@@ -20,12 +21,12 @@ function DashboardVariant() {
       <HeaderSkeleton />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-[120px] rounded-xl" />
+          <GlassShimmer key={i} className="h-[120px]" />
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Skeleton className="h-[300px] rounded-xl" />
-        <Skeleton className="h-[300px] rounded-xl" />
+        <GlassShimmer className="h-[300px]" />
+        <GlassShimmer className="h-[300px]" />
       </div>
     </div>
   );
