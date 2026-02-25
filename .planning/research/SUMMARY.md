@@ -1,344 +1,268 @@
 # Project Research Summary
 
-**Project:** ScheduleBox v1.3 — Revenue & Growth
-**Domain:** SaaS Subscription Billing, Multi-Location Franchise, Usage Metering, Analytics, Frontend Polish
-**Researched:** 2026-02-24
-**Confidence:** HIGH overall (MEDIUM specifically for Comgate recurring API — official docs return 403)
-
----
+**Project:** ScheduleBox v1.4 Glassmorphism Design Overhaul
+**Domain:** Visual design system redesign — premium SaaS booking platform (CZ/SK market)
+**Researched:** 2026-02-25
+**Confidence:** HIGH
 
 ## Executive Summary
 
-ScheduleBox v1.3 transforms a fully functional demo product into a revenue-generating SaaS business. The core work is: (1) activating subscription billing via Comgate recurring payments, (2) enforcing the plan tiers that already exist in the schema but are completely unenforced, (3) extending the data model to support multi-location franchise accounts, and (4) adding the analytics dashboards that justify premium tier pricing. Critically, zero new npm packages are required — every capability builds on the existing stack through schema additions, Drizzle migrations, Comgate API extensions, and BullMQ job definitions already deployed in the notification worker.
+ScheduleBox v1.4 is a full visual redesign of an already-functional booking SaaS, targeting "medium glassmorphism" — frosted glass cards, gradient mesh backgrounds, and premium micro-animations — to shift user perception from "AI-generated and boring" to "worth 2,990 CZK/month." The core finding across all four research areas is that this overhaul requires **zero new npm packages**: the existing stack (Tailwind CSS v3.4.5+, motion ^12.34.3, class-variance-authority, tailwind-merge, next-themes, next/font/google) is completely sufficient. All work is CSS token definition, Tailwind config extension, and additive component modification. The font changes from Inter to Plus Jakarta Sans via the same `next/font/google` API already in use — the only user-visible non-glass change.
 
-The highest-risk item is not technical: Comgate recurring payments must be manually activated by contacting their support team before any billing code ships. This is a business process blocker with an unknown timeline (days to weeks). Architecture-wise, the biggest decision is how to model multi-location without breaking the existing `company_id`-everywhere tenant isolation system. The recommended pattern — a new `organizations` table sitting above `companies` with a context-switch JWT endpoint — adds only 2 new tables and 1 nullable FK to `companies`, leaving all 49 existing tables and 29 RLS policies completely untouched. This is the only viable approach; the alternative (adding `parent_company_id` to `companies`) would require subqueries in all RLS USING clauses causing N×M performance regression, plus modifications to all 127 existing API routes.
+The recommended approach is a strict dependency-ordered implementation: gradient mesh backgrounds must be established before any glass component is built (glass on a flat background is invisible and makes all component-level testing invalid), and dark mode glass tokens must be defined as a completely separate token set before any component touches the `.dark` selector (the dark mode glass recipe is fundamentally different from light mode — higher opacity, more prominent borders, more saturated gradient orbs). Glass is applied additively using a `variant="glass"` CVA prop on existing shadcn components — never by mutating global CSS variables like `--card`. This preserves backward compatibility across the ~65,000 LOC codebase and provides a clean opt-out mechanism for surfaces that must remain opaque (data tables, form inputs, primary CTAs, error states).
 
-Build order is forced by data model and business logic dependencies: billing infrastructure first (everything else depends on knowing a company's active plan), usage enforcement second (the upgrade loop needs billing to exist as the destination), multi-location third (independent but high complexity), analytics fourth (cross-location views need the org model; platform admin dashboard needs subscription records), frontend last (polishing pages that depend on stable APIs). The subscription state machine, Comgate webhook idempotency, and the JWT context-switch security boundary are the three implementation areas requiring the most disciplined execution.
-
----
+The primary risks are GPU performance on mid-range Android (the CZ/SK SMB target market's dominant mobile device), WCAG contrast failures caused by translucent surfaces overlaying shifting backgrounds, and stacking context breakage from `backdrop-filter`'s automatic z-index side effects on the existing modal/drawer/popover system. All three risks have well-documented prevention patterns that must be baked into the foundation phase — they are exponentially more expensive to fix after component implementation. Safari's requirement for `-webkit-backdrop-filter` with hardcoded pixel values (CSS variables fail silently in Safari's webkit implementation) is a fourth risk that must be handled in the base CSS class definitions from day one.
 
 ## Key Findings
 
-### Stack Additions (v1.3)
+### Recommended Stack
 
-v1.3 requires **zero new npm packages**. All five capability areas build on the existing stack.
+The v1.4 stack is the v1.3 stack unchanged. No new dependencies are required. Every glassmorphism capability is already available through installed packages.
 
-**What actually changes:**
+**Core technologies (unchanged from v1.3):**
 
-- `comgate/client.ts` — extend with `initComgateSubscription()` (adds `initRecurring=true` to existing create flow) and `chargeComgateRecurring()` (calls `/v1.0/recurring` server-to-server). No Comgate Node.js SDK exists; the in-house client is the correct approach and must remain in-house.
-- `packages/database` — 6 new/modified objects via Drizzle migration: `subscriptions` table, `subscription_invoices` table, `organizations` table, `organization_members` table, `revenue_snapshots` table, materialized view `mv_daily_booking_summary` (converted from existing regular view).
-- `services/notification-worker` — add `subscription-renewal` BullMQ queue to the existing worker process (already runs BullMQ + Redis on Railway). Also add hourly BullMQ job to refresh the materialized view. No new Railway service required.
-- `packages/shared` — new `utils/tier-limits.ts` with Redis INCR counter helpers and plan limit constants.
-- `apps/web/components/ui/chart.tsx` — scaffolded via `pnpm dlx shadcn@latest add chart` CLI. This generates a local file, not a new npm package. It wraps already-installed recharts ^3.7.0.
+- **Tailwind CSS ^3.4.0** — `backdrop-blur-*` utilities with auto-generated `-webkit-backdrop-filter` since v3.4.5 (PR #13997, merged July 2024); `bg-white/70`, `border-white/20` opacity utilities; `supports-[backdrop-filter]:*` progressive enhancement modifier; `dark:` variants for theme-conditional glass without JS branching
+- **class-variance-authority ^0.7.1** — adds `glass` variant to existing shadcn components (Card, Button, Dialog, Badge); `defaultVariants: { variant: 'default' }` ensures every existing `<Card />` usage continues working with zero prop changes
+- **tailwind-merge ^3.4.0** — `cn()` handles class conflict resolution when glass utility classes are composed
+- **motion ^12.34.3** — all glass hover/entrance animations via `whileHover`, `initial`/`animate`; must animate `opacity`, `y`, `scale` only — never animate `backdropFilter` directly (GPU re-render per frame)
+- **next-themes ^0.4.6** — glass tokens defined in both `:root` and `.dark` via CSS variables; never via `useTheme()` JS branching (causes SSR hydration mismatches in Next.js App Router)
+- **next/font/google** — loads Plus Jakarta Sans (replaces Inter) with zero npm package cost, auto-self-hosted by Next.js, same API as current Inter setup; variable font covering weights 200-800
+- **autoprefixer ^10.4.0** — already in `postcss.config.mjs`; provides additional vendor prefix coverage beyond Tailwind's auto-webkit generation
 
-**Config fix required:** `serverExternalPackages: ['@react-pdf/renderer']` in `next.config.js` to prevent the known App Router crash on PDF generation in route handlers. Verify this is present before building any PDF report endpoint.
-
-**What NOT to add:** Stripe/Paddle/Lemon Squeezy (Comgate already approved for CZ/SK market); LaunchDarkly/GrowthBook/Unleash (4 static tiers, no dynamic flags needed); ClickHouse/Tinybird/Redshift (SMBs have 50-5,000 bookings/month — PostgreSQL materialized views are sufficient); Tremor (shadcn chart wraps recharts which is already installed); separate billing microservice (2-function Comgate extension + BullMQ job); pg_cron (Railway lacks superuser access for extension creation).
-
-See `.planning/research/STACK.md` for full version compatibility matrix and integration notes.
-
----
+**What NOT to add:** `tailwind-glassmorphism` (unmaintained, wraps utilities Tailwind provides natively), `glasscn-ui` (excludes Calendar/Charts/Sonner/Form used by ScheduleBox), `@casoon/tailwindcss-glass` (targets Tailwind v4 — version mismatch), any Fontsource package for Plus Jakarta Sans (next/font/google handles it), GSAP or anime.js (motion is already installed), CSS-in-JS of any kind (project is Tailwind-native).
 
 ### Expected Features
 
-**Must have for v1.3 launch (revenue generation depends on these):**
+Glassmorphism's success depends on a small set of non-negotiable foundational elements. Missing the foundation makes the visual effect invisible or broken, and differentiating features cannot be validated until the foundation is in place.
 
-- Comgate recurring subscription integration — first-party Czech gateway; avoids regulatory re-approval for alternatives
-- Subscription lifecycle state machine — `trialing → active → past_due → cancelled/paused`; 6+ states including dunning
-- Monthly renewal BullMQ job + dunning email flow — day 1, 3, 7, 14 retries; 14-day grace period before downgrade
-- Booking count entitlement check (Free: 50/mo) with Redis INCR counter — returns HTTP 402 with structured error
-- Staff count + AI feature gating — server-side only; UI-only gating is trivially bypassed
-- Subscription invoice PDF — Czech law: within 15 days, IČO required, 10-year retention
-- Revenue + bookings analytics dashboard — 4 KPI cards + date-range charts + top services/staff
-- Loading states, empty states, and error states audit — currently inconsistent across the app
+**Must have (table stakes — P1, ships with v1.4):**
 
-**Should have (increases tier adoption and retention):**
+- Gradient background system (radial mesh orbs in `globals.css`) — glass has no effect on a flat background; this is the hard prerequisite for every other feature
+- Glass card base class (`glass-surface` via Tailwind plugin) — foundational component all other glass features extend
+- Glass sidebar navigation — first visible element on login; most immediate premium signal
+- Frosted header bar (`glass-surface-subtle` + `sticky top-0`) — table-stakes glassmorphism pattern for every premium SaaS
+- Glass modal/dialog overlay — canonical glassmorphism use case; booking detail, upgrade modal, all dialogs
+- Dark mode glass tokens (separate from light mode) — `rgba(17,25,40,0.65)` dark vs `rgba(255,255,255,0.55)` light; critical for quality, cannot share values with light mode
+- Text legibility enforcement (semi-opaque `::before` scrim) — baked into `glass-surface` class itself, not added per-component
+- Glass KPI cards on dashboard — highest-visibility post-login component; primary glass moment for daily users
+- Hover glass intensify (`hover:shadow-glass-hover transition-all duration-200`) — low implementation cost, high perceived quality return
+- Gradient text for hero/key headings (`bg-clip-text text-transparent bg-gradient-to-r`) — landing page `<h1>` and dashboard welcome
+- Glass badge/status pill — booking status (Confirmed, Cancelled, No-show) across calendar, list, detail views
+- Responsive glass degradation — CSS `@media` in `globals.css` reduces blur on mobile `<768px` for GPU safety
 
-- Proration on mid-period upgrade (calculate remaining-days delta; charge immediately)
-- Multi-location entity (`organizations` table) + location switcher in app nav
-- Central admin (`org_owner`) and location manager (`location_manager`) RBAC roles
-- Peak hours heatmap, occupancy rate, new vs returning customer ratio
-- Dark mode (Tailwind CSS variable flip; shadcn already supports `class="dark"`)
-- Plan upgrade prompts at 80% limit threshold — better conversion than prompting at hard block
-- Subscription pause feature — critical for Czech/Slovak seasonal businesses (ski, summer camps); reduces churn vs. cancellation
-- Annual billing option (2 months free; 30% annual adoption target; meaningful ARR improvement)
+**Should have (competitive differentiation — P2, polish pass after P1 lands):**
 
-**Defer to v1.4:**
+- Glass shimmer loading skeleton — Framer Motion shimmer animation over glass-shaped placeholders; upgrades existing flat `PageSkeleton`
+- Entrance animations — `opacity + y` stagger on page load, 300ms ease-out, 50ms stagger per card
+- Glass dropdown/select menus — lower visual impact than sidebar/cards/modals; settings and filter dropdowns
+- Glass tooltip — hover state polish on data points, locked features, info icons
+- Animated aurora/gradient background — slow-moving (15-20s cycle) hero animation; landing page and auth pages only, never dashboard
+- Depth layering system documentation — codify z-plane usage in `design-tokens.md`
 
-- Cross-location booking — availability fan-out across locations; very high complexity
-- Per-location Comgate payout accounts — Comgate multi-merchant configuration; not standard
-- Customer cohort retention analysis — needs 3+ months of data history to be meaningful
-- Overage billing — new metered billing concept; defer until subscription baseline is stable
-- Branch-level AI models — per-location training data required; insufficient data at v1.3 launch
-- Command palette (cmdk) — quality-of-life, not revenue-blocking
+**Defer (v1.5+ future consideration):**
 
-**CZ/SK market specifics that affect implementation:**
+- Mouse-tracking "flashlight" border effect — HIGH complexity JS `mousemove` implementation; high wow factor but adds JS dependency to card rendering
+- Per-company brand color glass interaction — complex CSS variable cascade; defer until brand customization feature is revisited
 
-- Slovak VAT is 20% (not Czech 21%) — invoice VAT rate must be configurable per company country; do not hardcode 21%
-- Czech B2B buyers require IČO on every invoice — extend existing invoice template, not new template
-- Subscription pause reduces seasonal churn — this is a retention priority, not a nice-to-have
-- Pricing at 490 Kč/1,490 Kč needs clear value justification in upgrade modals (AI features, multi-staff, multi-location)
+**Anti-features (explicit DO NOT BUILD list):**
 
-See `.planning/research/FEATURES.md` for full user flows, per-category complexity assessments, and cross-category dependency graph.
-
----
+- Glass on every surface simultaneously (destroys visual hierarchy; users cannot find primary actions)
+- Animated `backdrop-filter` blur values (not GPU-composited; causes layout repaint jank)
+- Glass on form inputs (ambiguity between editable field and decorative panel)
+- Glass on primary CTA buttons (Book, Save, Submit must be solid and high-contrast)
+- Glass on data table rows, chart canvases, or calendar cells (readability failure + GPU catastrophe)
+- Fully transparent dark mode panels below 50% opacity (invisible against near-black background)
+- Glass on the public booking widget (renders on unknown third-party backgrounds — glass picks up the host website's content behind it)
+- 3D perspective tilt on glass cards (known Chrome bug: `transform: perspective()` + `backdrop-filter` causes severe jank)
 
 ### Architecture Approach
 
-v1.3 is an **additive extension** of the existing architecture. The core constraint: never modify `findCompanyId()`, never change the JWT payload structure, and never add subqueries to RLS USING clauses.
+The glassmorphism system layers on top of the existing CSS variable + Tailwind architecture without breaking it. The integration follows a 3-layer token system that mirrors the pattern shadcn/ui already uses for `--card`, `--border`, etc. Glass is additive — never a global CSS variable mutation.
 
-**Multi-location model: organizations above companies (Option A — the only viable choice)**
+**Major components and responsibilities:**
 
-Add an `organizations` table above `companies`. A context-switch endpoint `POST /api/v1/auth/switch-location` validates the user belongs to the organization that owns the target company, then mints a new JWT with `company_id` scoped to the selected location. All 49 existing tables and all 29 RLS policies remain unchanged. Existing `findCompanyId()` function remains unchanged. `companies.organization_id` is added as a nullable FK — `NULL` means "standalone business" (single location), no data migration required.
+1. **`apps/web/app/globals.css`** — Primitive glass tokens (`--glass-bg-light`, `--glass-blur-sm/md/lg`, `--glass-border-light`, `--glass-shadow-light`) plus semantic aliases in both `:root` and `.dark`; `@media (prefers-reduced-transparency: reduce)` fallback to opaque `var(--card)`; `@supports (backdrop-filter: blur(1px))` guard for progressive enhancement; gradient mesh CSS via `gradient-mesh` class
+2. **`apps/web/tailwind.config.ts`** — Theme extends for `backdropBlur`, `backgroundColor`, `boxShadow`, `borderColor`, `backgroundImage` (gradient presets), `fontFamily` (Plus Jakarta Sans); registers new `glassPlugin`; adds shimmer and glass-in keyframes
+3. **`apps/web/lib/tailwind/glass-plugin.ts`** — NEW Tailwind plugin adding `.glass-surface`, `.glass-surface-subtle`, `.glass-surface-heavy`, `.gradient-mesh` utility/component classes with hardcoded pixel values (never CSS variables in webkit variant)
+4. **Modified shadcn components** (`card.tsx`, `button.tsx`, `dialog.tsx`) — CVA `glass` variant added; `defaultVariants: { variant: 'default' }` preserves all existing usage; `supports-[backdrop-filter]:` progressive enhancement on every glass class
+5. **New primitive components** (`glass-panel.tsx`, `gradient-mesh.tsx`) — new files only, nothing existing modified; unblock layout-level glass usage
+6. **Layout modifications** (`(marketing)/layout.tsx`, `(auth)/layout.tsx`, `(dashboard)/layout.tsx`) — gradient mesh as `fixed inset-0 -z-10` background (`background-image` only — does NOT create a stacking context); stacking context managed correctly so existing Radix UI Portals continue to layer above
 
-Option B (adding `parent_company_id` to `companies`) is explicitly ruled out: it forces recursive CTE queries on every aggregate, requires subqueries in all 29 RLS USING clauses (N×M performance regression invisible in dev), and necessitates modifications to all 127 existing API routes.
+**Glass intensity by section:**
 
-**Subscription invoices: separate table from `payments`**
-
-The existing `payments` table is FK-constrained to `bookings.id` as NOT NULL. Subscription charges have no associated booking. A separate `subscription_invoices` table is required. Mixing subscription billing into `payments` breaks the SAGA pattern's assumption that every payment maps to a booking.
-
-**Usage limits: inline checks in POST handlers, not Next.js middleware**
-
-`apps/web/middleware.ts` runs on every request including static asset serving. Checking subscription limits there is expensive and fragile — a middleware crash takes down the entire app. Instead: add `checkBookingLimit(companyId)` before booking creation logic, `checkEmployeeLimit(companyId)` before employee creation. Redis INCR as the fast counter; PostgreSQL as nightly reconciliation source.
-
-**Analytics: materialized views + BullMQ refresh + service-role connection for cross-location**
-
-Convert existing `v_daily_booking_summary` (regular view, recomputes on every query) to `mv_daily_booking_summary` (materialized, refreshed hourly by BullMQ). Franchise cross-location queries require a `db_service_role` connection with PostgreSQL `BYPASSRLS` attribute — the standard single-tenant RLS `db` client cannot aggregate across multiple `company_id` values. The `db_service_role` connection must never be exposed in user-facing API routes.
-
-**Major components and their v1.3 changes:**
-
-1. `apps/web` — new `/api/v1/billing/`, `/api/v1/organizations/`, `/api/v1/auth/switch-location/` route groups; extend `comgate/client.ts` with recurring functions; add `lib/limits/usage-checker.ts`; new `components/billing/`, `components/organization/` directories; extend `components/analytics/`
-2. `services/notification-worker` — add `subscription-renewal` and `mv-refresh` BullMQ queues; no new Railway service
-3. `packages/database` — new `schema/subscriptions.ts`; extend `schema/auth.ts` (organizations, organization_members); extend `schema/analytics.ts` (revenue_snapshots); modify `schema/views.ts` (materialized view)
-4. `packages/shared` — new `utils/tier-limits.ts`
-5. Comgate API — recurring billing (two-phase: `initRecurring=true` on first payment, `/v1.0/recurring` for subsequent charges)
-
-See `.planning/research/ARCHITECTURE.md` for data flow diagrams, full schema change summary, and migration strategy for existing data.
-
----
+| Section | Glass Intensity | Rationale |
+|---------|----------------|-----------|
+| Marketing landing | Medium (navbar + feature/pricing cards) | Maximum visual impact; users evaluating the product |
+| Auth pages | Heavy (single glass card, high opacity) | Glass card on gradient = immediate premium signal; `glass-surface-heavy` for form legibility |
+| Dashboard header | Subtle glass | Present but not distracting for daily-use interface |
+| Dashboard sidebar | SOLID — no glass | Text density and nav item readability; glass at nav-item text size causes legibility failure |
+| Dashboard KPI cards | Medium glass | Highest-visibility post-login elements; primary glass moment of the application |
+| Data tables, calendar cells, chart canvases | None — always opaque | Data readability cannot be compromised for aesthetic; calendar cells with glass = GPU catastrophe |
+| Modals and dialogs | Heavy glass | Canonical glassmorphism use case; single element visible in viewport during modal state |
 
 ### Critical Pitfalls
 
-**1. Comgate recurring requires manual merchant approval — contact them before coding starts.**
-Recurring is a separate API feature requiring explicit merchant-account activation (not auto-enabled). Missing this blocks all of Phase 1. Do not begin subscription implementation until Comgate confirms recurring is active on merchant account 498621. Timeline is unknown (days to weeks). Start this conversation immediately.
+1. **Glass on a solid background is invisible** — `backdrop-filter: blur()` blurs whatever is literally at the pixel level behind the element. The current `--background` (pure white / near-black) produces a washed-out semi-transparent panel indistinguishable from a plain card. Gradient mesh backgrounds are a hard prerequisite. Build backgrounds in Phase 1; glass components in Phase 2. Prevention: establish gradient mesh first and test blur visibility before any component work.
 
-**2. Multi-location must not break the single company_id JWT assumption.**
-Adding `parent_company_id` to `companies` forces subqueries inside all 29 RLS USING clauses — N×M performance regression that is invisible in development but catastrophic under production load. The fix: `organizations` entity above `companies`, explicit JWT context-switch endpoint. Never modify `findCompanyId()` to return multiple IDs.
+2. **Dark mode requires a completely different glass recipe** — `rgba(255,255,255,0.05)` on a near-black background produces a dark gray smear, not glass. Dark mode glass needs higher opacity fill (0.06-0.10 white), more prominent borders (borders carry most of the glass perception on dark backgrounds), and more saturated gradient orbs (0.20-0.35 opacity vs 0.10-0.15 in light mode). Always test on a standard Windows laptop display, not a calibrated developer monitor or Figma mockup.
 
-**3. Comgate webhook async race condition on subscription activation.**
-User pays → redirects to dashboard → webhook hasn't arrived yet → dashboard shows "Free plan" for 1-5 seconds. If a sync-on-return endpoint and the webhook both write `subscription_plan` simultaneously, you have a race condition. Fix: `subscription_events` log table for idempotency; `SELECT FOR UPDATE` on company row; frontend polls `/api/v1/billing/status` for up to 10 seconds after payment return.
+3. **`backdrop-filter` creates stacking contexts that break existing z-index** — Any element with `backdrop-filter` automatically creates a new CSS stacking context, trapping all child elements inside it. This silently prevents dropdowns, modals, and popovers from layering above the glass container regardless of z-index value. ScheduleBox has reservation modals, booking drawers, and calendar popovers at high risk. Prevention: prefer `::before` pseudo-element for the blur layer (does not create stacking context on the parent); verify all interactive overlays use Radix UI Portals (shadcn Dialog, Popover, DropdownMenu already do); conduct a z-index audit before Phase 1 touches any layout wrapper.
 
-**4. Retroactive usage limits will immediately block existing free users.**
-Deploying "Free: 50 bookings/month" using a 30-day lookback query locks out users who used the product freely during beta. Fix: add `billing_period_start` anchor column to `companies`; limits apply from the anchor date forward; announce with a 30-day grace period before enforcement. Never deploy limits without this anchor.
+4. **Safari requires `-webkit-backdrop-filter` with hardcoded pixel values** — Safari still requires the webkit prefix as of Safari 18.x. More critically, CSS custom properties fail silently inside `-webkit-backdrop-filter`: `backdrop-filter: blur(var(--glass-blur))` works in Chrome but the webkit version produces no blur in Safari. Prevention: always use Tailwind's `backdrop-blur-*` utilities where possible (they auto-prefix and hardcode values); in custom CSS always write both declarations with hardcoded pixel values, never CSS variables in the webkit property.
 
-**5. Franchise analytics cannot use the standard RLS db client.**
-The standard `db` client has `app.company_id` set for single-tenant isolation — cross-location aggregation silently returns data for only one location or throws RLS violations. Fix: separate `db_service_role` connection with `BYPASSRLS` for franchise/platform analytics only; always add explicit `WHERE company_id IN (...)` even with service role; log all service-role queries to `audit_logs`.
+5. **WCAG contrast failures are context-dependent and standard checkers miss them** — Text on glass panels over shifting gradient backgrounds fails contrast at some scroll positions and passes at others. Standard contrast checkers evaluate a fixed background and cannot detect this pattern. Prevention: add a semi-opaque `::before` scrim inside all glass panels (baked into `glass-surface` base class); use font-weight 500+ minimum on all glass surfaces; test with the brightest gradient orb positioned directly behind the text.
 
-**6. Invoice numbering race condition under concurrent recurring billing.**
-The existing `MAX(invoice_number) + 1` pattern works for sequential invoice creation but fails under concurrent subscription renewals (multiple companies billing simultaneously). The race produces a `23505` unique constraint violation and the invoice is silently not created. Fix: replace with a PostgreSQL SEQUENCE for all subscription invoice numbering.
+6. **Modifying `--card` globally contaminates all shadcn components** — Making `--card` semi-transparent makes error dialogs, popovers, command palettes, select menus, and toast notifications glass without any opt-out mechanism. Prevention: never modify `--card`, `--popover`, or any global shadcn token to semi-transparent values; create a separate `--glass-bg` token set applied exclusively via the `variant="glass"` prop on individual component instances.
 
-**7. Subscription cancellation must never delete user data.**
-Downgrading from 5 locations to a 1-location limit must soft-disable excess locations (`is_active = false`), never delete them. A 7-day grace period after subscription lapse before enforcement. A nightly job checks expired subscriptions; never delete on webhook receipt alone.
-
-See `.planning/research/PITFALLS.md` for detection signals, phase assignments, full prevention strategies, and the complete phase-specific warnings table.
-
----
+7. **GPU performance on mid-range devices** — `backdrop-filter` is 15-25% more GPU-intensive than solid surfaces; frame rates drop ~12fps per additional blur element on mid-range Android (the CZ/SK SMB market's dominant mobile device). Nested glass elements double the cost and produce muddy visual artifacts. Prevention: maximum 3-4 simultaneous glass elements per viewport; blur values 8-12px for production (20px+ is exponentially more expensive); sidebar stays solid (full-height backdrop-filter is borderline for any device); calendar cells stay opaque always; never animate `backdrop-filter` values directly.
 
 ## Implications for Roadmap
 
-Build order is imposed by data model and business logic dependencies. Subscription billing is the unlock for all other features.
+The research establishes a clear dependency chain: tokens before components, components before pages, dashboard before marketing (higher complexity, more active users), auth last (simplest structure). The entire overhaul is 4-5 phases of frontend-only work with no backend, database, API, or RabbitMQ changes required.
 
-### Phase 1: Subscription Billing Infrastructure
+### Phase 1: Token Foundation and Background System
 
-**Rationale:** Everything else — usage prompts, upgrade flows, platform admin dashboard — requires a subscription record per company. This also has the longest external dependency (Comgate approval); it must start first. The subscription state machine is the most complex piece in all of v1.3.
+**Rationale:** Glass is invisible without a gradient background. Dark mode glass fails without separate tokens. Both are hard prerequisites for every subsequent phase. This phase produces zero visible user-facing output — it is pure CSS/config infrastructure. Doing any component work before this phase is complete means all visual testing is invalid.
 
-**Delivers:** Working monthly subscription billing. Companies subscribe, pay via Comgate, auto-renew monthly via BullMQ cron job, receive dunning emails on failure (4 retries over 14 days), and get downgraded to Free after grace period. Invoice PDFs generated and emailed. Plan column in `companies` is now enforced by actual billing state, not just a string.
+**Delivers:** `globals.css` with full glass token system (primitives + semantic aliases + both `:root` and `.dark`), `tailwind.config.ts` extensions (backdropBlur, boxShadow, backgroundImage, fontFamily), `glass-plugin.ts` with `.glass-surface`/`.glass-surface-subtle`/`.glass-surface-heavy`/`.gradient-mesh` utilities, `prefers-reduced-transparency` fallback and `@supports` guard baked into every glass class definition, Plus Jakarta Sans font swap in `layout.tsx`.
 
-**Features addressed:** Comgate recurring integration, subscription lifecycle state machine, renewal job, dunning flow, grace period enforcement, plan upgrade/downgrade UI, proration on upgrade, subscription invoice PDF (Czech-compliant), payment history page, cancellation flow with "pause" option for seasonal businesses.
+**Addresses:** Gradient background system, dark mode glass tokens, responsive glass degradation (CSS `@media` ships here in `globals.css`), font upgrade
 
-**Pitfalls to avoid:** Contact Comgate before sprint starts (Pitfall 3); implement `subscription_events` idempotency table + `SELECT FOR UPDATE` for webhook race condition (Pitfall 4); use PostgreSQL SEQUENCE for invoice numbering (Risk Area 2); soft-disable on downgrade, never delete (Risk Area 5); update `companies.subscription_plan` CHECK constraint if plan names change (Minor 4).
+**Avoids:** Pitfall 1 (invisible glass on solid background), Pitfall 2 (dark mode muddy glass), Pitfall 11/next-themes hydration mismatch (pure-CSS dark: variant pattern established from day one), Pitfall 12 (reduced-transparency accessibility established before any glass component ships)
 
-**Research flag:** MEDIUM confidence on exact Comgate REST API parameter names — inferred from PHP SDK (`setInitRecurring` → `initRecurring=true`). Verify in Comgate sandbox against live REST endpoint before building the renewal job. If sandbox does not support recurring, test in production with a real card.
+**Research flags:** Standard patterns. Official Tailwind docs, MDN, and the codebase's existing CSS variable architecture are sufficient. No additional research phase needed.
 
-**Duration estimate:** 5-7 days (3-4 DB/API, 2-3 frontend)
+### Phase 2: Primitive Components and shadcn Variants
 
----
+**Rationale:** New `glass-panel.tsx` and `gradient-mesh.tsx` components must exist before pages use them. The CVA variant additions to `card.tsx`, `button.tsx`, `dialog.tsx`, and `badge.tsx` must be TypeScript-verified and cross-browser-tested before any page references `variant="glass"`. The webkit prefix pattern, `overflow:hidden` cross-browser fix, stacking context rules, and performance budget must be locked in here before the patterns propagate across the codebase.
 
-### Phase 2: Usage Limits and Tier Enforcement
+**Delivers:** `glass-panel.tsx`, `gradient-mesh.tsx`, CVA `glass` variant on Card/Button/Dialog/Badge, hardcoded webkit prefixes in every glass surface class, `supports-[backdrop-filter]` progressive enhancement on all glass classes, `mask-image` pattern for rounded glass card border-radius clipping (avoids `overflow:hidden` Chrome bug), performance budget established and documented (max 3-4 glass elements per viewport).
 
-**Rationale:** Billing must exist first so upgrade prompts have a real destination. This phase closes the upgrade loop — users hit a limit, see a contextual upgrade modal, and can actually pay. Without billing, limits are enforced but no upgrade path exists.
+**Addresses:** Glass card base class, glass modal/dialog overlay, hover glass intensify (on Card glass variant), glass badge/status pill
 
-**Delivers:** All plan tier limits enforced server-side via inline POST handler checks. Free users see a usage meter in the dashboard sidebar and contextual upgrade prompts at 80% and 100% thresholds. API returns HTTP 402 with `{ error: "PLAN_LIMIT_EXCEEDED", code: "BOOKING_LIMIT_REACHED", details: { current, limit, plan, upgrade_url } }`. Frontend `UpgradeModal` catches 402 and shows plan comparison with usage context. AI features gated on Growth+ plan. Redis INCR as fast counter with 32-day TTL; PostgreSQL as nightly reconciliation source.
+**Avoids:** Pitfall 3 (WCAG contrast — `::before` scrim baked into `glass-surface`), Pitfall 5 (Safari webkit prefix — hardcoded pixel values in plugin), Pitfall 6 (stacking context — `::before` approach + Portal verification for shadcn interactive components), Pitfall 7 (`overflow:hidden` cross-browser — `mask-image` workaround established in base class), Pitfall 10 (global CSS variable contamination — `--card` stays opaque)
 
-**Features addressed:** Server-side entitlement check, booking count metering, staff count limit, location count limit, AI feature gating, upgrade modal with contextual copy, usage visible to user, 80% threshold warning banner.
+**Research flags:** The `overflow: hidden` + `backdrop-filter` cross-browser interaction (Pitfall 7 / Chrome vs Firefox difference) should be validated with a minimal test component in Chrome, Firefox, and Safari before the `glass-surface` base class is finalized. A broken base class after 50+ usages is expensive to recover from.
 
-**Pitfalls to avoid:** Retroactive limits blocking existing users — add `billing_period_start` to `companies` and enforce grace period (Pitfall 5); inline checks in POST handlers not in Next.js middleware (Anti-pattern 3); Redis INCR not DB COUNT on the booking creation hot path (Anti-pattern 4); feature-flag UI must sync via React Query (stale time 5 min, invalidate on billing action), not just Zustand auth state (Risk Area 3).
+### Phase 3: Dashboard Glass Application
 
-**Research flag:** Standard patterns. No additional research needed.
+**Rationale:** Dashboard is the highest time-on-page section and has the highest implementation complexity (z-index interactions with existing calendar popovers, booking drawers, and reservation modals). Doing dashboard before marketing means stacking context issues are caught and resolved before marketing repeats the same patterns. KPI cards are the primary glass moment for daily users and the highest-impact single change.
 
-**Duration estimate:** 2-3 days
+**Delivers:** `stat-card.tsx` → `Card variant="glass"`, `header.tsx` → `glass-surface-subtle`, `(dashboard)/layout.tsx` → subtle gradient mesh at 40% opacity with correct stacking context, gradient text on dashboard welcome heading. Pre-implementation z-index audit of all dashboard overlays (reservation modal, booking drawer, calendar popover, dropdown menus) completed and documented.
 
----
+**Addresses:** Glass KPI cards on dashboard, frosted dashboard header bar, gradient text for dashboard section headers
 
-### Phase 3: Multi-Location Organizations
+**Avoids:** Pitfall 4 (GPU performance — KPI cards are the glass limit; sidebar and all data tables stay opaque), Pitfall 6 (stacking context — pre-implementation z-index audit before layout changes), Pitfall 8 (data table and calendar readability — explicit exclusion list enforced as bugs), Pitfall 9 (visual hierarchy collapse — primary CTAs stay solid)
 
-**Rationale:** Architecturally independent of billing but highly complex. Required before cross-location analytics can be built. Critical for Enterprise/AI-Powered tier upsell ("upgrade to manage up to 50 locations"). Placed after billing so the subscription plan can gate how many locations a company can create.
+**Research flags:** MEDIUM complexity. The `(dashboard)/layout.tsx` stacking context change can affect z-index of calendar popovers, booking detail drawers, and the reservation modal. Manual verification of each overlay interaction is required before the phase is marked complete. This should be an explicit checklist item in the phase plan.
 
-**Delivers:** `organizations` and `organization_members` tables with Drizzle migration. Nullable `organization_id` FK on `companies` (NULL = standalone business, existing companies unaffected). Location switcher dropdown in app nav. `POST /api/v1/auth/switch-location` JWT context exchange endpoint. Central admin (`org_owner`) and location manager (`location_manager`) RBAC roles (location managers cannot see other locations' data — RLS enforced via single company_id JWT). Per-location working hours, staff assignment, service price overrides. Location creation wizard with public booking URL `/book/[company-slug]/[location-slug]`.
+### Phase 4: Marketing Pages Glass Application
 
-**Features addressed:** Location entity, location switcher UI, per-location working hours/staff/services, central admin role, location manager role, aggregated analytics preparation, customer unified profile (`master_customer_id` nullable FK for cross-location deduplication).
+**Rationale:** Marketing pages use the same patterns established in Phase 3 but with heavier glass intensity — this is where prospects evaluate the product before purchasing. The gradient mesh background, glass navbar, and glass pricing cards have the highest conversion-impact potential. The animated aurora background (P2) lands here as the most appropriate context.
 
-**Pitfalls to avoid:** Never add `parent_company_id` to `companies` (Pitfalls 1 and 2 — breaks RLS and all 127 routes); JWT context-switch must validate org membership before issuing new token — cross-tenant access is a critical security boundary; multi-location customer deduplication requires `master_customer_id` FK to avoid inflated CRM counts (Risk Area 4); all new tables need RLS policies in `policies.sql` AND a dedicated `0002_v13_rls_policies.sql` migration (Risk Area 1).
+**Delivers:** `(marketing)/layout.tsx` → gradient mesh background with correct stacking context (verified not to clip MobileNav), `marketing-navbar.tsx` → `glass-surface` token replacing the existing ad-hoc glass implementation, feature/pricing/testimonial cards → `glass-surface-subtle`, hero `<h1>` → gradient text, animated aurora background CSS keyframe animation on hero section, glass pricing card treatment (featured tier gets `glass-surface`, others get `glass-surface-subtle`).
 
-**Research flag:** The JWT context-switch security boundary has no documented precedent in this codebase. Write an integration test that verifies: (a) switching to a company owned by a different organization is rejected with 403, (b) after a valid switch, all queries are scoped to the new company_id only.
+**Addresses:** Glass navigation, gradient text for landing hero `<h1>`, animated aurora background (P2 — lands here as marketing polish), glass feature and pricing cards
 
-**Duration estimate:** 5-7 days (highest complexity in v1.3)
+**Avoids:** Pitfall 6 (stacking context — `gradient-mesh` uses only `background-image`, which does NOT create a stacking context; MobileNav slide-over must be verified), Pitfall 9 (conversion CTAs remain solid; glass is decorative only on marketing pages)
 
----
+**Research flags:** LOW complexity relative to dashboard. The `MobileNav` component stacking context interaction must be verified — the `fixed inset-0 -z-10` gradient mesh approach is documented as safe because `background-image` alone does not create a stacking context, but the actual MobileNav slide-over should be manually tested before marking the phase complete.
 
-### Phase 4: Analytics Dashboards
+### Phase 5: Auth Pages and Polish Pass
 
-**Rationale:** Depends on subscription billing (for platform admin MRR/ARR metrics) and benefits from the multi-location org model (for cross-location aggregations). Analytics justify premium tier price points and surface AI model value tangibly.
+**Rationale:** Auth pages have the simplest structure (single form card on gradient background) and are the lowest-risk glass application. The polish pass (entrance animations, glass shimmer loading, glass tooltip, depth layering documentation) completes v1.4.
 
-**Delivers:** Owner business dashboard with 4 KPI cards (revenue, bookings count, new customers, no-show rate), revenue-over-time chart with period comparison, top services/staff tables, peak hours heatmap, occupancy rate (booked/available slots), date range filter, CSV export. Platform admin dashboard with MRR/ARR, new MRR, churned MRR, plan distribution, active companies. Cross-location aggregate view for franchise owners (using `db_service_role` connection). Materialized view `mv_daily_booking_summary` with hourly BullMQ refresh. `revenue_snapshots` table populated by monthly BullMQ job for fast historical trend queries.
+**Delivers:** `(auth)/layout.tsx` → gradient mesh + `Card variant="glass"` with `glass-surface-heavy` for maximum form legibility, entrance animations on auth card, entrance animations on dashboard KPI cards (stagger 50ms per card), glass shimmer loading skeleton replacing flat `PageSkeleton` in glass contexts, glass tooltip style override for shadcn Tooltip, `design-tokens.md` documenting the z-plane depth layering system.
 
-**Features addressed:** Revenue over time, bookings/cancellation rate, no-show rate, top services/staff, new vs returning customer ratio, peak hours heatmap, occupancy rate, MRR/ARR tracking, plan distribution, multi-location comparison.
+**Addresses:** Auth form glass card, entrance animations (P2), glass shimmer loading (P2), glass tooltip (P2), depth layering documentation (P2)
 
-**Deferred from this phase:** Customer cohort retention analysis (needs data history), AI prediction overlay on revenue chart (needs trained forecasting model, already built in Phase 23).
+**Avoids:** Pitfall 3 (WCAG on auth form — `glass-surface-heavy` is highest opacity variant; form inputs inside the auth card remain opaque — glass is the card wrapper only, never the inputs themselves), Pitfall 9 (primary submit buttons in auth forms stay solid)
 
-**Pitfalls to avoid:** All analytics reads should route to a PostgreSQL read replica if available — if not, rely on materialized views with strict 90-day max query range (Pitfall 6); franchise aggregation must use `db_service_role` connection, never the RLS-scoped `db` client (Pitfall 7 / Risk Area 7); always use `REFRESH MATERIALIZED VIEW CONCURRENTLY` — requires unique index on view from day 1 (Minor 2); Drizzle Kit does not support materialized view schema pushes — must use raw SQL migration file (Drizzle issue #1787).
-
-**Research flag:** Occupancy rate is HIGH complexity — requires computing total available slots from working hours minus blocked time. May need to simplify to an approximation for v1.3 and deliver exact calculation in v1.4. Needs product decision before implementation starts.
-
-**Duration estimate:** 3-4 days
-
----
-
-### Phase 5: Frontend Polish and Design System
-
-**Rationale:** Polish should happen last, on pages built in Phases 1-4. Polishing a billing settings page that doesn't exist yet wastes effort. The highest-impact areas are the pages subscription/billing build touched — they justify the CZK 2,990/month price point and must feel premium.
-
-**Delivers:** Consistent loading states on all async actions (no double-submit). Skeleton loaders replacing spinner patterns on main list pages. Empty states with action CTAs on all previously-blank views. Error states with inline explanatory text (not just red borders) on all forms. Dark mode via Tailwind CSS variable flip + system preference detection. Design token additions for plan tier colors (free/essential/growth/ai-powered) and semantic states (warning, success). Typography/spacing consistency audit. Button state completeness (default/hover/active/disabled/loading). Mobile calendar responsiveness at 375px and 768px (tablet-first). `shadcn chart` component scaffolded via CLI.
-
-**Highest-impact polish areas (in priority order):** (1) Dashboard — first screen owners see daily, must be scannable in 5 seconds. (2) Booking creation flow — primary value entry point, zero friction tolerance. (3) Settings/Plan page — where subscription decisions happen, must feel premium and trustworthy. (4) Public booking widget — customer-facing, embeds on owner sites. (5) Mobile calendar view — salon owners check their schedule on mobile constantly.
-
-**Pitfalls to avoid:** shadcn `toast` vs `sonner` conflict — audit before adding new components (Minor 3); all new pages need Czech/Slovak/English translation keys added to message files before merge — never ship a feature with hardcoded English strings in a Czech UI (Risk Area 6); React Query stale time for subscription status should be 5 minutes, invalidated on billing action, not 0 (Minor 5); update next-intl middleware matcher when adding new route segments.
-
-**Research flag:** Standard patterns. No additional research needed.
-
-**Duration estimate:** 3-4 days (highest ROI when run concurrently on pages being touched by other phases)
-
----
+**Research flags:** LOW. Auth pages are the simplest structure in the codebase. Entrance animations follow the existing `motion` patterns already in use on the landing page testimonial section.
 
 ### Phase Ordering Rationale
 
-- Phase 1 before Phase 2: upgrade prompts require an active billing flow as their destination
-- Phase 1 before Phase 4 (admin dashboard): MRR/ARR metrics require subscription records to exist
-- Phase 3 before Phase 4 (cross-location analytics): organization model must be live before cross-location aggregations
-- Phase 3 after Phase 1 is stabilized: avoids concurrent schema migrations across two complex feature areas
-- Phase 5 runs concurrently with other phases on touched pages, but settings/plan polish gates on Phase 1 being complete
+- **Tokens before components:** `var(--glass-bg)` must be defined before any component references it; undefined CSS variables silently produce `initial` value (transparent), making effects invisible and debugging confusing
+- **New components before page modifications:** Verifies the glass system works in isolation before touching pages with existing user traffic
+- **Dashboard before marketing:** Higher complexity z-index interactions and more active daily users; catch and resolve stacking context issues before they propagate
+- **Auth last:** Simplest page structure, single card component, easiest WCAG verification
+- **No backend changes in any phase:** This is exclusively frontend — no API routes, database migrations, RabbitMQ events, or microservice changes required
 
 ### Research Flags
 
-**Needs careful verification before building:**
+Phases needing closer attention during execution:
 
-- **Phase 1 (Comgate recurring API):** MEDIUM confidence on REST parameter names — inferred from PHP SDK. Verify exact field names (`initRecurring` vs `recurrence=ON` vs another variant) in Comgate sandbox or by asking Comgate support directly. Build the renewal job only after confirming parameter names from a live API response.
-- **Phase 3 (JWT context-switch security):** No documented precedent in this codebase. Write an integration test for cross-org access rejection before merging any multi-location code to main.
-- **Phase 4 (occupancy rate calculation):** HIGH complexity — requires working hours minus blocked time divided by average service duration. Scope this explicitly in the phase plan and be prepared to ship an approximation.
+- **Phase 3 (Dashboard):** The `(dashboard)/layout.tsx` stacking context change is medium-risk. Calendar popovers, booking detail drawers, and the reservation modal must each be manually tested before the phase is marked complete. An explicit overlay interaction checklist should be part of the phase plan.
+- **Phase 2 (Components):** The `overflow: hidden` + `backdrop-filter` cross-browser interaction (Chrome clips blur before applying; Firefox sticky + overflow bug at Bugzilla #1803813) should be validated with a minimal isolated test component before the `glass-surface` base class is finalized.
 
-**Standard patterns (skip additional research):**
+Phases with well-established patterns (no additional research needed):
 
-- **Phase 2 (usage limits):** Redis INCR counter pattern is well-documented; existing `ioredis` client is already configured.
-- **Phase 4 (materialized views):** Drizzle Kit caveat (manual SQL migration) is a known constraint. `CONCURRENTLY` + unique index pattern is standard.
-- **Phase 5 (dark mode):** Tailwind CSS variable flip + shadcn `class="dark"` is fully documented and already partially supported.
-
----
-
-## Business Blockers
-
-These are not technical decisions. They must be resolved before implementation begins.
-
-| Blocker | Owner | Impact | Action |
-|---------|-------|--------|--------|
-| **Comgate recurring activation** | Business team contacts Comgate support | Blocks Phase 1 entirely | Contact Comgate immediately for merchant 498621. Ask about sandbox support for recurring. Get timeline in writing. |
-| **Subscription plan name canonicalization** | Product | Blocks Phase 1 schema migration | DB has `free/starter/professional/enterprise`; docs reference `free/essential/growth/ai_powered`. The CHECK constraint on `companies.subscription_plan` must be updated before any subscription records are created. Decide canonical names before Phase 1 migration runs. |
-| **Existing user limits grace period** | Business/product | Blocks Phase 2 deployment | Decide: do existing free users get grandfather period, or immediate enforcement from `billing_period_start`? Research recommends 30-day announced grace period. Must be confirmed before Phase 2 ships. |
-| **Czech VAT registration status** | Business/legal | Affects invoice templates | Slovak companies pay 20% VAT (not 21%). Invoice VAT rate must be configurable per company country. Legal must confirm the approach for mixed CZ/SK customer base. |
-| **GDPR vs 10-year invoice retention conflict** | Legal | Affects subscription data deletion flow | User right-to-erasure conflicts with Czech 10-year invoice retention law. Need legal guidance on what can be anonymized vs. what must be retained before implementing subscription cancellation data cleanup. |
-
----
-
-## Open Questions
-
-Questions that must be answered before or during implementation to avoid rework.
-
-| Question | Phase | How to Resolve |
-|----------|-------|----------------|
-| What are the exact Comgate recurring REST API parameter names? | Phase 1 | Test in Comgate sandbox. PHP SDK: `setInitRecurring(true)` → REST likely `initRecurring=true`. Verify before coding renewal job. |
-| Does the Comgate sandbox support recurring payments for testing? | Phase 1 | Ask Comgate support when requesting activation. If sandbox does not support it, plan for production testing with a real card. |
-| What canonical plan names does the business want? | Phase 1 | Confirm before running schema migration. If renaming `starter` → `essential`, the CHECK constraint and all plan comparison logic must update atomically. |
-| Are existing free users grandfathered or immediately limited? | Phase 2 | Business decision. Research strongly recommends `billing_period_start` anchor + 30-day grace period announcement. Must be confirmed before Phase 2 deploys. |
-| How should cross-location customer deduplication work at launch? | Phase 3 | Research recommends `master_customer_id` nullable FK with email-based deduplication. The alternative (leaving duplicates) produces inflated CRM counts and broken loyalty points. Needs product decision. |
-| Should occupancy rate ship in v1.3 or be deferred? | Phase 4 | Occupancy rate is HIGH complexity. If deferred, the 4 KPI cards become 3 (revenue, bookings count, no-show rate, new customers). Needs product decision before Phase 4 planning. |
-| Is a PostgreSQL read replica available on Railway for analytics? | Phase 4 | Check Railway plan. If unavailable, analytics must rely entirely on materialized views + strict 90-day query limit. |
-
----
+- **Phase 1 (Tokens):** Pure CSS and Tailwind config. Official Tailwind docs, MDN, and the codebase's existing CSS variable architecture are sufficient guides.
+- **Phase 4 (Marketing):** Same patterns as Phase 3, lower complexity. `fixed inset-0 -z-10` gradient mesh approach is verified safe from the architecture research.
+- **Phase 5 (Auth + Polish):** Simplest page structure; entrance animations follow existing `motion` patterns in the project.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Zero new packages. All additions are extensions of verified existing dependencies. Version matrix confirmed against npm registry. recharts 3.x migration notes apply if any v1.2 charts were built on 2.x patterns. |
-| Features | MEDIUM-HIGH | SaaS billing patterns HIGH (Stripe/Chargebee docs, multiple authoritative sources). Comgate-specific flows MEDIUM (docs behind auth, PHP SDK inference). Czech invoice law HIGH (Eurofiscalis official source). CZ/SK market pricing psychology MEDIUM (competitor research). |
-| Architecture | HIGH | All architectural constraints verified against live codebase: `tenant-scope.ts` (single company_id return), `policies.sql` (FORCE ROW LEVEL SECURITY), `jwt.ts` (single company_id in payload), `payments.ts` (booking_id NOT NULL confirms separate subscription_invoices needed), `views.ts` (current regular pgView). Multi-location option analysis is definitive. |
-| Pitfalls | HIGH | Most pitfalls based on direct codebase inspection. RLS performance regression: PostgreSQL documentation + AWS blog. Webhook race condition: Stripe/billing documentation + existing webhook handler inspection. Invoice race condition: direct inspection of `createInvoiceForPayment` pattern. Comgate pitfalls: MEDIUM (SDK inference). |
+| Stack | HIGH | Zero new packages confirmed against official Tailwind docs, Next.js docs, MDN, and caniuse.com. Tailwind v3.4.5 PR #13997 webkit prefix confirmed merged. Plus Jakarta Sans via `next/font/google` verified against Google Fonts and Next.js docs. |
+| Features | HIGH | Glassmorphism patterns well-documented across NNG, Axess Lab, WCAG, Framer, and multiple implementation guides. Anti-feature exclusions backed by NNG usability research and GPU performance data. Feature prioritization is consistent across all sources. |
+| Architecture | HIGH | Token system is based on the existing working shadcn/ui CSS variable pattern in the codebase, verified by direct code read. CVA variant addition verified against existing `buttonVariants` pattern. ThemeProvider hydration behavior verified against `app/providers.tsx` and `theme-toggle.tsx` in the codebase. All layout files read directly. |
+| Pitfalls | HIGH | Backed by MDN, NNG, Chrome DevRel, Axess Lab, Josh Comeau, Bugzilla, and browser bug trackers. Safari CSS variable bug in `backdrop-filter` documented at MDN browser-compat-data #25914. Stacking context behavior documented in CSS specification and Chromium source. |
 
-**Overall confidence: HIGH**
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Comgate recurring REST parameter names:** Inferred from PHP SDK. Must be verified in sandbox before building the renewal job. If the REST field names differ from PHP SDK method names, only the `chargeComgateRecurring()` function body changes — the interface contract stays stable.
-- **Railway read replica availability:** Determines analytics architecture. If unavailable, materialized views + 90-day query limit is the fallback. Check Railway plan before Phase 4 planning.
-- **Plan name canonicalization:** DB has `starter/professional/enterprise`; research docs use `essential/growth/ai_powered`. This is a one-time migration decision — once subscription records exist with plan names in them, renaming becomes a multi-table migration. Must be resolved before any Phase 1 schema work.
-- **GDPR retention conflict for cancelled subscriptions:** No technical solution until legal decides on anonymization vs. retention policy. Implement subscription cancellation with soft-delete only; defer data cleanup logic until legal guidance is received.
-
----
+- **GPU performance benchmarks are hardware-dependent:** The "12fps drop per glass element on mid-range Android" figure is qualitative consensus across sources, not measured on ScheduleBox specifically. The glass performance budget (max 3-4 elements per viewport, 8-12px blur) is the correct preventive measure. Actual performance must be validated on a real mid-range Android device during Phase 3.
+- **`prefers-reduced-transparency` browser support is incomplete:** Chrome 118+ and Edge 118+ support it; Firefox is behind a flag; Safari does not support it. The `@supports (backdrop-filter: blur(1px))` guard provides reliable cross-browser fallback. The reduced-transparency-specific behavior is best-effort for Chrome/Edge users only as of early 2026.
+- **Animated aurora background detail not fully designed:** The aurora animation is P2 and scoped to marketing pages only. Implementation complexity is MEDIUM (CSS `@keyframes` on `background-position`). Mobile performance impact should be tested before enabling — the slow 15-20s cycle is intentionally low-cost but requires validation.
+- **Plus Jakarta Sans rendering on Windows:** Variable fonts render slightly differently between macOS and Windows ClearType. The font was selected for Google Fonts availability and `next/font/google` compatibility — validate the weight rendering at 14px and 16px on a Windows display before finalizing.
 
 ## Sources
 
 ### Primary (HIGH confidence)
 
-- ScheduleBox codebase — `packages/database/src/rls/policies.sql` (direct inspection 2026-02-24)
-- ScheduleBox codebase — `apps/web/lib/db/tenant-scope.ts` (direct inspection 2026-02-24)
-- ScheduleBox codebase — `apps/web/app/api/v1/payments/comgate/client.ts` (direct inspection 2026-02-24)
-- ScheduleBox codebase — `packages/database/src/schema/auth.ts`, `payments.ts`, `analytics.ts`, `views.ts` (direct inspection 2026-02-24)
-- ScheduleBox codebase — `apps/web/lib/auth/jwt.ts` (direct inspection 2026-02-24)
-- Comgate PHP SDK — github.com/comgate-payments/sdk-php (`setInitRecurring`, `initRecurringPayment` confirmed)
-- recharts ^3.7.0 — https://www.npmjs.com/package/recharts
-- shadcn/ui Chart component — https://ui.shadcn.com/docs/components/radix/chart
-- BullMQ CronScheduler — https://docs.bullmq.io/guide/job-schedulers
-- PostgreSQL materialized views — https://www.postgresql.org/docs/current/sql-refreshmaterializedview.html
-- Drizzle ORM materialized view issue #1787 — confirmed Drizzle Kit does not support MV introspect
-- Drizzle ORM views docs — https://orm.drizzle.team/docs/views (`pgMaterializedView()` API verified)
-- Eurofiscalis Czech invoice requirements — https://www.eurofiscalis.com/en/invoicing-in-czech-republic/
-- AWS multi-tenant RLS — https://aws.amazon.com/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/
-- Billing webhook race condition — https://excessivecoding.com/blog/billing-webhook-race-condition-solution-guide
-- @react-pdf/renderer App Router crash fix — github.com/diegomura/react-pdf/issues/2460
+- Tailwind CSS v3 official docs (tailwindcss.com, v3.tailwindcss.com) — `backdrop-blur-*` utilities, plugin API (`addUtilities`, `addComponents`), `supports-[backdrop-filter]` modifier, JIT purging behavior
+- Tailwind PR #13997 — confirms auto `-webkit-backdrop-filter` generation in v3.4.5+ (merged July 13, 2024)
+- Next.js Font Optimization docs (nextjs.org) — `Plus_Jakarta_Sans` import name, variable font loading, self-hosting behavior via `next/font/google`
+- MDN Web Docs — `backdrop-filter`, `prefers-reduced-transparency`, `-webkit-backdrop-filter` still required for Safari, `mask-image` for border-radius clipping
+- MDN browser-compat-data issue #25914 — confirms CSS variables fail inside `-webkit-backdrop-filter` in Safari (unresolved as of research date)
+- WCAG 2.1/2.2 contrast requirements (WebAIM) — 4.5:1 normal text, 3:1 large text and UI elements
+- Nielsen Norman Group — Glassmorphism: Definition and Best Practices (nngroup.com) — visual hierarchy and anti-feature rationale
+- Axess Lab — Glassmorphism Meets Accessibility (axesslab.com) — WCAG contrast failures, `prefers-reduced-transparency` requirements
+- Chrome for Developers — `prefers-reduced-transparency` (developer.chrome.com) — browser support matrix
+- Josh W. Comeau — Next-level frosted glass with backdrop-filter (joshwcomeau.com) — stacking context and blur behavior deep dive
+- Behance — "X: AI Tech Start-Up" design reference — primary visual reference reviewed and approved by project EP
+- WebAIM — WCAG 2.1 Contrast Requirements — official accessibility standard
+- Framer Blog — Shimmer effect techniques — Framer Motion shimmer animation pattern
+- Bugzilla #1803813 — Firefox bug: backdrop-filter fails on `position: sticky` with ancestor `overflow` + `border-radius`
+- Codebase (direct reads): `apps/web/app/globals.css`, `tailwind.config.ts`, `components/ui/button.tsx`, `components/ui/card.tsx`, `app/providers.tsx`, `components/ui/theme-toggle.tsx`, `app/[locale]/(dashboard)/layout.tsx`, `app/[locale]/(marketing)/layout.tsx`, `components/layout/header.tsx`
 
 ### Secondary (MEDIUM confidence)
 
-- Comgate recurring payments help — https://help.comgate.cz/docs/en/recurring-payments (403 during research fetch; confirmed via search result snippets and PHP SDK)
-- Comgate API docs — https://apidoc.comgate.cz/en/api/rest/ (content not directly accessible)
-- Fresha multi-location — https://www.fresha.com/blog/easy-ways-to-manage-multiple-locations
-- Pabau multi-location scheduling — https://pabau.com/blog/multi-location-scheduling-software/
-- Stigg usage-based pricing guide — https://www.stigg.io/blog-posts/beyond-metering-the-only-guide-youll-ever-need-to-implement-usage-based-pricing
-- Stripe subscription upgrade/downgrade — https://docs.stripe.com/billing/subscriptions/upgrade-downgrade
-- Chargebee proration — https://www.chargebee.com/subscription-management/handle-prorations/
-- Kinde dunning strategies — https://kinde.com/learn/billing/churn/dunning-strategies-for-saas-email-flows-and-retry-logic/
-- SaaS KPI dashboard metrics — https://www.hubifi.com/blog/saas-kpi-dashboard-metrics
-- PostgreSQL materialized view benchmark (28s → 180ms) — https://stormatics.tech/blogs/postgresql-materialized-views-when-caching-your-query-results-makes-sense
+- caniuse.com (backdrop-filter) — 95.76% global support; Chrome 76+, Firefox 103+, Safari 9+, Edge 17+
+- Epic Web Dev — Glassmorphism with Tailwind CSS — confirms `bg-white/10 backdrop-blur-lg` Tailwind pattern
+- glasscn-ui GitHub (itsjavi/glasscn-ui) — confirms it excludes Calendar, Charts, Form, Sonner (components ScheduleBox uses)
+- LogRocket — Glassmorphism CSS implementation — stacking context and dark mode guidance
+- Half Accessible — Glassmorphism Implementation Guide 2025 — blur value performance guidelines (8-15px threshold)
+- shadcn/ui GitHub issue #327 — backdrop-filter performance concerns with shadcn/ui
+- Motion library docs (motion.dev) — spring transitions, `whileHover`, `initial`/`animate` API
+- FlyonUI — Glassmorphism with Tailwind CSS guide — dark mode notes
+- UX Pilot — 12 Glassmorphism UI Features and Best Practices — aggregated industry research
+- LogRocket — What is glassmorphism? — UX context
+- Half Accessible Playground — Glassmorphism Implementation Guide 2025 — `@supports` feature detection pattern
+- Havn Blog — Chromium and Nested Backdrop-Filters — nested glass anti-pattern
+- Alpha Efficiency — Dark Mode Glassmorphism Tips — dark mode opacity and border guidance
+- Vercel Academy — Extending shadcn/ui with CVA variant patterns — CVA addition documentation
+
+### Tertiary (LOW confidence)
+
+- Medium/@developer_89726 — Dark Glassmorphism 2026 (single source, not independently verified; recommendations corroborated by higher-confidence sources)
+- Everyday UX — Glassmorphism in 2025: Apple Liquid Glass (GPU performance data is qualitative; not independently measured)
+- Innoraft — Glassmorphism for Enterprise UI (conceptual; not implementation-verified)
 
 ---
 
-_Research completed: 2026-02-24_
+_Research completed: 2026-02-25_
 _Ready for roadmap: yes_
