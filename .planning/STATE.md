@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
 - **Phase:** 33 of 37 (Token Foundation and Background System)
-- **Plan:** 0 of TBD — ready to plan
-- **Status:** Ready to plan
-- **Last activity:** 2026-02-25 — v1.4 roadmap created, Phase 33 ready
+- **Plan:** 1 complete — 33-01 done
+- **Status:** In progress
+- **Last activity:** 2026-02-25 — 33-01 complete (glass CSS token foundation)
 
-Progress: [░░░░░░░░░░] 0% (v1.4)
+Progress: [░░░░░░░░░░] 5% (v1.4)
 
 ## What's Done
 
@@ -31,6 +31,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 **v1.4 design direction (Decision 16):** Glassmorphism + Behance blue #0057FF. Zero new npm packages — existing Tailwind 3.4.5, motion, CVA, next-themes, next/font/google are sufficient. Glass applied additively via `variant="glass"` CVA prop — never by mutating `--card` or other global shadcn tokens.
 
 **v1.4 exclusions:** No glass on sidebar (legibility), data tables, calendar cells, chart canvases, form inputs, primary CTA buttons, or public booking widget. No animated backdrop-filter values. No 3D perspective tilt on glass cards. No backend changes.
+
+**33-01 (Decision 17):** Glass tokens additive under --glass-* namespace; hardcoded pixel blur values throughout (Safari MDN#25914); gradient-mesh base class layout-only to prevent stacking context; position:relative baked into glass-surface classes via @supports guard.
 
 ## Blockers
 
@@ -50,5 +52,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: v1.4 roadmap created. Phase 33 is next — run `/gsd:plan-phase 33`.
+Stopped at: Completed 33-01-PLAN.md (glass CSS token foundation)
 Resume file: None

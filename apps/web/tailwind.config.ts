@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
+import glassPlugin from './lib/plugins/glass-plugin';
 
 const config: Config = {
   darkMode: ['class'],
@@ -60,11 +61,25 @@ const config: Config = {
           foreground: 'hsl(var(--warning-foreground))',
         },
       },
+      backdropBlur: {
+        'glass-sm': '8px',
+        'glass-md': '16px',
+        'glass-lg': '24px',
+      },
+      backgroundColor: {
+        glass: 'var(--glass-bg-light)',
+        'glass-subtle': 'var(--glass-bg-subtle-light)',
+        'glass-heavy': 'var(--glass-bg-heavy-light)',
+      },
       boxShadow: {
         sm: 'var(--shadow-sm)',
         DEFAULT: 'var(--shadow)',
         md: 'var(--shadow-md)',
         lg: 'var(--shadow-lg)',
+        glass: 'var(--glass-shadow-light)',
+      },
+      borderColor: {
+        glass: 'var(--glass-border-light)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -72,7 +87,7 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['var(--font-plus-jakarta-sans)', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
@@ -90,7 +105,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, glassPlugin],
 };
 
 export default config;

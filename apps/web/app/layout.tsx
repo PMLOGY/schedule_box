@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import { getLocale } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { Providers } from './providers';
 import './globals.css';
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-plus-jakarta-sans',
+  weight: ['300', '400', '500', '600', '700'],
   preload: true,
 });
 
@@ -25,7 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`}>
+      <body className={`${plusJakartaSans.variable} font-sans`}>
         <Providers>
           {children}
           <Toaster />
