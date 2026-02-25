@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phases 35+36 COMPLETE, Phase 37 next
+**Current focus:** v1.4 Design Overhaul — Phase 37 in progress (37-01 complete, 37-02 next)
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
-- **Phase:** 36 of 37 — Phases 35+36 COMPLETE (executed in parallel)
-- **Plan:** 4/4 complete (35-01, 35-02, 36-01, 36-02)
-- **Status:** Phases 35+36 verified (DASH-01..05 + MKTG-01..05 all met)
-- **Last activity:** 2026-02-25 — Phases 35+36 verified in parallel
+- **Phase:** 37 of 37 — Auth & Polish
+- **Plan:** 1/2 complete (37-01 done, 37-02 next)
+- **Status:** 37-01 complete (AUTH-01..03, POLSH-03..04 met)
+- **Last activity:** 2026-02-25 — 37-01 glass auth layout + portaled components
 
-Progress: [████████░░] 80% (v1.4)
+Progress: [█████████░] 90% (v1.4)
 
 ## What's Done
 
@@ -48,6 +48,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **36-02 (Decision 23):** Pricing tier glass intensity differentiation via cn() className instead of variant prop — featured Pro tier uses glass-surface (16px), non-featured use glass-surface-subtle (8px). GlassPanel intensity="subtle" on legal pages for readability. Footer uses glass-surface-subtle + border-glass to replace solid bg-muted.
 
+**37-01 (Decision 25):** Auth layout converted to client component for Motion -- child page.tsx server components retain metadata exports (Next.js App Router pattern). TooltipContent uses glass-surface-subtle (lighter frost) while Select/DropdownMenu use glass-surface (standard frost) for appropriate visual weight. Glass applied only to Radix Portal Content wrappers, never triggers/items.
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
@@ -66,5 +68,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phases 35+36 complete, verified. Next: plan Phase 37 (Auth + Polish).
+Stopped at: Completed 37-01-PLAN.md (glass auth layout + portaled components). Next: 37-02-PLAN.md.
 Resume file: None
