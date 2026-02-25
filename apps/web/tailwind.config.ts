@@ -77,6 +77,7 @@ const config: Config = {
         md: 'var(--shadow-md)',
         lg: 'var(--shadow-lg)',
         glass: 'var(--glass-shadow-light)',
+        'glass-hover': 'var(--glass-shadow-hover-light)',
       },
       borderColor: {
         glass: 'var(--glass-border-light)',
