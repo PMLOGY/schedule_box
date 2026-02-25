@@ -36,7 +36,9 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **33-02 (Decision 18):** Hardcoded px blur values (16px/8px/24px) in glass-plugin.ts — never CSS variables; opaque rgba fallback outside @supports guard; Plus Jakarta Sans with latin-ext subset for Czech diacritics.
 
-**34-02 (Decision 19):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
+**34-01 (Decision 19):** CVA defaultVariants is the backward-compatibility mechanism for Card/Badge/Button glass variants — zero usage-site changes for 476+ Card instances. Dialog glass is default-on (no variant prop) since all instances benefit equally. Badge color tints use inline rgba values not CSS variables to keep --glass-* token namespace clean.
+
+**34-02 (Decision 20):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
 
 ## Blockers
 
@@ -56,5 +58,5 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 34 plan 02 complete (34-02-SUMMARY.md created). Next: Phase 34 plan 03+.
+Stopped at: Completed 34-01-PLAN.md (glass variants for Card, Button, Dialog, Badge + BookingStatusBadge). Next: Phase 34 plan 03+.
 Resume file: None
