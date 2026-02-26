@@ -15,12 +15,14 @@ import {
   Building2,
   type LucideIcon,
 } from 'lucide-react';
+import type { SubscriptionPlan } from '@schedulebox/shared/types';
 
 export interface NavItem {
   key: string; // Translation key
   href: string;
   icon: LucideIcon;
   roles: string[];
+  minPlan?: SubscriptionPlan;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -71,18 +73,21 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/automation',
     icon: Zap,
     roles: ['owner', 'manager'],
+    minPlan: 'growth',
   },
   {
     key: 'loyalty',
     href: '/loyalty',
     icon: Award,
     roles: ['owner', 'manager'],
+    minPlan: 'growth',
   },
   {
     key: 'analytics',
     href: '/analytics',
     icon: BarChart3,
     roles: ['owner'],
+    minPlan: 'essential',
   },
   {
     key: 'adminAnalytics',
@@ -95,12 +100,14 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/ai',
     icon: Brain,
     roles: ['owner'],
+    minPlan: 'growth',
   },
   {
     key: 'marketing',
     href: '/marketing',
     icon: Megaphone,
     roles: ['owner', 'manager'],
+    minPlan: 'essential',
   },
   {
     key: 'organization',
@@ -116,8 +123,23 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export function filterNavByRole(role: string): NavItem[] {
+const PLAN_HIERARCHY: SubscriptionPlan[] = ['free', 'essential', 'growth', 'ai_powered'];
+
+function planIndex(plan: SubscriptionPlan): number {
+  return PLAN_HIERARCHY.indexOf(plan);
+}
+
+export function filterNav(role: string, plan: SubscriptionPlan = 'free'): NavItem[] {
   // Admin (superadmin) sees all nav items
   if (role === 'admin') return NAV_ITEMS;
-  return NAV_ITEMS.filter((item) => item.roles.includes(role));
+  return NAV_ITEMS.filter((item) => {
+    if (!item.roles.includes(role)) return false;
+    if (item.minPlan && planIndex(plan) < planIndex(item.minPlan)) return false;
+    return true;
+  });
+}
+
+/** @deprecated Use filterNav instead */
+export function filterNavByRole(role: string): NavItem[] {
+  return filterNav(role);
 }

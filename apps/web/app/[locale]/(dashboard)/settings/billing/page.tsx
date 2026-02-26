@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Loader2, Download, AlertTriangle, Check, X, Crown } from 'lucide-react';
 
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +39,7 @@ import {
   type BillingPlan,
 } from '@/hooks/use-billing-query';
 import type { SubscriptionPlan } from '@schedulebox/shared';
+import { usePlanFeatures } from '@/hooks/use-plan-features';
 
 // ============================================================================
 // CONSTANTS
@@ -71,6 +72,7 @@ function CurrentSubscriptionCard() {
   const t = useTranslations('billing');
   const tCommon = useTranslations('common');
   const { data: subscription, isLoading } = useCurrentSubscription();
+  const { plan: companyPlan } = usePlanFeatures();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const downgradeMutation = useDowngrade();
 
@@ -101,8 +103,10 @@ function CurrentSubscriptionCard() {
     );
   }
 
-  // No subscription — Free plan
+  // No subscription record — show plan from company settings
   if (!subscription) {
+    const planLabel = companyPlan !== 'free' ? t(`plans.${companyPlan}`) : t('freePlan');
+    const isFreePlan = companyPlan === 'free';
     return (
       <Card variant="glass">
         <CardHeader>
@@ -112,14 +116,18 @@ function CurrentSubscriptionCard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-semibold">{t('freePlan')}</span>
-                <Badge variant="secondary">{t('plans.free')}</Badge>
+                <span className="text-xl font-semibold">{planLabel}</span>
+                <Badge variant="secondary">{t(`plans.${companyPlan}`)}</Badge>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">{t('noPaidSubscription')}</p>
+              {isFreePlan && (
+                <p className="mt-1 text-sm text-muted-foreground">{t('noPaidSubscription')}</p>
+              )}
             </div>
-            <Button asChild>
-              <a href="#plans">{t('upgradeNow')}</a>
-            </Button>
+            {isFreePlan && (
+              <Button asChild>
+                <a href="#plans">{t('upgradeNow')}</a>
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -297,11 +305,12 @@ function PlanComparisonGrid() {
     }
   };
 
-  const formatFeatureValue = (value: number) => {
-    if (value === Infinity || value > 99999) {
+  const formatFeatureValue = (value: number | null | undefined) => {
+    const v = value ?? 0;
+    if (v === Infinity || v > 99999) {
       return t('features.unlimited');
     }
-    return value.toLocaleString('cs-CZ');
+    return v.toLocaleString('cs-CZ');
   };
 
   const renderPlanAction = (plan: BillingPlan) => {
@@ -425,21 +434,21 @@ function PlanComparisonGrid() {
 
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">{t(`plans.${plan.key}`)}</CardTitle>
-                  <CardDescription>
+                  <div className="text-sm text-muted-foreground">
                     <span className="text-3xl font-bold text-foreground">
-                      {plan.price.toLocaleString('cs-CZ')}
+                      {(plan.price ?? 0).toLocaleString('cs-CZ')}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {' '}
                       {plan.currency} {t('plans.perMonth')}
                     </span>
-                    {plan.priceAnnual > 0 && (
+                    {(plan.priceAnnual ?? 0) > 0 && (
                       <div className="mt-1 text-xs text-muted-foreground">
-                        {plan.priceAnnual.toLocaleString('cs-CZ')} {plan.currency}{' '}
+                        {(plan.priceAnnual ?? 0).toLocaleString('cs-CZ')} {plan.currency}{' '}
                         {t('plans.perYear')}
                       </div>
                     )}
-                  </CardDescription>
+                  </div>
                 </CardHeader>
 
                 <CardContent className="flex flex-1 flex-col justify-between gap-4">
@@ -450,25 +459,25 @@ function PlanComparisonGrid() {
                         {t('features.bookingsPerMonth')}
                       </span>
                       <span className="font-medium">
-                        {formatFeatureValue(plan.features.maxBookingsPerMonth)}
+                        {formatFeatureValue(plan.features?.maxBookingsPerMonth)}
                       </span>
                     </li>
                     <li className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('features.employees')}</span>
                       <span className="font-medium">
-                        {formatFeatureValue(plan.features.maxEmployees)}
+                        {formatFeatureValue(plan.features?.maxEmployees)}
                       </span>
                     </li>
                     <li className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('features.services')}</span>
                       <span className="font-medium">
-                        {formatFeatureValue(plan.features.maxServices)}
+                        {formatFeatureValue(plan.features?.maxServices)}
                       </span>
                     </li>
                     <li className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('features.aiFeatures')}</span>
                       <span>
-                        {plan.features.aiFeatures ? (
+                        {plan.features?.aiFeatures ? (
                           <Check className="h-4 w-4 text-green-600" />
                         ) : (
                           <X className="h-4 w-4 text-muted-foreground" />

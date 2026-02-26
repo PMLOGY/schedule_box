@@ -4,7 +4,8 @@ import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useUIStore } from '@/stores/ui.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { filterNavByRole } from '@/lib/navigation';
+import { filterNav } from '@/lib/navigation';
+import { usePlanFeatures } from '@/hooks/use-plan-features';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -17,8 +18,9 @@ export function MobileNav() {
   const t = useTranslations('nav');
   const { sidebarMobileOpen, toggleMobileSidebar } = useUIStore();
   const { user, logout } = useAuthStore();
+  const { plan } = usePlanFeatures();
 
-  const navItems = user ? filterNavByRole(user.role) : [];
+  const navItems = user ? filterNav(user.role, plan) : [];
 
   const handleLogout = () => {
     logout();

@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Link } from '@/lib/i18n/navigation';
+import { CreditCard } from 'lucide-react';
 import {
   useCompanySettingsQuery,
   useWorkingHoursQuery,
@@ -72,9 +74,32 @@ function CompanyProfileCard() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<CompanyUpdateData>({});
 
-  // Populate form when company data loads or edit mode is toggled
+  // Populate form when company data changes while editing
   useEffect(() => {
     if (company && editing) {
+      setForm((prev) => {
+        // Only populate if form is still empty (initial edit) or company data refreshed
+        if (!prev.name) {
+          return {
+            name: company.name,
+            email: company.email || '',
+            phone: company.phone || '',
+            website: company.website || '',
+            description: company.description || '',
+            address_street: company.address_street || '',
+            address_city: company.address_city || '',
+            address_zip: company.address_zip || '',
+            currency: company.currency,
+            timezone: company.timezone,
+          };
+        }
+        return prev;
+      });
+    }
+  }, [company, editing]);
+
+  const startEditing = () => {
+    if (company) {
       setForm({
         name: company.name,
         email: company.email || '',
@@ -88,7 +113,8 @@ function CompanyProfileCard() {
         timezone: company.timezone,
       });
     }
-  }, [company, editing]);
+    setEditing(true);
+  };
 
   const handleSave = async () => {
     try {
@@ -144,7 +170,7 @@ function CompanyProfileCard() {
           <CardDescription>{t('companyProfileDescription')}</CardDescription>
         </div>
         {!editing && (
-          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+          <Button variant="outline" size="sm" onClick={startEditing}>
             {tCommon('edit')}
           </Button>
         )}
@@ -528,12 +554,29 @@ function WorkingHoursCard() {
 
 export default function SettingsPage() {
   const t = useTranslations('settings');
+  const tBilling = useTranslations('billing');
 
   return (
     <div className="space-y-8">
       <PageHeader title={t('title')} description={t('description')} />
       <CompanyProfileCard />
       <WorkingHoursCard />
+
+      {/* Billing link */}
+      <Card variant="glass">
+        <CardContent className="flex items-center justify-between py-6">
+          <div className="flex items-center gap-3">
+            <CreditCard className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="font-medium">{tBilling('title')}</p>
+              <p className="text-sm text-muted-foreground">{tBilling('description')}</p>
+            </div>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/settings/billing">{tBilling('upgradeNow')}</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

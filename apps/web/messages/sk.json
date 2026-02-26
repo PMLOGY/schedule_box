@@ -99,7 +99,9 @@
     "help": "Nápoveda",
     "myAccount": "Môj účet",
     "profile": "Profil",
-    "logout": "Odhlásiť sa"
+    "logout": "Odhlásiť sa",
+    "collapse": "Skryť",
+    "billing": "Fakturácia"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -121,7 +123,10 @@
     "recentBookings": "Nedávne rezervácie",
     "viewAllBookings": "Zobraziť všetky rezervácie",
     "noRevenueData": "Trend tržieb sa zobrazí po prvých rezerváciách",
-    "noBookingsYet": "Zatiaľ žiadne rezervácie"
+    "noBookingsYet": "Zatiaľ žiadne rezervácie",
+    "aiUpgradeTitle": "AI funkcie dostupné na pláne Growth",
+    "aiUpgradeDescription": "Získajte AI predikcie, odporúčania a dynamické ceny pre vaše podnikanie.",
+    "aiUpgradeCta": "Upgradovať"
   },
   "calendar": {
     "title": "Kalendár",
@@ -1056,18 +1061,25 @@
       "annual": "Ročne",
       "annualSaving": "Ušetríte 2 mesiace",
       "currency": "Kč/mes",
+      "currencyYear": "Kč/rok",
       "cta": "Začať zadarmo",
+      "ctaFree": "Začať zadarmo",
+      "freeLabel": "Zadarmo",
       "free": {
         "name": "Free",
         "description": "Pre začínajúcich podnikateľov"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "Pre rastúce firmy"
+      "essential": {
+        "name": "Essential",
+        "description": "Pre malé firmy a živnostníkov"
       },
-      "business": {
-        "name": "Business",
-        "description": "Pre veľké prevádzky"
+      "growth": {
+        "name": "Growth",
+        "description": "Pre rastúce firmy s AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "Pre veľké prevádzky bez limitov"
       },
       "mostPopular": "Najobľúbenejší",
       "features": {
@@ -1075,18 +1087,30 @@
         "basicCalendar": "Základný kalendár",
         "emailNotifications": "Emailové notifikácie",
         "oneStaff": "1 zamestnanec",
+        "fiveServices": "5 služieb",
         "fiftyBookings": "50 rezervácií/mesiac",
         "everythingFree": "Všetko z Free",
         "smsReminders": "SMS pripomienky",
         "payments": "Online platby",
         "crm": "CRM a verní zákazníci",
-        "fiveStaff": "5 zamestnancov",
-        "unlimitedBookings": "Neobmedzené rezervácie",
-        "everythingPro": "Všetko z Pro",
+        "threeStaff": "3 zamestnanci",
+        "twentyServices": "20 služieb",
+        "fiveHundredBookings": "500 rezervácií/mesiac",
+        "marketing": "Marketingové nástroje",
+        "analytics": "Analytika a reporty",
+        "everythingEssential": "Všetko z Essential",
         "aiPredictions": "AI predikcie a odporúčania",
         "dynamicPricing": "Dynamické ceny",
-        "apiAccess": "API prístup",
+        "automation": "Automatizácia procesov",
+        "loyalty": "Vernostný program",
+        "tenStaff": "10 zamestnancov",
+        "hundredServices": "100 služieb",
+        "twoThousandBookings": "2 000 rezervácií/mesiac",
+        "everythingGrowth": "Všetko z Growth",
+        "unlimitedBookings": "Neobmedzené rezervácie",
         "unlimitedStaff": "Neobmedzený počet zamestnancov",
+        "unlimitedServices": "Neobmedzený počet služieb",
+        "apiAccess": "API prístup",
         "prioritySupport": "Prioritná podpora"
       }
     },

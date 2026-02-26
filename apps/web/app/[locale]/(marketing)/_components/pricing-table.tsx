@@ -15,47 +15,56 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
+import { PLAN_CONFIG, type SubscriptionPlan } from '@schedulebox/shared/types';
 
-const PLANS = [
-  {
-    id: 'free',
-    nameKey: 'free',
-    price: 0,
-    annualPrice: 0,
-    featured: false,
-    features: ['onlineBooking', 'basicCalendar', 'emailNotifications', 'oneStaff', 'fiftyBookings'],
-  },
-  {
-    id: 'pro',
-    nameKey: 'pro',
-    price: 299,
-    annualPrice: 249,
-    featured: true,
-    features: [
-      'everythingFree',
-      'smsReminders',
-      'payments',
-      'crm',
-      'fiveStaff',
-      'unlimitedBookings',
-    ],
-  },
-  {
-    id: 'business',
-    nameKey: 'business',
-    price: 699,
-    annualPrice: 579,
-    featured: false,
-    features: [
-      'everythingPro',
-      'aiPredictions',
-      'dynamicPricing',
-      'apiAccess',
-      'unlimitedStaff',
-      'prioritySupport',
-    ],
-  },
-] as const;
+const PLAN_KEYS: SubscriptionPlan[] = ['free', 'essential', 'growth', 'ai_powered'];
+
+const FEATURED_PLAN: SubscriptionPlan = 'growth';
+
+const PLAN_FEATURES: Record<SubscriptionPlan, string[]> = {
+  free: [
+    'onlineBooking',
+    'basicCalendar',
+    'emailNotifications',
+    'oneStaff',
+    'fiveServices',
+    'fiftyBookings',
+  ],
+  essential: [
+    'everythingFree',
+    'smsReminders',
+    'payments',
+    'crm',
+    'threeStaff',
+    'twentyServices',
+    'fiveHundredBookings',
+    'marketing',
+    'analytics',
+  ],
+  growth: [
+    'everythingEssential',
+    'aiPredictions',
+    'dynamicPricing',
+    'automation',
+    'loyalty',
+    'tenStaff',
+    'hundredServices',
+    'twoThousandBookings',
+  ],
+  ai_powered: [
+    'everythingGrowth',
+    'unlimitedBookings',
+    'unlimitedStaff',
+    'unlimitedServices',
+    'apiAccess',
+    'prioritySupport',
+  ],
+};
+
+function formatPrice(price: number): string {
+  if (price === 0) return '0';
+  return price.toLocaleString('cs-CZ');
+}
 
 export function PricingTable() {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -93,39 +102,45 @@ export function PricingTable() {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 max-w-5xl mx-auto">
-        {PLANS.map((plan) => {
-          const price = isAnnual ? plan.annualPrice : plan.price;
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+        {PLAN_KEYS.map((planKey) => {
+          const config = PLAN_CONFIG[planKey];
+          const price = isAnnual ? config.priceAnnual : config.price;
+          const isFeatured = planKey === FEATURED_PLAN;
+          const features = PLAN_FEATURES[planKey];
+
           return (
             <Card
-              key={plan.id}
+              key={planKey}
               className={cn(
                 'relative flex flex-col',
-                plan.featured ? 'glass-surface ring-2 ring-primary/70' : 'glass-surface-subtle',
+                isFeatured ? 'glass-surface ring-2 ring-primary/70' : 'glass-surface-subtle',
               )}
             >
-              {plan.featured && (
+              {isFeatured && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
                   {t('mostPopular')}
                 </Badge>
               )}
               <CardHeader>
-                <CardTitle>{t(`${plan.nameKey}.name`)}</CardTitle>
-                <CardDescription>{t(`${plan.nameKey}.description`)}</CardDescription>
+                <CardTitle>{t(`${planKey}.name`)}</CardTitle>
+                <CardDescription>{t(`${planKey}.description`)}</CardDescription>
               </CardHeader>
               <CardContent className="flex-1">
                 <div className="mb-6">
                   {price === 0 ? (
-                    <span className="text-4xl font-bold">Zdarma</span>
+                    <span className="text-4xl font-bold">{t('freeLabel')}</span>
                   ) : (
                     <>
-                      <span className="text-4xl font-bold">{price}</span>
-                      <span className="ml-1 text-muted-foreground">{t('currency')}</span>
+                      <span className="text-4xl font-bold">{formatPrice(price)}</span>
+                      <span className="ml-1 text-muted-foreground">
+                        {isAnnual ? t('currencyYear') : t('currency')}
+                      </span>
                     </>
                   )}
                 </div>
                 <ul className="space-y-3">
-                  {plan.features.map((featureKey) => (
+                  {features.map((featureKey) => (
                     <li key={featureKey} className="flex items-start gap-2 text-sm">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       <span>{t(`features.${featureKey}`)}</span>
@@ -134,8 +149,8 @@ export function PricingTable() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button asChild variant={plan.featured ? 'default' : 'outline'} className="w-full">
-                  <Link href="/register">{t('cta')}</Link>
+                <Button asChild variant={isFeatured ? 'default' : 'outline'} className="w-full">
+                  <Link href="/register">{planKey === 'free' ? t('ctaFree') : t('cta')}</Link>
                 </Button>
               </CardFooter>
             </Card>

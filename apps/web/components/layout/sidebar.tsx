@@ -5,7 +5,8 @@ import { Link, usePathname } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useUIStore } from '@/stores/ui.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { filterNavByRole } from '@/lib/navigation';
+import { filterNav } from '@/lib/navigation';
+import { usePlanFeatures } from '@/hooks/use-plan-features';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -16,6 +17,7 @@ export function Sidebar() {
   const t = useTranslations('nav');
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const { user } = useAuthStore();
+  const { plan } = usePlanFeatures();
   const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   // Clear pending state once navigation completes
@@ -23,12 +25,12 @@ export function Sidebar() {
     setPendingPath(null);
   }, [pathname]);
 
-  const navItems = user ? filterNavByRole(user.role) : [];
+  const navItems = user ? filterNav(user.role, plan) : [];
 
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col border-r bg-background transition-all duration-300',
+        'hidden md:flex flex-col h-full border-r bg-background transition-all duration-300',
         sidebarCollapsed ? 'w-16' : 'w-64',
       )}
     >
@@ -44,7 +46,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-2" aria-label="Main navigation">
+      <nav className="space-y-1 p-2" aria-label="Main navigation">
         <TooltipProvider>
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -91,7 +93,10 @@ export function Sidebar() {
         </TooltipProvider>
       </nav>
 
-      {/* Toggle button */}
+      {/* Spacer to push toggle to very bottom */}
+      <div className="flex-1" />
+
+      {/* Toggle button — pinned to very bottom */}
       <div className="border-t p-2">
         <Button
           variant="ghost"
@@ -106,7 +111,7 @@ export function Sidebar() {
           ) : (
             <>
               <ChevronLeft className="h-4 w-4" />
-              <span className="ml-2">Skrýt</span>
+              <span className="ml-2">{t('collapse')}</span>
             </>
           )}
         </Button>

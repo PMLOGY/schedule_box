@@ -117,31 +117,35 @@ export async function incrementBookingCounter(companyId: number): Promise<number
  * @returns Current booking count for the billing period
  */
 export async function getBookingCount(companyId: number): Promise<number> {
+  // Try Redis first for the fast-path counter
   try {
     const key = bookingCounterKey(companyId, getCurrentPeriod());
     const result = await redis.get(key);
-    return parseInt(result ?? '0', 10) || 0;
+    if (result !== null) {
+      return parseInt(result, 10) || 0;
+    }
+    // Key doesn't exist in Redis — fall through to DB count
   } catch (error) {
     console.error('[UsageService] Redis getBookingCount error, falling back to DB:', error);
+  }
 
-    // Fallback: count bookings created this month from DB
-    try {
-      const startOfMonth = getStartOfMonth();
-      const [result] = await db
-        .select({ count: sql<number>`cast(count(*) as int)` })
-        .from(bookings)
-        .where(
-          and(
-            eq(bookings.companyId, companyId),
-            gte(bookings.createdAt, startOfMonth),
-            isNull(bookings.deletedAt),
-          ),
-        );
-      return result?.count ?? 0;
-    } catch (dbError) {
-      console.error('[UsageService] DB fallback for booking count also failed:', dbError);
-      return 0; // Fail-open
-    }
+  // Fallback: count bookings created this month from DB
+  try {
+    const startOfMonth = getStartOfMonth();
+    const [result] = await db
+      .select({ count: sql<number>`cast(count(*) as int)` })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.companyId, companyId),
+          gte(bookings.createdAt, startOfMonth),
+          isNull(bookings.deletedAt),
+        ),
+      );
+    return result?.count ?? 0;
+  } catch (dbError) {
+    console.error('[UsageService] DB fallback for booking count also failed:', dbError);
+    return 0; // Fail-open
   }
 }
 

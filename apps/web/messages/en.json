@@ -99,7 +99,9 @@
     "help": "Help",
     "myAccount": "My Account",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "collapse": "Hide",
+    "billing": "Billing"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -121,7 +123,10 @@
     "recentBookings": "Recent Bookings",
     "viewAllBookings": "View all bookings",
     "noRevenueData": "Revenue trend will appear after first bookings",
-    "noBookingsYet": "No bookings yet"
+    "noBookingsYet": "No bookings yet",
+    "aiUpgradeTitle": "AI features available on Growth plan",
+    "aiUpgradeDescription": "Get AI predictions, recommendations, and dynamic pricing for your business.",
+    "aiUpgradeCta": "Upgrade"
   },
   "calendar": {
     "title": "Calendar",
@@ -1248,18 +1253,25 @@
       "annual": "Annual",
       "annualSaving": "Save 2 months",
       "currency": "CZK/mo",
+      "currencyYear": "CZK/yr",
       "cta": "Start for free",
+      "ctaFree": "Start for free",
+      "freeLabel": "Free",
       "free": {
         "name": "Free",
         "description": "For starting entrepreneurs"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "For growing businesses"
+      "essential": {
+        "name": "Essential",
+        "description": "For small businesses & freelancers"
       },
-      "business": {
-        "name": "Business",
-        "description": "For large establishments"
+      "growth": {
+        "name": "Growth",
+        "description": "For growing businesses with AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "For large businesses, no limits"
       },
       "mostPopular": "Most Popular",
       "features": {
@@ -1267,18 +1279,30 @@
         "basicCalendar": "Basic calendar",
         "emailNotifications": "Email notifications",
         "oneStaff": "1 staff member",
+        "fiveServices": "5 services",
         "fiftyBookings": "50 bookings/month",
         "everythingFree": "Everything in Free",
         "smsReminders": "SMS reminders",
         "payments": "Online payments",
         "crm": "CRM & loyal customers",
-        "fiveStaff": "5 staff members",
-        "unlimitedBookings": "Unlimited bookings",
-        "everythingPro": "Everything in Pro",
+        "threeStaff": "3 staff members",
+        "twentyServices": "20 services",
+        "fiveHundredBookings": "500 bookings/month",
+        "marketing": "Marketing tools",
+        "analytics": "Analytics & reports",
+        "everythingEssential": "Everything in Essential",
         "aiPredictions": "AI predictions & recommendations",
         "dynamicPricing": "Dynamic pricing",
-        "apiAccess": "API access",
+        "automation": "Process automation",
+        "loyalty": "Loyalty program",
+        "tenStaff": "10 staff members",
+        "hundredServices": "100 services",
+        "twoThousandBookings": "2,000 bookings/month",
+        "everythingGrowth": "Everything in Growth",
+        "unlimitedBookings": "Unlimited bookings",
         "unlimitedStaff": "Unlimited staff members",
+        "unlimitedServices": "Unlimited services",
+        "apiAccess": "API access",
         "prioritySupport": "Priority support"
       }
     },

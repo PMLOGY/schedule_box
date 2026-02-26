@@ -11,15 +11,18 @@ import { AiInsightsPanel } from '@/components/ai/AiInsightsPanel';
 import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
 import { DemoDataCard } from '@/components/onboarding/demo-data-card';
 import { useOnboardingRedirect } from '@/hooks/use-onboarding';
+import { usePlanFeatures } from '@/hooks/use-plan-features';
 import { UsageWidget } from '@/components/dashboard/usage-widget';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Brain } from 'lucide-react';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const tOnboarding = useTranslations('onboarding');
   const router = useRouter();
   const { shouldRedirect, isLoading } = useOnboardingRedirect();
+  const { canAccess } = usePlanFeatures();
 
   // Redirect to /onboarding when wizard has not been completed
   useEffect(() => {
@@ -75,8 +78,25 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* AI Insights */}
-      <AiInsightsPanel />
+      {/* AI Insights — Growth+ only */}
+      {canAccess('growth') ? (
+        <AiInsightsPanel />
+      ) : (
+        <Card className="glass-surface-subtle">
+          <CardContent className="flex items-center gap-4 py-6">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Brain className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium">{t('aiUpgradeTitle')}</p>
+              <p className="text-sm text-muted-foreground">{t('aiUpgradeDescription')}</p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/settings/billing">{t('aiUpgradeCta')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Usage widget */}
       <UsageWidget />

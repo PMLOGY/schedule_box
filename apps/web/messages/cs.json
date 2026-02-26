@@ -99,7 +99,9 @@
     "help": "Nápověda",
     "myAccount": "Můj účet",
     "profile": "Profil",
-    "logout": "Odhlásit se"
+    "logout": "Odhlásit se",
+    "collapse": "Skrýt",
+    "billing": "Fakturace"
   },
   "dashboard": {
     "title": "Přehled",
@@ -121,7 +123,10 @@
     "recentBookings": "Nedávné rezervace",
     "viewAllBookings": "Zobrazit všechny rezervace",
     "noRevenueData": "Trend tržeb se zobrazí po prvních rezervacích",
-    "noBookingsYet": "Zatím žádné rezervace"
+    "noBookingsYet": "Zatím žádné rezervace",
+    "aiUpgradeTitle": "AI funkce dostupné na plánu Growth",
+    "aiUpgradeDescription": "Získejte AI predikce, doporučení a dynamické ceny pro vaše podnikání.",
+    "aiUpgradeCta": "Upgradovat"
   },
   "calendar": {
     "title": "Kalendář",
@@ -1248,18 +1253,25 @@
       "annual": "Ročně",
       "annualSaving": "Ušetříte 2 měsíce",
       "currency": "Kč/měs",
+      "currencyYear": "Kč/rok",
       "cta": "Začít zdarma",
+      "ctaFree": "Začít zdarma",
+      "freeLabel": "Zdarma",
       "free": {
         "name": "Free",
         "description": "Pro začínající podnikatele"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "Pro rostoucí firmy"
+      "essential": {
+        "name": "Essential",
+        "description": "Pro malé firmy a živnostníky"
       },
-      "business": {
-        "name": "Business",
-        "description": "Pro velké provozovny"
+      "growth": {
+        "name": "Growth",
+        "description": "Pro rostoucí firmy s AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "Pro velké provozovny bez limitů"
       },
       "mostPopular": "Nejoblíbenější",
       "features": {
@@ -1267,18 +1279,30 @@
         "basicCalendar": "Základní kalendář",
         "emailNotifications": "Emailové notifikace",
         "oneStaff": "1 zaměstnanec",
+        "fiveServices": "5 služeb",
         "fiftyBookings": "50 rezervací/měsíc",
         "everythingFree": "Vše z Free",
         "smsReminders": "SMS připomínky",
         "payments": "Online platby",
         "crm": "CRM a věrní zákazníci",
-        "fiveStaff": "5 zaměstnanců",
-        "unlimitedBookings": "Neomezené rezervace",
-        "everythingPro": "Vše z Pro",
+        "threeStaff": "3 zaměstnanci",
+        "twentyServices": "20 služeb",
+        "fiveHundredBookings": "500 rezervací/měsíc",
+        "marketing": "Marketingové nástroje",
+        "analytics": "Analytika a reporty",
+        "everythingEssential": "Vše z Essential",
         "aiPredictions": "AI predikce a doporučení",
         "dynamicPricing": "Dynamické ceny",
-        "apiAccess": "API přístup",
+        "automation": "Automatizace procesů",
+        "loyalty": "Věrnostní program",
+        "tenStaff": "10 zaměstnanců",
+        "hundredServices": "100 služeb",
+        "twoThousandBookings": "2 000 rezervací/měsíc",
+        "everythingGrowth": "Vše z Growth",
+        "unlimitedBookings": "Neomezené rezervace",
         "unlimitedStaff": "Neomezený počet zaměstnanců",
+        "unlimitedServices": "Neomezený počet služeb",
+        "apiAccess": "API přístup",
         "prioritySupport": "Prioritní podpora"
       }
     },
