@@ -18,7 +18,7 @@
     --destructive-foreground: 0 0% 100%;
 
     /* Background and foreground */
-    --background: 0 0% 100%;
+    --background: 224 20% 94%;
     --foreground: 222.2 84% 4.9%;
 
     /* Card */
@@ -30,16 +30,16 @@
     --popover-foreground: 222.2 84% 4.9%;
 
     /* Muted */
-    --muted: 210 40% 96.1%;
+    --muted: 220 25% 93%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
     /* Accent */
-    --accent: 210 40% 96.1%;
+    --accent: 220 25% 93%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     /* Border and input */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
 
     /* Ring */
     --ring: 217 91% 60%;
@@ -63,12 +63,12 @@
     --glass-blur-sm: 8px;
     --glass-blur-md: 16px;
     --glass-blur-lg: 24px;
-    --glass-bg-light: rgba(255, 255, 255, 0.08);
-    --glass-bg-subtle-light: rgba(255, 255, 255, 0.05);
-    --glass-bg-heavy-light: rgba(255, 255, 255, 0.15);
-    --glass-border-light: rgba(255, 255, 255, 0.12);
-    --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-    --glass-shadow-hover-light: 0 16px 48px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.12);
+    --glass-bg-light: rgba(255, 255, 255, 0.35);
+    --glass-bg-subtle-light: rgba(255, 255, 255, 0.2);
+    --glass-bg-heavy-light: rgba(255, 255, 255, 0.5);
+    --glass-border-light: rgba(0, 87, 255, 0.15);
+    --glass-shadow-light: 0 8px 32px rgba(0, 50, 180, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06);
+    --glass-shadow-hover-light: 0 16px 48px rgba(0, 50, 180, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 
   .dark {
@@ -124,10 +124,10 @@
     --warning-foreground: 0 0% 100%;
 
     /* === GLASS TOKENS (dark) === */
-    --glass-bg-light: rgba(15, 23, 42, 0.55);
-    --glass-bg-subtle-light: rgba(15, 23, 42, 0.5);
-    --glass-bg-heavy-light: rgba(15, 23, 42, 0.65);
-    --glass-border-light: rgba(255, 255, 255, 0.12);
+    --glass-bg-light: rgba(255, 255, 255, 0.08);
+    --glass-bg-subtle-light: rgba(255, 255, 255, 0.05);
+    --glass-bg-heavy-light: rgba(255, 255, 255, 0.12);
+    --glass-border-light: rgba(255, 255, 255, 0.15);
     --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
     --glass-shadow-hover-light: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.35);
   }
@@ -152,43 +152,43 @@
 
   .gradient-mesh-dashboard {
     background:
-      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+      radial-gradient(ellipse 70% 50% at 10% 10%, rgba(0, 87, 255, 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse 55% 40% at 90% 80%, rgba(99, 102, 241, 0.22) 0%, transparent 50%),
+      radial-gradient(ellipse 45% 55% at 50% 95%, rgba(168, 85, 247, 0.16) 0%, transparent 55%);
   }
 
   .gradient-mesh-marketing {
     background:
-      radial-gradient(ellipse 90% 60% at 10% 10%, rgba(59, 130, 246, 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 50% at 85% 80%, rgba(99, 102, 241, 0.2) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 70% at 60% 30%, rgba(168, 85, 247, 0.12) 0%, transparent 60%);
+      radial-gradient(ellipse 80% 55% at 5% 5%, rgba(0, 87, 255, 0.38) 0%, transparent 45%),
+      radial-gradient(ellipse 65% 45% at 92% 88%, rgba(99, 102, 241, 0.28) 0%, transparent 45%),
+      radial-gradient(ellipse 55% 65% at 55% 30%, rgba(168, 85, 247, 0.22) 0%, transparent 50%);
   }
 
   .gradient-mesh-auth {
     background:
-      radial-gradient(ellipse 70% 50% at 30% 30%, rgba(148, 163, 184, 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 70% 70%, rgba(100, 116, 139, 0.08) 0%, transparent 60%);
+      radial-gradient(ellipse 65% 45% at 20% 20%, rgba(0, 87, 255, 0.25) 0%, transparent 50%),
+      radial-gradient(ellipse 55% 35% at 80% 80%, rgba(99, 102, 241, 0.16) 0%, transparent 50%);
   }
 }
 
 .dark .gradient-mesh-dashboard {
   background:
-    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0, 87, 255, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
 }
 
 .dark .gradient-mesh-marketing {
   background:
-    radial-gradient(ellipse 90% 60% at 10% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 85% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 60% 30%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+    radial-gradient(ellipse 90% 60% at 10% 10%, rgba(0, 87, 255, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 80%, rgba(99, 102, 241, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 70% at 60% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 60%);
 }
 
 .dark .gradient-mesh-auth {
   background:
-    radial-gradient(ellipse 70% 50% at 30% 30%, rgba(148, 163, 184, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 70% 70%, rgba(100, 116, 139, 0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 50% at 30% 30%, rgba(0, 87, 255, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 70% 70%, rgba(99, 102, 241, 0.06) 0%, transparent 60%);
 }
 
 @media (max-width: 767px) {

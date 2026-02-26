@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Database, Trash2 } from 'lucide-react';
+import { AlertTriangle, Database, Trash2, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,10 +34,16 @@ export function DemoDataCard() {
   const queryClient = useQueryClient();
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  const DISMISSED_KEY = 'sb_demo_data_card_dismissed';
 
   // Hydration guard
   useEffect(() => {
     setMounted(true);
+    if (localStorage.getItem(DISMISSED_KEY) === 'true') {
+      setDismissed(true);
+    }
   }, []);
 
   const { data: demoStatus, isLoading } = useQuery({
@@ -76,8 +82,13 @@ export function DemoDataCard() {
     },
   });
 
+  const handleDismiss = () => {
+    localStorage.setItem(DISMISSED_KEY, 'true');
+    setDismissed(true);
+  };
+
   // Don't render until mounted (prevents hydration mismatch)
-  if (!mounted || isLoading) return null;
+  if (!mounted || isLoading || dismissed) return null;
 
   const hasDemoData = demoStatus?.has_demo_data === true;
 
@@ -85,27 +96,45 @@ export function DemoDataCard() {
     <>
       {hasDemoData ? (
         // State 2: Demo data is active
-        <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <div className="relative flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 pr-10">
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-4 w-4 text-amber-600" />
             <span className="text-sm font-medium text-amber-800">
               {t('activeBanner')} — {t('activeCompany')}
             </span>
           </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-900"
+              onClick={() => setShowRemoveDialog(true)}
+              disabled={removeMutation.isPending}
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              {t('removeButton')}
+            </Button>
+          </div>
           <Button
-            variant="outline"
-            size="sm"
-            className="border-amber-300 text-amber-700 hover:bg-amber-100 hover:text-amber-900"
-            onClick={() => setShowRemoveDialog(true)}
-            disabled={removeMutation.isPending}
+            variant="ghost"
+            size="icon"
+            className="absolute top-1 right-1 h-7 w-7 text-amber-600 hover:text-amber-900"
+            onClick={handleDismiss}
           >
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-            {t('removeButton')}
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
         // State 1: No demo data loaded
-        <Card className="border-dashed border-border bg-muted/50">
+        <Card className="relative border-dashed border-border bg-muted/50">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-foreground z-10"
+            onClick={handleDismiss}
+          >
+            <X className="h-4 w-4" />
+          </Button>
           <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100">

@@ -132,3 +132,14 @@ None — no external service configuration required.
 
 _Phase: 36-marketing-glass_
 _Completed: 2026-02-25_
+
+## Self-Check: PASSED
+
+- FOUND: `apps/web/app/globals.css`
+- FOUND: `apps/web/app/[locale]/(marketing)/layout.tsx`
+- FOUND: `apps/web/app/[locale]/(marketing)/_components/marketing-navbar.tsx`
+- FOUND: `apps/web/app/[locale]/(marketing)/_components/hero-section.tsx`
+- FOUND: `.planning/phases/36-marketing-glass/36-01-SUMMARY.md`
+- FOUND commit: `c54e116` (Task 1)
+- FOUND commit: `8d09df3` (Task 2)
+- TypeScript: zero errors (`npx tsc --noEmit` passed twice)

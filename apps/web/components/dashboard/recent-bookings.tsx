@@ -47,7 +47,7 @@ export function RecentBookings() {
           <div className="space-y-3">
             {bookings.map((booking) => (
               <div
-                key={booking.uuid}
+                key={booking.uuid ?? String(booking.id)}
                 className="flex items-center justify-between gap-2 rounded-lg border p-3"
               >
                 <div className="min-w-0 flex-1">

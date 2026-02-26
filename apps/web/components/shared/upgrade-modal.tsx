@@ -68,7 +68,7 @@ export function UpgradeModal({
 }: UpgradeModalProps) {
   const t = useTranslations('usage');
 
-  const resourceKey = resource as 'bookings' | 'employees' | 'services';
+  const resourceKey = (resource || 'bookings') as 'bookings' | 'employees' | 'services';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
