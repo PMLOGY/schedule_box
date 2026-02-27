@@ -10,6 +10,7 @@ interface StatCardProps {
   trend?: number;
   icon: LucideIcon;
   formatter?: 'currency' | 'number' | 'percentage' | 'rating';
+  className?: string;
 }
 
 function formatValue(value: string | number, formatter?: StatCardProps['formatter']): string {
@@ -28,11 +29,11 @@ function formatValue(value: string | number, formatter?: StatCardProps['formatte
   }
 }
 
-export function StatCard({ title, value, trend, icon: Icon, formatter }: StatCardProps) {
+export function StatCard({ title, value, trend, icon: Icon, formatter, className }: StatCardProps) {
   const t = useTranslations('dashboard');
 
   return (
-    <Card>
+    <Card variant="glass" className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <Icon className="h-5 w-5 text-muted-foreground" />
@@ -41,7 +42,7 @@ export function StatCard({ title, value, trend, icon: Icon, formatter }: StatCar
         <div className="text-2xl font-bold">{formatValue(value, formatter)}</div>
         {trend !== undefined && (
           <p
-            className={`flex items-center text-xs ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            className={`flex items-center text-xs ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}
           >
             {trend >= 0 ? (
               <ArrowUp className="mr-1 h-3 w-3" />

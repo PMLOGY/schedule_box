@@ -23,7 +23,8 @@
     "to": "to",
     "of": "of",
     "page": "Page",
-    "entries": "entries"
+    "entries": "entries",
+    "actions": "Actions"
   },
   "auth": {
     "login": {
@@ -87,6 +88,7 @@
     "pricing": "Pricing",
     "optimization": "Optimization",
     "marketing": "Marketing",
+    "organization": "Organization",
     "settings": "Settings",
     "templates": "Templates",
     "rewards": "Rewards Catalog",
@@ -97,7 +99,9 @@
     "help": "Help",
     "myAccount": "My Account",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "collapse": "Hide",
+    "billing": "Billing"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -112,7 +116,17 @@
     "quickActions": "Quick actions",
     "newBooking": "New booking",
     "addCustomer": "Add customer",
-    "viewCalendar": "View calendar"
+    "viewCalendar": "View calendar",
+    "viewAnalytics": "View Analytics",
+    "manageServices": "Manage Services",
+    "revenueTrend": "Revenue Trend",
+    "recentBookings": "Recent Bookings",
+    "viewAllBookings": "View all bookings",
+    "noRevenueData": "Revenue trend will appear after first bookings",
+    "noBookingsYet": "No bookings yet",
+    "aiUpgradeTitle": "AI features available on Growth plan",
+    "aiUpgradeDescription": "Get AI predictions, recommendations, and dynamic pricing for your business.",
+    "aiUpgradeCta": "Upgrade"
   },
   "calendar": {
     "title": "Calendar",
@@ -419,6 +433,8 @@
       "bookingsCSV": "Bookings CSV",
       "revenuePDF": "Revenue PDF",
       "bookingsPDF": "Bookings PDF",
+      "customerCSV": "Customers CSV",
+      "customerPDF": "Customers PDF",
       "downloading": "Downloading...",
       "success": "Export downloaded successfully",
       "error": "Error exporting data",
@@ -1237,18 +1253,25 @@
       "annual": "Annual",
       "annualSaving": "Save 2 months",
       "currency": "CZK/mo",
+      "currencyYear": "CZK/yr",
       "cta": "Start for free",
+      "ctaFree": "Start for free",
+      "freeLabel": "Free",
       "free": {
         "name": "Free",
         "description": "For starting entrepreneurs"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "For growing businesses"
+      "essential": {
+        "name": "Essential",
+        "description": "For small businesses & freelancers"
       },
-      "business": {
-        "name": "Business",
-        "description": "For large establishments"
+      "growth": {
+        "name": "Growth",
+        "description": "For growing businesses with AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "For large businesses, no limits"
       },
       "mostPopular": "Most Popular",
       "features": {
@@ -1256,18 +1279,30 @@
         "basicCalendar": "Basic calendar",
         "emailNotifications": "Email notifications",
         "oneStaff": "1 staff member",
+        "fiveServices": "5 services",
         "fiftyBookings": "50 bookings/month",
         "everythingFree": "Everything in Free",
         "smsReminders": "SMS reminders",
         "payments": "Online payments",
         "crm": "CRM & loyal customers",
-        "fiveStaff": "5 staff members",
-        "unlimitedBookings": "Unlimited bookings",
-        "everythingPro": "Everything in Pro",
+        "threeStaff": "3 staff members",
+        "twentyServices": "20 services",
+        "fiveHundredBookings": "500 bookings/month",
+        "marketing": "Marketing tools",
+        "analytics": "Analytics & reports",
+        "everythingEssential": "Everything in Essential",
         "aiPredictions": "AI predictions & recommendations",
         "dynamicPricing": "Dynamic pricing",
-        "apiAccess": "API access",
+        "automation": "Process automation",
+        "loyalty": "Loyalty program",
+        "tenStaff": "10 staff members",
+        "hundredServices": "100 services",
+        "twoThousandBookings": "2,000 bookings/month",
+        "everythingGrowth": "Everything in Growth",
+        "unlimitedBookings": "Unlimited bookings",
         "unlimitedStaff": "Unlimited staff members",
+        "unlimitedServices": "Unlimited services",
+        "apiAccess": "API access",
         "prioritySupport": "Priority support"
       }
     },
@@ -1365,6 +1400,195 @@
       "termsLink": "Terms of Service",
       "copyright": "© {year} ScheduleBox. All rights reserved.",
       "registryNote": "Registered in the Commercial Register maintained by the Municipal Court in Prague."
+    }
+  },
+  "billing": {
+    "title": "Billing & Subscription",
+    "description": "Manage your subscription and invoices",
+    "currentPlan": "Current Plan",
+    "freePlan": "Free Plan",
+    "noPaidSubscription": "You have no paid subscription",
+    "upgradeNow": "Upgrade",
+    "nextBilling": "Next billing",
+    "monthlyPrice": "Monthly price",
+    "billingCycle": "Billing cycle",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "daysUntilRenewal": "{days} days until renewal",
+    "status": {
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Past Due",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "plans": {
+      "title": "Compare Plans",
+      "free": "Free",
+      "essential": "Essential",
+      "growth": "Growth",
+      "ai_powered": "AI-Powered",
+      "perMonth": "/ month",
+      "perYear": "/ year",
+      "current": "Current",
+      "subscribe": "Subscribe",
+      "upgrade": "Upgrade",
+      "downgrade": "Downgrade",
+      "mostPopular": "Most Popular"
+    },
+    "features": {
+      "bookingsPerMonth": "Bookings / month",
+      "employees": "Employees",
+      "services": "Services",
+      "aiFeatures": "AI Features",
+      "unlimited": "Unlimited",
+      "included": "Included",
+      "notIncluded": "Not included"
+    },
+    "invoices": {
+      "title": "Invoice History",
+      "noInvoices": "You have no invoices yet",
+      "number": "Invoice number",
+      "date": "Date",
+      "period": "Period",
+      "amount": "Amount",
+      "status": "Status",
+      "download": "Download PDF",
+      "paid": "Paid",
+      "issued": "Issued",
+      "failed": "Failed"
+    },
+    "actions": {
+      "cancelSubscription": "Cancel Subscription",
+      "cancelConfirm": "Are you sure you want to cancel? Your plan will remain active until the end of the billing period.",
+      "cancelSuccess": "Subscription will be cancelled at the end of the period",
+      "upgradeSuccess": "Plan upgraded successfully",
+      "upgradeProrationCharged": "Prorated amount was automatically charged to your payment method",
+      "downgradeConfirm": "Downgrade will take effect at the end of the current period. Do you want to continue?",
+      "downgradeSuccess": "Downgrade will take effect at the end of the period",
+      "paymentPending": "Waiting for payment confirmation...",
+      "paymentTimeout": "Payment is being processed, try refreshing the page in a moment",
+      "paymentActivated": "Subscription activated successfully!",
+      "processing": "Processing..."
+    },
+    "warnings": {
+      "pastDue": "Your payment has failed. Please update your payment details.",
+      "pendingDowngrade": "Plan will be downgraded to {plan} at the end of the period"
+    }
+  },
+  "usage": {
+    "widget": {
+      "title": "Plan Usage",
+      "bookings": "Bookings this month",
+      "employees": "Employees",
+      "services": "Services",
+      "unlimited": "Unlimited",
+      "of": "of",
+      "upgrade": "Upgrade Plan",
+      "warning": "Approaching plan limit. Consider upgrading for more capacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Plan Limit Reached",
+      "description": {
+        "bookings": "You have reached the monthly limit of {current}/{limit} bookings on the {plan} plan.",
+        "employees": "You have reached the limit of {current}/{limit} employees on the {plan} plan.",
+        "services": "You have reached the limit of {current}/{limit} services on the {plan} plan."
+      },
+      "comparePlans": "Plan Comparison",
+      "viewPlans": "View Plans",
+      "close": "Close",
+      "bookingsPerMonth": "Bookings/month",
+      "employeesLimit": "Employees",
+      "servicesLimit": "Services"
+    }
+  },
+  "organization": {
+    "title": "Organization",
+    "description": "Manage your multi-location organization",
+    "switchError": "Failed to switch location",
+    "overview": "Overview",
+    "settings": "Settings",
+    "noOrganization": "No Organization",
+    "noOrgDescription": "You don't belong to an organization yet.",
+    "createOrg": "Create Organization",
+    "upgradeRequired": "Multi-location organizations require a Growth or AI-Powered plan.",
+    "upgradePlan": "Upgrade Plan",
+    "locationCount": "{count} locations",
+    "memberCount": "{count} members",
+    "locations": "Locations",
+    "members": "Members",
+    "locationsUsed": "{count}/{max} locations used",
+    "addLocation": "Add Location",
+    "editLocation": "Edit Location",
+    "deactivateLocation": "Deactivate Location",
+    "deactivateConfirm": "Deactivating a location hides it from customers but preserves all historical data. Continue?",
+    "deactivateSuccess": "Location deactivated successfully",
+    "locationAdded": "Location added successfully",
+    "locationUpdated": "Location updated successfully",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "removeConfirm": "Are you sure you want to remove this member from the organization?",
+    "memberAdded": "Member added successfully",
+    "memberRemoved": "Member removed successfully",
+    "fields": {
+      "name": "Name",
+      "slug": "Slug",
+      "email": "Email",
+      "phone": "Phone",
+      "addressStreet": "Street",
+      "addressCity": "City",
+      "addressZip": "ZIP Code",
+      "role": "Role",
+      "userEmail": "User Email",
+      "location": "Location",
+      "status": "Status"
+    },
+    "roles": {
+      "franchise_owner": "Franchise Owner",
+      "location_manager": "Location Manager"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "orgName": "Organization Name",
+    "createOrgDescription": "Create a new multi-location organization to manage multiple business locations.",
+    "create": "Create",
+    "dashboard": {
+      "title": "Organization Dashboard",
+      "totalBookings": "Total Bookings",
+      "totalRevenue": "Total Revenue",
+      "activeLocations": "Active Locations",
+      "thisMonth": "This month",
+      "switchToLocation": "Switch to location",
+      "occupancy": "Occupancy",
+      "na": "N/A",
+      "noLocations": "No locations found in this organization.",
+      "accessRestricted": "Access restricted. Only franchise owners can view the organization dashboard."
+    },
+    "customers": {
+      "title": "Organization Customers",
+      "description": "Cross-location customer search with deduplication",
+      "searchPlaceholder": "Search by name, email, or phone...",
+      "totalBookings": "Total Bookings",
+      "totalSpent": "Total Spent",
+      "lastVisit": "Last Visit",
+      "locationsVisited": "Locations Visited",
+      "locationsCount": "{count} locations",
+      "locationsSingle": "1 location",
+      "noCustomers": "No customers found.",
+      "accessRestricted": "Access restricted. Only franchise owners can view organization customers."
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Settings",
+      "customers": "Customers"
     }
   }
 }

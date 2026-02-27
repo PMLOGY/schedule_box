@@ -34,7 +34,7 @@ export async function SocialProof() {
         <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">{t('title')}</h2>
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((testimonial) => (
-            <Card key={testimonial.name}>
+            <Card variant="glass" key={testimonial.name}>
               <CardContent className="pt-6">
                 <div className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (

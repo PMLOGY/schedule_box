@@ -2,53 +2,71 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-24)
+See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.3 Revenue & Growth — Phase 28, roadmap created
+**Current focus:** v1.4 Design Overhaul — Phase 37 in progress (37-01 complete, 37-02 next)
 
 ## Current Position
 
-- **Milestone:** v1.3 Revenue & Growth
-- **Phase:** 28 — Subscription Billing Infrastructure
-- **Plan:** — (not started)
-- **Status:** Roadmap created, ready for Phase 28 planning
-- **Last activity:** 2026-02-24 — v1.3 roadmap created (5 phases, 32 requirements mapped)
+- **Milestone:** v1.4 Design Overhaul (Phases 33-37)
+- **Phase:** 37 of 37 — Auth & Polish
+- **Plan:** 1/2 complete (37-01 done, 37-02 next)
+- **Status:** 37-01 complete (AUTH-01..03, POLSH-03..04 met)
+- **Last activity:** 2026-02-25 — 37-01 glass auth layout + portaled components
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████████░] 90% (v1.4)
 
 ## What's Done
 
-**v1.0 shipped** (103 requirements, 15 phases, 101 plans). Deployed to Railway 2026-02-15.
-
-**v1.1 shipped** (33 requirements, 7 phases, 22 plans). All complete 2026-02-20, Twilio + Comgate credentials configured 2026-02-24.
-
-**v1.2 shipped** (34 requirements, 5 phases, 20 plans). Completed 2026-02-24:
-- Phase 23: AI training pipeline
-- Phase 24: AI-powered UI
-- Phase 25: Czech marketing landing page
-- Phase 26: Booking UX polish
-- Phase 27: Onboarding wizard
-
-**v1.3 roadmap created** (32 requirements, 5 phases: 28-32). Phases defined 2026-02-24.
+**v1.0 shipped** (15 phases, 101 plans — 2026-02-12)
+**v1.1 shipped** (7 phases, 22 plans — 2026-02-21)
+**v1.2 shipped** (5 phases, 20 plans — 2026-02-24)
+**v1.3 shipped** (5 phases, 21 plans — 2026-02-25): subscription billing, usage limits, multi-location orgs, analytics, frontend polish
 
 ## Decisions
 
-See `.planning/PROJECT.md` Key Decisions section.
+See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
+
+**v1.4 design direction (Decision 16):** Glassmorphism + Behance blue #0057FF. Zero new npm packages — existing Tailwind 3.4.5, motion, CVA, next-themes, next/font/google are sufficient. Glass applied additively via `variant="glass"` CVA prop — never by mutating `--card` or other global shadcn tokens.
+
+**v1.4 exclusions:** No glass on sidebar (legibility), data tables, calendar cells, chart canvases, form inputs, primary CTA buttons, or public booking widget. No animated backdrop-filter values. No 3D perspective tilt on glass cards. No backend changes.
+
+**33-01 (Decision 17):** Glass tokens additive under --glass-* namespace; hardcoded pixel blur values throughout (Safari MDN#25914); gradient-mesh base class layout-only to prevent stacking context; position:relative baked into glass-surface classes via @supports guard.
+
+**33-02 (Decision 18):** Hardcoded px blur values (16px/8px/24px) in glass-plugin.ts — never CSS variables; opaque rgba fallback outside @supports guard; Plus Jakarta Sans with latin-ext subset for Czech diacritics.
+
+**34-01 (Decision 19):** CVA defaultVariants is the backward-compatibility mechanism for Card/Badge/Button glass variants — zero usage-site changes for 476+ Card instances. Dialog glass is default-on (no variant prop) since all instances benefit equally. Badge color tints use inline rgba values not CSS variables to keep --glass-* token namespace clean.
+
+**34-02 (Decision 20):** GlassPanel uses forwardRef (interactive containers need ref access); GradientMesh is plain function component (decorative backgrounds never need ref). No overflow:hidden on GlassPanel (prevents stacking context that traps backdrop-filter). No style prop on GradientMesh (prevents caller-injected stacking context triggers).
+
+**35-01 (Decision 21):** GradientMesh placed outside flex wrapper (position:fixed removes from flow, unaffecting flex layout); sidebar stays bg-background per DASH-05 locked decision; header uses glass-surface-subtle + border-glass replacing bg-background — Radix UI Portals unaffected by header stacking context.
+
+**35-02 (Decision 24):** BookingCalendar NOT wrapped in glass — FullCalendar event popovers use absolute positioning (not Portal), a glass stacking context would clip them. Data tables (bookings, customers) stay in opaque bg-card containers. Split-container pattern: glass Card wraps title/controls; opaque div holds table/calendar.
+
+**36-01 (Decision 22):** MarketingNavbar converted to 'use client' with useTranslations — co-locating MobileNav (Sheet requires client boundary) in same file forces entire module to be client; useTranslations is identical in behavior to getTranslations for this use case. Aurora opacity 60% light / 30% dark keeps animation subtle enough for text legibility.
+
+**36-02 (Decision 23):** Pricing tier glass intensity differentiation via cn() className instead of variant prop — featured Pro tier uses glass-surface (16px), non-featured use glass-surface-subtle (8px). GlassPanel intensity="subtle" on legal pages for readability. Footer uses glass-surface-subtle + border-glass to replace solid bg-muted.
+
+**37-01 (Decision 25):** Auth layout converted to client component for Motion -- child page.tsx server components retain metadata exports (Next.js App Router pattern). TooltipContent uses glass-surface-subtle (lighter frost) while Select/DropdownMenu use glass-surface (standard frost) for appropriate visual weight. Glass applied only to Radix Portal Content wrappers, never triggers/items.
 
 ## Blockers
 
-- Real testimonials needed for landing page social proof — business team must secure (placeholder content in place)
-- **[NEW] Comgate recurring activation** — must contact Comgate support for merchant 498621 before Phase 28 implementation begins. Recurring is not auto-enabled; timeline is unknown (days to weeks). This blocks Phase 28 entirely.
-- **[NEW] Subscription plan name canonicalization** — DB has `free/starter/professional/enterprise`; v1.3 targets `free/essential/growth/ai_powered`. The CHECK constraint on `companies.subscription_plan` must be resolved before Phase 28 schema migration runs.
+- Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
+- **[DEFERRED]** Comgate recurring activation — code complete (Phase 28), live recurring requires contacting Comgate support for merchant 498621
 
 ## Performance Metrics
 
 | Milestone | Phases | Plans | Timeline |
 |-----------|--------|-------|----------|
-| v1.0 | 15 | 101 | 2 days (2026-02-10 → 2026-02-12) |
-| v1.1 | 7 | 22 | 5 days (2026-02-15 → 2026-02-21) |
-| v1.2 | 5 | 20 | 4 days (2026-02-21 → 2026-02-24) |
+| v1.0 | 15 | 101 | 2 days |
+| v1.1 | 7 | 22 | 5 days |
+| v1.2 | 5 | 20 | 4 days |
+| v1.3 | 5 | 21 | 1 day |
+| v1.4 | 5 | TBD | In progress |
 
----
-*Last updated: 2026-02-24 — v1.3 roadmap created, Phase 28 ready to plan*
+## Session Continuity
+
+Last session: 2026-02-25
+Stopped at: Completed 37-01-PLAN.md (glass auth layout + portaled components). Next: 37-02-PLAN.md.
+Resume file: None

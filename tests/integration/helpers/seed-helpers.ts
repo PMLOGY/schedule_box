@@ -61,6 +61,68 @@ export async function seedUser(
 }
 
 // ============================================================================
+// ROLE
+// ============================================================================
+
+export async function seedRole(db: Db, overrides?: Partial<typeof schema.roles.$inferInsert>) {
+  const [role] = await db
+    .insert(schema.roles)
+    .values({
+      name: 'owner',
+      description: 'Company owner',
+      ...overrides,
+    })
+    .returning();
+  return role;
+}
+
+// ============================================================================
+// ORGANIZATION
+// ============================================================================
+
+export async function seedOrganization(
+  db: Db,
+  overrides?: Partial<typeof schema.organizations.$inferInsert>,
+) {
+  const now = Date.now();
+  const [org] = await db
+    .insert(schema.organizations)
+    .values({
+      name: 'Test Organization',
+      slug: `test-org-${now}`,
+      ownerUserId: 1, // overridden by caller
+      ...overrides,
+    })
+    .returning();
+  return org;
+}
+
+// ============================================================================
+// ORGANIZATION_MEMBER
+// ============================================================================
+
+export async function seedOrganizationMember(
+  db: Db,
+  params: {
+    organizationId: number;
+    userId: number;
+    companyId?: number | null;
+    role: 'franchise_owner' | 'location_manager';
+  },
+) {
+  const [member] = await db
+    .insert(schema.organizationMembers)
+    .values({
+      organizationId: params.organizationId,
+      userId: params.userId,
+      companyId: params.companyId ?? null,
+      role: params.role,
+    })
+    .returning();
+  return member;
+}
+
+// ============================================================================
 // SERVICE
 // ============================================================================
 

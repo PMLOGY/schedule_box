@@ -30,7 +30,9 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-      <h1 className="text-center text-3xl font-bold tracking-tight md:text-4xl">{t('title')}</h1>
+      <h1 className="text-center text-3xl font-bold tracking-tight md:text-4xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        {t('title')}
+      </h1>
       <div className="mt-12">
         <PricingTable />
       </div>

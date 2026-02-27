@@ -23,7 +23,8 @@
     "to": "do",
     "of": "z",
     "page": "Stránka",
-    "entries": "záznamů"
+    "entries": "záznamů",
+    "actions": "Akce"
   },
   "auth": {
     "login": {
@@ -87,6 +88,7 @@
     "pricing": "Cenotvorba",
     "optimization": "Optimalizace",
     "marketing": "Marketing",
+    "organization": "Organizace",
     "settings": "Nastavení",
     "templates": "Šablony",
     "rewards": "Katalog odměn",
@@ -97,7 +99,9 @@
     "help": "Nápověda",
     "myAccount": "Můj účet",
     "profile": "Profil",
-    "logout": "Odhlásit se"
+    "logout": "Odhlásit se",
+    "collapse": "Skrýt",
+    "billing": "Fakturace"
   },
   "dashboard": {
     "title": "Přehled",
@@ -112,7 +116,17 @@
     "quickActions": "Rychlé akce",
     "newBooking": "Nová rezervace",
     "addCustomer": "Přidat zákazníka",
-    "viewCalendar": "Zobrazit kalendář"
+    "viewCalendar": "Zobrazit kalendář",
+    "viewAnalytics": "Zobrazit analytiku",
+    "manageServices": "Spravovat služby",
+    "revenueTrend": "Trend tržeb",
+    "recentBookings": "Nedávné rezervace",
+    "viewAllBookings": "Zobrazit všechny rezervace",
+    "noRevenueData": "Trend tržeb se zobrazí po prvních rezervacích",
+    "noBookingsYet": "Zatím žádné rezervace",
+    "aiUpgradeTitle": "AI funkce dostupné na plánu Growth",
+    "aiUpgradeDescription": "Získejte AI predikce, doporučení a dynamické ceny pro vaše podnikání.",
+    "aiUpgradeCta": "Upgradovat"
   },
   "calendar": {
     "title": "Kalendář",
@@ -419,6 +433,8 @@
       "bookingsCSV": "Rezervace CSV",
       "revenuePDF": "Tržby PDF",
       "bookingsPDF": "Rezervace PDF",
+      "customerCSV": "Zákazníci CSV",
+      "customerPDF": "Zákazníci PDF",
       "downloading": "Stahování...",
       "success": "Export byl úspěšně stažen",
       "error": "Chyba při exportu dat",
@@ -1237,18 +1253,25 @@
       "annual": "Ročně",
       "annualSaving": "Ušetříte 2 měsíce",
       "currency": "Kč/měs",
+      "currencyYear": "Kč/rok",
       "cta": "Začít zdarma",
+      "ctaFree": "Začít zdarma",
+      "freeLabel": "Zdarma",
       "free": {
         "name": "Free",
         "description": "Pro začínající podnikatele"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "Pro rostoucí firmy"
+      "essential": {
+        "name": "Essential",
+        "description": "Pro malé firmy a živnostníky"
       },
-      "business": {
-        "name": "Business",
-        "description": "Pro velké provozovny"
+      "growth": {
+        "name": "Growth",
+        "description": "Pro rostoucí firmy s AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "Pro velké provozovny bez limitů"
       },
       "mostPopular": "Nejoblíbenější",
       "features": {
@@ -1256,18 +1279,30 @@
         "basicCalendar": "Základní kalendář",
         "emailNotifications": "Emailové notifikace",
         "oneStaff": "1 zaměstnanec",
+        "fiveServices": "5 služeb",
         "fiftyBookings": "50 rezervací/měsíc",
         "everythingFree": "Vše z Free",
         "smsReminders": "SMS připomínky",
         "payments": "Online platby",
         "crm": "CRM a věrní zákazníci",
-        "fiveStaff": "5 zaměstnanců",
-        "unlimitedBookings": "Neomezené rezervace",
-        "everythingPro": "Vše z Pro",
+        "threeStaff": "3 zaměstnanci",
+        "twentyServices": "20 služeb",
+        "fiveHundredBookings": "500 rezervací/měsíc",
+        "marketing": "Marketingové nástroje",
+        "analytics": "Analytika a reporty",
+        "everythingEssential": "Vše z Essential",
         "aiPredictions": "AI predikce a doporučení",
         "dynamicPricing": "Dynamické ceny",
-        "apiAccess": "API přístup",
+        "automation": "Automatizace procesů",
+        "loyalty": "Věrnostní program",
+        "tenStaff": "10 zaměstnanců",
+        "hundredServices": "100 služeb",
+        "twoThousandBookings": "2 000 rezervací/měsíc",
+        "everythingGrowth": "Vše z Growth",
+        "unlimitedBookings": "Neomezené rezervace",
         "unlimitedStaff": "Neomezený počet zaměstnanců",
+        "unlimitedServices": "Neomezený počet služeb",
+        "apiAccess": "API přístup",
         "prioritySupport": "Prioritní podpora"
       }
     },
@@ -1365,6 +1400,195 @@
       "termsLink": "Obchodní podmínky",
       "copyright": "© {year} ScheduleBox. Všechna práva vyhrazena.",
       "registryNote": "Zapsáno v obchodním rejstříku vedeném Městským soudem v Praze."
+    }
+  },
+  "billing": {
+    "title": "Fakturace a předplatné",
+    "description": "Správa vašeho předplatného a faktur",
+    "currentPlan": "Aktuální plán",
+    "freePlan": "Bezplatný plán",
+    "noPaidSubscription": "Nemáte žádné placené předplatné",
+    "upgradeNow": "Upgradovat",
+    "nextBilling": "Další platba",
+    "monthlyPrice": "Měsíční cena",
+    "billingCycle": "Fakturační cyklus",
+    "monthly": "Měsíčně",
+    "annual": "Ročně",
+    "daysUntilRenewal": "{days} dní do obnovení",
+    "status": {
+      "trialing": "Zkušební",
+      "active": "Aktivní",
+      "past_due": "Po splatnosti",
+      "cancelled": "Zrušeno",
+      "expired": "Vypršelo"
+    },
+    "plans": {
+      "title": "Porovnání plánů",
+      "free": "Free",
+      "essential": "Essential",
+      "growth": "Growth",
+      "ai_powered": "AI-Powered",
+      "perMonth": "/ měsíc",
+      "perYear": "/ rok",
+      "current": "Aktuální",
+      "subscribe": "Předplatit",
+      "upgrade": "Upgradovat",
+      "downgrade": "Snížit plán",
+      "mostPopular": "Nejoblíbenější"
+    },
+    "features": {
+      "bookingsPerMonth": "Rezervací / měsíc",
+      "employees": "Zaměstnanců",
+      "services": "Služeb",
+      "aiFeatures": "AI funkce",
+      "unlimited": "Neomezeno",
+      "included": "Zahrnuto",
+      "notIncluded": "Nezahrnuto"
+    },
+    "invoices": {
+      "title": "Historie faktur",
+      "noInvoices": "Zatím nemáte žádné faktury",
+      "number": "Číslo faktury",
+      "date": "Datum",
+      "period": "Období",
+      "amount": "Částka",
+      "status": "Stav",
+      "download": "Stáhnout PDF",
+      "paid": "Zaplaceno",
+      "issued": "Vystaveno",
+      "failed": "Neúspěšné"
+    },
+    "actions": {
+      "cancelSubscription": "Zrušit předplatné",
+      "cancelConfirm": "Opravdu chcete zrušit předplatné? Plán zůstane aktivní do konce fakturačního období.",
+      "cancelSuccess": "Předplatné bude zrušeno na konci období",
+      "upgradeSuccess": "Plán byl úspěšně upgradován",
+      "upgradeProrationCharged": "Poměrný doplatek byl automaticky stržen z vaší platební metody",
+      "downgradeConfirm": "Snížení plánu bude provedeno na konci aktuálního období. Chcete pokračovat?",
+      "downgradeSuccess": "Snížení plánu bude provedeno na konci období",
+      "paymentPending": "Čekáme na potvrzení platby...",
+      "paymentTimeout": "Platba se zpracovává, zkuste obnovit stránku za chvíli",
+      "paymentActivated": "Předplatné bylo úspěšně aktivováno!",
+      "processing": "Zpracování..."
+    },
+    "warnings": {
+      "pastDue": "Vaše platba se nezdařila. Aktualizujte platební údaje.",
+      "pendingDowngrade": "Na konci období bude plán snížen na {plan}"
+    }
+  },
+  "usage": {
+    "widget": {
+      "title": "Využití plánu",
+      "bookings": "Rezervace tento měsíc",
+      "employees": "Zaměstnanci",
+      "services": "Služby",
+      "unlimited": "Neomezeno",
+      "of": "z",
+      "upgrade": "Upgradovat plán",
+      "warning": "Blížíte se limitu plánu. Zvažte upgrade pro více kapacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Limit plánu dosažen",
+      "description": {
+        "bookings": "Dosáhli jste měsíčního limitu {current}/{limit} rezervací na plánu {plan}.",
+        "employees": "Dosáhli jste limitu {current}/{limit} zaměstnanců na plánu {plan}.",
+        "services": "Dosáhli jste limitu {current}/{limit} služeb na plánu {plan}."
+      },
+      "comparePlans": "Porovnání plánů",
+      "viewPlans": "Zobrazit plány",
+      "close": "Zavřít",
+      "bookingsPerMonth": "Rezervací/měsíc",
+      "employeesLimit": "Zaměstnanců",
+      "servicesLimit": "Služeb"
+    }
+  },
+  "organization": {
+    "title": "Organizace",
+    "description": "Správa vaší organizace s více pobočkami",
+    "switchError": "Nepodařilo se přepnout pobočku",
+    "overview": "Přehled",
+    "settings": "Nastavení",
+    "noOrganization": "Žádná organizace",
+    "noOrgDescription": "Zatím nepatříte do žádné organizace.",
+    "createOrg": "Vytvořit organizaci",
+    "upgradeRequired": "Organizace s více pobočkami vyžaduje tarif Growth nebo AI-Powered.",
+    "upgradePlan": "Změnit tarif",
+    "locationCount": "{count} poboček",
+    "memberCount": "{count} členů",
+    "locations": "Pobočky",
+    "members": "Členové",
+    "locationsUsed": "{count}/{max} poboček využito",
+    "addLocation": "Přidat pobočku",
+    "editLocation": "Upravit pobočku",
+    "deactivateLocation": "Deaktivovat pobočku",
+    "deactivateConfirm": "Deaktivace pobočky ji skryje zákazníkům, ale zachová všechna historická data. Pokračovat?",
+    "deactivateSuccess": "Pobočka byla deaktivována",
+    "locationAdded": "Pobočka byla přidána",
+    "locationUpdated": "Pobočka byla aktualizována",
+    "addMember": "Přidat člena",
+    "removeMember": "Odebrat člena",
+    "removeConfirm": "Opravdu chcete odebrat tohoto člena z organizace?",
+    "memberAdded": "Člen byl přidán",
+    "memberRemoved": "Člen byl odebrán",
+    "fields": {
+      "name": "Název",
+      "slug": "Slug",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "addressStreet": "Ulice",
+      "addressCity": "Město",
+      "addressZip": "PSČ",
+      "role": "Role",
+      "userEmail": "E-mail uživatele",
+      "location": "Pobočka",
+      "status": "Stav"
+    },
+    "roles": {
+      "franchise_owner": "Vlastník franšízy",
+      "location_manager": "Manažer pobočky"
+    },
+    "status": {
+      "active": "Aktivní",
+      "inactive": "Neaktivní"
+    },
+    "orgName": "Název organizace",
+    "createOrgDescription": "Vytvořte novou organizaci s více pobočkami pro správu více obchodních míst.",
+    "create": "Vytvořit",
+    "dashboard": {
+      "title": "Dashboard organizace",
+      "totalBookings": "Celkem rezervací",
+      "totalRevenue": "Celkové tržby",
+      "activeLocations": "Aktivní pobočky",
+      "thisMonth": "Tento měsíc",
+      "switchToLocation": "Přepnout na pobočku",
+      "occupancy": "Obsazenost",
+      "na": "N/A",
+      "noLocations": "V této organizaci nebyly nalezeny žádné pobočky.",
+      "accessRestricted": "Přístup omezen. Dashboard organizace mohou zobrazit pouze vlastníci franšízy."
+    },
+    "customers": {
+      "title": "Zákazníci organizace",
+      "description": "Vyhledávání zákazníků napříč pobočkami s deduplikací",
+      "searchPlaceholder": "Hledat podle jména, e-mailu nebo telefonu...",
+      "totalBookings": "Celkem rezervací",
+      "totalSpent": "Celkem utraceno",
+      "lastVisit": "Poslední návštěva",
+      "locationsVisited": "Navštívené pobočky",
+      "locationsCount": "{count} poboček",
+      "locationsSingle": "1 pobočka",
+      "noCustomers": "Žádní zákazníci nebyli nalezeni.",
+      "accessRestricted": "Přístup omezen. Zákazníky organizace mohou zobrazit pouze vlastníci franšízy."
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Nastavení",
+      "customers": "Zákazníci"
     }
   }
 }

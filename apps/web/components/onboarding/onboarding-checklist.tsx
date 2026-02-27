@@ -25,19 +25,17 @@ export function OnboardingChecklist() {
   // Hydration guard — read localStorage only after mount
   useEffect(() => {
     setMounted(true);
-    if (companySettings?.uuid) {
-      const key = `${DISMISSED_KEY_PREFIX}${companySettings.uuid}`;
-      if (localStorage.getItem(key) === 'true') {
-        setDismissed(true);
-      }
+    const uuid = companySettings?.uuid;
+    const key = uuid ? `${DISMISSED_KEY_PREFIX}${uuid}` : `${DISMISSED_KEY_PREFIX}global`;
+    if (localStorage.getItem(key) === 'true') {
+      setDismissed(true);
     }
   }, [companySettings?.uuid]);
 
   const handleDismiss = () => {
-    if (companySettings?.uuid) {
-      const key = `${DISMISSED_KEY_PREFIX}${companySettings.uuid}`;
-      localStorage.setItem(key, 'true');
-    }
+    const uuid = companySettings?.uuid;
+    const key = uuid ? `${DISMISSED_KEY_PREFIX}${uuid}` : `${DISMISSED_KEY_PREFIX}global`;
+    localStorage.setItem(key, 'true');
     setDismissed(true);
   };
 
@@ -49,23 +47,23 @@ export function OnboardingChecklist() {
   if (!mounted || dismissed) return null;
   // Wizard takes priority: hide checklist until onboarding is complete
   if (companySettings?.onboarding_completed === false) return null;
+  // All items complete — nothing left to show
+  if (!isLoading && isAllComplete) return null;
 
   const progressPercent = (completedCount / totalCount) * 100;
 
   return (
     <Card className="relative">
-      {/* Dismiss button — only when all items are complete */}
-      {isAllComplete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-foreground"
-          onClick={handleDismiss}
-          aria-label={t('dismiss')}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      )}
+      {/* Dismiss button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-foreground"
+        onClick={handleDismiss}
+        aria-label={t('dismiss')}
+      >
+        <X className="h-4 w-4" />
+      </Button>
 
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold">{t('title')}</CardTitle>

@@ -23,7 +23,8 @@
     "to": "do",
     "of": "z",
     "page": "Stránka",
-    "entries": "záznamov"
+    "entries": "záznamov",
+    "actions": "Akcie"
   },
   "auth": {
     "login": {
@@ -87,6 +88,7 @@
     "pricing": "Cenotvorba",
     "optimization": "Optimalizácia",
     "marketing": "Marketing",
+    "organization": "Organizácia",
     "settings": "Nastavenia",
     "templates": "Šablóny",
     "rewards": "Katalóg odmien",
@@ -97,7 +99,9 @@
     "help": "Nápoveda",
     "myAccount": "Môj účet",
     "profile": "Profil",
-    "logout": "Odhlásiť sa"
+    "logout": "Odhlásiť sa",
+    "collapse": "Skryť",
+    "billing": "Fakturácia"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -112,7 +116,17 @@
     "quickActions": "Rýchle akcie",
     "newBooking": "Nová rezervácia",
     "addCustomer": "Pridať zákazníka",
-    "viewCalendar": "Zobraziť kalendár"
+    "viewCalendar": "Zobraziť kalendár",
+    "viewAnalytics": "Zobraziť analytiku",
+    "manageServices": "Spravovať služby",
+    "revenueTrend": "Trend tržieb",
+    "recentBookings": "Nedávne rezervácie",
+    "viewAllBookings": "Zobraziť všetky rezervácie",
+    "noRevenueData": "Trend tržieb sa zobrazí po prvých rezerváciách",
+    "noBookingsYet": "Zatiaľ žiadne rezervácie",
+    "aiUpgradeTitle": "AI funkcie dostupné na pláne Growth",
+    "aiUpgradeDescription": "Získajte AI predikcie, odporúčania a dynamické ceny pre vaše podnikanie.",
+    "aiUpgradeCta": "Upgradovať"
   },
   "calendar": {
     "title": "Kalendár",
@@ -419,6 +433,8 @@
       "bookingsCSV": "Rezervácie CSV",
       "revenuePDF": "Tržby PDF",
       "bookingsPDF": "Rezervácie PDF",
+      "customerCSV": "Zákazníci CSV",
+      "customerPDF": "Zákazníci PDF",
       "downloading": "Sťahovanie...",
       "success": "Export bol úspešne stiahnutý",
       "error": "Chyba pri exporte dát",
@@ -1045,18 +1061,25 @@
       "annual": "Ročne",
       "annualSaving": "Ušetríte 2 mesiace",
       "currency": "Kč/mes",
+      "currencyYear": "Kč/rok",
       "cta": "Začať zadarmo",
+      "ctaFree": "Začať zadarmo",
+      "freeLabel": "Zadarmo",
       "free": {
         "name": "Free",
         "description": "Pre začínajúcich podnikateľov"
       },
-      "pro": {
-        "name": "Pro",
-        "description": "Pre rastúce firmy"
+      "essential": {
+        "name": "Essential",
+        "description": "Pre malé firmy a živnostníkov"
       },
-      "business": {
-        "name": "Business",
-        "description": "Pre veľké prevádzky"
+      "growth": {
+        "name": "Growth",
+        "description": "Pre rastúce firmy s AI"
+      },
+      "ai_powered": {
+        "name": "AI-Powered",
+        "description": "Pre veľké prevádzky bez limitov"
       },
       "mostPopular": "Najobľúbenejší",
       "features": {
@@ -1064,18 +1087,30 @@
         "basicCalendar": "Základný kalendár",
         "emailNotifications": "Emailové notifikácie",
         "oneStaff": "1 zamestnanec",
+        "fiveServices": "5 služieb",
         "fiftyBookings": "50 rezervácií/mesiac",
         "everythingFree": "Všetko z Free",
         "smsReminders": "SMS pripomienky",
         "payments": "Online platby",
         "crm": "CRM a verní zákazníci",
-        "fiveStaff": "5 zamestnancov",
-        "unlimitedBookings": "Neobmedzené rezervácie",
-        "everythingPro": "Všetko z Pro",
+        "threeStaff": "3 zamestnanci",
+        "twentyServices": "20 služieb",
+        "fiveHundredBookings": "500 rezervácií/mesiac",
+        "marketing": "Marketingové nástroje",
+        "analytics": "Analytika a reporty",
+        "everythingEssential": "Všetko z Essential",
         "aiPredictions": "AI predikcie a odporúčania",
         "dynamicPricing": "Dynamické ceny",
-        "apiAccess": "API prístup",
+        "automation": "Automatizácia procesov",
+        "loyalty": "Vernostný program",
+        "tenStaff": "10 zamestnancov",
+        "hundredServices": "100 služieb",
+        "twoThousandBookings": "2 000 rezervácií/mesiac",
+        "everythingGrowth": "Všetko z Growth",
+        "unlimitedBookings": "Neobmedzené rezervácie",
         "unlimitedStaff": "Neobmedzený počet zamestnancov",
+        "unlimitedServices": "Neobmedzený počet služieb",
+        "apiAccess": "API prístup",
         "prioritySupport": "Prioritná podpora"
       }
     },
@@ -1365,6 +1400,121 @@
       "description": "Vaše rezervácie sa tu zobrazia, keď ich prijmete",
       "action": "Vytvoriť rezerváciu",
       "secondaryAction": "Nastaviť pracovnú dobu"
+    }
+  },
+  "usage": {
+    "widget": {
+      "title": "Využitie plánu",
+      "bookings": "Rezervácie tento mesiac",
+      "employees": "Zamestnanci",
+      "services": "Služby",
+      "unlimited": "Neobmedzené",
+      "of": "z",
+      "upgrade": "Upgradovať plán",
+      "warning": "Blížite sa k limitu plánu. Zvážte upgrade pre viac kapacity.",
+      "plan": {
+        "free": "Free",
+        "essential": "Essential",
+        "growth": "Growth",
+        "ai_powered": "AI-Powered"
+      }
+    },
+    "upgradeModal": {
+      "title": "Limit plánu dosiahnutý",
+      "description": {
+        "bookings": "Dosiahli ste mesačného limitu {current}/{limit} rezervácií na pláne {plan}.",
+        "employees": "Dosiahli ste limitu {current}/{limit} zamestnancov na pláne {plan}.",
+        "services": "Dosiahli ste limitu {current}/{limit} služieb na pláne {plan}."
+      },
+      "comparePlans": "Porovnanie plánov",
+      "viewPlans": "Zobraziť plány",
+      "close": "Zavrieť",
+      "bookingsPerMonth": "Rezervácií/mesiac",
+      "employeesLimit": "Zamestnancov",
+      "servicesLimit": "Služieb"
+    }
+  },
+  "organization": {
+    "title": "Organizácia",
+    "description": "Správa vašej organizácie s viacerými pobočkami",
+    "switchError": "Nepodarilo sa prepnúť pobočku",
+    "overview": "Prehľad",
+    "settings": "Nastavenia",
+    "noOrganization": "Žiadna organizácia",
+    "noOrgDescription": "Zatiaľ nepatríte do žiadnej organizácie.",
+    "createOrg": "Vytvoriť organizáciu",
+    "upgradeRequired": "Organizácie s viacerými pobočkami vyžadujú tarif Growth alebo AI-Powered.",
+    "upgradePlan": "Zmeniť tarif",
+    "locationCount": "{count} pobočiek",
+    "memberCount": "{count} členov",
+    "locations": "Pobočky",
+    "members": "Členovia",
+    "locationsUsed": "{count}/{max} pobočiek využitých",
+    "addLocation": "Pridať pobočku",
+    "editLocation": "Upraviť pobočku",
+    "deactivateLocation": "Deaktivovať pobočku",
+    "deactivateConfirm": "Deaktivácia pobočky ju skryje zákazníkom, ale zachová všetky historické dáta. Pokračovať?",
+    "deactivateSuccess": "Pobočka bola deaktivovaná",
+    "locationAdded": "Pobočka bola pridaná",
+    "locationUpdated": "Pobočka bola aktualizovaná",
+    "addMember": "Pridať člena",
+    "removeMember": "Odobrať člena",
+    "removeConfirm": "Naozaj chcete odobrať tohto člena z organizácie?",
+    "memberAdded": "Člen bol pridaný",
+    "memberRemoved": "Člen bol odobratý",
+    "fields": {
+      "name": "Názov",
+      "slug": "Slug",
+      "email": "E-mail",
+      "phone": "Telefón",
+      "addressStreet": "Ulica",
+      "addressCity": "Mesto",
+      "addressZip": "PSČ",
+      "role": "Rola",
+      "userEmail": "E-mail používateľa",
+      "location": "Pobočka",
+      "status": "Stav"
+    },
+    "roles": {
+      "franchise_owner": "Vlastník franšízy",
+      "location_manager": "Manažér pobočky"
+    },
+    "status": {
+      "active": "Aktívna",
+      "inactive": "Neaktívna"
+    },
+    "orgName": "Názov organizácie",
+    "createOrgDescription": "Vytvorte novú organizáciu s viacerými pobočkami na správu viacerých obchodných miest.",
+    "create": "Vytvoriť",
+    "dashboard": {
+      "title": "Dashboard organizácie",
+      "totalBookings": "Celkom rezervácií",
+      "totalRevenue": "Celkové tržby",
+      "activeLocations": "Aktívne pobočky",
+      "thisMonth": "Tento mesiac",
+      "switchToLocation": "Prepnúť na pobočku",
+      "occupancy": "Obsadenosť",
+      "na": "N/A",
+      "noLocations": "V tejto organizácii neboli nájdené žiadne pobočky.",
+      "accessRestricted": "Prístup obmedzený. Dashboard organizácie môžu zobraziť iba vlastníci franšízy."
+    },
+    "customers": {
+      "title": "Zákazníci organizácie",
+      "description": "Vyhľadávanie zákazníkov naprieč pobočkami s deduplikáciou",
+      "searchPlaceholder": "Hľadať podľa mena, e-mailu alebo telefónu...",
+      "totalBookings": "Celkom rezervácií",
+      "totalSpent": "Celkom minuté",
+      "lastVisit": "Posledná návšteva",
+      "locationsVisited": "Navštívené pobočky",
+      "locationsCount": "{count} pobočiek",
+      "locationsSingle": "1 pobočka",
+      "noCustomers": "Žiadni zákazníci neboli nájdení.",
+      "accessRestricted": "Prístup obmedzený. Zákazníkov organizácie môžu zobraziť iba vlastníci franšízy."
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "settings": "Nastavenia",
+      "customers": "Zákazníci"
     }
   }
 }

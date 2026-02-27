@@ -94,6 +94,16 @@ export class BadRequestError extends AppError {
 }
 
 /**
+ * 402 Payment Required - Feature requires higher subscription plan
+ */
+export class PaymentRequiredError extends AppError {
+  constructor(message = 'Payment required', details?: unknown) {
+    super('PAYMENT_REQUIRED', message, 402, details);
+    Object.setPrototypeOf(this, PaymentRequiredError.prototype);
+  }
+}
+
+/**
  * 501 Not Implemented - Feature not yet implemented
  */
 export class NotImplementedError extends AppError {

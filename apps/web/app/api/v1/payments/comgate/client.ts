@@ -14,10 +14,11 @@ export interface InitComgatePaymentParams {
   price: number; // Amount in CZK (will be converted to hellers internally)
   currency: string;
   label: string; // Payment description
-  refId: string; // Booking UUID (for tracking)
+  refId: string; // Booking UUID or subscription UUID (for tracking)
   email: string; // Customer email
   redirectUrl: string; // Where user returns after payment
   callbackUrl: string; // Webhook URL for payment status updates
+  initRecurring?: boolean; // Set true to create a recurring payment token
 }
 
 export interface ComgatePaymentResponse {
@@ -107,6 +108,11 @@ export async function initComgatePayment(
   requestParams.set('lang', 'cs'); // Czech language
   requestParams.set('url', redirectUrl);
   requestParams.set('callback', callbackUrl);
+
+  // Enable recurring payment token creation for subscription billing
+  if (params.initRecurring) {
+    requestParams.set('initRecurring', 'true');
+  }
 
   // Call Comgate API
   const response = await fetchWithTimeout(`${COMGATE_API_URL}/v1.0/create`, {
@@ -231,6 +237,60 @@ export async function refundComgatePayment(
   return {
     success: code === '0',
     message: message || undefined,
+  };
+}
+
+// ============================================================================
+// CHARGE RECURRING PAYMENT
+// ============================================================================
+
+/**
+ * Charge a recurring payment using a previously authorized card token.
+ *
+ * Comgate recurring works in two phases:
+ * 1. Initial payment with initRecurring=true (user-facing redirect)
+ * 2. Subsequent charges via POST /v1.0/recurring (server-to-server)
+ *
+ * The initRecurringId is the transId from the initial payment.
+ *
+ * @param params Recurring charge parameters
+ * @returns Transaction ID, code, and message from Comgate
+ */
+export async function chargeRecurringPayment(params: {
+  initRecurringId: string; // transId from the initial payment
+  price: number; // Amount in CZK (converted to hellers internally)
+  currency: string;
+  label: string;
+  refId: string;
+  email: string;
+}): Promise<{ transactionId: string; code: string; message: string }> {
+  const { merchantId, secret } = getComgateCredentials();
+  const requestParams = new URLSearchParams();
+  requestParams.set('merchant', merchantId);
+  requestParams.set('secret', secret);
+  requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
+  requestParams.set('price', Math.round(params.price * 100).toString());
+  requestParams.set('curr', params.currency.toUpperCase());
+  requestParams.set('label', params.label);
+  requestParams.set('refId', params.refId);
+  requestParams.set('email', params.email);
+  requestParams.set('initRecurringId', params.initRecurringId);
+
+  const response = await fetchWithTimeout(`${COMGATE_API_URL}/v1.0/recurring`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: requestParams.toString(),
+  });
+
+  const responseText = await response.text();
+  const responseParams = new URLSearchParams(responseText);
+
+  return {
+    transactionId: responseParams.get('transId') || '',
+    code: responseParams.get('code') || '',
+    message: responseParams.get('message') || '',
   };
 }
 

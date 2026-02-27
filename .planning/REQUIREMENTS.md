@@ -1,126 +1,127 @@
 # Requirements: ScheduleBox
 
-**Defined:** 2026-02-24 (v1.3)
+**Defined:** 2026-02-25 (v1.4)
 **Core Value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
 
 ---
 
-## v1.3 Requirements
+## v1.4 Requirements
 
-### Subscription Billing
+### Design System Foundation (DSYS)
 
-- [ ] **BILL-01**: Comgate recurring payment initialization — first payment creates recurring template, server stores `initRecurringId` for future charges
-- [ ] **BILL-02**: Subscription state machine with states: trialing, active, past_due, cancelled, expired — transitions triggered by Comgate webhooks and manual actions
-- [ ] **BILL-03**: Plan upgrade and downgrade — immediate plan change with prorated billing for the current period
-- [ ] **BILL-04**: Invoice PDF generation for each billing cycle with Czech VAT compliance (ICO, DIC, sequential numbering)
-- [ ] **BILL-05**: Comgate recurring webhook handler — processes payment success, failure, and cancellation events with idempotent `subscription_events` log
-- [ ] **BILL-06**: Billing portal page — current plan, next payment date, plan comparison, upgrade/downgrade buttons, invoice history with PDF download
-- [ ] **BILL-07**: BullMQ recurring billing job — initiates Comgate charge on billing cycle date, handles retries on failure, updates subscription state
+- [ ] **DSYS-01**: Glass CSS token system in globals.css — primitive tokens (--glass-bg, --glass-blur-sm/md/lg, --glass-border, --glass-shadow) with separate light and dark mode values in :root and .dark selectors
+- [ ] **DSYS-02**: Gradient mesh background system — radial gradient orbs in globals.css with presets for dashboard (subtle blue), marketing (vibrant blue-indigo), and auth (muted neutral), applied via gradient-mesh utility class
+- [ ] **DSYS-03**: Tailwind glass plugin (glass-plugin.ts) registering glass-surface, glass-surface-subtle, and glass-surface-heavy utility classes with hardcoded webkit-backdrop-filter pixel values and @supports progressive enhancement
+- [ ] **DSYS-04**: tailwind.config.ts extensions for backdropBlur, backgroundColor, boxShadow (shadow-glass, shadow-glass-hover), borderColor, backgroundImage (gradient presets), and fontFamily (Plus Jakarta Sans)
+- [ ] **DSYS-05**: Plus Jakarta Sans font swap replacing Inter in root layout via next/font/google with variable font weights 200-800
+- [ ] **DSYS-06**: Responsive glass degradation via CSS @media query in globals.css — reduced blur on viewports below 768px for mobile GPU safety
+- [ ] **DSYS-07**: Accessibility fallbacks — @supports (backdrop-filter) guard on all glass classes, prefers-reduced-transparency media query falling back to opaque card backgrounds, WCAG 4.5:1 contrast enforcement via semi-opaque ::before scrim in glass-surface base class
 
-### Usage Limits and Tier Enforcement
+### Component Glass Variants (COMP)
 
-- [ ] **LIMIT-01**: Redis-based atomic usage counters per company per billing period (bookings/month, employees, services)
-- [ ] **LIMIT-02**: Hard limit on booking creation — block immediately when monthly booking quota exceeded, show upgrade prompt
-- [ ] **LIMIT-03**: Hard limit on employee and service creation — block when tier maximum exceeded, show upgrade prompt
-- [ ] **LIMIT-04**: Usage dashboard widget showing current consumption vs tier limits with visual progress bars
-- [ ] **LIMIT-05**: Plan tier limits configuration — Free: 50 bookings/month, Essential: 500, Growth: 2000, AI-Powered: unlimited
+- [ ] **COMP-01**: Card component glass variant via CVA — variant="glass" prop with glass-surface styling, defaultVariants preserving all existing Card usage unchanged
+- [ ] **COMP-02**: Button component glass variant via CVA — secondary/ghost buttons gain subtle glass tint, primary CTA buttons remain solid for contrast
+- [ ] **COMP-03**: Dialog/modal glass treatment — glass panel with glass-surface-heavy for content, backdrop with bg-black/40 backdrop-blur-sm overlay
+- [ ] **COMP-04**: Badge glass variant — booking status pills (Confirmed, Cancelled, No-show) as translucent glass badges with color-coded tints
+- [ ] **COMP-05**: GlassPanel primitive component (glass-panel.tsx) — reusable wrapper for arbitrary glass content with configurable intensity
+- [ ] **COMP-06**: GradientMesh primitive component (gradient-mesh.tsx) — layout background component using fixed positioning with correct z-index that does not create stacking context conflicts
 
-### Multi-Location Organizations
+### Dashboard Redesign (DASH)
 
-- [ ] **ORG-01**: Organizations table linking multiple companies (locations) under one franchise entity, with `organization_owner` role
-- [ ] **ORG-02**: Location switcher in dashboard header — switch active company context via `/auth/switch-location` endpoint issuing new JWT
-- [ ] **ORG-03**: Organization-level RBAC roles — franchise_owner (all locations), location_manager (single location), with permission checks
-- [ ] **ORG-04**: Organization dashboard showing all locations with key metrics (bookings, revenue, occupancy) per location
-- [ ] **ORG-05**: Cross-location customer visibility — customers visible and searchable across all locations within an organization
-- [ ] **ORG-06**: Location CRUD from organization settings — add new location, edit location details, deactivate location
+- [ ] **DASH-01**: Dashboard layout with gradient mesh background at subtle 40% opacity, correct stacking context for all existing overlays (dropdowns, modals, calendar popovers)
+- [ ] **DASH-02**: KPI stat cards using Card variant="glass" with hover intensify effect (shadow-glass-hover transition), gradient text on dashboard welcome heading
+- [ ] **DASH-03**: Frosted header bar — glass-surface-subtle with sticky positioning and backdrop-blur, maintaining location switcher and theme toggle functionality
+- [ ] **DASH-04**: All dashboard sub-pages (calendar, bookings, customers, analytics, settings, billing, organization) using glass card wrappers for content sections while keeping data tables, calendar cells, and chart canvases opaque
+- [ ] **DASH-05**: Dashboard sidebar remains solid (no glass) for text readability at navigation-item text sizes per research constraint
 
-### Analytics and Reporting
+### Marketing Pages Redesign (MKTG)
 
-- [ ] **ANLYT-01**: Revenue dashboard — daily/weekly/monthly revenue line charts, payment method breakdown pie chart, revenue per service
-- [ ] **ANLYT-02**: Booking analytics — booking volume trends, peak hours heatmap, service popularity ranking, cancellation and no-show rates
-- [ ] **ANLYT-03**: Customer retention metrics — repeat booking rate, customer churn, CLV distribution histogram
-- [ ] **ANLYT-04**: Employee utilization dashboard — bookings per employee bar chart, utilization percentage, revenue attribution per employee
-- [ ] **ANLYT-05**: Cross-location aggregate analytics for franchise owners — org-level totals with per-location breakdown drill-down
-- [ ] **ANLYT-06**: Platform admin dashboard — MRR chart, churn rate, plan distribution, active company count, new signups trend
-- [ ] **ANLYT-07**: PostgreSQL materialized views for analytics pre-aggregation with BullMQ nightly refresh job
-- [ ] **ANLYT-08**: Exportable reports — PDF and CSV export for revenue, bookings, and customer reports
+- [ ] **MKTG-01**: Marketing layout with vibrant gradient mesh background, glass navbar replacing existing solid navigation
+- [ ] **MKTG-02**: Landing page hero section redesign with gradient text heading, glass feature cards, and animated aurora background (CSS keyframe, 15-20s cycle)
+- [ ] **MKTG-03**: Pricing section with glass card treatment — featured tier (Growth) gets glass-surface, others get glass-surface-subtle, CTAs remain solid
+- [ ] **MKTG-04**: Testimonials and social proof sections with glass card containers
+- [ ] **MKTG-05**: Footer and secondary marketing pages (privacy, terms) with consistent glass styling
 
-### Frontend Polish and Design System
+### Auth Pages Redesign (AUTH)
 
-- [ ] **UI-01**: Dashboard redesign — professional layout grid with data visualization cards, KPI summary row, quick actions
-- [ ] **UI-02**: Design system harmonization — consistent spacing scale, typography hierarchy, color palette, shadow system, border radii across all pages
-- [ ] **UI-03**: Landing page upgrade — real imagery, improved hero animations, better copywriting, testimonials section refresh
-- [ ] **UI-04**: Dark mode support — system preference detection, manual toggle, all components and pages styled for dark theme
-- [ ] **UI-05**: Loading and error states audit — skeleton loaders on every data-fetching page, consistent error boundaries, empty states review
-- [ ] **UI-06**: Responsive design audit — mobile/tablet/desktop breakpoints verified on all dashboard and marketing pages
+- [ ] **AUTH-01**: Auth layout with gradient mesh background and centered glass card (glass-surface-heavy) for login/register/reset-password forms
+- [ ] **AUTH-02**: Form inputs inside auth glass card remain opaque with clear focus states — glass is the card wrapper only, never input fields
+- [ ] **AUTH-03**: Entrance animation on auth card — opacity + y slide-up on page load using Motion library
 
----
+### Polish and Animations (POLSH)
 
-## Future Requirements (v1.4+)
+- [ ] **POLSH-01**: Entrance animations on dashboard KPI cards — stagger fade+slide (50ms per card, 300ms ease-out) on initial page load using Motion
+- [ ] **POLSH-02**: Glass shimmer loading skeletons replacing flat PageSkeleton/TableSkeleton in glass contexts — Motion-powered shimmer wave over glass-shaped placeholders
+- [ ] **POLSH-03**: Glass dropdown/select menus in settings and filter contexts — glass treatment on shadcn Select and DropdownMenu components
+- [ ] **POLSH-04**: Glass tooltip style override for shadcn Tooltip — frosted glass instead of default black rectangle
+- [ ] **POLSH-05**: Dark mode comprehensive QA — all glass components verified on #191919 base with correct opacity, border prominence, and gradient orb saturation per dark mode glass recipe
+- [ ] **POLSH-06**: Responsive QA at 375px (mobile), 768px (tablet), 1280px (desktop) — no horizontal scroll, no overlapping elements, glass degradation active on mobile
 
-- **PERF-01**: Load testing with k6 against production-like environment
-- **SEC-01**: Penetration testing and security audit
-- **SCALE-01**: Horizontal scaling validation with multiple web instances
-- **VOICE-01**: Natural language / voice booking via OpenAI NLU integration
-- **TENANT-01**: Per-tenant AI models (requires >10K bookings per company)
-- **FORECAST-01**: Capacity forecast chart with Prophet (needs real historical data)
-- **NOTIF-01**: In-app notification center with real-time updates
-- **API-01**: Public API with OAuth2 for third-party integrations
+## v2 Requirements
+
+### Advanced Glass Effects
+
+- **GLASS-01**: Mouse-tracking "flashlight" border effect on KPI cards — cursor-following radial gradient on card border
+- **GLASS-02**: Per-company brand color glass interaction — glass tint inherits company brand color
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Mobile native app | PWA sufficient, defer to v2.0 |
-| Stripe billing | Using Comgate recurring — single Czech provider for all payments |
-| Per-tenant AI models | SMBs have 50-500 bookings, need >10K for meaningful per-tenant training |
-| Capacity forecast chart | Prophet needs real data, not synthetic, to be credible |
-| Real-time chat | High complexity, not core to scheduling value |
-| White-label multi-tenant | Franchise model covers multi-location; full white-label is v2.0+ |
+| Glass on every surface simultaneously | Destroys visual hierarchy, GPU performance catastrophe on mobile |
+| Animated backdrop-filter blur values | Not GPU-composited, causes layout repaint jank |
+| Glass on form inputs | Ambiguity between editable field and decorative panel |
+| Glass on primary CTA buttons | Book/Save/Submit must be solid and high-contrast |
+| Glass on data table rows/calendar cells/chart canvases | Readability failure + GPU catastrophe |
+| Glass on public booking widget | Renders on unknown third-party backgrounds |
+| 3D perspective tilt on glass cards | Known Chrome bug with backdrop-filter |
+| Dark mode panels below 50% opacity | Invisible against near-black background |
+| New backend/API/database changes | This is purely a frontend visual redesign |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BILL-01 | Phase 28 | Pending |
-| BILL-02 | Phase 28 | Pending |
-| BILL-03 | Phase 28 | Pending |
-| BILL-04 | Phase 28 | Pending |
-| BILL-05 | Phase 28 | Pending |
-| BILL-06 | Phase 28 | Pending |
-| BILL-07 | Phase 28 | Pending |
-| LIMIT-01 | Phase 29 | Pending |
-| LIMIT-02 | Phase 29 | Pending |
-| LIMIT-03 | Phase 29 | Pending |
-| LIMIT-04 | Phase 29 | Pending |
-| LIMIT-05 | Phase 29 | Pending |
-| ORG-01 | Phase 30 | Pending |
-| ORG-02 | Phase 30 | Pending |
-| ORG-03 | Phase 30 | Pending |
-| ORG-04 | Phase 30 | Pending |
-| ORG-05 | Phase 30 | Pending |
-| ORG-06 | Phase 30 | Pending |
-| ANLYT-01 | Phase 31 | Pending |
-| ANLYT-02 | Phase 31 | Pending |
-| ANLYT-03 | Phase 31 | Pending |
-| ANLYT-04 | Phase 31 | Pending |
-| ANLYT-05 | Phase 31 | Pending |
-| ANLYT-06 | Phase 31 | Pending |
-| ANLYT-07 | Phase 31 | Pending |
-| ANLYT-08 | Phase 31 | Pending |
-| UI-01 | Phase 32 | Pending |
-| UI-02 | Phase 32 | Pending |
-| UI-03 | Phase 32 | Pending |
-| UI-04 | Phase 32 | Pending |
-| UI-05 | Phase 32 | Pending |
-| UI-06 | Phase 32 | Pending |
+| DSYS-01 | Phase 33 | Pending |
+| DSYS-02 | Phase 33 | Pending |
+| DSYS-03 | Phase 33 | Pending |
+| DSYS-04 | Phase 33 | Pending |
+| DSYS-05 | Phase 33 | Pending |
+| DSYS-06 | Phase 33 | Pending |
+| DSYS-07 | Phase 33 | Pending |
+| COMP-01 | Phase 34 | Pending |
+| COMP-02 | Phase 34 | Pending |
+| COMP-03 | Phase 34 | Pending |
+| COMP-04 | Phase 34 | Pending |
+| COMP-05 | Phase 34 | Pending |
+| COMP-06 | Phase 34 | Pending |
+| DASH-01 | Phase 35 | Pending |
+| DASH-02 | Phase 35 | Pending |
+| DASH-03 | Phase 35 | Pending |
+| DASH-04 | Phase 35 | Pending |
+| DASH-05 | Phase 35 | Pending |
+| MKTG-01 | Phase 36 | Pending |
+| MKTG-02 | Phase 36 | Pending |
+| MKTG-03 | Phase 36 | Pending |
+| MKTG-04 | Phase 36 | Pending |
+| MKTG-05 | Phase 36 | Pending |
+| AUTH-01 | Phase 37 | Pending |
+| AUTH-02 | Phase 37 | Pending |
+| AUTH-03 | Phase 37 | Pending |
+| POLSH-01 | Phase 37 | Pending |
+| POLSH-02 | Phase 37 | Pending |
+| POLSH-03 | Phase 37 | Pending |
+| POLSH-04 | Phase 37 | Pending |
+| POLSH-05 | Phase 37 | Pending |
+| POLSH-06 | Phase 37 | Pending |
 
 **Coverage:**
-- v1.3 requirements: 32 total
-- Mapped to phases: 32
-- Unmapped: 0
+
+- v1.4 requirements: 31 total
+- Mapped to phases: 31
+- Unmapped: 0 ✓
 
 ---
 
-_Requirements defined: 2026-02-24_
-_Last updated: 2026-02-24 after roadmap creation (all 32 requirements mapped)_
+_Requirements defined: 2026-02-25_
+_Last updated: 2026-02-25 — roadmap created, all 31 requirements mapped to Phases 33-37_

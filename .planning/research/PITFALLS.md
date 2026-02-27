@@ -1,417 +1,521 @@
-# Domain Pitfalls — v1.3 Revenue & Growth
+# Pitfalls Research
 
-**Domain:** Adding subscription billing, multi-location/franchise, usage metering, analytics dashboards, and frontend polish to existing ScheduleBox SaaS (~65k LOC, v1.2 shipped)
-**Researched:** 2026-02-24
-**Confidence:** HIGH for billing/RLS/analytics (verified with codebase inspection + multiple sources); MEDIUM for Comgate recurring-specific API (official docs blocked, SDK partially inspected)
+**Domain:** Glassmorphism design overhaul for existing Next.js 14 / Tailwind / shadcn/ui SaaS application
+**Researched:** 2026-02-25
+**Confidence:** HIGH (backed by MDN, NNG, Chrome DevRel, Axess Lab, Josh Comeau deep-dive, and browser bug trackers)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that will cause data corruption, production incidents, or full rewrites.
+Mistakes that will cause visual regressions, accessibility failures, or significant rewrites.
 
 ---
 
-### Pitfall 1: Multi-Location Breaks the Single company_id JWT Assumption
+### Pitfall 1: Glass on a Solid Background Is Invisible
 
 **What goes wrong:**
-Every JWT token embeds exactly one `company_id` claim. Every call to `findCompanyId(user.sub)` in all ~94 API routes returns a single integer. When a franchise owner manages 3 locations (each a separate `company_id`), there is no way for them to view cross-location data or switch context without a new token. Worse, if you model franchise as a hierarchy on top of existing companies (e.g., adding a `parent_company_id`), queries that filter only by the leaf `company_id` will silently exclude data the owner expects to see.
+The glassmorphism effect only works when there is something interesting behind the element to blur. If the background is a single flat color, `backdrop-filter: blur()` just blurs that solid color — producing a washed-out, slightly transparent panel that looks like a broken UI, not premium glass. ScheduleBox's current `globals.css` sets `--background: 0 0% 100%` (pure white) in light mode and `--background: 222.2 84% 4.9%` (near-black) in dark mode. Every glass card placed on these backgrounds will look identical to a low-opacity solid card — the effect is lost entirely.
 
 **Why it happens:**
-`tenant-scope.ts` does `users.companyId` → single integer. The function signature returns `{ companyId: number; companyUuid: string }` — no concept of "effective company context" or "set of authorized company IDs." The RLS policies in `policies.sql` use `current_company_id()` which is set to exactly one value per connection.
-
-**Consequences:**
-- Franchise dashboard shows zero bookings (all belong to child company IDs, not parent)
-- Cross-location reports aggregate incorrectly or throw RLS violations
-- Every API route that calls `findCompanyId` must be re-examined — that is currently 94 endpoints
-- JWT tokens become stale: a user's token has `company_id: 5` but they need to query companies 5, 6, 7
-
-**Prevention:**
-Model franchise before touching any other feature. Design choices early:
-
-Option A — Separate Auth Context (recommended): Add a `franchise_id` to the companies table. Build a separate `GET /api/v1/franchise/switch?location_id=X` that mints a new JWT for the target location. Franchise owner gets a location-picker UI before entering the dashboard. No change to RLS or existing routes.
-
-Option B — Aggregate Queries at Application Layer: Create new `/api/v1/franchise/*` endpoints that explicitly loop or `IN (...)` across a set of location IDs. Never pass a franchise query through the existing single-company-id middleware.
-
-Do NOT modify `findCompanyId` to return multiple IDs — every downstream caller makes assumptions about a scalar company context. That path cascades changes into all 94 routes.
-
-**Detection (warning signs):**
-- Anyone proposes "just add `parent_company_id` to companies and query `WHERE company_id IN (...)`" — this will break RLS
-- A franchise owner can see another owner's data in test
-- Analytics endpoints return 0 rows for the franchise owner
-
-**Phase:** Must be designed in the franchise schema phase before any API work starts. Architecture decision is irreversible once locations start accumulating data.
-
-**Confidence:** HIGH — based on direct inspection of `tenant-scope.ts`, `policies.sql`, and the companies schema.
-
----
-
-### Pitfall 2: RLS Policies Break When Adding parent_company_id to Existing Tables
-
-**What goes wrong:**
-If multi-location is implemented by adding a `parent_company_id` FK to the `companies` table (a tempting shortcut), existing RLS policies fail in subtle ways. The policy `USING (company_id = current_company_id())` on 29 tables still filters by leaf company ID. A franchise admin querying with parent's company_id sees no rows. A developer then adds `OR company_id IN (SELECT id FROM companies WHERE parent_company_id = current_company_id())` to every policy — this runs a subquery on every row access, creating a severe performance regression that is invisible in development but catastrophic under load.
-
-**Why it happens:**
-PostgreSQL RLS policies execute for every row evaluated, not just the final result set. A subquery inside a USING clause becomes an N×M problem: for a bookings table with 100k rows, every row triggers the subquery. The EXPLAIN plan may look fine with 100 rows but degrade linearly with data growth.
-
-**Consequences:**
-- 20x query slowdown under load that doesn't appear in dev
-- Franchise admin can see child locations' data (if policy logic wrong) or can't see any (if too strict)
-- Cannot easily roll back: once data exists with parent/child relationships, the schema change is permanent
-
-**Prevention:**
-Do not extend RLS policies with subqueries. Enforce franchise isolation entirely at the application layer via explicit `WHERE company_id IN (...)` in new franchise-specific endpoints. Keep existing 29 RLS policies unchanged. The FORCE ROW LEVEL SECURITY on all tables means you must maintain `SET app.company_id` to a valid leaf company ID for every query — this is the constraint you must work within.
-
-**Detection:**
-- EXPLAIN ANALYZE on any booking/customer query shows nested loop on companies table inside RLS filter
-- Query time increases proportionally to number of child locations
-
-**Phase:** Franchise data model design.
-**Confidence:** HIGH — based on `policies.sql` inspection and PostgreSQL RLS performance documentation.
-
----
-
-### Pitfall 3: Comgate recurring payments require manual approval and a second API flow
-
-**What goes wrong:**
-The existing Comgate integration handles one-time payments via a standard redirect flow (`/api/v1/payments/comgate/create`). Adding subscription billing assumes you can simply flag a payment as "recurring" — but Comgate recurring payments are a separate API feature that: (1) requires explicit merchant approval from Comgate support (not automatically enabled), (2) uses a two-phase API flow (`initRecurring=true` on first payment, then a separate server-to-server `POST /v1.0/recurring` call for subsequent charges), and (3) sends recurring charge webhooks to a different endpoint than one-time payment webhooks.
-
-**Why it happens:**
-The existing `comgate/client.ts` and webhook handler are built for `status: PAID | CANCELLED | AUTHORIZED`. Recurring payment webhooks from Comgate carry a different payload structure and may arrive at the same webhook URL but with additional fields (`isRecurring`, `recurringId`). Without understanding this, teams add `initRecurring` to the payment create call and expect subsequent charges to happen automatically — they do not. Each billing cycle requires an explicit API call from your server.
-
-**Consequences:**
-- Subscriptions never auto-renew: first payment works, renewals silently fail
-- Recurring payments processed twice if webhook deduplication uses `transId` only (each recurrence has a new `transId`)
-- Comgate sandbox may not support recurring — production testing required
-- Missing Comgate approval blocks the entire billing feature
-
-**Prevention:**
-1. Contact Comgate support to enable recurring payments on the merchant account before any coding starts (this can take days to weeks)
-2. Build a separate `subscriptions` table tracking `comgate_init_trans_id` (the ID from the first payment, used as the token for all future charges)
-3. Build a separate scheduled job (cron) that calls Comgate's recurring endpoint for each active subscription on the billing date — do not rely on Comgate to initiate charges
-4. Add a separate webhook handler branch for recurring payment confirmations
-5. Test the full renewal cycle in Comgate sandbox before production
-
-**Detection:**
-- First subscriber payment succeeds, no renewal ever arrives
-- Comgate API returns an error code indicating recurring not enabled on account
-
-**Phase:** Billing infrastructure phase, before any subscription UI work.
-**Confidence:** MEDIUM — Comgate official docs repeatedly 403'd during research. Findings based on Comgate public site description, GitHub SDK inspection, and general recurring payment gateway patterns. Verify directly with Comgate support.
-
----
-
-### Pitfall 4: Subscription State Lives in companies.subscription_plan but Comgate Webhook Is Async
-
-**What goes wrong:**
-The companies table already has `subscription_plan` (enum: free/starter/professional/enterprise), `subscription_valid_until`, and `trial_ends_at`. The temptation is to update these fields directly in the Comgate webhook handler when a subscription payment succeeds. But Comgate webhooks arrive 1–5 seconds after the user returns from the payment page. The user is immediately redirected back to the dashboard, which reads `subscription_plan` from the database and shows "Free" — their payment was accepted but the webhook hasn't arrived yet.
-
-**Why it happens:**
-`apps/web/app/api/v1/webhooks/comgate/route.ts` already demonstrates this pattern for one-time payments: the webhook fires after the redirect. For subscriptions the stakes are higher because the user expects to immediately access paid features.
-
-**Consequences:**
-- User pays for Professional, lands on dashboard, still sees Free plan limitations → contacts support, churn risk
-- If you add a "sync on return" endpoint (immediately query Comgate API on return), you add a second path to update subscription state — now both the sync endpoint AND the webhook can update the same row simultaneously, causing a race condition on `subscription_plan`
-- Downgrade webhooks (subscription cancellation) are even more dangerous: processing a cancellation twice resets a valid subscription
-
-**Prevention:**
-1. Add a `subscription_events` table that records every Comgate subscription webhook (with `transId` as primary key for idempotency)
-2. The webhook handler inserts into `subscription_events` and updates `subscription_plan` — both in one transaction
-3. On the return redirect, the frontend polls `/api/v1/billing/status` with a 1s interval for up to 10 seconds. The endpoint reads from `subscription_events` (reflects webhook arrival) not the companies row directly
-4. Protect the update with `SELECT FOR UPDATE` on the company row to prevent concurrent webhook + sync-endpoint from both writing
-5. Use the `subscription_valid_until` timestamp as the source of truth for feature gating, not the string plan name
-
-**Detection:**
-- Load test: 50 concurrent subscription payments, check how many result in correct plan assignment
-- User reports: "I paid but still see Free plan"
-
-**Phase:** Billing webhook handling phase.
-**Confidence:** HIGH — race condition pattern verified with Stripe/billing webhook documentation and confirmed against existing Comgate webhook handler in codebase.
-
----
-
-### Pitfall 5: Usage Metering Enforcement Breaks All Free-Tier Users If Applied Retrospectively
-
-**What goes wrong:**
-The system currently has zero usage limits. When you add limits (e.g., "Free tier: 50 bookings/month"), you must decide: do these limits apply from the day you deploy them, or from each user's billing period start? If you deploy limits at midnight and query `SELECT COUNT(*) FROM bookings WHERE company_id = ? AND created_at > NOW() - INTERVAL '30 days'`, every free-tier user who already has 50+ bookings in the past 30 days is immediately blocked from creating new bookings — even for bookings that occurred before the limits were announced. Users who've been using the product freely for months become "locked out" overnight.
-
-**Why it happens:**
-No `billing_period_start` anchor exists in the current schema. `companies.subscriptionPlan` is just a string. There is no metering table counting monthly usage per tenant.
-
-**Consequences:**
-- Free trial users who were promised unlimited access during beta feel deceived → mass churn
-- If you soft-launch limits only for new signups, you need a `grandfathered_until` field or a feature flag — adding this retroactively is a schema migration on a live 49-table database
-- Usage count queries on the `bookings` table run on the OLTP database — at scale, `COUNT(*)` with a date range on a large table slows down every booking creation
-
-**Prevention:**
-1. Add a `usage_limits` table: `(company_id, period_start, period_end, resource, used_count, limit)` — pre-compute and cache monthly usage
-2. Add `billing_period_start` to the `companies` table (default: company `created_at`)
-3. Announce limits with a 30-day grace period before enforcement
-4. Maintain a Redis counter (`INCR usage:{company_id}:{month}`) as the hot path for limit checks — fall back to DB count for Redis cache miss, not the other way around
-5. Never do `COUNT(*) FROM bookings` inline during booking creation — check the Redis counter atomically before the booking insert
-
-**Detection:**
-- Free users immediately blocked after deploy without prior announcement
-- Booking creation latency spikes after limit check added to the hot path
-
-**Phase:** Usage limits and tier enforcement phase — must come after billing is set up, before limit enforcement goes live.
-**Confidence:** HIGH — based on direct schema inspection and general SaaS metering patterns.
-
----
-
-### Pitfall 6: Analytics Queries on the OLTP Database Will Lock Booking Rows
-
-**What goes wrong:**
-The existing `analytics_events` table and the `bookings`, `payments`, `customers` tables are all in the same OLTP PostgreSQL database. Adding analytics dashboards that run `GROUP BY`, `DATE_TRUNC`, `SUM()` across these tables will compete with the booking creation path for I/O, memory, and connection slots. A 30-day revenue report joining bookings × payments × customers on a medium-sized tenant (10k bookings) will run for 2–10 seconds, during which it holds a shared lock on the scanned pages — blocking concurrent inserts on those same pages.
-
-**Why it happens:**
-PostgreSQL's MVCC model does reduce lock contention, but analytics queries still consume significant I/O bandwidth and shared buffer cache, evicting the hot booking/availability data. The `idx_analytics_created` and `idx_audit_created` composite indexes are on `(company_id, created_at)` — correct for OLTP lookups but insufficient for cross-company aggregations that admins will need.
-
-**Consequences:**
-- Booking creation P99 latency spikes when a large tenant runs a weekly report
-- Dashboard queries timeout at 30s under concurrent OLTP load
-- Adding indexes to support analytics queries increases write latency on the booking insert path
-
-**Prevention:**
-1. Route all analytics reads to a PostgreSQL read replica — this is the minimum viable separation
-2. Create materialized views for common aggregations (revenue by day, bookings by employee) and refresh them on a schedule (hourly or nightly), not on demand
-3. Never expose a raw `GROUP BY` endpoint without an explicit time-range limit (max 90 days) and result caching in Redis
-4. For franchise analytics (aggregate across multiple companies), run these as async jobs that write results to an `analytics_reports` table — the user requests a report, waits for completion, downloads it
-5. Index strategy: add `(company_id, created_at, status)` composite indexes to `bookings` and `payments` for analytics range queries, but test the write-path impact before deploying to production
-
-**Detection:**
-- EXPLAIN ANALYZE on a "last 30 days revenue" query takes > 500ms on dev data
-- Booking creation latency degrades when another tenant triggers a dashboard refresh
-
-**Phase:** Analytics infrastructure phase — before building any dashboard UI.
-**Confidence:** HIGH — verified with PostgreSQL OLTP/analytics resource contention documentation and materialized view patterns.
-
----
-
-## High-Risk Areas
-
-Issues that are likely to cause rework if not caught early, but not immediately catastrophic.
-
----
-
-### Risk Area 1: Drizzle ORM Cannot Generate Migrations for RLS Policy Changes
-
-**What goes wrong:**
-Drizzle Kit's `generate` command creates SQL migrations from schema TypeScript changes. However, adding new RLS policies, modifying existing `CREATE POLICY` statements, or adding a `parent_company_id` column with a cascading RLS check are not schema-level Drizzle changes — they require custom SQL in the migration file. Developers who rely on `drizzle-kit generate` will get a migration file that adds the column but silently omits the policy update. The result is a deployed migration that looks complete but leaves tenant isolation broken.
-
-**Why it happens:**
-Drizzle added RLS support in v0.30+ (October 2024) via `pgPolicy`, but the existing `policies.sql` is a standalone SQL file applied separately from Drizzle migrations. Any new RLS policy for new v1.3 tables must be added to `policies.sql` AND the deployment process must re-run it.
-
-**Prevention:**
-1. Create a dedicated `0002_v13_rls_policies.sql` custom migration file for every new RLS policy added in v1.3
-2. Add an integration test that verifies: when `app.company_id` is set to company A's ID, querying a new v1.3 table returns 0 rows for company B's data
-3. Run the full `policies.sql` as part of deploy (it is idempotent — uses DROP IF EXISTS / CREATE POLICY)
-
-**Phase:** Every phase that adds new tables.
-**Confidence:** HIGH — based on direct inspection of `policies.sql`, Drizzle Kit documentation, and the existing migration pattern.
-
----
-
-### Risk Area 2: Invoice Numbering Collision When Recurring Payments Auto-Fire
-
-**What goes wrong:**
-The existing invoice system uses a per-company sequential number guaranteed by a UNIQUE constraint on `(company_id, invoice_number)`. Today, invoices are created synchronously in the webhook handler or payment route. When subscription renewals fire automatically (via cron job calling Comgate), multiple renewals may fire near-simultaneously for different customers of the same company. Two concurrent invoice inserts using `MAX(invoice_number) + 1` hit the unique constraint — one transaction succeeds, the other throws a `23505` unique constraint violation and the invoice is never created.
-
-**Why it happens:**
-The pattern `await generateInvoiceNumber(tx)` inside the existing invoice generator does not use a PostgreSQL SEQUENCE — it reads the current max and increments. This is a read-modify-write race condition that existing single-invoice-at-a-time flows never trigger but recurring batch billing will.
-
-**Prevention:**
-Create a `company_invoice_seq` PostgreSQL SEQUENCE per company, or use a single shared sequence with company prefix, for all v1.3 invoice generation. Alternatively: use `INSERT INTO invoices ... ON CONFLICT (company_id, invoice_number) DO NOTHING` with retry logic in the invoice service. Do not use `MAX() + 1`.
-
-**Phase:** Subscription billing invoice generation.
-**Confidence:** HIGH — based on direct inspection of `payments.ts` schema and the `createInvoiceForPayment` call pattern in existing payment routes.
-
----
-
-### Risk Area 3: Frontend Feature-Gating Creates Inconsistent UI State
-
-**What goes wrong:**
-When you add plan-based feature gating (e.g., "Multi-location requires Professional plan"), you must gate both the API (return 403 with `{ code: 'PLAN_LIMIT' }`) and the UI (hide or disable the feature in the sidebar). If only the API is gated, users can see buttons that always fail with cryptic errors. If only the UI is gated, sophisticated users call the API directly and bypass the limit. The inconsistency creates a support burden and erodes trust.
-
-The deeper issue: frontend feature flags are driven by `subscription_plan` read from the API on login. If that value is cached in Zustand global state, a user who upgrades mid-session sees the old plan until they refresh. A user who's downgraded still sees paid features in the UI until they refresh — but the API correctly rejects calls.
-
-**Why it happens:**
-Zustand store is populated from the initial auth response. No subscription change event exists to push an update to connected clients.
-
-**Prevention:**
-1. Gate every feature at the API layer first (return 403 + `{ code: 'PLAN_LIMIT', requiredPlan: 'professional' }`)
-2. Add plan info to the JWT refresh response so it's re-read when the token rotates (every 15 minutes)
-3. UI gates should read from a React Query subscription status query that has a short stale time (2 minutes), not from the initial Zustand auth load
-4. On the billing success/return page, explicitly invalidate the subscription status query cache so the UI re-renders immediately
-
-**Phase:** Billing UI and feature-flag phase.
-**Confidence:** HIGH — based on direct inspection of `route-handler.ts`, Zustand usage, and React Query setup in the codebase.
-
----
-
-### Risk Area 4: Multi-Location Customers Are Ambiguous
-
-**What goes wrong:**
-The `customers` table has `(company_id, email)` with a unique constraint. A customer who visits two franchise locations (e.g., they book at Location A and Location B) exists as two separate customer records — one per `company_id`. When a franchise owner views "all customers across my locations," they see duplicates. Loyalty points earned at Location A are invisible from Location B's dashboard.
-
-**Why it happens:**
-The current model assumes one customer per company. Cross-location customer identity was not a design consideration in v1.0.
-
-**Consequences:**
-- Franchise-level CRM shows inflated customer counts (double-counts)
-- Loyalty program cannot accumulate points across locations
-- Marketing segmentation counts are wrong
-
-**Prevention:**
-Add a `master_customer_id` nullable FK on the customers table pointing to another customer record designated as the canonical identity. Build a deduplication service that matches by email across locations under the same franchise. Do NOT merge the rows — keep them separate for RLS correctness, just link them via `master_customer_id`. Franchise-level queries JOIN on this field.
-
-**Phase:** Multi-location customer data model design.
-**Confidence:** MEDIUM — based on schema inspection and general franchise CRM patterns. Specific deduplication strategy may need iteration.
-
----
-
-### Risk Area 5: Subscription Cancellation Leaves Orphaned Active Features
-
-**What goes wrong:**
-When a subscription is cancelled (either by the user or due to payment failure), the system must downgrade the company to the Free plan. If this happens via the Comgate cancellation webhook, there is a window between "webhook not yet received" and "subscription expired" during which the company continues using paid features. More dangerous: if the downgrade logic deletes or archives resources that exceed the Free tier limit (e.g., "Free plan supports 1 location, Professional supports 5 — delete excess locations on downgrade"), this can destroy a user's data on payment failure.
-
-**Why it happens:**
-No graceful downgrade logic exists in v1.2. `subscription_plan` is updated but no cleanup runs.
-
-**Prevention:**
-1. Never delete user data on downgrade — set excess resources to `is_active = false` (soft-disable)
-2. Give a 7-day grace period after subscription lapse before enforcing tier limits (update `subscription_valid_until` to `now() + 7 days` on cancellation)
-3. Send email notification at cancellation and 3 days before grace period ends
-4. Build a nightly job that checks expired subscriptions and soft-disables excess resources, logging all actions to audit_logs
-
-**Phase:** Billing subscription lifecycle management phase.
-**Confidence:** HIGH — based on general SaaS subscription best practices and confirmed by codebase inspection of the companies schema.
-
----
-
-### Risk Area 6: next-intl Route Groups Break When New Dashboard Sections Are Added
-
-**What goes wrong:**
-The existing frontend uses next-intl with locale prefixes (`/cs/`, `/en/`, `/sk/`). When adding new pages for billing (e.g., `/dashboard/billing/plans`), franchise management (e.g., `/dashboard/locations`), and analytics, developers often forget to: (1) add the new route to the middleware matcher in `middleware.ts`, (2) add Czech/Slovak translation strings for the new section, or (3) add the new section to the sidebar navigation with proper i18n keys. The result is an English-only billing page in an otherwise Czech UI, and sidebar links that throw "missing translation key" warnings.
-
-**Why it happens:**
-next-intl requires every user-visible string to come from a message file. New pages that use hardcoded English strings pass TypeScript checks but break the Czech UX.
-
-**Prevention:**
-1. Create message file entries for every new UI section in Czech (primary), Slovak, and English simultaneously — do not ship a feature with untranslated strings
-2. Add a CI check (or lint rule) that fails if any `t('...')` key is not present in all three locale files
-3. Update the middleware matcher array in `middleware.ts` when adding new route segments
-4. For the billing/subscription section specifically, ensure plan names and pricing appear in CZK with Czech number formatting (Intl.NumberFormat with `cs-CZ`)
-
-**Phase:** Any phase adding new frontend pages.
-**Confidence:** HIGH — based on direct inspection of the i18n setup and next-intl pattern in the codebase.
-
----
-
-### Risk Area 7: Analytics Aggregate Queries Must Be RLS-Aware for Franchise Context
-
-**What goes wrong:**
-When building analytics endpoints (e.g., "total revenue this month"), every query runs with `SET app.company_id = ?` for a single tenant. Franchise-level analytics (aggregate across multiple company IDs) cannot use the RLS machinery at all — you must bypass it with a raw query or with a superuser/service role connection. If developers reuse the existing `db` client (which has `app.company_id` set) for franchise aggregation, they will see data from one location only and silently undercount.
-
-**Why it happens:**
-The db client setup in `packages/database/src/client.ts` is configured for single-tenant RLS operation. There is no "multi-tenant aggregation" mode in the current architecture.
-
-**Prevention:**
-1. Create a separate `db_service_role` connection that connects with a PostgreSQL role that has `BYPASSRLS` attribute, used exclusively for platform-level analytics and admin queries
-2. Never expose this connection in user-facing API routes — restrict to internal analytics job runners
-3. Add explicit `WHERE company_id IN (?)` clauses even when using the service role connection, as a defense-in-depth measure
-4. Log every service-role query to audit_logs with `user_id = null, action = 'platform_analytics'`
-
-**Phase:** Analytics infrastructure.
-**Confidence:** HIGH — based on direct inspection of `policies.sql` (FORCE ROW LEVEL SECURITY is applied), Drizzle client setup, and RLS documentation.
-
----
-
-## Minor Pitfalls
-
-Friction points that create rework but are recoverable.
-
----
-
-### Minor 1: Comgate Webhook Idempotency Table Will Fill With Subscription Events
-
-The existing `processed_webhooks` table (used by `checkWebhookIdempotency`) uses `transId` as the primary key. For recurring payments, each monthly charge has a new `transId`. Over 12 months with 1000 active subscribers, this table accumulates 12,000 rows per year. No cleanup job exists. Add a retention policy: delete rows older than 90 days. Index on `processed_at` for efficient cleanup.
-
-**Phase:** Billing webhook infrastructure.
-
----
-
-### Minor 2: Materialized View Refresh Blocks During Analytics Heavy Load
-
-PostgreSQL `REFRESH MATERIALIZED VIEW` acquires an `ExclusiveLock` on the view table by default. During refresh, any reads against the materialized view return an error. Use `REFRESH MATERIALIZED VIEW CONCURRENTLY` for all v1.3 analytics views. This requires a UNIQUE index on the view, so design views with a `(company_id, period, dimension)` composite unique key from the start. Concurrent refresh is slower but non-blocking.
-
-**Phase:** Analytics database phase.
-
----
-
-### Minor 3: shadcn/ui Component Updates Between v1.2 and v1.3
-
-shadcn/ui deprecated the `toast` component in favor of `sonner` in late 2024. The existing codebase uses `toast`. Adding new components (e.g., a billing upgrade modal) from the current shadcn/ui CLI will pull in `sonner` if you install new components, creating two toast systems running simultaneously. Either migrate all toasts to `sonner` in v1.3 or pin the shadcn/ui CLI version to pre-sonner and add new components manually.
-
-**Phase:** Frontend polish phase.
-
----
-
-### Minor 4: Drizzle check() Constraint on subscription_plan Needs Updating
-
-The `companies` table has:
-```sql
-CHECK subscription_plan IN ('free', 'starter', 'professional', 'enterprise')
+Developers apply `backdrop-filter: blur(12px)` to components and expect the result to look like design mockups, which were made against gradient mesh or photo backgrounds in Figma. The `backdrop-filter` property blurs whatever is literally behind the element at the pixel level; if the background layer is monotone, there is nothing interesting to reveal.
+
+**How to avoid:**
+Establish gradient mesh backgrounds before applying any glass effects. A minimum viable approach: add 2–3 large, softly blurred radial gradient "orbs" (positioned absolute, pointer-events-none) anchored to page-level layouts.
+
+```css
+/* light mode ambient layer */
+background: radial-gradient(ellipse at 20% 50%, hsl(217 91% 60% / 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse at 80% 20%, hsl(142 71% 45% / 0.10) 0%, transparent 55%);
 ```
-If v1.3 renames or adds plan tiers (e.g., adding a `franchise` tier), this CHECK constraint must be updated in a migration. Drizzle does not automatically update CHECK constraints when you change `.$type<>()` — you must write a custom migration that `ALTER TABLE companies DROP CONSTRAINT subscription_plan_check, ADD CONSTRAINT ...`. Forgetting this causes silent Drizzle type mismatches (TypeScript says the value is valid, PostgreSQL rejects it with a constraint error at runtime).
 
-**Phase:** Billing plan schema migration.
+Both light and dark modes need their own orb sets — in dark mode the orbs need more saturation (purple, blue, teal at 0.20–0.30 opacity) to register against the dark canvas.
 
----
+**Warning signs:**
+- Glass cards look the same as non-glass cards except slightly transparent
+- Mockups look great in Figma; implementation looks flat in browser
+- Adding `backdrop-filter` produces no visible change
 
-### Minor 5: React Query Cache Stale Time for Subscription Status
-
-The default TanStack Query stale time is 0 (always refetch on mount). For subscription status, this means an extra API call on every page navigation, adding latency to every dashboard load. For billing data that changes only on webhook receipt, set a stale time of 5 minutes and invalidate on billing action completion. Conversely, do not cache subscription status for too long — a cancelled subscription should deactivate features within minutes, not hours.
-
-**Phase:** Frontend billing integration.
+**Phase to address:** Phase 1 — Foundation / Background System. Must be done before any glass component work. Glass applied before background orbs exists will be invisible and invalidate all component-level testing.
 
 ---
 
-## Phase-Specific Warnings
+### Pitfall 2: Dark Mode Glass Looks Muddy or Invisible
 
-| Phase Topic | Likely Pitfall | Mitigation |
+**What goes wrong:**
+Dark mode exposes the weakest point of glassmorphism. With a very dark background (ScheduleBox uses near-black `222.2 84% 4.9%`), a glass card with `background: white/0.05` and `backdrop-filter: blur(12px)` blurs near-black content with near-black ambient light, producing a dark gray smear. The panel becomes invisible against the background at best, or picks up harsh glow artifacts from bright elements that scroll behind it at worst.
+
+**Why it happens:**
+Designers prototype dark mode glass against colorful gradient backgrounds in Figma. Developers copy the opacity values (5–10% white fill) without recreating those background conditions. The formula that works in light mode (less saturation, lighter orbs) fails completely in dark mode because there is not enough chromatic difference for blur to show.
+
+**How to avoid:**
+Dark mode glass needs a completely different recipe than light mode:
+- Use `background: rgba(255, 255, 255, 0.06)` to `rgba(255, 255, 255, 0.10)` — slightly higher opacity than light mode
+- Increase border prominence: `border: 1px solid rgba(255, 255, 255, 0.12)` — borders carry most of the "glass" perception in dark mode
+- Background orbs in dark mode must be noticeably more saturated and higher opacity (0.20–0.35) than in light mode
+- Avoid pure black (`#000000`) as the page background — use dark charcoal with a slight blue tint so orbs register
+- Add a subtle white gradient on the top edge of glass cards (`background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, transparent 100%)`) to simulate light hitting glass from above
+
+Test on the actual deployed dark background on a non-developer display, not Figma.
+
+**Warning signs:**
+- Cards are visually indistinguishable from the background
+- You can only see a card by its border, not its glass surface
+- Scrolling content behind a glass panel looks identical blurred vs. unblurred
+
+**Phase to address:** Phase 1 (background system) AND Phase 2 (glass design tokens). Dark mode glass requires a separate token set — same token values as light mode will fail.
+
+---
+
+### Pitfall 3: WCAG Contrast Failures on Glass Surfaces
+
+**What goes wrong:**
+Text on semi-transparent glass surfaces fails WCAG 2.2 contrast requirements (4.5:1 for body text, 3:1 for large text and UI elements). The failure is non-obvious and context-dependent: the glass panel sits over different background areas as the page scrolls, meaning text contrast varies continuously. A ratio that passes at one scroll position fails at another. Standard contrast checkers evaluate a fixed background color and cannot catch this.
+
+**Why it happens:**
+Translucent components overlay multiple colors. Text may have enough contrast over one background area and fail over another. Developers check contrast against the glass panel's own color and pass — but do not account for the shifting blurred content behind the panel.
+
+**How to avoid:**
+Never rely solely on blur for text legibility. Use a semi-opaque color scrim beneath all text within glass panels:
+
+```css
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--background) / 0.25);
+  border-radius: inherit;
+  pointer-events: none;
+}
+```
+
+Additionally:
+- Prefer font-weight 500+ for all text on glass surfaces
+- Minimum body text size 16px on glass
+- Test contrast by placing the darkest and lightest possible background content behind the glass panel and measuring both extremes
+- Implement `prefers-reduced-transparency` fallback with a fully opaque surface (see Pitfall 12)
+
+**Warning signs:**
+- Thin font weights (300–400) on glass panels
+- Text directly on glass with no reinforcing scrim
+- Contrast ratio tools pass but users report difficulty reading
+- Mobile users (smaller screens, lower brightness) struggle with legibility
+
+**Phase to address:** Phase 2 — Design tokens AND Phase 3 — Component glass variants. Make WCAG audit a checklist item in every component's QA.
+
+---
+
+### Pitfall 4: `backdrop-filter` Performance Degrades Low-End Devices
+
+**What goes wrong:**
+`backdrop-filter: blur()` is GPU-intensive. Applying it to many simultaneous elements triggers composite layer creation for each, saturating GPU memory and causing janky scrolling, dropped frames, and rapid battery drain. Measured impact: approximately 15–25% higher GPU usage vs. solid surfaces; frame rates drop approximately 12fps on mid-range Android with multiple glass elements visible simultaneously. SMB owners in CZ/SK commonly use mid-range Android phones and older business laptops — the same devices most affected.
+
+**Why it happens:**
+Glass looks smooth on developer MacBook Pros. Testing is not done on lower-spec hardware. The effect is applied to cards, sidebars, navbars, modals, and tooltips simultaneously without measuring composite layer count.
+
+**How to avoid:**
+- Limit `backdrop-filter` to a maximum of 3–4 simultaneous elements in any viewport
+- Keep blur values between 8–12px; above 20px costs exponentially more with diminishing visual return
+- Never animate `backdrop-filter` values directly — animate `opacity` of overlaid elements instead
+- Avoid `backdrop-filter` on full-width, full-height elements (sidebars spanning entire screen height are borderline)
+- Use `@media (prefers-reduced-motion: reduce)` to disable animated glass transitions
+- Test specifically on Chrome DevTools CPU throttle (4x slowdown) and on a real mid-range Android device
+- For data tables and analytics pages: `backdrop-filter` applies only to the page-level background; table rows and cells must remain opaque
+
+**Warning signs:**
+- Scroll jank (frame rate drops below 30fps)
+- Chrome DevTools Layers panel shows 10+ compositor layers
+- Chrome DevTools "Rendering > Paint flashing" lights up on scroll across glass surfaces
+- Battery drain complaints from mobile users
+
+**Phase to address:** Phase 2 — Component implementation. Establish and enforce a glass performance budget. Analytics and calendar pages get explicit exclusion from cell-level glass.
+
+---
+
+### Pitfall 5: Safari Requires `-webkit-` Prefix and Rejects CSS Variables in `backdrop-filter`
+
+**What goes wrong:**
+Safari still requires `-webkit-backdrop-filter` as of Safari 18.x. Without it, the entire blur effect is silently skipped on all Apple devices. A deeper Safari-specific bug: CSS custom properties (variables) do not work inside `-webkit-backdrop-filter`. A pattern like `backdrop-filter: blur(var(--glass-blur))` works in Chrome but silently fails in Safari's webkit-prefixed version — it renders with no blur.
+
+**Why it happens:**
+Tailwind's `backdrop-blur-*` utilities add the `-webkit-` prefix automatically. But any custom CSS written directly (in `globals.css`, component CSS modules, or inline styles) skips it. Developers also reach for CSS variables to centralize blur values — a reasonable abstraction — without knowing it breaks Safari's webkit implementation. The MDN browser-compat-data issue #25914 documents this as unresolved behavior.
+
+**How to avoid:**
+- Always use Tailwind's `backdrop-blur-*` utilities where possible; they handle prefixing
+- For custom CSS, always write both declarations:
+  ```css
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  ```
+- Never use CSS variables inside `-webkit-backdrop-filter` — hardcode pixel values or use Tailwind utilities
+- Add a test checkpoint: view on real Safari (not Chrome on Mac) before each phase is marked complete
+
+**Warning signs:**
+- Glass renders perfectly in Chrome and Firefox but appears opaque or has no blur in Safari
+- Using `var(--glass-blur)` inside `backdrop-filter` in any CSS file
+- No `-webkit-backdrop-filter` alongside standard `backdrop-filter` in any custom CSS
+
+**Phase to address:** Phase 2 — Component implementation. Bake the `-webkit-` prefix into every glass base class from day one.
+
+---
+
+### Pitfall 6: `backdrop-filter` Creates Stacking Contexts That Break Existing z-index
+
+**What goes wrong:**
+Any element that has `backdrop-filter` applied automatically creates a new CSS stacking context. This silently breaks z-index layering for all descendants and creates surprising interactions with existing modals, dropdowns, tooltips, and popovers. For example: a glass sidebar with `backdrop-filter` traps all its children in its stacking context, preventing a dropdown menu inside the sidebar from layering above a modal that sits outside the sidebar's context — no matter how high the z-index value is set. ScheduleBox has complex overlay patterns (reservation modals, calendar popovers, booking drawers) that are at high risk.
+
+**Why it happens:**
+Stacking context creation is a side-effect of `backdrop-filter` that is invisible in code review. The z-index breakage is non-deterministic by appearance — things look fine until a specific combination of overlapping elements is triggered — so it gets missed in initial review.
+
+**How to avoid:**
+- Audit all existing modal, dropdown, popover, and tooltip z-index values before introducing glass to layout wrappers
+- Prefer applying `backdrop-filter` to pseudo-elements (`::before`, `::after`) rather than the element itself — this avoids stacking context creation on the parent container
+- Use Radix UI's Portal (which shadcn/ui Dialog, Popover, DropdownMenu, etc. already use) to render overlays at the document body level, removing them from nested stacking contexts — verify all shadcn interactive components use Portals
+- For glass elements that must contain interactive children: use `isolation: isolate` on the glass element's parent to explicitly control stacking context boundaries
+
+**Warning signs:**
+- Dropdowns inside a glass sidebar clip behind the sidebar's edge
+- Modals appear behind glass panels despite high z-index values
+- Tooltips disappear randomly when hovering inside glass containers
+- `z-index: 9999` stops working in unexpected places
+
+**Phase to address:** Pre-implementation audit before Phase 1 touches any layout wrappers, AND Phase 2 component implementation. This must be caught before glass is applied to the app shell.
+
+---
+
+### Pitfall 7: `backdrop-filter` Fails with `overflow: hidden` — Chrome and Firefox Behave Differently
+
+**What goes wrong:**
+A glass card with rounded corners needs `overflow: hidden` to clip content to the border-radius. In Chrome, adding `overflow: hidden` to a parent of a `backdrop-filter` element causes the blur to clip before the filter is applied — the glass blur disappears in Chrome even though it works correctly in Firefox and Safari. Additionally, Firefox has a confirmed bug where `backdrop-filter` stops working on `position: sticky` elements when an ancestor has both `overflow` and `border-radius` set (Bugzilla #1803813).
+
+**Why it happens:**
+Chrome and Firefox implement different order-of-operations for `overflow` clipping vs. filter application. This is a known cross-browser difference in the filter effects specification, not an easy fix. The workaround requires specific CSS incantations that are non-obvious.
+
+**How to avoid:**
+- Use `mask-image` instead of `overflow: hidden` to clip glass panels to border-radius:
+  ```css
+  /* forces GPU compositing that respects clip correctly across browsers */
+  mask-image: radial-gradient(white, white);
+  ```
+- Or use `clip-path: inset(0 round var(--radius))` instead of `overflow: hidden`
+- Alternative: add `filter: blur(0px)` or `z-index: 1` to the `overflow: hidden` parent — forces the browser to re-evaluate compositing order and resolves the Chrome clipping issue
+- For sticky glass navbars: test the specific combination of `position: sticky` + ancestor `overflow` in Firefox before shipping
+
+**Warning signs:**
+- Glass blur disappears in Chrome but works in Firefox/Safari (or vice versa)
+- Rounded glass cards show their border-radius correctly in one browser, not another
+- `overflow: hidden` is on the same element or direct parent of a `backdrop-filter` element
+
+**Phase to address:** Phase 2 — Component implementation. Establish a standard rounded glass card base pattern that passes Chrome, Firefox, and Safari before it is used anywhere else.
+
+---
+
+### Pitfall 8: Glass Applied to Data-Heavy Pages Destroys Readability
+
+**What goes wrong:**
+Glass effects on data tables, calendar cells, and chart containers actively degrade readability. Chart tooltip text over glass is nearly unreadable when the chart's own colored series are behind the glass layer. Calendar event chips on a glass calendar grid become visually indistinguishable from the grid itself. Data table rows with alternating row colors lose scan-ability when glass flattens the contrast difference between odd and even rows. ScheduleBox's analytics dashboard (revenue charts, booking tables) and the calendar view are the highest-risk pages.
+
+**Why it happens:**
+The design mockup shows glass on a clean hero background. Implementation copies the glass pattern to data-heavy components where the "content behind the glass" is the data itself — creating visual competition between the glass aesthetic and the data the user must read.
+
+**How to avoid:**
+- Apply glassmorphism only to page-level containers: the page background, sidebar, top nav, modal overlays, and dashboard stat cards
+- Data tables: always fully opaque with standard card backgrounds — no `backdrop-filter` on table wrappers
+- Charts: glass applies to the chart card wrapper only; the `<canvas>` or SVG rendering area must be opaque
+- Calendar: grid cells must be opaque; only the top-level calendar container or header bar can use glass
+- Rule of thumb: if the content inside the component is the primary data the user is reading, the component must be opaque
+
+**Warning signs:**
+- Text in data table cells is hard to read
+- Chart series colors bleed through adjacent panel backgrounds
+- Calendar events disappear into the glass grid background
+- Users cannot distinguish interactive rows from non-interactive background areas
+
+**Phase to address:** Phase 3 — Page-by-page application. Maintain an explicit exclusion list for glass: table rows, chart canvases, calendar cells, form inputs. Treat violations as bugs.
+
+---
+
+### Pitfall 9: Over-Application of Glass Destroys Visual Hierarchy
+
+**What goes wrong:**
+When every surface is glass, nothing is glass. The visual hierarchy collapses: users cannot determine what is a primary action, what is a container, and what is background. Nielsen Norman Group research documents that glassmorphism's visual ambiguity makes interactive elements unclear and increases cognitive load. In SaaS dashboards, the contrast between primary CTAs (solid, high-confidence) and ambient containers (glass) is the main driver of correct visual hierarchy.
+
+**Why it happens:**
+After implementing glass on a few components with impressive results, developers apply it everywhere. The technique becomes the style, not a tool for hierarchy. The result is a product that looks trendy but is harder to use.
+
+**How to avoid:**
+- Define a "glass budget" per page: maximum 3 simultaneous glass surfaces in any viewport at once
+- Primary action buttons (Book, Save, Submit, Confirm) must always be solid and high-contrast — never glass
+- Form inputs must always be opaque — glass inputs create ambiguity about whether fields are editable or decorative
+- Glass surfaces apply to: stat cards, app shell (nav/sidebar), modal overlays, decorative hero sections
+- Glass surfaces never apply to: primary CTAs, form fields, error/destructive states, loading states, data table rows
+
+**Warning signs:**
+- Difficulty locating the primary CTA on any page within 3 seconds
+- Form inputs look like decorative panels rather than editable fields
+- Error states and success states are visually similar to normal glass cards
+- "Everything looks beautiful but I don't know where to click" feedback pattern
+
+**Phase to address:** Phase 2 — Establish glass usage rules and the component-type exclusion list before any implementation begins.
+
+---
+
+### Pitfall 10: Modifying shadcn/ui CSS Variables Globally Applies Glass Everywhere
+
+**What goes wrong:**
+shadcn/ui components (Card, Dialog, Sheet, Popover, etc.) use CSS variables (`--card`, `--popover`, `--background`) for their backgrounds. Overriding these variables globally to a semi-transparent RGBA value makes every component that uses `--card` become glass — including error dialogs, confirmation modals, data table containers, and toast notifications. Conversely, attempting to add `backdrop-filter` via Tailwind utility classes to every individual usage site creates a maintenance nightmare of 200+ scattered `backdrop-blur` classes with no ability to opt out.
+
+**Why it happens:**
+The natural instinct is "make all cards glass" by changing the `--card` CSS variable. This is logically appealing but architecturally incorrect: it applies glass globally without any opt-out mechanism.
+
+**How to avoid:**
+- Never make `--card`, `--popover`, or any global CSS variable semi-transparent
+- Create an additive glass modifier class applied explicitly per instance:
+  ```css
+  .glass {
+    background: hsl(var(--background) / 0.60) !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.50);
+  }
+  ```
+- Apply `.glass` class to specific component instances, not via global CSS variable mutation
+- For shadcn Dialog and Sheet: wrap the inner content div with a glass variant, keeping the Portal and overlay system intact and unmodified
+- Verify via grep after each phase: `grep -r "backdrop-filter\|backdrop-blur" apps/web/components` — confirm glass is not spreading into unexpected components
+
+**Warning signs:**
+- Modifying `--card` makes error dialogs semi-transparent
+- More than 50 unique `backdrop-blur-*` Tailwind class usages scattered across unrelated components
+- Glass appearing on toast notifications, form validation errors, or destructive confirmation dialogs
+
+**Phase to address:** Phase 2 — Glass design system. Establish the `.glass` modifier class pattern before touching any individual components.
+
+---
+
+### Pitfall 11: next-themes Hydration Mismatch with Theme-Conditional Glass Logic
+
+**What goes wrong:**
+Glass effects that differ between light and dark mode (different opacity, different orb colors, different blur intensity) can cause SSR hydration mismatches in Next.js when implemented with JavaScript theme branching. The server renders with the default theme (undefined/system), the client hydrates with the user's persisted theme preference from localStorage, and React logs hydration errors. This specifically affects components that use `useTheme()` to conditionally apply glass class names or glass intensities.
+
+**Why it happens:**
+next-themes (used by shadcn/ui's ThemeProvider) cannot access `localStorage` during SSR, so theme values are `undefined` on the server. Code that branches on `theme === 'dark'` to return different class strings will always produce server/client mismatches.
+
+**How to avoid:**
+- Never use `useTheme()` inside component render to conditionally apply glass class names
+- Drive all light/dark glass differences entirely through CSS variable tokens and Tailwind `dark:` variants — no JS branching:
+  ```tsx
+  // WRONG: causes hydration mismatch
+  const { theme } = useTheme();
+  <div className={theme === 'dark' ? 'glass-dark' : 'glass-light'}>
+
+  // CORRECT: pure CSS, SSR-safe
+  <div className="glass dark:glass-dark">
+  ```
+- Background gradient orbs (which differ significantly between light and dark) must be rendered using CSS `dark:` variants, not JS conditionals
+- If a component genuinely needs JS theme access for glass behavior, use `dynamic(() => import(...), { ssr: false })` to exclude it from SSR
+
+**Warning signs:**
+- "Hydration error: Text content does not match server-rendered HTML" in the Next.js console
+- Glass orb backgrounds flash or shift on page load (FOUC-style flicker)
+- Components using `useTheme()` inside render for glass class name selection
+
+**Phase to address:** Phase 1 — Foundation. Establish the pure-CSS dark mode glass pattern from day one to prevent this propagating across 65,000 LOC.
+
+---
+
+### Pitfall 12: Missing `prefers-reduced-transparency` Accessibility Fallback
+
+**What goes wrong:**
+Users with vestibular disorders, migraines, or visual impairments may have enabled "Reduce Transparency" in their OS (macOS, iOS, Windows). Without a `@media (prefers-reduced-transparency: reduce)` rule, glassmorphism remains active for these users despite their explicit system preference — causing visual discomfort, legibility issues, or migraine triggers. The `prefers-reduced-motion` query (which must also disable animated glass effects) has wider support and is equally required.
+
+**Why it happens:**
+`prefers-reduced-transparency` has limited browser support as of early 2026: Chrome 118+, Edge 118+; Firefox is behind a flag; Safari does not support it. Developers deprioritize it assuming low impact. The correct pattern — additive transparency enhancement — is also less intuitive than the common implementation approach.
+
+**How to avoid:**
+Apply the additive pattern: solid backgrounds first, glass as an enhancement only when the user has not opted out:
+
+```css
+/* Solid fallback — always present */
+.glass {
+  background: hsl(var(--card));
+}
+
+/* Glass enhancement — only when user allows transparency and browser supports it */
+@media (prefers-reduced-transparency: no-preference) {
+  @supports (backdrop-filter: blur(1px)) {
+    .glass {
+      background: hsl(var(--card) / 0.60);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+    }
+  }
+}
+
+/* Disable animated glass transitions regardless of transparency preference */
+@media (prefers-reduced-motion: reduce) {
+  .glass {
+    transition: none;
+  }
+}
+```
+
+The `@supports` guard simultaneously handles older browsers (old Android WebViews) without polyfills.
+
+To test: enable "Reduce Transparency" in macOS System Settings > Accessibility > Display, then view in Chrome 118+.
+
+**Warning signs:**
+- No `@media (prefers-reduced-transparency)` anywhere in the codebase
+- No `@supports (backdrop-filter: blur(1px))` guard on glass effects
+- Animated glass transitions not covered by `prefers-reduced-motion`
+- The `.glass` class has no solid background fallback before the `backdrop-filter` rule
+
+**Phase to address:** Phase 2 — Glass design tokens. Bake the fallback pattern into the `.glass` base class definition from the start so every component inherits it.
+
+---
+
+## Technical Debt Patterns
+
+Shortcuts that seem reasonable but create long-term problems.
+
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|---|---|---|---|
+| Modifying `--card` CSS variable to semi-transparent | Fast global glass on all cards | Breaks all opt-out; error dialogs become glass | Never |
+| Using `useTheme()` for conditional glass class names | Feels explicit and intentional | SSR hydration mismatches, visible FOUC on load | Never in SSR components |
+| Blur values above 20px | Impressive in demos and screenshots | Exponential GPU cost; muddy appearance on dark mode | Never for production |
+| Skipping `-webkit-backdrop-filter` prefix in custom CSS | Cleaner-looking code | Silent failure on all Apple devices | Never |
+| Applying glass to all Card component instances globally | Consistent look across the app | Cannot opt out; breaks data tables and error states | Never |
+| Using `overflow: hidden` on glass card wrapper directly | Simple border-radius clip | Cross-browser blur failure in Chrome | Only when combined with `mask-image` workaround |
+| Skipping `prefers-reduced-transparency` fallback | Saves a few lines of CSS | Accessibility violation; potential harm to users | MVP only with explicit debt ticket and timeline |
+| Applying glass to calendar cells for visual richness | Looks impressive in demo | Jank on calendar render; 52+ compositor layers | Never |
+
+---
+
+## Integration Gotchas
+
+Common mistakes when connecting glass effects to the existing system.
+
+| Integration | Common Mistake | Correct Approach |
 |---|---|---|
-| Franchise / multi-location schema | company_id JWT assumption broken | Design franchise isolation model before any API work |
-| Franchise RLS extension | Subquery in USING clause causes N×M scan | Never extend RLS with parent-child subqueries; use app-layer enforcement |
-| Recurring billing setup | Comgate approval may take days | Contact Comgate before sprint starts, not during |
-| Subscription webhook handling | Race condition between redirect sync and webhook | Use SELECT FOR UPDATE + subscription_events log table |
-| Usage limit enforcement | Retroactive limits block existing users | Billing period anchor date + Redis atomic counters |
-| Analytics dashboard | OLTP contention under concurrent load | Read replica + materialized views + 90-day result cache |
-| Franchise analytics aggregation | RLS blocks cross-location queries | Service-role connection with explicit IN() clause |
-| New frontend pages | Untranslated strings in Czech UI | Message files updated before merge, CI key check |
-| Subscription downgrade | Data deleted on payment failure | Soft-disable only, 7-day grace period |
-| Invoice generation (recurring) | MAX()+1 race condition | Replace with PostgreSQL SEQUENCE |
+| shadcn/ui Card | Override `--card` variable globally to semi-transparent | Add `.glass` modifier class applied per-instance only |
+| shadcn/ui Dialog | Apply `backdrop-filter` to the Dialog wrapper element | Apply to `DialogContent` inner div; Portal handles stacking |
+| shadcn/ui Sheet | Glass on `SheetContent` breaks z-index in Safari | Use `::before` pseudo-element for blur layer |
+| Recharts / chart library | Glass on chart container clips or obscures tooltips | Glass on the card wrapper only; chart canvas stays opaque |
+| TanStack Table | Glass row backgrounds destroy alternating row contrast | Table is always opaque; glass only on the outer table card wrapper |
+| next-themes | `useTheme()` in render for conditional glass class names | Pure CSS `dark:` variants; no JS theme branching for styling |
+| Tailwind JIT | Custom blur values via arbitrary `backdrop-blur-[14px]` inconsistently | Extend `theme.backdropBlur` in tailwind.config.ts for consistency |
+| Framer Motion | Animating `backdrop-filter` value from one blur level to another | Animate `opacity` of an overlaid element; never animate `backdrop-filter` itself |
+| Loading skeletons | Apply glass shimmer to skeleton overlays | Keep loading skeletons as flat, opaque surfaces |
+
+---
+
+## Performance Traps
+
+Patterns that work at small scale but fail under real usage.
+
+| Trap | Symptoms | Prevention | When It Breaks |
+|---|---|---|---|
+| Glass on more than 4 simultaneous viewport elements | Jank on scroll, 12+ fps drop | Glass budget: max 3–4 per viewport | Any device below MacBook Pro class GPU |
+| High blur values (20px+) | Exponential GPU cost, battery drain on mobile | Keep blur 8–12px for production | Mid-range Android phones immediately |
+| Animating `backdrop-filter` | Per-frame GPU re-composite on every animation frame | Animate `opacity` of overlay elements instead | Immediately on any device |
+| Glass on full-screen-height sidebar (entire page height) | Continuously recomposite entire sidebar during scroll | Solid sidebar body; glass only on sidebar header bar | Low-end laptops and mid-range Android |
+| Nested `backdrop-filter` elements (one inside another) | Double-blur visual artifact and 2x GPU cost | Never nest elements with backdrop-filter | Any browser, immediately |
+| Glass on all 52 calendar week cells | Critical scroll and render jank on calendar page | Calendar cells must be opaque; only header can be glass | Immediately on calendar render |
+| `will-change: backdrop-filter` | Unintended extra stacking context plus GPU reservation | Never use `will-change` with `backdrop-filter` | Any browser |
+
+---
+
+## UX Pitfalls
+
+Common user experience mistakes in glassmorphism for a SaaS application.
+
+| Pitfall | User Impact | Better Approach |
+|---|---|---|
+| Glass form inputs | Users unsure if field is editable vs. decorative background | All form inputs always opaque with solid visible border |
+| Glass error/destructive states | Errors look decorative rather than urgent | Error states always use solid high-contrast red background, never glass |
+| Glass primary CTA buttons | Primary action is ambiguous, lower click-through | CTAs always solid, high-contrast, never glass |
+| Thin font weight (300) on glass | Text illegible especially on mobile and dim displays | Minimum font-weight 500 for all text on glass surfaces |
+| Glass chart tooltips | Tooltip text unreadable over colored chart series behind it | Chart tooltips always use solid opaque background |
+| Glass loading skeletons | Shimmer animation compounds visual noise; distracting | Loading skeletons stay flat and opaque |
+| Text without scrim layer on scrollable glass | Contrast varies by scroll position; random legibility failures | Always add semi-opaque scrim beneath text in any glass container |
+| Glass on mobile without performance budget | Scroll jank, battery drain, frustrated users | Reduce or disable glass on viewport width below 768px using media query |
+
+---
+
+## "Looks Done But Isn't" Checklist
+
+Things that appear complete but are missing critical pieces.
+
+- [ ] **Background system:** Glass cards may look great on developer monitor but appear flat on a standard laptop — verify on a mid-range Windows laptop display, not a calibrated monitor
+- [ ] **Dark mode:** Glass panels look fine in Figma but are invisible in the deployed dark mode — verify contrast of each glass card with the darkest and brightest orb position behind it
+- [ ] **Safari test:** Glass renders in Chrome but is missing entirely in Safari — explicitly test on Safari iOS or macOS before marking any phase complete
+- [ ] **Calendar page:** Glass accidentally applied to calendar cell internals — verify all calendar cells remain fully opaque in the browser rendering
+- [ ] **Data tables:** Alternating row color contrast is still visible and scannable through the glass wrapper — verify with real data in both themes
+- [ ] **z-index audit:** Existing reservation modal, booking drawer, and calendar popovers still layer correctly after adding glass to the app shell — explicitly test each overlay interaction
+- [ ] **WCAG contrast:** Text on each glass surface passes 4.5:1 ratio even when the most saturated background orb is positioned directly behind the text — test with aXe browser extension
+- [ ] **Performance:** Scroll performance on the analytics dashboard does not drop below 60fps on Chrome DevTools 4x CPU throttle
+- [ ] **prefers-reduced-transparency:** Enable "Reduce Transparency" in macOS Accessibility settings and verify glass degrades gracefully to an opaque surface in Chrome 118+
+- [ ] **Hydration:** Zero hydration mismatch errors in the Next.js console on cold page load in both light and dark mode
+
+---
+
+## Recovery Strategies
+
+When pitfalls occur despite prevention, how to recover.
+
+| Pitfall | Recovery Cost | Recovery Steps |
+|---|---|---|
+| Glass on solid background (effect invisible) | MEDIUM | Add background orb layer to layout — no component changes needed; re-test all glass |
+| Dark mode invisible or muddy glass | MEDIUM | Redesign dark-mode glass token values; increase orb saturation and card opacity; re-test |
+| WCAG contrast failures widespread | HIGH | Audit every glass surface; add text scrim layers to each; increase font weights; full QA cycle |
+| z-index breakage across existing overlays | HIGH | Refactor glass to pseudo-elements on affected containers; audit all modal and dropdown interactions |
+| `backdrop-filter` removed for performance | LOW | Replace with `background: hsl(var(--card) / 0.85)` flat glass fallback — preserves semi-transparent look |
+| Safari breakage from missing `-webkit-` | LOW | Global search-replace in CSS files; add prefix to Tailwind config — 1–2 hour fix |
+| Hydration mismatches from JS theme branching | MEDIUM | Refactor conditional class names to pure CSS `dark:` variants; no business logic changes needed |
+| Over-applied glass (visual hierarchy collapsed) | HIGH | Systematic removal audit: CTAs, forms, tables, error states — full design and QA review cycle |
+
+---
+
+## Pitfall-to-Phase Mapping
+
+| Pitfall | Prevention Phase | Verification |
+|---|---|---|
+| Glass on solid background (invisible effect) | Phase 1: Background gradient system | Glass cards show visible blur and depth on both themes on a non-developer display |
+| Dark mode muddy or invisible glass | Phase 1 + Phase 2 tokens | Dark mode glass passes visual review on a standard Windows laptop monitor |
+| WCAG contrast failures | Phase 2 + per-component QA | Lighthouse accessibility audit scores remain at or above pre-overhaul baseline |
+| Performance degradation on low-end devices | Phase 2 performance budget | Chrome DevTools 4x throttle scroll test on analytics page maintains >= 60fps |
+| Safari `-webkit-` prefix missing | Phase 2 component base classes | Safari iOS and macOS test checkpoint before each phase is closed |
+| Stacking context z-index breakage | Pre-implementation audit + Phase 2 | All modal, drawer, and dropdown overlay interactions pass on every page |
+| `overflow: hidden` cross-browser blur failure | Phase 2 glass card base pattern | Same-output cross-browser screenshot comparison: Chrome, Firefox, Safari |
+| Data table and chart readability | Phase 3 page application | User can read all table data with correct color differentiation; chart series are distinct |
+| Over-application / hierarchy collapse | Phase 2 rules + Phase 3 audit | Primary CTA on each page is identified in under 3 seconds; no ambiguous interactive surfaces |
+| shadcn/ui global CSS variable contamination | Phase 2 architecture decision | Zero glass appearance on error dialogs, toast notifications, or form inputs |
+| next-themes hydration mismatch | Phase 1 foundation pattern | Zero hydration errors in Next.js console on cold load in both themes |
+| Missing reduced-transparency fallback | Phase 2 base `.glass` class definition | macOS "Reduce Transparency" + Chrome 118+ shows solid opaque card surfaces |
 
 ---
 
 ## Sources
 
-### Primary (HIGH confidence)
-- ScheduleBox codebase — `packages/database/src/rls/policies.sql` (direct inspection, 2026-02-24)
-- ScheduleBox codebase — `apps/web/lib/db/tenant-scope.ts` (direct inspection, 2026-02-24)
-- ScheduleBox codebase — `apps/web/app/api/v1/webhooks/comgate/route.ts` (direct inspection, 2026-02-24)
-- ScheduleBox codebase — `packages/database/src/schema/auth.ts`, `payments.ts`, `analytics.ts` (direct inspection, 2026-02-24)
-- [PostgreSQL RLS Pitfalls — Permit.io](https://www.permit.io/blog/postgres-rls-implementation-guide)
-- [AWS: Multi-Tenant Data Isolation with PostgreSQL RLS](https://aws.amazon.com/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/)
-- [Billing Webhook Race Condition Solution Guide](https://excessivecoding.com/blog/billing-webhook-race-condition-solution-guide)
-- [When OLAP meets OLTP: Long-running queries in PostgreSQL — Springtail](https://www.springtail.io/blog/long-running-queries-postgresql)
-- [Drizzle ORM RLS documentation](https://orm.drizzle.team/docs/rls)
-- [Stripe Webhooks — Subscription Handling](https://docs.stripe.com/billing/subscriptions/webhooks)
+- [Glassmorphism Meets Accessibility — Axess Lab](https://axesslab.com/glassmorphism-meets-accessibility-can-frosted-glass-be-inclusive/)
+- [Glassmorphism: Definition and Best Practices — Nielsen Norman Group](https://www.nngroup.com/articles/glassmorphism/)
+- [Next-level frosted glass with backdrop-filter — Josh W. Comeau](https://www.joshwcomeau.com/css/backdrop-filter/)
+- [CSS prefers-reduced-transparency — Chrome for Developers](https://developer.chrome.com/blog/css-prefers-reduced-transparency)
+- [backdrop-filter — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)
+- [prefers-reduced-transparency — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-transparency)
+- [Safari 18 backdrop-filter + CSS variables bug — MDN browser-compat-data #25914](https://github.com/mdn/browser-compat-data/issues/25914)
+- [Glassmorphism Complete Implementation Guide 2025 — Developer Playground](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide)
+- [Dark Mode Glassmorphism Tips — Alpha Efficiency](https://alphaefficiency.com/dark-mode-glassmorphism)
+- [Glassmorphism Readability and Accessibility — New Target](https://www.newtarget.com/web-insights-blog/glassmorphism/)
+- [Dark Glassmorphism 2026 — Medium / MustBeWebCode](https://medium.com/@developer_89726/dark-glassmorphism-the-aesthetic-that-will-define-ui-in-2026-93aa4153088f)
+- [backdrop-filter and z-index stacking context — copyprogramming.com](https://copyprogramming.com/howto/backdrop-filter-and-z-index-dosent-works-together)
+- [Chromium and Nested Backdrop-Filters — Havn Blog](https://havn.blog/2024/03/14/chromium-and-nested.html)
+- [Backdrop-filter fails with overflow:hidden — copyprogramming.com](https://copyprogramming.com/howto/transitioning-backdrop-filter-blur-on-an-element-with-overflow-hidden-parent-is-not-working)
+- [Firefox bug #1803813 — backdrop-filter with sticky + overflow + border-radius](https://bugzilla.mozilla.org/show_bug.cgi?id=1803813)
+- [Fixing Hydration Mismatch in Next.js (next-themes) — Medium](https://medium.com/@pavan1419/fixing-hydration-mismatch-in-next-js-next-themes-issue-8017c43dfef9)
+- [Glassmorphism for Enterprise UI — Innoraft](https://www.innoraft.ai/blog/how-glassmorphism-drives-user-focus-complex-enterprise-ui)
+- [shadcn-glass-ui drop-in library — DEV Community](https://dev.to/yhooi2/introducing-shadcn-glass-ui-a-glassmorphism-component-library-for-react-4cpl)
 
-### Secondary (MEDIUM confidence)
-- [Comgate Recurring Payments — help.comgate.cz](https://help.comgate.cz/docs/en/recurring-payments) (403 during fetch — content description only from search result snippets)
-- [Comgate PHP SDK — GitHub](https://github.com/comgate-payments/sdk-php) (adapted for v1.3 recurring patterns)
-- [SaaS Architecture Pitfalls — AWS re:Invent 2024](https://reinvent.awsevents.com/content/dam/reinvent/2024/slides/sas/SAS305_SaaS-architecture-pitfalls-Lessons-from-the-field.pdf)
-- [Multi-Tenant Architecture Guide — WorkOS](https://workos.com/blog/developers-guide-saas-multi-tenant-architecture)
-- [OLTP Workloads Offload — Materialize](https://materialize.com/blog/oltp-workloads/)
-- [Stripe Race Condition Deep Dive — Pedro Alonso](https://www.pedroalonso.net/blog/stripe-webhooks-deep-dive/)
+---
+
+_Pitfalls research for: glassmorphism design overhaul on existing Next.js 14 SaaS application (ScheduleBox)_
+_Researched: 2026-02-25_

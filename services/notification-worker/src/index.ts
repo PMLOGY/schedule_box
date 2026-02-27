@@ -149,6 +149,8 @@ async function shutdown(signal: string) {
     if (schedulerResources) {
       await schedulerResources.reminderWorker.close();
       await schedulerResources.reminderQueue.close();
+      await schedulerResources.billingWorker.close();
+      await schedulerResources.billingQueue.close();
       console.log('[Notification Worker] Schedulers closed');
     }
 

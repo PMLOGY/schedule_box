@@ -53,7 +53,9 @@ export const companies = pgTable(
     currency: varchar('currency', { length: 3 }).default('CZK'),
     timezone: varchar('timezone', { length: 50 }).default('Europe/Prague'),
     locale: varchar('locale', { length: 10 }).default('cs-CZ'),
-    subscriptionPlan: varchar('subscription_plan', { length: 20 }).default('free'),
+    subscriptionPlan: varchar('subscription_plan', { length: 20 })
+      .default('free')
+      .$type<'free' | 'essential' | 'growth' | 'ai_powered'>(),
     subscriptionValidUntil: timestamp('subscription_valid_until', { withTimezone: true }),
     industryType: varchar('industry_type', { length: 50 }).default('general'),
     industryConfig: jsonb('industry_config').default({}),
@@ -62,6 +64,7 @@ export const companies = pgTable(
     suspendedAt: timestamp('suspended_at', { withTimezone: true }),
     featuresEnabled: jsonb('features_enabled').default({}),
     settings: jsonb('settings').default({}),
+    organizationId: integer('organization_id'),
     busyAppearanceEnabled: boolean('busy_appearance_enabled').default(false),
     busyAppearancePercent: smallint('busy_appearance_percent').default(0),
     isActive: boolean('is_active').default(true),
@@ -71,7 +74,7 @@ export const companies = pgTable(
   (table) => ({
     subscriptionPlanCheck: check(
       'subscription_plan_check',
-      sql`${table.subscriptionPlan} IN ('free', 'starter', 'professional', 'enterprise')`,
+      sql`${table.subscriptionPlan} IN ('free', 'essential', 'growth', 'ai_powered')`,
     ),
     industryTypeCheck: check(
       'industry_type_check',
@@ -83,6 +86,7 @@ export const companies = pgTable(
     ),
     // idx_companies_slug removed: covered by companies_slug_unique
     subscriptionIdx: index('idx_companies_subscription').on(table.subscriptionPlan),
+    organizationIdx: index('idx_companies_organization').on(table.organizationId),
   }),
 );
 

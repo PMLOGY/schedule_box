@@ -12,6 +12,7 @@
   "dependencies": {
     "@schedulebox/database": "workspace:*",
     "@schedulebox/events": "workspace:*",
+    "@schedulebox/shared": "workspace:*",
     "amqplib": "^0.10.4",
     "bullmq": "^5.29.5",
     "drizzle-orm": "^0.36.4",

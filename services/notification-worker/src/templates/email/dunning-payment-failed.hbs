@@ -1,0 +1,25 @@
+<h2>Platba se nezdarila</h2>
+
+<p>Dobry den {{owner_name}},</p>
+
+<p>bohuzel se nam nepodarilo zpracovat platbu za Vase predplatne <strong>{{plan_name}}</strong> ve vysi <strong>{{formatCurrency amount currency}}</strong>.</p>
+
+<div class="details-box">
+  <p><strong>Plan:</strong> {{plan_name}}</p>
+  <p><strong>Castka:</strong> {{formatCurrency amount currency}}</p>
+  <p><strong>Dalsi pokus o platbu:</strong> {{next_retry_date}}</p>
+  <p><strong>Lhuta pro uhrazeni:</strong> do {{grace_end_date}}</p>
+</div>
+
+<p>Pokud nebude platba uhrazena do <strong>{{grace_end_date}}</strong>, Vas ucet bude automaticky preveden na plan <strong>Free</strong>. Zadna data nebudou smazana, ale ztratite pristup k platenym funkcim.</p>
+
+<p>Prosim, zkontrolujte sve platebni udaje a ujistete se, ze na karte je dostatek prostredku.</p>
+
+<p style="text-align: center;">
+  <a href="{{billing_portal_url}}" class="button">Aktualizovat platebni udaje</a>
+</p>
+
+<p>Pokud mate jakekoli dotazy, nevahjete nas kontaktovat.</p>
+
+<p>S pozdravem,<br>
+Tym ScheduleBox</p>

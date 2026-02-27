@@ -18,6 +18,7 @@ import {
   type BookingListQuery,
 } from '@/validations/booking';
 import { createBooking, listBookings } from '@/lib/booking/booking-service';
+import { checkBookingLimit, incrementBookingCounter } from '@/lib/usage/usage-service';
 
 /**
  * GET /api/v1/bookings
@@ -60,6 +61,9 @@ export const POST = createRouteHandler({
     const userSub = user?.sub ?? '';
     const { companyId } = await findCompanyId(userSub);
 
+    // Check booking limit for company's plan tier
+    await checkBookingLimit(companyId);
+
     // Get user internal ID (needed for audit trail)
     const [userRecord] = await db
       .select({ id: users.id })
@@ -83,6 +87,11 @@ export const POST = createRouteHandler({
         userId: userRecord.id,
       },
     );
+
+    // Increment booking counter for usage tracking (fire-and-forget, non-blocking)
+    incrementBookingCounter(companyId).catch((err) => {
+      console.error('[UsageCounter] Failed to increment booking counter:', err);
+    });
 
     // Return 201 Created
     return successResponse(booking, 201);

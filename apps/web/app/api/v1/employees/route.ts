@@ -13,6 +13,7 @@ import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse, createdResponse } from '@/lib/utils/response';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { employeeCreateSchema } from '@/validations/employee';
+import { checkEmployeeLimit } from '@/lib/usage/usage-service';
 
 /**
  * List employees
@@ -162,6 +163,9 @@ export const POST = createRouteHandler({
 
     // Get company scope
     const { companyId } = await findCompanyId(user.sub);
+
+    // Check employee limit for company's plan tier
+    await checkEmployeeLimit(companyId);
 
     // Extract service_ids before creating employee
     const { service_ids, ...employeeData } = body;

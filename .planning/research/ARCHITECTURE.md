@@ -1,707 +1,810 @@
-# Architecture Patterns: v1.3 Revenue & Growth Integration
+# Architecture Patterns: Glassmorphism Design System Integration
 
-**Domain:** AI-powered SaaS Booking Platform — v1.3 Feature Integration
-**Researched:** 2026-02-24
-**Overall confidence:** HIGH (codebase-verified for all existing constraints; MEDIUM for Comgate recurring API specifics)
-
----
-
-## Current State Summary
-
-### What Exists and Is Locked In
-
-The existing architecture has constraints that v1.3 must work within — not around. These are non-negotiable:
-
-| Constraint | Detail | Impact on v1.3 |
-|------------|--------|----------------|
-| `company_id` on every row | 49 tables, all scoped by `company_id` FK | Multi-location must decide: new `organization_id` FK or parent `company_id` |
-| `findCompanyId(userUuid)` | Every API handler calls this; returns `{ companyId, companyUuid }` | Must extend — not replace — this function for multi-location |
-| JWT payload contains `company_id: number` | Token is issued with ONE company ID | Multi-location: user must switch context, not have multi-company JWT |
-| `subscriptionPlan` on `companies` table | 4 values: `free\|starter\|professional\|enterprise` (but docs say Essential/Growth/AI-Powered) | Already exists — needs billing enforcement code around it |
-| No subscription enforcement in code | `subscriptionPlan` column exists but no middleware checks it | Limits enforcement is entirely new code |
-| Comgate client handles one-time payments | `initComgatePayment()` builds single payments | Must add `initRecurring=true` and `recurring()` paths |
-| Views are regular PostgreSQL views | `v_daily_booking_summary`, `v_customer_metrics` are `pgView()` | Analytics can graduate to `pgMaterializedView()` for performance |
-| 127 API route files under `/api/v1/` | All use `createRouteHandler` factory | Usage limits can hook into this factory with minimal diffs |
-
-### Database: Table Count and Schema Files
-
-```
-packages/database/src/schema/
-├── auth.ts        → companies, users, roles, permissions, api_keys, ...
-├── payments.ts    → payments (gateway: comgate|qrcomat|cash|bank_transfer|gift_card)
-├── analytics.ts   → analytics_events, audit_logs, competitor_data
-├── views.ts       → v_daily_booking_summary, v_customer_metrics (pgView)
-└── [17 other schema files]
-```
-
-**Total existing tables: 49.** v1.3 adds approximately 6-8 new tables.
+**Domain:** Glassmorphism design overhaul for existing Next.js 14 + Tailwind + shadcn/ui SaaS app
+**Researched:** 2026-02-25
+**Confidence:** HIGH (codebase-verified for all integration points; MEDIUM for performance benchmarks which are hardware-dependent)
 
 ---
 
-## Integration Analysis: Feature by Feature
+## The Integration Problem
 
-### Feature 1: Comgate Recurring Subscription Billing
+ScheduleBox has ~65,000 LOC already structured around:
+- `globals.css` with HSL CSS variables for every shadcn/ui token
+- `tailwind.config.ts` mapping those CSS vars to Tailwind color names
+- 21 shadcn/ui components in `apps/web/components/ui/` (copy-paste style — owned, not npm)
+- `ThemeProvider` via `next-themes` using `attribute="class"` (adds `.dark` to `<html>`)
+- Three distinct layout groups: `(marketing)`, `(auth)`, `(dashboard)`
 
-**What already exists:**
-- `companies.subscriptionPlan` (`free|starter|professional|enterprise`) — column exists, no enforcement
-- `companies.subscriptionValidUntil` — column exists, no enforcement
-- `companies.trialEndsAt` — column exists, no enforcement
-- `payments` table with Comgate gateway support
-- `comgate/client.ts` with `initComgatePayment()`, `getComgatePaymentStatus()`, `refundComgatePayment()`
-
-**Comgate recurring billing API (MEDIUM confidence — PHP SDK verified, REST docs inaccessible):**
-
-Comgate recurring works in two phases:
-1. **Initial payment**: `initComgatePayment()` + `initRecurring: true` parameter → user pays via card → Comgate stores card token linked to transaction ID
-2. **Subsequent charges**: Call `recurring` endpoint with original transaction ID (`initRecurringId`) → silent background charge, no user redirect needed
-
-The Comgate PHP SDK confirms:
-- `setInitRecurring(true)` on the first payment
-- `setInitRecurringId('XXXX-YYYY-ZZZZ')` on subsequent recurring charges
-- These two parameters are mutually exclusive
-
-**What must change in `comgate/client.ts`:**
-
-```typescript
-// EXTEND (do not replace) initComgatePayment:
-export interface InitComgatePaymentParams {
-  // ... existing fields ...
-  initRecurring?: boolean; // NEW: mark as subscription setup payment
-}
-
-// NEW function for recurring charges:
-export async function chargeRecurringPayment(params: {
-  initRecurringTransactionId: string; // From original subscription payment
-  price: number;
-  currency: string;
-  label: string;
-  refId: string; // subscription period reference
-}): Promise<ComgatePaymentResponse>
-```
-
-**New tables required:**
-
-```typescript
-// packages/database/src/schema/subscriptions.ts (NEW FILE)
-
-subscriptions: {
-  id: serial PK
-  uuid: uuid UNIQUE
-  companyId: integer FK companies.id
-  plan: varchar(20)  // free|essential|growth|ai_powered
-  status: varchar(20) // trialing|active|past_due|cancelled|paused
-  billingCycle: varchar(10) // monthly|annual
-  priceMonthly: numeric(10,2) // snapshot at subscription time
-  comgateInitTransactionId: varchar(255) // from first payment — used for recurring charges
-  currentPeriodStart: timestamp with timezone
-  currentPeriodEnd: timestamp with timezone
-  cancelAtPeriodEnd: boolean default false
-  cancelledAt: timestamp with timezone nullable
-  trialStart: timestamp with timezone nullable
-  trialEnd: timestamp with timezone nullable
-  createdAt, updatedAt timestamps
-}
-
-subscriptionInvoices: {
-  id: serial PK
-  uuid: uuid UNIQUE
-  companyId: integer FK
-  subscriptionId: integer FK subscriptions.id
-  amount: numeric(10,2)
-  currency: varchar(3)
-  status: varchar(20) // draft|issued|paid|failed
-  period: varchar(20) // e.g. '2026-03'
-  comgateTransactionId: varchar(255) nullable
-  paidAt: timestamp nullable
-  failedAt: timestamp nullable
-  failureReason: text nullable
-  createdAt timestamp
-}
-```
-
-**Integration with existing `payments` table:** Subscription invoices are a SEPARATE table from `payments`. The existing `payments` table is for booking-level transactions. Mixing subscription billing into it would break the current per-booking invoice logic and the SAGA pattern. Keep them separate.
-
-**BullMQ job for recurring charges:**
-
-The notification worker already uses BullMQ. Add a recurring billing job queue to it:
-
-```
-services/notification-worker/
-└── queues/
-    └── subscription-billing.ts  (NEW)
-        - scheduleBillingCycle(subscriptionId): enqueue charge job for period end
-        - chargingJob handler: call Comgate recurring API → update subscription_invoices → update companies.subscriptionPlan if failed
-```
-
-**New API routes:**
-
-```
-/api/v1/billing/
-├── subscribe/route.ts       POST — initiate subscription (creates trial or first payment)
-├── plans/route.ts           GET  — list available plans with pricing
-├── subscription/route.ts    GET/PUT — current subscription status, cancel-at-period-end
-├── invoices/route.ts        GET  — subscription invoice history (separate from booking invoices)
-└── comgate/callback/route.ts POST — webhook from Comgate for subscription payments
-```
-
-**How `companies.subscriptionPlan` gets updated:** The billing system is the single writer. After a successful Comgate charge callback: `UPDATE companies SET subscription_plan = 'essential', subscription_valid_until = [period_end] WHERE id = ?`. Failed payment: `UPDATE companies SET subscription_plan = 'free'` after grace period.
+The glassmorphism system must layer on top of this without breaking existing CSS variables, without requiring component replacement, and without creating hydration mismatches.
 
 ---
 
-### Feature 2: Multi-Location Franchise
-
-**This is the most architecturally complex v1.3 feature. Two viable approaches exist.**
-
-#### Option A: New `organizations` Entity (Recommended)
-
-Add an `organizations` table that sits above `companies`:
-
-```typescript
-organizations: {
-  id: serial PK
-  uuid: uuid UNIQUE
-  name: varchar(255)
-  ownerUserId: integer FK users.id  // franchise owner
-  subscriptionPlan: varchar(20)     // billing at org level
-  subscriptionId: integer FK subscriptions.id nullable
-  maxLocations: integer default 50
-  settings: jsonb
-  createdAt, updatedAt timestamps
-}
-
-// Junction: user can manage multiple locations under one org
-organizationMembers: {
-  id: serial PK
-  organizationId: integer FK organizations.id
-  userId: integer FK users.id
-  role: varchar(20)  // org_owner|org_admin|location_manager
-  createdAt timestamp
-}
-```
-
-**No changes to existing 49 tables.** The `companies` table gets one new nullable FK:
-
-```typescript
-// ALTER companies table:
-organizationId: integer FK organizations.id nullable
-```
-
-**RLS implications:** The existing RLS policies on all 49 tables remain unchanged — they still filter by `company_id`. Cross-location queries (aggregate analytics for franchise dashboard) go through a service layer that collects all `company_id` values the user controls, then queries with `WHERE company_id = ANY([id1, id2, ...])`. This is NOT a RLS change — it's application-layer query expansion.
-
-**JWT implications:** The JWT still contains ONE `company_id`. For franchise owners, the UI shows a location switcher that exchanges the current JWT for one scoped to the selected location. The `findCompanyId()` function is unchanged — the context switch happens at login/switch time by issuing a new token.
+## System Overview
 
 ```
-// Location switcher flow:
-POST /api/v1/auth/switch-location
-  body: { company_uuid: "..." }
-  validates: user belongs to organization that owns this company
-  returns: new JWT with company_id = selected location's id
-```
-
-**`findCompanyId()` unchanged.** This is the key safety property: all existing code works with zero modification. Multi-location is additive.
-
-#### Option B: Parent-Child on `companies` (Not Recommended)
-
-Add `parentCompanyId: integer FK companies.id` to `companies`. This requires:
-- Recursive CTE queries for every aggregate view
-- RLS policies must be updated to allow parent company access to child rows
-- JWT must encode the parent/child relationship
-- Every single query that filters by `company_id` either needs updating OR must use a session variable that expands to include child IDs
-
-**Why Option A is better:** Option B touches all 49 tables' worth of query logic and all RLS policies. Option A is purely additive — it adds 2 new tables and 1 nullable FK on `companies`. No existing code requires modification.
-
-**New tables summary (multi-location):**
-- `organizations` (NEW)
-- `organization_members` (NEW)
-- `companies.organization_id` FK (ALTER, nullable — existing companies unaffected)
-
-**New API routes (multi-location):**
-```
-/api/v1/organizations/
-├── route.ts                    GET (list locations), POST (create org)
-├── [id]/
-│   ├── route.ts                GET/PUT (org settings)
-│   ├── locations/route.ts      GET/POST (list/add locations)
-│   └── members/route.ts        GET/POST (team members across locations)
-/api/v1/auth/switch-location/route.ts  POST (context switch)
-/api/v1/analytics/cross-location/route.ts  GET (aggregate across all locations)
+┌─────────────────────────────────────────────────────────────────────┐
+│  DESIGN SYSTEM FOUNDATION (globals.css + tailwind.config.ts)        │
+├───────────────────────┬─────────────────────────────────────────────┤
+│  Existing tokens      │  New glass tokens (added alongside)         │
+│  --primary            │  --glass-bg-light                           │
+│  --background         │  --glass-bg-dark                            │
+│  --card               │  --glass-border-light                       │
+│  --border             │  --glass-border-dark                        │
+│  --shadow-*           │  --glass-blur-sm/md/lg                      │
+│  (unchanged)          │  --glass-shadow                             │
+└───────────────────────┴─────────────────────────────────────────────┘
+           │                           │
+           ▼                           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  TAILWIND EXTENSION (tailwind.config.ts)                            │
+│  theme.extend: {                                                     │
+│    backdropBlur: { glass: 'var(--glass-blur-md)' }                  │
+│    backgroundColor: { glass: 'var(--glass-bg)' }                    │
+│  }                                                                   │
+│  plugins: [ glassPlugin ]  ← NEW: adds .glass-* utility classes     │
+└─────────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  COMPONENT LAYER                                                     │
+├──────────────────────────┬──────────────────────────────────────────┤
+│  MODIFIED (add variant)  │  NEW glass-specific components            │
+│  Card → +glass variant   │  GlassPanel (pure surface)                │
+│  Button → +glass variant │  GlassNavbar (marketing header)           │
+│  Dialog → glass bg       │  GlassModal (auth/dashboard dialogs)      │
+│  Sheet → glass sidebar   │  GradientMesh (background layer)          │
+│                          │  GlassSkeleton (loading states)           │
+└──────────────────────────┴──────────────────────────────────────────┘
+           │
+           ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  PAGE LAYOUT LAYER                                                   │
+├─────────────────┬──────────────────┬──────────────────┬─────────────┤
+│  (marketing)    │  (auth)          │  (dashboard)     │  [company]  │
+│  Gradient mesh  │  Frosted card    │  Solid sidebar + │  Public     │
+│  Glass navbar   │  on gradient     │  glass header    │  booking    │
+│  Glass cards    │  background      │  glass KPI cards │  widget     │
+└─────────────────┴──────────────────┴──────────────────┴─────────────┘
 ```
 
 ---
 
-### Feature 3: Usage Limits Enforcement
+## Token Architecture: Three Layers
 
-**What already exists:** `companies.subscriptionPlan` (column, no enforcement). `companies.featuresEnabled` JSONB (exists, not used for limits). No middleware enforces limits anywhere.
+### Layer 1 — Primitive Glass Tokens (in `globals.css`)
 
-**Recommended approach: Application-layer checking, not database constraints.**
+Define raw values. These never appear in components directly.
 
-Database constraints (CHECK constraints on bookings count) would require triggers and are hard to grandfacially manage. Application-layer is simpler and maps directly to the subscription plan tiers:
+```css
+/* globals.css — add to :root block */
+:root {
+  /* Glass blur intensities */
+  --glass-blur-sm:  blur(8px);
+  --glass-blur-md:  blur(12px);
+  --glass-blur-lg:  blur(20px);
+  --glass-blur-xl:  blur(32px);
 
-| Plan | Bookings/month | Employees | Locations | API access |
-|------|---------------|-----------|-----------|------------|
-| Free | 50 | 1 | 1 | No |
-| Essential | 500 | 5 | 1 | No |
-| Growth | 5,000 | 25 | 3 | No |
-| AI-Powered | Unlimited | Unlimited | 50 | Yes |
+  /* Glass backgrounds — light mode */
+  --glass-bg-light:        rgba(255, 255, 255, 0.55);
+  --glass-bg-light-subtle: rgba(255, 255, 255, 0.30);
+  --glass-bg-light-heavy:  rgba(255, 255, 255, 0.75);
 
-**Counter strategy:** Use Redis for monthly booking counts (fast increment/check) with PostgreSQL as the authoritative source-of-truth fallback:
+  /* Glass borders — light mode */
+  --glass-border-light:    rgba(255, 255, 255, 0.35);
+  --glass-border-light-sm: rgba(255, 255, 255, 0.20);
 
-```typescript
-// New utility: lib/limits/usage-checker.ts
+  /* Glass shadows — light mode */
+  --glass-shadow-light: 0 8px 32px rgba(31, 38, 135, 0.12),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
-const PLAN_LIMITS = {
-  free: { bookings: 50, employees: 1, locations: 1 },
-  essential: { bookings: 500, employees: 5, locations: 1 },
-  growth: { bookings: 5000, employees: 25, locations: 3 },
-  ai_powered: { bookings: Infinity, employees: Infinity, locations: 50 },
-};
+  /* Gradient mesh colors — light mode */
+  --mesh-primary:   hsl(var(--primary) / 0.12);
+  --mesh-secondary: hsl(var(--secondary) / 0.08);
+  --mesh-accent:    hsl(270 91% 60% / 0.06);
+}
 
-// Redis key: limits:{companyId}:bookings:{YYYY-MM}
-// INCR on each booking creation
-// Set with TTL = end of month + 7 days (buffer)
+.dark {
+  /* Glass backgrounds — dark mode */
+  --glass-bg-light:        rgba(17, 25, 40, 0.65);
+  --glass-bg-light-subtle: rgba(17, 25, 40, 0.45);
+  --glass-bg-light-heavy:  rgba(17, 25, 40, 0.80);
 
-export async function checkBookingLimit(companyId: number): Promise<void>
-export async function checkEmployeeLimit(companyId: number): Promise<void>
-export async function incrementBookingCount(companyId: number): Promise<void>
-export async function getUsageStats(companyId: number): Promise<UsageStats>
+  /* Glass borders — dark mode */
+  --glass-border-light:    rgba(255, 255, 255, 0.12);
+  --glass-border-light-sm: rgba(255, 255, 255, 0.07);
+
+  /* Glass shadows — dark mode */
+  --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.40),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Gradient mesh colors — dark mode */
+  --mesh-primary:   hsl(var(--primary) / 0.20);
+  --mesh-secondary: hsl(var(--secondary) / 0.12);
+  --mesh-accent:    hsl(270 91% 60% / 0.10);
+}
 ```
 
-**Where to hook the limit check:**
+**Why `rgba()` not `hsl() / opacity`:** rgba is required for glassmorphism backgrounds because the glass panel must blend with the backdrop behind it, not just its own background. HSL opacity works for solid colors but not when the background is a separate blurred composite.
 
-NOT in Next.js middleware — middleware runs on every request including static assets. Instead, hook into `createRouteHandler` or the specific POST handlers for bookings and employees:
+**Why `.dark` class not `prefers-color-scheme`:** The existing `ThemeProvider` uses `attribute="class"` — it adds `.dark` to `<html>`. CSS `prefers-color-scheme` would conflict with the user's manual toggle preference. Match the existing system.
 
-```typescript
-// In apps/web/app/api/v1/bookings/route.ts POST handler:
-// After findCompanyId(), before createBooking():
-await checkBookingLimit(companyId);
-// Throws PlanLimitError if over limit → caught by handleRouteError
+### Layer 2 — Semantic Glass Tokens (in `globals.css`)
 
-// In apps/web/app/api/v1/employees/route.ts POST handler:
-await checkEmployeeLimit(companyId);
+Map primitives to semantic context. These are what components use.
+
+```css
+:root {
+  /* Semantic aliases — components reference these */
+  --glass-bg:         var(--glass-bg-light);
+  --glass-bg-subtle:  var(--glass-bg-light-subtle);
+  --glass-bg-heavy:   var(--glass-bg-light-heavy);
+  --glass-border:     var(--glass-border-light);
+  --glass-shadow:     var(--glass-shadow-light);
+  --glass-blur:       var(--glass-blur-md);
+}
+
+.dark {
+  --glass-bg:         var(--glass-bg-dark);   /* dark mode redefines same names */
+  --glass-bg-subtle:  var(--glass-bg-dark-subtle);
+  --glass-bg-heavy:   var(--glass-bg-dark-heavy);
+  --glass-border:     var(--glass-border-dark);
+  --glass-shadow:     var(--glass-shadow-dark);
+  --glass-blur:       var(--glass-blur-md);   /* same blur, different bg */
+}
 ```
 
-**`createRouteHandler` stays unchanged.** Limit checks are in individual handlers, not the factory. This keeps the factory generic and avoids one-size-fits-all overhead on every route.
+This is the same pattern shadcn/ui already uses for `--card`, `--border`, etc. The `.dark` selector just redefines the same variable names. Components use `var(--glass-bg)` and automatically adapt.
 
-**PlanLimitError response format:**
-```json
-{
-  "error": "PLAN_LIMIT_EXCEEDED",
-  "code": "BOOKING_LIMIT_REACHED",
-  "message": "Dosáhli jste limitu 50 rezervací pro plán Free.",
-  "details": {
-    "current": 50,
-    "limit": 50,
-    "plan": "free",
-    "upgrade_url": "/cs/billing/plans"
+### Layer 3 — Tailwind Utilities (in `tailwind.config.ts`)
+
+Expose tokens as Tailwind classes.
+
+```typescript
+// tailwind.config.ts — extend the existing config
+theme: {
+  extend: {
+    // Existing entries stay untouched
+    backdropBlur: {
+      'glass-sm': 'var(--glass-blur-sm)',
+      'glass':    'var(--glass-blur-md)',
+      'glass-lg': 'var(--glass-blur-lg)',
+      'glass-xl': 'var(--glass-blur-xl)',
+    },
+    backgroundColor: {
+      'glass':        'var(--glass-bg)',
+      'glass-subtle': 'var(--glass-bg-subtle)',
+      'glass-heavy':  'var(--glass-bg-heavy)',
+    },
+    boxShadow: {
+      'glass': 'var(--glass-shadow)',
+    },
+    borderColor: {
+      'glass': 'var(--glass-border)',
+    },
+  }
+},
+plugins: [
+  tailwindcssAnimate,  // existing
+  glassPlugin,         // NEW — defined below
+],
+```
+
+**Glass Plugin** (`apps/web/lib/tailwind/glass-plugin.ts`):
+
+```typescript
+import plugin from 'tailwindcss/plugin';
+
+export const glassPlugin = plugin(function ({ addUtilities, addComponents }) {
+  // Utility classes for glass surfaces
+  addUtilities({
+    '.glass-surface': {
+      'background': 'var(--glass-bg)',
+      'backdrop-filter': 'var(--glass-blur)',
+      '-webkit-backdrop-filter': 'var(--glass-blur)',
+      'border': '1px solid var(--glass-border)',
+      'box-shadow': 'var(--glass-shadow)',
+    },
+    '.glass-surface-subtle': {
+      'background': 'var(--glass-bg-subtle)',
+      'backdrop-filter': 'var(--glass-blur-sm)',
+      '-webkit-backdrop-filter': 'var(--glass-blur-sm)',
+      'border': '1px solid var(--glass-border)',
+    },
+    '.glass-surface-heavy': {
+      'background': 'var(--glass-bg-heavy)',
+      'backdrop-filter': 'var(--glass-blur-lg)',
+      '-webkit-backdrop-filter': 'var(--glass-blur-lg)',
+      'border': '1px solid var(--glass-border)',
+      'box-shadow': 'var(--glass-shadow)',
+    },
+  });
+
+  // Gradient mesh background component
+  addComponents({
+    '.gradient-mesh': {
+      'background-image': `
+        radial-gradient(ellipse at 20% 50%, var(--mesh-primary) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, var(--mesh-secondary) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, var(--mesh-accent) 0%, transparent 55%)
+      `,
+    },
+  });
+});
+```
+
+---
+
+## Component Integration Map
+
+### Modified Components (add `glass` variant to existing CVA)
+
+These components already exist in `apps/web/components/ui/`. Add the `glass` variant to their existing CVA configuration. Do NOT replace the default variant.
+
+#### Card — add glass variant
+
+```typescript
+// apps/web/components/ui/card.tsx
+// BEFORE: no CVA, static classNames
+// AFTER: introduce cardVariants with CVA
+
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const cardVariants = cva(
+  'rounded-lg transition-shadow',
+  {
+    variants: {
+      variant: {
+        default: 'border border-border bg-card text-card-foreground shadow-sm',
+        glass: [
+          'glass-surface',                          // from glass plugin
+          'text-card-foreground',
+          'supports-[backdrop-filter]:bg-glass',    // progressive enhancement
+          'not-supports-[backdrop-filter]:bg-card', // fallback: opaque card
+        ].join(' '),
+        'glass-subtle': 'glass-surface-subtle text-card-foreground',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+// Card now accepts optional variant prop, default is 'default'
+// All existing <Card /> usage unchanged — backward compatible
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardVariants({ variant }), className)}
+      {...props}
+    />
+  ),
+);
+```
+
+**Key:** `defaultVariants: { variant: 'default' }` — every existing `<Card />` in the codebase continues working with zero prop changes.
+
+#### Button — add glass variant
+
+```typescript
+// apps/web/components/ui/button.tsx — extend existing buttonVariants
+// ADD to existing variants.variant object:
+glass: [
+  'glass-surface-subtle',
+  'text-foreground',
+  'hover:glass-surface',
+  'border border-glass',
+].join(' '),
+```
+
+#### Dialog — glass background overlay
+
+```typescript
+// apps/web/components/ui/dialog.tsx
+// The DialogOverlay gets a glass tint instead of pure black:
+// CHANGE: 'bg-black/80' → 'bg-black/40 backdrop-blur-glass-sm'
+// The DialogContent gets glass-surface treatment
+```
+
+### New Components (glass-specific, no existing equivalent)
+
+These do not replace anything. They are new additions to `apps/web/components/ui/`.
+
+| Component | File | Purpose | Used In |
+|-----------|------|---------|---------|
+| `GlassPanel` | `components/ui/glass-panel.tsx` | Pure glass surface wrapper, no semantics | Dashboard KPI cards, marketing sections |
+| `GradientMesh` | `components/ui/gradient-mesh.tsx` | Animated gradient background layer | Page backgrounds, hero section |
+| `GlassSkeleton` | `components/ui/glass-skeleton.tsx` | Loading skeleton matching glass card shape | Replaces existing Skeleton inside glass contexts |
+
+---
+
+## Page-Section Glass Strategy
+
+Different page sections require different glass intensities. This prevents the "everything is blurred" anti-pattern.
+
+### Marketing Layout `(marketing)/layout.tsx`
+
+```
+Background layer:   gradient-mesh (fixed, behind everything)
+Navbar:             glass-surface + sticky + z-50
+Hero section:       NO glass on text — glass only on the demo widget card
+Feature cards:      glass-surface-subtle on hover (CSS hover transition)
+Pricing cards:      glass-surface for featured tier, glass-surface-subtle for others
+Social proof:       glass-surface-subtle on testimonial cards
+Footer:             solid bg-background (no glass — reduces visual noise at bottom)
+```
+
+**Isolation pattern:** The `(marketing)/layout.tsx` wraps the entire page in a positioned container that contains the gradient mesh background. This creates a stacking context so `backdrop-filter` on navbar and cards blurs the gradient mesh correctly.
+
+```tsx
+// apps/web/app/[locale]/(marketing)/layout.tsx — MODIFIED
+export default async function MarketingLayout({ children }) {
+  return (
+    // Outermost: relative + min-h-screen creates the stacking context
+    <div className="relative min-h-screen flex flex-col overflow-x-hidden">
+      {/* Gradient mesh as fixed layer behind content */}
+      <div className="fixed inset-0 gradient-mesh -z-10" aria-hidden="true" />
+      <MarketingNavbar />  {/* uses glass-surface internally */}
+      <main className="flex-1">{children}</main>
+      <MarketingFooter />  {/* uses solid bg-background */}
+      <CookieConsentBanner />
+    </div>
+  );
+}
+```
+
+### Auth Layout `(auth)/layout.tsx`
+
+```
+Background:         gradient-mesh (full page)
+Auth card:          glass-surface-heavy (most opaque — form readability)
+Logo/brand area:    no glass — plain text on gradient
+```
+
+```tsx
+// apps/web/app/[locale]/(auth)/layout.tsx — MODIFIED
+export default function AuthLayout({ children }) {
+  return (
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="fixed inset-0 gradient-mesh -z-10" aria-hidden="true" />
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LocaleSwitcher />
+        <ThemeToggle />
+      </div>
+      <div className="w-full max-w-md px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary">ScheduleBox</h1>
+          <p className="text-muted-foreground mt-2">...</p>
+        </div>
+        {/* Card gets glass variant — heavy opacity for form legibility */}
+        <Card variant="glass" className="glass-surface-heavy shadow-glass">
+          <CardContent className="pt-6">{children}</CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+```
+
+### Dashboard Layout `(dashboard)/layout.tsx`
+
+Dashboard glass is more restrained than marketing. Users spend hours here — aggressive glass causes eye fatigue. Use glass selectively on interactive surfaces, not as a base layer.
+
+```
+Sidebar:            SOLID bg-background (NOT glass) — text density + readability
+Header:             glass-surface-subtle + sticky + z-10
+KPI stat cards:     glass-surface (the primary glass moment in dashboard)
+Revenue chart card: glass-surface-subtle
+Modal/dialog:       glass overlay + glass-surface-heavy for content
+Page background:    subtle gradient-mesh at low opacity (--mesh-primary at 0.06 opacity)
+```
+
+```tsx
+// apps/web/app/[locale]/(dashboard)/layout.tsx — MODIFIED
+export default function DashboardLayout({ children }) {
+  return (
+    <AuthGuard>
+      <SkipLink />
+      <NavigationProgress />
+      {/* Subtle mesh background — very low opacity, just adds depth */}
+      <div className="fixed inset-0 gradient-mesh opacity-40 -z-10" aria-hidden="true" />
+      <div className="flex h-screen">
+        <aside aria-label="Dashboard sidebar">
+          {/* Sidebar stays SOLID — readability over aesthetics */}
+          <Sidebar />
+        </aside>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Header gets glass treatment */}
+          <Header />
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-6">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
+        </div>
+      </div>
+      <DashboardTour />
+    </AuthGuard>
+  );
+}
+```
+
+**Why the sidebar stays solid:** The sidebar contains navigation text at small sizes with icon labels. Blur behind text of this density causes readability problems, especially in dark mode. Reserve glass for surfaces with large content areas or decorative use.
+
+---
+
+## Existing Component Modification Guide
+
+### StatCard (dashboard KPI cards)
+
+The `StatCard` in `apps/web/components/dashboard/stat-card.tsx` is the single highest-impact glass target. It renders in a 4-column grid on every dashboard load.
+
+```typescript
+// BEFORE:
+<Card className={`shadow-sm hover:shadow transition-shadow ${className ?? ''}`}>
+
+// AFTER:
+<Card
+  variant="glass"
+  className={cn('hover:shadow-glass transition-shadow', className)}
+>
+```
+
+One line change. Zero prop API changes to callers.
+
+### MarketingNavbar
+
+The existing navbar already has a partial glass implementation:
+
+```tsx
+// CURRENT (already glass-ish):
+className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+
+// REPLACE WITH (proper glass token):
+className="sticky top-0 z-50 glass-surface supports-[backdrop-filter]:glass-surface not-supports-[backdrop-filter]:bg-background/95"
+```
+
+The `supports-[backdrop-filter]` modifier is native Tailwind CSS — no plugin needed. This is the progressive enhancement pattern.
+
+### Header (dashboard)
+
+```tsx
+// CURRENT:
+className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-6"
+
+// MODIFIED:
+className="sticky top-0 z-10 flex h-16 items-center justify-between glass-surface-subtle px-6"
+```
+
+---
+
+## Hydration Safety
+
+### The Problem
+
+`next-themes` ThemeProvider with `attribute="class"` applies `.dark` on the client after mount. During SSR, the server doesn't know the user's theme preference. If glass CSS variables reference `.dark` values in server-rendered HTML, there's a brief flash on first paint.
+
+### The Solution (already used in this codebase)
+
+The existing `ThemeToggle` component already uses the correct pattern:
+
+```typescript
+// apps/web/components/ui/theme-toggle.tsx — EXISTING correct pattern
+const [mounted, setMounted] = useState(false);
+useEffect(() => { setMounted(true); }, []);
+if (!mounted) return <Button disabled suppressHydrationWarning>...</Button>;
+```
+
+**For glass components:** Glass effects are purely CSS-driven (CSS variables + `backdrop-filter`). They have NO JavaScript logic. There is no hydration mismatch risk from glass CSS itself — the browser applies the correct `.dark` class CSS variables immediately on paint without any JS involvement after `next-themes` writes the class.
+
+**SSR note:** `backdrop-filter` is a CSS property applied via Tailwind classes in server-rendered HTML. The browser reads the HTML → sees `class="glass-surface"` → looks up the CSS rule → applies `backdrop-filter`. There is no JS involved in rendering the blur effect itself. No hydration mismatch is possible from the CSS approach.
+
+### The Only Risk: Theme Flash on First Load
+
+`disableTransitionOnChange` is already set in the existing `ThemeProvider`:
+
+```tsx
+// apps/web/app/providers.tsx — EXISTING
+<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+```
+
+This prevents the transition animation from running on theme initialization, which is the main source of flash. No changes needed here.
+
+---
+
+## Performance Architecture
+
+### Compositing Layer Budget
+
+Each element with `backdrop-filter` creates a new GPU compositing layer. Excessive stacking causes frame drops, especially on mobile.
+
+**Rule: Maximum 3-4 simultaneous backdrop-filter elements in any viewport.**
+
+| Context | Allowed Glass Elements | Rationale |
+|---------|----------------------|-----------|
+| Marketing landing | 1 navbar + up to 4 feature cards | Cards only glass on visible viewport, not all at once |
+| Auth page | 1 card | Single form element |
+| Dashboard | 1 header + up to 4 KPI cards | KPI cards are the primary glass moment |
+| Modal/dialog open | 1 overlay + 1 dialog | Dialog replaces page content visually |
+
+### Blur Value Guidelines
+
+Higher blur values are exponentially more expensive on GPU:
+
+| Blur Value | Use Case | GPU Cost |
+|------------|----------|----------|
+| `blur(8px)` — `glass-blur-sm` | Subtle surfaces, sidebar overlays | Low |
+| `blur(12px)` — `glass-blur-md` | Standard cards, headers | Medium |
+| `blur(20px)` — `glass-blur-lg` | Auth cards, modals | High |
+| `blur(32px)` — `glass-blur-xl` | Hero centerpiece only | Very High |
+
+The default `--glass-blur-md: blur(12px)` is the safe production value. Do not use `glass-blur-xl` on elements that render multiple times per page.
+
+### will-change Strategy
+
+Do NOT apply `will-change: filter` to glass elements statically. Apply only during animation:
+
+```css
+/* Only add will-change during hover transitions, remove after */
+.glass-panel {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.glass-panel:hover {
+  will-change: transform;  /* NOT will-change: filter */
+}
+```
+
+`will-change: filter` forces a new compositing layer even when the element is not animating, causing unnecessary memory consumption.
+
+### Loading Skeleton Compatibility
+
+The existing `PageSkeleton` component uses `<Skeleton className="h-[120px] rounded-xl" />`. When dashboard cards become glass, the loading skeleton should match the glass shape without applying `backdrop-filter`:
+
+```typescript
+// apps/web/components/shared/page-skeleton.tsx
+// Skeleton components do NOT use glass-surface
+// They are replaced with opaque shimmer skeletons that LOOK like glass cards
+// (same border-radius, similar border, shimmer animation)
+
+// The distinction: glass is a live effect; skeletons are placeholder shapes
+// Using backdrop-filter on skeletons is wasted GPU during data loading
+```
+
+### Prefers-Reduced-Transparency / Reduced-Motion
+
+```css
+/* Add to globals.css after the existing @layer base block */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-bg:         hsl(var(--card));
+    --glass-bg-subtle:  hsl(var(--card));
+    --glass-bg-heavy:   hsl(var(--card));
+    --glass-blur:       blur(0px);
+  }
+  .glass-surface,
+  .glass-surface-subtle,
+  .glass-surface-heavy {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 ```
 
-**Frontend upgrade prompts:** When the API returns `PLAN_LIMIT_EXCEEDED`, React Query's error handling displays an upgrade modal. The 402 HTTP status code is appropriate here.
+`prefers-reduced-transparency` is the correct media query (not `prefers-reduced-motion`) for users who disable translucency in their OS accessibility settings. This provides a proper opaque fallback that uses the existing `--card` token.
 
 ---
 
-### Feature 4: Analytics and Reporting
+## Progressive Enhancement Strategy
 
-**What already exists:**
-- `analytics_events` table (behavioral events, per company)
-- `audit_logs` table (system audit trail)
-- `v_daily_booking_summary` regular PostgreSQL view
-- `v_customer_metrics` regular PostgreSQL view
-- `/api/v1/analytics/overview`, `/api/v1/analytics/bookings`, `/api/v1/analytics/revenue`
-- `/api/v1/reports/bookings/pdf`, `/api/v1/reports/revenue/pdf`
+`@supports (backdrop-filter: blur(1px))` is the standard CSS feature query. Tailwind exposes this as the `supports-[backdrop-filter]` modifier.
 
-**What v1.3 analytics adds:**
-1. Cross-location aggregate dashboard (franchise owners)
-2. Revenue breakdown by service/employee
-3. Trend analysis with period-over-period comparison (already partially exists)
-4. Export in additional formats
+**Pattern for every glass component:**
 
-**Performance decision: Regular views vs. materialized views.**
-
-The existing `v_daily_booking_summary` is a regular PostgreSQL view — it recomputes on every query. At current scale (<1,000 bookings/day), this is fine. For v1.3, consider converting to materialized views:
-
-Benchmark evidence: Regular views on 28-second complex queries → 180ms with materialized view + 4.2s refresh overhead (from research). For daily summaries, refreshing hourly is acceptable.
-
-**Drizzle ORM materialized view support:** `pgMaterializedView()` exists. `db.refreshMaterializedView(view)` is callable from application code. Drizzle Kit does NOT yet fully support materialized views in introspect/push — they must be created via raw SQL migration.
-
-**Recommendation:** Convert `v_daily_booking_summary` to a materialized view in v1.3. Add a BullMQ job to refresh it hourly. Leave `v_customer_metrics` as a regular view for now (used by AI models that need fresh data).
-
-```typescript
-// NEW in packages/database/src/schema/views.ts:
-export const dailyBookingSummaryMaterialized = pgMaterializedView(
-  'mv_daily_booking_summary'
-).as(/* same query as current view */);
-
-// NEW: BullMQ job in notification-worker to refresh hourly:
-// REFRESH MATERIALIZED VIEW CONCURRENTLY mv_daily_booking_summary;
+```tsx
+// In JSX className:
+className={cn(
+  // Base styles (always apply — border, radius, shadow)
+  'rounded-lg border border-border shadow-sm',
+  // Fallback background when backdrop-filter NOT supported
+  'bg-card/95',
+  // Glass upgrade when backdrop-filter IS supported
+  'supports-[backdrop-filter]:bg-glass supports-[backdrop-filter]:backdrop-blur-glass supports-[backdrop-filter]:border-glass',
+)}
 ```
 
-**Cross-location analytics query pattern:**
+This means:
+- Firefox (historically poor `backdrop-filter` support): gets opaque card with `bg-card/95`
+- Chrome/Safari/Edge: gets full glass effect
+- Users with OS reduced transparency: gets opaque card via CSS media query override
 
-```typescript
-// For franchise owners: collect all company_ids under their org
-const locationIds = await getOrganizationCompanyIds(organizationId);
+**Browser support for `backdrop-filter` as of 2025-2026:** All major browsers support it — Chrome 76+, Firefox 103+ (with `layout.css.backdrop-filter.enabled` flag, enabled by default from Firefox 103), Safari 9+ (with `-webkit-` prefix). The `-webkit-` prefix must be included alongside the standard property.
 
-// Query using ANY:
-db.select({...}).from(dailyBookingSummaryMaterialized)
-  .where(inArray(dailyBookingSummaryMaterialized.companyId, locationIds))
-  .groupBy(...)
+---
+
+## Recommended File Structure (Changes Only)
+
 ```
-
-**New analytics tables for v1.3:**
-
-The existing `analytics_events` table stores raw behavioral events but is not designed for aggregate reporting. Add summary tables:
-
-```typescript
-// packages/database/src/schema/analytics.ts — ADD to existing file:
-
-revenueSnapshots: {
-  id: serial PK
-  companyId: integer FK
-  period: varchar(7)    // 'YYYY-MM'
-  totalRevenue: numeric
-  bookingCount: integer
-  avgBookingValue: numeric
-  newCustomers: integer
-  returningCustomers: integer
-  cancellationRate: numeric
-  noShowRate: numeric
-  snapshotAt: timestamp
-}
-// Populated monthly by a BullMQ job. One row per company per month.
-// Enables fast historical trend queries without scanning bookings.
+apps/web/
+├── app/
+│   └── globals.css                    MODIFIED — add glass tokens to :root and .dark
+├── tailwind.config.ts                 MODIFIED — add backdropBlur, backgroundColor, boxShadow, borderColor extensions + glassPlugin
+├── lib/
+│   └── tailwind/
+│       └── glass-plugin.ts            NEW — Tailwind plugin for .glass-surface utilities
+├── components/
+│   ├── ui/
+│   │   ├── card.tsx                   MODIFIED — add glass variant via CVA
+│   │   ├── button.tsx                 MODIFIED — add glass variant to existing buttonVariants
+│   │   ├── dialog.tsx                 MODIFIED — glass overlay + content background
+│   │   ├── glass-panel.tsx            NEW — generic glass surface component
+│   │   └── gradient-mesh.tsx          NEW — animated gradient mesh background
+│   ├── layout/
+│   │   ├── sidebar.tsx                UNCHANGED — stays solid for readability
+│   │   └── header.tsx                 MODIFIED — replace bg-background with glass-surface-subtle
+│   ├── dashboard/
+│   │   └── stat-card.tsx              MODIFIED — Card variant="glass"
+│   └── shared/
+│       └── page-skeleton.tsx          UNCHANGED — skeletons stay opaque (correct)
+└── app/[locale]/
+    ├── (marketing)/
+    │   ├── layout.tsx                 MODIFIED — add gradient-mesh background, fix stacking context
+    │   └── _components/
+    │       └── marketing-navbar.tsx   MODIFIED — replace ad-hoc glass with glass-surface token
+    ├── (auth)/
+    │   └── layout.tsx                 MODIFIED — add gradient-mesh, switch Card to glass variant
+    └── (dashboard)/
+        └── layout.tsx                 MODIFIED — add subtle gradient-mesh at low opacity
 ```
 
 ---
 
-### Feature 5: Frontend Redesign and Design System
+## Build Order (Dependency-Sequenced)
 
-**What already exists:**
-- `apps/web/app/globals.css` — CSS variables for shadcn/ui tokens (primary, secondary, background, etc.)
-- `tailwind.config.ts` — maps CSS vars to Tailwind colors (border, input, ring, background, foreground, primary, secondary, destructive, muted, accent, popover, card)
-- `apps/web/components/ui/` — 21 shadcn/ui primitives (in-place, not in `packages/ui`)
-- `apps/web/components/` — subdirectories: ai, analytics, auth, booking, calendar, dashboard, i18n, layout, loyalty, onboarding, shared, ui
-
-**What v1.3 frontend adds:**
-1. Billing/subscription UI (plan selector, usage meter, upgrade modals)
-2. Multi-location switcher in app shell
-3. Analytics dashboard expansion (charts, cross-location views)
-4. Design system tokens formalization
-
-**Design system approach:**
-
-The existing CSS variable structure is already correct shadcn/ui theming. For v1.3, add missing tokens for the new billing/upgrade UI without touching existing tokens:
-
-```css
-/* globals.css — ADD these tokens: */
---warning: 38 92% 50%;         /* amber-500 for usage warning */
---warning-foreground: 0 0% 100%;
---success: 142 71% 45%;        /* already --secondary, alias it */
---info: 217 91% 60%;           /* already --primary, alias it */
-
-/* Plan tier colors (for badge/indicator use): */
---plan-free: 215 20.2% 65.1%;
---plan-essential: 217 91% 60%;
---plan-growth: 142 71% 45%;
---plan-ai: 270 91% 60%;
-```
-
-**Component locations for v1.3 additions:**
+The design system foundation MUST be complete before any page-level work begins. Components depend on tokens; pages depend on components.
 
 ```
-apps/web/components/
-├── billing/                     (NEW)
-│   ├── plan-selector.tsx        Plan upgrade card grid
-│   ├── usage-meter.tsx          Booking usage progress bar with limit
-│   ├── upgrade-modal.tsx        Triggered by PLAN_LIMIT_EXCEEDED
-│   ├── subscription-status.tsx  Current plan + renewal date
-│   └── invoice-list.tsx         Subscription invoice history
-├── organization/                (NEW)
-│   ├── location-switcher.tsx    Dropdown in dashboard nav
-│   ├── location-card.tsx        Per-location summary card
-│   └── cross-location-table.tsx Aggregate stats across locations
-├── analytics/                   (EXISTING — extend)
-│   ├── revenue-chart.tsx        Add service/employee breakdown
-│   └── trend-chart.tsx          Add comparison overlays
-└── dashboard/                   (EXISTING — extend)
-    └── usage-indicator.tsx      Mini usage meter in sidebar
+Phase 1: Token Foundation (no visible output yet — unblocks everything)
+  ├── globals.css: add --glass-* primitives and semantic tokens to :root and .dark
+  ├── tailwind.config.ts: add theme extensions for backdropBlur, backgroundColor, etc.
+  └── lib/tailwind/glass-plugin.ts: create plugin with .glass-surface utilities
+  Blocks: All other phases
+  Risk: LOW — pure CSS/config, no component changes
+
+Phase 2: New Primitive Components (no page changes yet)
+  ├── components/ui/glass-panel.tsx: GlassPanel wrapper
+  └── components/ui/gradient-mesh.tsx: GradientMesh background
+  Blocks: Layout modifications
+  Risk: LOW — new files only, nothing existing modified
+
+Phase 3: Existing Component Variants (backward-compatible modifications)
+  ├── components/ui/card.tsx: add CVA + glass variant (default unchanged)
+  ├── components/ui/button.tsx: add glass variant to buttonVariants
+  └── components/ui/dialog.tsx: glass overlay and content styling
+  Blocks: Page-level usage of glass components
+  Risk: LOW-MEDIUM — CVA introduction changes Card props interface; verify TypeScript
+
+Phase 4: Dashboard Page Sections (highest user time-on-page, most impact)
+  ├── components/dashboard/stat-card.tsx: Card variant="glass"
+  ├── components/layout/header.tsx: glass-surface-subtle
+  └── app/[locale]/(dashboard)/layout.tsx: subtle gradient-mesh + stacking context
+  Blocks: Nothing (final consumer)
+  Risk: MEDIUM — stacking context changes can affect z-index of dropdowns/tooltips
+
+Phase 5: Marketing Pages
+  ├── app/[locale]/(marketing)/layout.tsx: gradient-mesh + stacking context
+  └── app/[locale]/(marketing)/_components/marketing-navbar.tsx: glass tokens
+  Blocks: Nothing
+  Risk: MEDIUM — z-index stacking context must be verified against MobileNav
+
+Phase 6: Auth Pages
+  └── app/[locale]/(auth)/layout.tsx: gradient-mesh + heavy glass card
+  Blocks: Nothing
+  Risk: LOW — simplest page structure, single card component
 ```
 
-**`packages/ui` decision:** Still do not migrate from `apps/web/components/ui/`. No second consumer exists. The billing and org components are app-specific logic, not generic primitives. If v1.4 adds a separate admin panel, THEN populate `packages/ui`. Keep placeholder for now.
+**Why this order:**
+- Tokens before components: components cannot use `var(--glass-bg)` until the variable is defined
+- New components before modifications: verifies the glass system works before touching existing code
+- Dashboard before marketing: dashboard has higher complexity (z-index, dropdowns, mobile nav) and more active users
+- Auth last: simplest structure, lowest risk, easiest to verify
 
 ---
 
-## Schema Changes Summary
+## Stacking Context Pitfalls
 
-### New Tables (6)
+### Dashboard z-index Conflicts
 
-| Table | File | Purpose |
-|-------|------|---------|
-| `subscriptions` | `schema/subscriptions.ts` (NEW) | Subscription state per company |
-| `subscription_invoices` | `schema/subscriptions.ts` (NEW) | Per-period billing records |
-| `organizations` | `schema/auth.ts` (ADD) | Franchise/multi-location owner entity |
-| `organization_members` | `schema/auth.ts` (ADD) | User-organization role junction |
-| `revenue_snapshots` | `schema/analytics.ts` (ADD) | Monthly aggregated revenue records |
-| Materialized view `mv_daily_booking_summary` | `schema/views.ts` (MODIFY) | Converted from regular view |
+The existing dashboard layout creates stacking contexts at:
+- Sidebar: `z-*` from sticky positioning
+- Header: `z-10` (explicit)
+- Modals/Dialogs: Radix UI portals at `z-50`
 
-### Modified Tables (3)
+Adding `gradient-mesh` as a fixed background with `-z-10` is safe — negative z-index sits below the document flow.
 
-| Table | Change | Risk |
-|-------|--------|------|
-| `companies` | Add nullable `organization_id` FK | LOW — nullable, existing rows unaffected |
-| `companies` | `subscriptionPlan` rename from `starter` → `essential` if needed | MEDIUM — check existing data first |
-| `users` | Add `primaryCompanyId` nullable to track default location for multi-location users | LOW — nullable |
+**Verified conflict risk:** The `MobileNav` component in `apps/web/components/layout/` renders a slide-over panel. If the marketing layout's gradient mesh creates a new stacking context via `transform` or `filter`, it can clip the mobile nav. Solution: use `fixed inset-0` with `-z-10` on the mesh, NOT `transform` or `filter` on the mesh container itself. The CSS `gradient-mesh` utility uses only `background-image`, which does NOT create a stacking context.
 
-### New Columns on Existing Tables (0)
+### Backdrop-Filter Clip Boundary
 
-The multi-location design (Option A: separate `organizations` table) intentionally adds NO new columns to the 49 existing tenant tables. This is the key advantage.
+`backdrop-filter` blurs everything behind an element up to its nearest ancestor that is a "backdrop root" (i.e., has `isolation: isolate` or creates a new stacking context). If the gradient mesh background is behind a parent with `isolation: isolate`, backdrop-filter on child glass cards may blur incorrectly against a white background instead of the gradient.
+
+**Prevention:** Do NOT add `isolation: isolate` or `transform` to the page wrapper that contains both the gradient mesh and the glass cards. The mesh `div` uses `fixed inset-0 -z-10` — it is positioned outside the layout flow, so it is naturally the backdrop for all glass elements in the document without requiring explicit isolation.
 
 ---
 
-## Build Order and Data Model Dependencies
+## Anti-Patterns
 
-The following order is forced by data model dependencies:
+### Anti-Pattern 1: Replacing `bg-card` Globally
 
-```
-Step 1: Subscription billing schema + Comgate recurring (FIRST — unblocks billing)
-   packages/database/src/schema/subscriptions.ts
-   apps/web/app/api/v1/billing/
-   apps/web/app/api/v1/payments/comgate/client.ts (extend)
-   Duration: 3-4 days
-   Risk: MEDIUM — Comgate recurring API needs testing in sandbox mode
-   Blocks: Usage limits (needs subscription status to know plan), Frontend billing UI
+**What people do:** Change `--card` CSS variable to `rgba(255,255,255,0.55)` to make all cards glass.
+**Why it's wrong:** `--card` is used by shadcn/ui in dropdowns, popovers, command palettes, and select menus. A transparent `--card` makes interactive overlays like `<Select>` render with a blurred translucent background that is unreadable. Popover content becomes illegible.
+**Do this instead:** Keep `--card` as the opaque solid color. Add separate `--glass-bg` tokens and use them explicitly via the `variant="glass"` prop on individual Card components.
 
-Step 2: Usage limits enforcement (SECOND — depends on subscription state)
-   apps/web/lib/limits/usage-checker.ts
-   Hook into booking POST and employee POST handlers
-   Duration: 1-2 days
-   Risk: LOW — Redis counter pattern is straightforward
-   Blocks: Frontend upgrade prompts
+### Anti-Pattern 2: Applying Glass to Text-Dense Surfaces
 
-Step 3: Multi-location organizations (THIRD — architecturally independent of billing)
-   packages/database/src/schema/auth.ts (add organizations, organization_members)
-   Drizzle migration: ALTER companies ADD organization_id
-   apps/web/app/api/v1/organizations/
-   apps/web/app/api/v1/auth/switch-location/route.ts
-   Duration: 4-5 days
-   Risk: HIGH — JWT context switching needs careful testing to prevent cross-tenant data leaks
-   Blocks: Cross-location analytics, Organization frontend
+**What people do:** Glass sidebar navigation, glass data tables, glass form inputs.
+**Why it's wrong:** Text at small sizes (12-14px) against a blurred background fails WCAG contrast requirements. Data tables with glass panels behind them become difficult to scan. Form inputs need clear affordances — a translucent input field creates uncertainty about editability.
+**Do this instead:** Reserve glass for cards with large text, icon-forward KPI cards, hero sections, and structural containers. Inputs, tables, and navigation items stay on solid backgrounds.
 
-Step 4: Analytics expansion (FOURTH — depends on subscription for plan-gating, benefits from org structure)
-   Convert v_daily_booking_summary → mv_daily_booking_summary (materialized)
-   Add revenue_snapshots table + BullMQ monthly job
-   Extend /api/v1/analytics/ routes with cross-location support
-   Duration: 2-3 days
-   Risk: LOW — additive query work
-   Blocks: Analytics frontend
+### Anti-Pattern 3: Glass with No Background Behind It
 
-Step 5: Frontend (LAST — depends on all backend APIs being ready)
-   billing/, organization/, analytics/ component directories
-   Dashboard layout updates for location switcher
-   Usage meter in sidebar
-   Duration: 3-4 days
-   Risk: LOW — UI work against stable APIs
-```
+**What people do:** Add `backdrop-blur-lg` to a card that sits on `bg-background` (plain white or plain dark).
+**Why it's wrong:** Blurring a solid color produces the same solid color. If there is nothing visually interesting behind the glass, the effect is invisible. The glass surface appears as an ordinary opaque card with slightly reduced performance.
+**Do this instead:** Glass only works when there is a gradient, image, or visually distinct layer behind it. The `gradient-mesh` background is the required companion to glass UI in this design system. Always ensure glass elements are positioned over the mesh layer.
 
-**Steps 1, 2, 3 can parallelize across segments:**
-- DATABASE: Steps 1+3 schema work in parallel (different schema files)
-- BACKEND: Step 1 API, then Step 2 hooks, then Step 3 API
-- FRONTEND: Step 5 (starts once BACKEND APIs are drafted)
-- DEVOPS: BullMQ job additions for subscription billing and view refresh
+### Anti-Pattern 4: will-change: filter on Static Glass Elements
+
+**What people do:** Add `will-change: filter` or `will-change: backdrop-filter` to glass cards to "pre-optimize" them.
+**Why it's wrong:** `will-change` allocates a GPU compositing layer immediately and holds it for the element's lifetime. With 4 KPI cards all having `will-change: filter`, that's 4 permanent GPU layers for elements that never animate their filter.
+**Do this instead:** No `will-change` on static glass. Add `will-change: transform` only during hover state transitions (scale, translate), not filter. The browser optimizes `backdrop-filter` automatically during compositing.
+
+### Anti-Pattern 5: Nested Glass Elements
+
+**What people do:** A glass card inside a glass panel inside a glass section.
+**Why it's wrong:** Each level of `backdrop-filter` compounds. The innermost element blurs what is behind it — which is the parent glass panel — which is itself a blurred, semi-transparent surface. The result is muddy, grey, and loses the visual clarity that makes glass beautiful.
+**Do this instead:** Maximum one level of glass nesting per section. If nesting is required (e.g., a modal inside a glass-backgrounded page), use `glass-surface-heavy` on the inner element to make it fully opaque, not glass-on-glass.
 
 ---
 
-## Migration Strategy for Existing Data
+## Confidence Assessment
 
-### For `companies.organization_id` (multi-location FK)
-
-```sql
--- Migration: Add organization_id to companies (nullable, no data loss)
-ALTER TABLE companies
-  ADD COLUMN organization_id INTEGER REFERENCES organizations(id) ON DELETE SET NULL;
-
--- No data backfill required: NULL means "standalone business" (single location)
--- Existing companies continue working exactly as before
-```
-
-### For `subscriptions` table (billing state)
-
-```sql
--- Migration: Create subscriptions table
--- Backfill: For each company, create a subscription record matching current plan
-INSERT INTO subscriptions (company_id, plan, status, current_period_start, current_period_end)
-SELECT
-  id,
-  subscription_plan,
-  CASE WHEN subscription_plan = 'free' THEN 'active' ELSE 'legacy' END,
-  NOW(),
-  COALESCE(subscription_valid_until, NOW() + INTERVAL '30 days')
-FROM companies;
--- 'legacy' status means: existing paying customer, no Comgate recurring token yet
--- These customers will be prompted to set up recurring billing on next renewal
-```
-
-### For materialized view conversion
-
-```sql
--- Step 1: Drop existing regular view
-DROP VIEW IF EXISTS v_daily_booking_summary;
-
--- Step 2: Create materialized view with same schema
-CREATE MATERIALIZED VIEW mv_daily_booking_summary AS
-  SELECT company_id, DATE(start_time) AS booking_date, ...
-  FROM bookings GROUP BY company_id, DATE(start_time);
-
--- Step 3: Create unique index (required for CONCURRENTLY refresh)
-CREATE UNIQUE INDEX ON mv_daily_booking_summary (company_id, booking_date);
-
--- No Drizzle push — this must be a raw SQL migration file
-```
-
-**Drizzle Kit caveat:** Drizzle Kit does not fully support materialized view schema pushes. The materialized view creation must go into a handwritten SQL migration file (`packages/database/src/migrations/XXXX_add_mv_daily_booking.sql`) rather than relying on `drizzle-kit generate`. This is a KNOWN Drizzle limitation (GitHub issue #1787).
-
----
-
-## Component Boundaries
-
-| Component | Responsibility | Communicates With |
-|-----------|---------------|------------------|
-| `apps/web` (Next.js) | All API routes, frontend, billing webhooks | PostgreSQL (Drizzle), Redis (limits counters), RabbitMQ, AI service, Comgate API |
-| `services/notification-worker` | Email/SMS delivery, subscription billing jobs, view refresh jobs | PostgreSQL, Redis (BullMQ), RabbitMQ |
-| `services/ai` (FastAPI) | ML inference — unchanged in v1.3 | Redis, `apps/web` internal API |
-| `packages/database` | Drizzle schema — add subscriptions.ts, extend auth.ts | Used by `apps/web` only |
-| Comgate API | Payment gateway — extend with recurring support | Called from `apps/web` |
-| Redis | Rate limits, usage counters, session cache | `apps/web`, `notification-worker` |
-
----
-
-## Data Flow Changes
-
-### Subscription Billing Flow (New)
-
-```
-New customer registers → companies.subscription_plan = 'free'
-    ↓
-Owner clicks "Upgrade to Essential"
-    → POST /api/v1/billing/subscribe { plan: 'essential', cycle: 'monthly' }
-    → Create subscription record (status='trialing' or 'active')
-    → Call initComgatePayment({ initRecurring: true, price: 490, ... })
-    → Redirect user to Comgate payment page
-    ↓
-User pays → Comgate callback → POST /api/v1/billing/comgate/callback
-    → Verify Comgate webhook secret
-    → Update subscription status → 'active'
-    → Store comgateInitTransactionId on subscription
-    → UPDATE companies SET subscription_plan = 'essential', subscription_valid_until = [+30d]
-    → Schedule BullMQ job: charge again in 30 days
-    ↓
-30 days later → BullMQ executes subscription billing job
-    → chargeRecurringPayment({ initRecurringTransactionId, price: 490, ... })
-    → No user redirect — silent background charge
-    → Comgate callback updates subscription_invoice status
-    → If successful: reset subscription_valid_until + 30d
-    → If failed: retry 3x, then downgrade to 'free' after grace period (7 days)
-```
-
-### Multi-Location Context Switch Flow (New)
-
-```
-Franchise owner logs in → JWT: { company_id: [headquarters_id], role: 'owner', ... }
-    ↓
-Dashboard shows location switcher (org has 5 locations)
-    ↓
-Owner selects "Location: Praha Žižkov"
-    → POST /api/v1/auth/switch-location { company_uuid: "abc-123" }
-    → Validate: user's organization owns this company
-    → Issue new JWT: { company_id: [zizkov_id], role: 'owner', ... }
-    → Store new token → all subsequent API calls scoped to Žižkov
-    ↓
-Existing API routes unchanged — they still call findCompanyId() which returns Žižkov's ID
-    ↓
-Owner navigates to "Cross-Location Analytics"
-    → GET /api/v1/analytics/cross-location (uses organization_id from user's token or query param)
-    → Service layer: SELECT all company_ids WHERE organization_id = [org_id]
-    → Query materialized view WHERE company_id = ANY([all_location_ids])
-    → Aggregate results across locations
-```
-
-### Usage Limit Enforcement Flow (New)
-
-```
-Customer tries to book (company on Free plan, 50 bookings used this month)
-    → POST /api/v1/bookings
-    → findCompanyId(userSub) → companyId
-    → checkBookingLimit(companyId):
-        → GET Redis key: limits:{companyId}:bookings:{2026-02} → "50"
-        → Company plan = 'free', limit = 50, current = 50 → LIMIT EXCEEDED
-        → throw PlanLimitError(402, 'BOOKING_LIMIT_REACHED', { upgrade_url: '/billing/plans' })
-    → handleRouteError catches PlanLimitError → returns 402 JSON
-    ↓
-Frontend React Query error handler:
-    → response.status === 402 && code === 'BOOKING_LIMIT_REACHED'
-    → Display UpgradeModal with plan comparison
-```
-
----
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Parent-Child on `companies` for Multi-Location
-
-**What:** Adding `parent_company_id` FK to `companies` table.
-**Why bad:** Every aggregate query becomes a recursive CTE. All 49 tables' RLS policies need updating for parent access. JWT must carry hierarchy context. Every existing query potentially returns wrong data if the WHERE clause doesn't account for the child relationship.
-**Instead:** Use the `organizations` entity (Option A). Additive, zero existing code changes.
-
-### Anti-Pattern 2: Mixing Subscription Invoices with Booking Payments
-
-**What:** Adding `payment_type: 'subscription' | 'booking'` to the existing `payments` table.
-**Why bad:** The existing `payments` table is FK-constrained to `bookings` (`booking_id` NOT NULL). Subscription charges have no associated booking. Nullable FKs on a NOT NULL column require table migrations and break the SAGA pattern's assumption that every payment maps to a booking.
-**Instead:** Separate `subscription_invoices` table. The concept is different: booking payments are transactional, subscription invoices are periodic.
-
-### Anti-Pattern 3: Enforcing Usage Limits in Next.js Middleware
-
-**What:** Checking subscription limits in `apps/web/middleware.ts` for every request.
-**Why bad:** Next.js middleware runs on EVERY request including static asset serving, API health checks, and public routes. Loading subscription state on every request is expensive and fragile. Middleware crashes can take down the entire app.
-**Instead:** Inline checks in specific POST handlers (bookings, employees). The overhead is proportional to the action being limited.
-
-### Anti-Pattern 4: Storing Usage Counts Only in PostgreSQL
-
-**What:** `SELECT COUNT(*) FROM bookings WHERE company_id = ? AND created_at >= start_of_month` on every booking creation.
-**Why bad:** Under concurrent booking load, this query runs on every POST. At 100 concurrent bookings, that's 100 full-table-scan-equivalent queries hitting PostgreSQL simultaneously.
-**Instead:** Redis INCR as the fast counter, PostgreSQL as the reconciliation source (nightly job verifies Redis counts match DB).
-
-### Anti-Pattern 5: Multi-Company JWT
-
-**What:** Including an array of company IDs in the JWT for franchise owners: `{ company_ids: [1, 2, 3, 4, 5] }`.
-**Why bad:** JWTs grow large with many locations. The `findCompanyId()` function is used in 127 route files — it expects ONE company ID. Changing the JWT payload type breaks every single route handler. RBAC checks would need to handle array context, which is undefined behavior in the current permission system.
-**Instead:** Single active `company_id` in JWT + explicit location switch endpoint. Context is always unambiguous. Existing code unchanged.
-
----
-
-## Scalability Considerations
-
-| Concern | At 100 companies | At 1K companies | At 10K companies |
-|---------|-----------------|----------------|-----------------|
-| Usage limit Redis keys | ~300 keys (100 companies × 3 periods buffer) | ~3K keys | ~30K keys — trivial for Redis |
-| Materialized view refresh | Hourly refresh, <1s at 100 companies | <5s at 1K | Consider incremental refresh at 10K |
-| Cross-location queries | ANY([5 ids]) | ANY([50 ids]) | Consider read replica for org-level analytics |
-| Subscription billing jobs | 100 jobs/month max | 1K jobs/month | 10K — BullMQ handles this comfortably |
-| Comgate recurring | 100 API calls/month | 1K | Rate limits may apply — check Comgate docs |
+| Area | Confidence | Basis |
+|------|------------|-------|
+| Token architecture | HIGH | Based on existing working shadcn/ui CSS variable pattern in codebase; same mechanism |
+| Tailwind plugin API | HIGH | Official Tailwind v3 docs verified via WebFetch |
+| CVA variant addition | HIGH | Verified against existing `buttonVariants` pattern in codebase |
+| ThemeProvider hydration | HIGH | `ThemeToggle` in codebase already uses correct mounted-check pattern |
+| Stacking context analysis | HIGH | Verified layout structure from actual component reads |
+| backdrop-filter browser support | MEDIUM | Cited sources; caniuse not directly accessible but widely documented as 95%+ global support |
+| Performance benchmarks | MEDIUM | GPU cost claims are qualitative consensus across multiple sources; actual values are hardware-dependent |
+| `prefers-reduced-transparency` support | MEDIUM | Safari/Chrome supported; Firefox support may vary; always test |
 
 ---
 
 ## Sources
 
-- Codebase: `packages/database/src/schema/auth.ts` — `companies` table verified, subscription columns confirmed — HIGH confidence
-- Codebase: `packages/database/src/schema/payments.ts` — `payments` table structure verified — HIGH confidence
-- Codebase: `apps/web/app/api/v1/payments/comgate/client.ts` — current Comgate client functions verified — HIGH confidence
-- Codebase: `apps/web/lib/db/tenant-scope.ts` — `findCompanyId()` signature verified — HIGH confidence
-- Codebase: `apps/web/lib/auth/jwt.ts` — JWT payload structure with single `company_id` verified — HIGH confidence
-- Codebase: `packages/database/src/schema/views.ts` — current regular pgView implementation — HIGH confidence
-- Comgate PHP SDK: [github.com/comgate-payments/sdk-php](https://github.com/comgate-payments/sdk-php) — `setInitRecurring`, `setInitRecurringId`, `initRecurringPayment()` — MEDIUM confidence (PHP SDK, not direct REST API docs)
-- [Comgate recurring payments help page](https://help.comgate.cz/docs/en/recurring-payments) — confirmed recurring is an approved feature requiring activation — MEDIUM confidence (403 on full docs)
-- [PostgreSQL RLS for multi-tenant](https://aws.amazon.com/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/) — parent-child RLS complexity confirmed — HIGH confidence
-- [Drizzle ORM materialized view issue #1787](https://github.com/drizzle-team/drizzle-orm/issues/1787) — confirmed Drizzle Kit does not fully support materialized views in introspect — HIGH confidence
-- [Drizzle ORM views docs](https://orm.drizzle.team/docs/views) — `pgMaterializedView()` and `db.refreshMaterializedView()` API verified — HIGH confidence
-- [PostgreSQL materialized view benchmark](https://stormatics.tech/blogs/postgresql-materialized-views-when-caching-your-query-results-makes-sense) — 28s → 180ms performance improvement, 4.2s refresh overhead — MEDIUM confidence (single source)
+- Codebase: `apps/web/app/globals.css` — existing CSS variable structure verified — HIGH confidence
+- Codebase: `apps/web/tailwind.config.ts` — existing theme extensions verified — HIGH confidence
+- Codebase: `apps/web/components/ui/button.tsx` — existing CVA `buttonVariants` pattern verified — HIGH confidence
+- Codebase: `apps/web/components/ui/card.tsx` — existing non-CVA Card verified; CVA addition required — HIGH confidence
+- Codebase: `apps/web/app/providers.tsx` — ThemeProvider `attribute="class"` confirmed — HIGH confidence
+- Codebase: `apps/web/app/[locale]/(marketing)/layout.tsx` — stacking context baseline verified — HIGH confidence
+- Codebase: `apps/web/app/[locale]/(dashboard)/layout.tsx` — existing layout structure verified — HIGH confidence
+- Codebase: `apps/web/components/layout/header.tsx` — existing `bg-background` class verified — HIGH confidence
+- Codebase: `apps/web/components/ui/theme-toggle.tsx` — `mounted` hydration pattern verified — HIGH confidence
+- [Tailwind CSS Plugins docs (v3)](https://v3.tailwindcss.com/docs/plugins) — `addUtilities`, `addComponents` API — HIGH confidence
+- [Vercel Academy: Extending shadcn/ui](https://vercel.com/academy/shadcn-ui/extending-shadcn-ui-with-custom-components) — CVA variant addition pattern — HIGH confidence
+- [glasscn-ui GitHub](https://github.com/itsjavi/glasscn-ui) — reference implementation for shadcn/ui glass variants — MEDIUM confidence
+- [shadcn-glass-ui DEV.to](https://dev.to/yhooi2/introducing-shadcn-glass-ui-a-glassmorphism-component-library-for-react-4cpl) — 3-layer token architecture reference — MEDIUM confidence
+- [LogRocket: Glassmorphism CSS](https://blog.logrocket.com/implement-glassmorphism-css/) — stacking context and dark mode guidance — MEDIUM confidence
+- [Epic Web Dev: Tailwind CSS Glassmorphism](https://www.epicweb.dev/tips/creating-glassmorphism-effects-with-tailwind-css) — `bg-white/10 backdrop-blur-lg` pattern — HIGH confidence
+- [Axess Lab: Glassmorphism Accessibility](https://axesslab.com/glassmorphism-meets-accessibility-can-frosted-glass-be-inclusive/) — `prefers-reduced-transparency` and contrast requirements — HIGH confidence
+- [Half Accessible: Glassmorphism Implementation Guide](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide) — blur value performance guidelines (8-15px threshold) — MEDIUM confidence
+- [shadcn/ui issue #327](https://github.com/shadcn-ui/ui/issues/327) — backdrop-filter performance concerns with shadcn/ui — MEDIUM confidence
+
+---
+
+_Architecture research for: Glassmorphism design system integration with Next.js 14 + Tailwind + shadcn/ui_
+_Researched: 2026-02-25_

@@ -4,12 +4,14 @@ import { Header } from '@/components/layout/header';
 import { SkipLink } from '@/components/accessibility/skip-link';
 import { NavigationProgress } from '@/components/layout/navigation-progress';
 import { DashboardTour } from '@/components/onboarding/driver-tour';
+import { GradientMesh } from '@/components/glass/gradient-mesh';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
       <SkipLink />
       <NavigationProgress />
+      <GradientMesh preset="dashboard" />
       <div className="flex h-screen">
         <aside aria-label="Dashboard sidebar">
           <Sidebar />

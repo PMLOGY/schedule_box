@@ -1,542 +1,266 @@
-# Feature Landscape: ScheduleBox v1.3 — Revenue & Growth
+# Feature Research: Glassmorphism Design Overhaul
 
-**Domain:** AI-powered Scheduling SaaS — Subscription Billing, Multi-Location, Usage Gating, Analytics, Design Polish
-**Researched:** 2026-02-24
-**Confidence:** MEDIUM-HIGH overall (Comgate recurring API specifics LOW — docs are behind auth; SaaS patterns HIGH from multiple verified sources; CZ/SK billing law MEDIUM from official sources)
+**Domain:** Glassmorphism visual redesign — premium SaaS booking platform
+**Researched:** 2026-02-25
+**Confidence:** HIGH overall (glassmorphism patterns are well-documented across multiple authoritative sources; accessibility requirements verified via WCAG and NN/g; implementation patterns verified via official shadcn/ui ecosystem)
 
 ---
 
 ## Context
 
-ScheduleBox v1.2 shipped a fully functional, demo-ready product. v1.3 is about turning it into a **revenue-generating SaaS business**:
+ScheduleBox v1.3 shipped a functionally complete booking SaaS. The v1.4 milestone is a **full visual redesign** targeting "medium glassmorphism" — the goal is to move from "AI-generated and boring" to "premium product users trust at 2,990 CZK/month."
 
-- Pricing tiers exist on the landing page but are **not enforced** — everyone gets all features
-- Comgate is integrated for one-time booking payments but **not for subscriptions**
-- The system has one company per account — no concept of **multiple locations**
-- Analytics exist but show **booking data only** — no SaaS/business health metrics
-- The UI works but lacks the **visual polish** expected from a premium CZK 2,990/month product
+**Design reference:** "X: AI Tech Start-Up" on Behance (saved in `.planning/phases/32-frontend-polish/32-CONTEXT.md`)
+**Primary palette:** `#0057FF` (electric blue) with dark states `#003ECC`, `#002F9A`
+**Glass intensity:** Medium — glass cards throughout, gradient backgrounds on hero/key sections, blur on overlays
 
-**What already exists (do not rebuild):**
-- Booking engine, availability, double-booking prevention
-- Comgate one-time payment + webhook infrastructure
-- CRM, loyalty program, coupons, gift cards
-- 7 AI/ML models (no-show, CLV, pricing, capacity, health score, reminder timing, upselling)
-- Onboarding wizard with industry templates
-- Marketing landing page with pricing tiers (Free/490/1490/2990 Kč)
-- i18n (cs/en/sk), full notification system (email + SMS)
-- RabbitMQ event infrastructure, Drizzle ORM, PostgreSQL RLS
+**What already exists (do not touch):**
+- `next-themes` dark/light mode toggle (working)
+- Basic `PageSkeleton`, `TableSkeleton` components
+- Dashboard KPI cards, revenue chart, recent bookings
+- Landing page (hero, pricing, testimonials)
+- Auth pages (login, register, reset password)
+- Calendar, bookings, customers, analytics, settings, billing pages
+- Sidebar navigation, header with location switcher
+- shadcn/ui component library throughout
 
----
-
-## Category 1: Subscription Billing
-
-### How Competing Platforms Handle This
-
-**Calendly/Acuity pattern:** Monthly credit card auto-charge with instant plan activation. Upgrade activates immediately with proration. Downgrade schedules for end of period. Failed payment triggers 3–4 retry attempts over 14 days before account downgrade.
-
-**Fresha pattern:** Usage-based (zero subscription) — charges per transaction. Not applicable to ScheduleBox's subscription model.
-
-**Reservio/Reservanto (CZ market):** Monthly SEPA or card payment. Invoice emailed on each charge. Czech companies require IČO on invoice and 10-year retention.
-
-### Table Stakes
-
-Features users expect when paying a subscription. Missing = trust is broken immediately.
-
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **Comgate recurring payment initiation** | First-party Czech payment gateway — avoids needing Stripe or other foreign gateways | HIGH | Existing Comgate integration (Phase 21). Requires Comgate account-level approval for recurring feature. New API params: `recurrence=ON`, `recurrenceCycle=MONTH`. |
-| **Subscription lifecycle state machine** | Plans must move through: `trialing → active → past_due → canceled → paused` | HIGH | New DB table `company_subscriptions`. Must integrate with existing `companies.plan` column. |
-| **Automatic monthly charge** | Background job debits saved card on renewal date | HIGH | Existing RabbitMQ queue for async jobs. New cron scheduler or pg-cron. |
-| **Failed payment dunning** | Smart retry (day 1, 3, 7, 14) + email notifications. Standard 14-day grace period. | MEDIUM | Existing notification worker + email infrastructure. New dunning state tracking. |
-| **Grace period enforcement** | Account stays functional during grace period but shows persistent banner. Hard lock after 14 days. | MEDIUM | Must integrate with tier enforcement (Category 3). |
-| **Plan upgrade / downgrade UI** | Settings page with current plan, upgrade CTA, downgrade with end-of-period scheduling | MEDIUM | Existing settings pages. Upgrade → Comgate payment. Downgrade → schedule change. |
-| **Proration on upgrade** | Mid-period upgrade charges only remaining days on new plan. Standard expectation. | MEDIUM | New billing math utility. Comgate doesn't handle proration — must calculate and charge delta. |
-| **Subscription invoice PDF** | Czech law: invoice within 15 days, must include IČO, VAT if applicable, stored 10 years | HIGH | Existing invoice PDF generation (Phase 6). New invoice type: `subscription`. Czech VAT: 21% standard, 12% reduced. |
-| **Cancellation flow** | Self-serve cancel with confirmation + "reasons" survey. Access until period end. | LOW | UI only, minimal backend state change. |
-| **Payment history page** | List of all charges with PDF download, status (paid/failed/refunded) | LOW | Existing payments table. New filter for subscription-type charges. |
-
-### Differentiators
-
-Features that set ScheduleBox apart in the CZ/SK market for billing.
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-----------------|-----------|-------|
-| **Annual plan with 2 months free** | Industry-standard LTV boost. "Pay 10 months, get 12." | MEDIUM | Annual billing cycle in Comgate. Significant MRR/ARR improvement. Target 30% annual adoption. |
-| **Trial-to-paid conversion flow** | Contextual upgrade prompts at friction points (booking #48 of 50 limit, etc.) | MEDIUM | Requires usage metering (Category 3). Most effective: prompt at 80% limit consumption, not at hard stop. |
-| **Čeština na faktuře** | Invoice text in Czech with proper legal terminology. Required by Czech B2B buyers. | LOW | Template change only. Already have i18n. |
-| **Pause subscription** | For seasonal businesses (ski instructors, summer camps). Pause 1–3 months, card not charged. | MEDIUM | CZ/SK SMB market is seasonally heavy. Reduces churn vs. cancelation. New subscription state. |
-
-### Anti-Features
-
-Features to explicitly NOT build in v1.3.
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|-------------|----------|-------------------|
-| **Per-booking revenue share (Fresha model)** | Vendor lock-in through payment dependency destroys trust. SMB owners hate unpredictable costs. | Fixed subscription only |
-| **Multi-currency billing** | CZK/EUR complexity; Comgate handles CZK natively. EUR adds accounting complexity for CZ entities. | CZK only in v1.3 |
-| **Complex proration edge cases** | Mid-month upgrade + addon + partial refund logic creates bugs. Start simple. | Immediate upgrade charge = full month of difference. Refine in v1.4. |
-| **Stripe/PayPal for subscriptions** | Comgate is the chosen CZ gateway; adding a second billing system creates split state | Comgate recurring only |
-
-### User Flows
-
-**New Subscription (from Free):**
-1. User hits tier limit (e.g., booking 51 of 50) → contextual upgrade modal appears
-2. Modal shows plan comparison with current usage highlighted
-3. User selects Essential/Growth/AI-Powered plan
-4. Redirect to Comgate payment page (first charge + recurring consent)
-5. Comgate webhook fires → subscription activated → plan column updated → welcome email sent
-
-**Monthly Renewal (background):**
-1. Cron job runs on renewal_date
-2. Comgate recurring charge API called with stored recurrence token
-3. Success → subscription renewed, invoice generated + emailed
-4. Failure → retry schedule begins (day 1, 3, 7, 14)
-5. Retry 4 fails → subscription enters `past_due` → user emailed → grace period starts
-6. Day 14 past_due → account locked to Free tier, data preserved
-
-**Upgrade (Active Subscriber):**
-1. User clicks "Upgrade" in Settings → Plan
-2. Shows proration calculation ("You'll be charged X Kč today for the remaining 14 days")
-3. Confirm → immediate Comgate charge for delta
-4. Plan updated instantly, new features unlocked
-
-**Downgrade:**
-1. User selects lower plan
-2. "Your plan changes to [X] on [renewal date]. Until then, you keep current features."
-3. Scheduled plan change recorded. No immediate charge change.
-4. On renewal date: lower plan charge, features adjusted
-
-### Complexity Assessment
-
-| Aspect | Complexity | Reason |
-|--------|-----------|--------|
-| Comgate recurring API integration | HIGH | Requires separate account approval; limited public docs; must handle async webhook flow |
-| Subscription state machine | HIGH | 6+ states, edge cases with concurrent upgrades/dunning |
-| Proration math | MEDIUM | Custom calculation since Comgate doesn't prorate |
-| Czech invoice compliance | MEDIUM | PDF template change + IČO/DIČ fields |
-| UI (settings/upgrade flow) | LOW-MEDIUM | Standard modal/page patterns; shadcn components available |
+**What the glassmorphism overhaul must do:**
+- Apply glass card treatment to the existing component system without rebuilding it
+- Make dark mode actually look premium (current dark mode colors are weak)
+- Introduce gradient backgrounds on key layout sections
+- Add micro-animations that feel premium, not busy
+- Remain performant (mobile users, mid-range devices in CZ/SK market)
+- Maintain WCAG 2.1 AA contrast compliance
 
 ---
 
-## Category 2: Multi-Location / Franchise Management
+## Core Glassmorphism Principles (Verified)
 
-### How Competing Platforms Handle This
+Before features: the 4 non-negotiable rules that make glass work.
 
-**Fresha:** Each location is a separate "workspace" that shares the same account login. Owner switches between locations via top-level dropdown. Separate bank accounts per location (Fresha's unique feature). Analytics filterable by location or aggregated.
-
-**Pabau:** Role-based access per location. Practice managers see their location; head office sees all. Consolidated reporting with location filter. Client records are global (accessible from any branch).
-
-**Homebase/FranConnect (franchise-first):** Central admin ("franchisor") controls brand standards, menus, pricing ranges. Location manager ("franchisee") operates within those constraints. Separate P&L per location with roll-up reporting.
-
-**AppMaster/small chain pattern (5-50 branches):** Location is a first-class entity with its own staff, services, working hours, and resources. Customers book at a specific location. Central admin can view/manage all locations.
-
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **Location entity** | A company can have 1-N locations. Each location has own address, hours, staff, services, resources | HIGH | New DB: `locations` table. RLS must scope to location within company. Existing `companies` → `locations` → everything else hierarchy. |
-| **Location switcher UI** | Owner switches active location via top-nav dropdown. Single login, multiple locations. | MEDIUM | Global state change (Zustand). All subsequent data queries scoped to selected location. |
-| **Per-location working hours** | Location A: Mon-Fri, Location B: Tue-Sat | LOW | Existing `working_hours` table needs `location_id` FK |
-| **Per-location staff assignment** | Staff assigned to 1 or more locations. Staff calendar shows only their assigned locations. | MEDIUM | Existing `employees` table needs `location_id` (M:N join table). |
-| **Per-location services with pricing overrides** | Base service defined at company level. Location can override price (e.g., Prague branch charges more). | MEDIUM | New `location_service_overrides` table. Fallback to company-level service if no override. |
-| **Central admin role** | "Franchisor" or chain owner can see all locations, manage settings, view aggregated analytics | HIGH | New role in RBAC: `chain_admin`. Existing RBAC infrastructure. |
-| **Location manager role** | Location manager can only manage their assigned location(s). Cannot see other locations' data. | HIGH | New role: `location_manager`. RLS update to enforce location_id scope. |
-| **Aggregated analytics** | Owner dashboard shows total revenue, bookings across ALL locations + breakdown by location | HIGH | Existing analytics queries need GROUP BY location_id + roll-up view. |
-| **Customer location history** | Customer who visits multiple branches has unified profile | MEDIUM | Existing `customers` table is already company-scoped (cross-location). No change needed. |
-| **Booking at specific location** | Public booking widget shows "Choose location" step first | MEDIUM | Existing booking widget needs location selection step prepended. |
-
-### Differentiators
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-----------------|-----------|-------|
-| **Separate payout accounts per location** | Fresha does this — critical for franchise where each franchisee owns their branch financially | HIGH | Comgate supports multiple merchant accounts. Each location has own bank account for payouts. Complex implementation. |
-| **Cross-location booking** | "Book at whichever branch has availability" — single customer UI shows all branches' slots | HIGH | Requires availability engine to query across locations simultaneously. Already built for single-location. |
-| **Location performance benchmarking** | "Branch Prague is 23% above chain average for revenue per booking" | MEDIUM | Dashboard comparison component. Analytics data already collected if location_id tracked. |
-| **Template propagation** | Central admin pushes service catalog changes to all branches at once | MEDIUM | Admin action: "Apply to all locations". Useful for price increases, new service rollouts. |
-| **Branch-level AI insights** | No-show predictor per location (each branch may have different customer behavior) | HIGH | AI models would need per-location training. Complex. Probably v1.4. |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|-------------|----------|-------------------|
-| **Full white-label per location** | Each branch having completely different branding = unmanageable. SMBs with 5-50 branches want consistency. | Company-level branding, location-specific name/address only |
-| **Separate billing per location** | Subscription billing at branch level creates 5-50 billing relationships. Nightmare for SMB. | Single subscription at company level covers all locations. Tier limits scale with locations (e.g., Growth = up to 5 locations). |
-| **Full franchise royalty management** | Revenue share calculations, franchise fee collection = enterprise ERP territory. Out of scope. | Revenue reporting only. Let owners do their own accounting. |
-| **Inter-location staff time tracking** | Staff traveling between branches → complex scheduling math | Staff is assigned to specific locations. Cross-location assignments are manual. |
-
-### User Flows
-
-**Setting Up a Second Location:**
-1. Settings → Locations → "Add Location"
-2. Enter name, address, working hours for new branch
-3. System creates new location record, generates public booking URL: `/book/[company-slug]/[location-slug]`
-4. Admin assigns existing staff to location (or invites new staff for that branch)
-5. Optionally clone service catalog from existing location with price overrides
-6. New location immediately available in location switcher and analytics
-
-**Chain Admin Daily Use:**
-1. Login → landing on "All Locations" aggregate dashboard
-2. See total: bookings today (across all), revenue this month, utilization %
-3. Click location name → drill into single-location view
-4. Staff management, schedule management operate on selected location's data
-5. Analytics report with "Compare Locations" toggle
-
-**Location Manager Daily Use:**
-1. Login → automatically scoped to their assigned location(s)
-2. Cannot see other locations' data (RLS enforced)
-3. Same booking/staff/analytics UI but single-location only
-4. Cannot change subscription plan (chain admin only)
-
-### Complexity Assessment
-
-| Aspect | Complexity | Reason |
-|--------|-----------|--------|
-| Location entity + DB migration | HIGH | Cascading FK changes across most tables (bookings, staff, services, resources, hours) |
-| RLS updates for location scoping | HIGH | Every RLS policy must now scope to location_id within company_id |
-| Aggregated analytics queries | HIGH | Cross-location GROUP BY with roll-up; performance-sensitive |
-| UI location switcher | MEDIUM | Zustand global state; context propagation throughout app |
-| Cross-location booking widget | HIGH | Availability engine query fan-out |
-| Per-location payout accounts | HIGH | Comgate multi-merchant configuration; not standard |
+1. **The background must cooperate.** Glass cards need something to blur. A flat solid background gives nothing. Gradient backgrounds (mesh or radial) are required.
+2. **Limit simultaneous blur elements.** GPU cost: ~15-25% more than opaque surfaces. Mobile: frame rate drops ~12fps per additional blur layer. Rule: max 2-3 blurred elements visible at once.
+3. **Blur range.** 8-15px for web glass. 6-8px on mobile. Larger values are more expensive and rarely look better.
+4. **Contrast is non-negotiable.** WCAG requires 4.5:1 for normal text. Glass transparency undermines this. Fix: add a semi-opaque solid overlay (10-30% opacity) behind text inside glass panels.
 
 ---
 
-## Category 3: Usage Limits and Tier Gating
+## Feature Landscape
 
-### How Competing Platforms Handle This
+### Table Stakes (Users Expect These from a Premium Product)
 
-**Calendly pattern:** Free = 1 active event type. Soft-limit with persistent banner. Hitting limit shows modal with upgrade CTA. No hard block for most features — the upgrade prompt is the enforcement.
+These are the features that define whether the redesign reads as "premium glassmorphism" or "cheap transparent effect." Missing these = product still looks like v1.3.
 
-**Acuity pattern:** Calendars = staff count. At limit, "Add Staff Member" button shows lock icon + upgrade required. Feature access checked server-side at API level, not just UI.
+| Feature | Why Expected | Complexity | shadcn/ui Dependency | Notes |
+|---------|-------------|-----------|---------------------|-------|
+| **Gradient background system** | Glass has no character against a flat background. Every premium glassmorphism reference uses radial or mesh gradients behind the glass. | LOW | None — pure CSS/Tailwind | Define 2-3 gradient presets in `globals.css`: (1) blue radial for dashboard/app, (2) blue-to-indigo mesh for landing hero, (3) neutral muted for auth pages. |
+| **Glass card variant** | The foundational component. All KPI cards, stat panels, info boxes must use glass treatment. | LOW | Extends shadcn `Card` | CSS: `bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10`. Add as Tailwind utility class `glass-card`. |
+| **Glass sidebar navigation** | Sidebar over gradient background = immediate premium signal. Freefloating glass nav is the most recognizable glassmorphism pattern. | LOW-MEDIUM | Extends existing sidebar component | `backdrop-blur-xl bg-white/8 dark:bg-slate-900/60 border-r border-white/10`. Must not blur sidebar content — only blur what is behind it. |
+| **Glass modal/dialog overlay** | Modals are the canonical glassmorphism use case (Apple, iOS). Booking detail dialogs, upgrade modal, all popups should use glass. | LOW | shadcn `Dialog` — wrapper update only | Backdrop: `bg-black/40 backdrop-blur-sm`. Dialog panel: `bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl`. |
+| **Frosted header bar** | Fixed header with backdrop blur as user scrolls is a table-stakes glassmorphism pattern seen in every premium SaaS reference. | LOW | Extends existing `<Header>` | `backdrop-blur-md bg-white/70 dark:bg-slate-900/70 border-b border-white/20 sticky top-0`. |
+| **Dark mode glass tokens** | Dark mode glass is distinctly different from light mode glass. `rgba(255,255,255,0.05)` on dark instead of `rgba(255,255,255,0.1)` on light. Without separate tokens, dark mode looks muddy. | LOW | CSS variable update in `globals.css` | Define: `--glass-bg-light`, `--glass-bg-dark`, `--glass-border-light`, `--glass-border-dark`. Use `dark:` Tailwind variants throughout. |
+| **Subtle glass borders** | Glass without a border reads as transparent, not glass. A `1px` border at `rgba(255,255,255,0.2)` (light) or `rgba(255,255,255,0.1)` (dark) creates the necessary edge definition. | LOW | Pure CSS/Tailwind | Include in the `glass-card` utility class. |
+| **Glass KPI cards on dashboard** | The dashboard is the first screen post-login. KPI cards (bookings today, revenue, occupancy) are the most-viewed components. Glass treatment here = immediate premium perception shift. | LOW-MEDIUM | shadcn `Card` + custom variant | Apply `glass-card` + subtle shadow (`shadow-glass`). Ensure text contrast ≥ 4.5:1 by adding `bg-white/20` text container if background is complex. |
+| **Loading state with glass shimmer** | Existing `PageSkeleton` uses flat gray placeholders. A glass shimmer (translucent shimmer wave over glass-shaped blocks) is the premium loading pattern. | MEDIUM | Extends existing skeleton components | Framer Motion shimmer animation: x from -200% to 200% over 1.5s, linear, repeat. Apply over glass-shaped placeholder divs. |
+| **Text legibility enforcement** | The single most common glassmorphism failure. Text must always have sufficient contrast regardless of what the gradient background is doing behind the glass. | MEDIUM | Applied to all glass components | Strategy: (1) text-shadow: 0 1px 2px rgba(0,0,0,0.2) for light mode, (2) always use `text-slate-900 dark:text-white` on glass, (3) semi-opaque overlay behind text blocks if needed. |
 
-**Stripe/SaaS standard (2025):** Hybrid model — hard limits for resource-cost features (e.g., SMS credits, AI API calls), soft limits with prompts for productivity features (event types, bookings count). 80% threshold triggers first warning, 100% triggers upgrade prompt, 110% triggers hard lock.
+### Differentiators (Competitive Advantage)
 
-**Industry consensus:** Hard limit at Free tier (no payment method captured, must prevent abuse). Soft limit with grace for paid tiers (customer has paid in good faith, brief over-limit is acceptable). Always allow data access even when over-limit.
+These are what separate a "glassmorphism redesign" from a "premium product." The Behance reference "X: AI Tech Start-Up" uses several of these.
 
-### Table Stakes
+| Feature | Value Proposition | Complexity | shadcn/ui Dependency | Notes |
+|---------|-----------------|-----------|---------------------|-------|
+| **Animated gradient background (aurora)** | Static gradients feel designed. Slow-moving aurora-style gradients feel alive and high-end. Seen in Linear, Vercel, Stripe's premium sections. | MEDIUM | None — CSS keyframe animation | CSS `@keyframes` animating `background-position` on a radial gradient. Slow (15-20s cycle), subtle scale shift. Apply only to landing hero and auth pages. Do NOT on dashboard (too distracting for daily use). |
+| **Hover glass intensify** | On hover, glass blur increases slightly + shadow deepens. Signals interactivity and premium polish. Common in top-tier SaaS dashboards. | LOW | Tailwind `hover:` variants | `hover:backdrop-blur-lg hover:shadow-glass-hover transition-all duration-200`. Used on card and button components. |
+| **Mouse-tracking "flashlight" border effect on cards** | A soft radial gradient on the card border that follows the cursor position, like a flashlight shining on glass. Seen on linear.app, Vercel. Extremely premium feel. | HIGH | No direct shadcn dependency — custom JS | Requires `mousemove` event listener → calculates cursor position relative to card → updates CSS custom property `--mouse-x --mouse-y` → gradient reads those values. Worth the complexity for dashboard KPI cards specifically. |
+| **Entrance animations (fade + slide up)** | Glass cards sliding up with fade on page load communicate "this is a living interface." Standard in premium SaaS (Notion, Linear). | LOW-MEDIUM | Framer Motion already in project | `initial: { opacity: 0, y: 20 }` → `animate: { opacity: 1, y: 0 }`. 300ms ease-out. Stagger by 50ms per card. Do NOT animate on every navigation — only on initial page entry. |
+| **Glass badge / status pill** | Booking status badges (Confirmed, Cancelled, No-show) rendered as glass pills over gradient look dramatically more premium than flat colored boxes. | LOW | shadcn `Badge` variant | `bg-green-500/15 dark:bg-green-500/10 text-green-700 dark:text-green-300 border border-green-500/30 backdrop-blur-sm`. |
+| **Depth layering (z-plane stacking)** | Use 3 visual "planes": background gradient → glass cards → solid action elements (buttons, key text). Each plane has different opacity/blur, creating visual hierarchy without heavy borders. | MEDIUM | CSS variable system | Define `--z-plane-1` (background): no blur, gradient. `--z-plane-2` (glass): backdrop-blur-md + low opacity. `--z-plane-3` (solid): full opacity, no blur. Apply consistently across all components. |
+| **Gradient text for key headings** | Hero heading, dashboard greeting, section titles using `bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-400` — the Behance reference uses this extensively. | LOW | Pure Tailwind | Apply to `<h1>` on landing hero, dashboard welcome, marketing section headers only. NOT body text. |
+| **Glass dropdown / select menu** | Settings and filter dropdowns with glass treatment instead of flat white. When dropdowns open over gradient sections they look excellent. | LOW | shadcn `Select`, `DropdownMenu` — override styles | `bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 shadow-glass`. |
+| **Responsive glass degradation** | On mobile (< 768px), reduce blur intensity from `backdrop-blur-md` to `backdrop-blur-sm` and increase panel opacity. Maintains aesthetic while protecting performance on mobile GPUs. | LOW | CSS `@media` query | Not Tailwind responsive prefix — uses CSS `@supports` check + media query for GPU safety. |
+| **Glass tooltip** | Hovering over data points on charts, locked features, or info icons shows a glass tooltip instead of the default shadcn black rectangle. | LOW | shadcn `Tooltip` — style override | `bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-white/20 text-slate-900 dark:text-white shadow-glass`. |
 
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **Server-side entitlement check** | UI-only gating is trivially bypassed. All tier limits must be enforced in API middleware. | HIGH | New `entitlements` middleware in Next.js API routes. Checks company plan before processing request. |
-| **Booking count metering** | Free: 50 bookings/month. Count tracked in DB. API rejects booking #51. | MEDIUM | New `monthly_booking_count` field or view on `companies`. Reset on 1st of month. |
-| **Staff count limit** | Free: 1, Essential: 3, Growth: 10, AI-Powered: unlimited | MEDIUM | Check on staff creation API. Existing `employees` table count. |
-| **Location count limit** | Free: 1, Essential: 1, Growth: 5, AI-Powered: unlimited | MEDIUM | Check on location creation API (Category 2 dependency). |
-| **AI feature gating** | AI features available only on Growth+ or AI-Powered tier | LOW | Add tier check to existing `/api/ai/*` route middleware. Already structured as separate routes. |
-| **Upgrade prompt on limit hit** | When user hits a limit, show upgrade modal (not just a generic error) | MEDIUM | New `UpgradeModal` component. Must pass context: "You've used 50/50 bookings this month." |
-| **Usage visible to user** | "38 of 50 bookings used this month" in dashboard | LOW | Query against metered field. Display in dashboard sidebar/banner. |
-| **80% threshold warning** | Proactive: at 40/50 bookings, show yellow banner "Running low on bookings" | LOW | Computed property. Banner component in layout. |
+### Anti-Features (Commonly Requested, Often Problematic)
 
-### Differentiators
+These are tempting additions that damage the design, harm performance, or break accessibility. Explicit `DO NOT BUILD` list.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-----------------|-----------|-------|
-| **Contextual upgrade prompts** | "You've reached your Free limit. Owners like you upgrade to Essential to handle seasonal peaks." | MEDIUM | User-segment-aware copy. Industry detected during onboarding (wizard already exists). Copy variation by industry segment. Conversion lift of ~32% vs generic prompts (Mixpanel data). |
-| **AI-gated feature preview** | Free/Essential users can _see_ AI features (greyed out) with "Try for 14 days" CTA. Shows value before asking for money. | MEDIUM | Show AI section in sidebar with lock icon. Click → trial activation or upgrade prompt. Better than hiding features entirely. |
-| **Usage reset notification** | "Your booking count reset to 0. You have 50 bookings available this month!" Email on 1st of month. | LOW | Simple cron + notification template. Reduces churn from accidental limit-anxiety. |
-| **Overage option (paid tiers)** | Growth tier can purchase extra bookings: 100 additional bookings for 99 Kč. | HIGH | New metered billing concept on top of subscription. Comgate one-time charge via existing infrastructure. Complex to implement correctly. |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|-------------|----------|-------------------|
-| **Surprise hard-lock without warning** | User hits limit mid-appointment, gets error, customer can't book. Terrible UX. Trust destroyed. | Show warnings at 80%, 90%, 100%. Only hard-lock after 14-day grace. |
-| **Feature flag without UI explanation** | Button just disappears or is grayed out with no explanation. User thinks it's a bug. | Always show locked features with lock icon + tier label + "Upgrade to [Plan]" tooltip. |
-| **Retroactive limit enforcement** | Removing existing bookings/staff/data when downgrading. | Read-only state: can view existing data, cannot add new. E.g., downgrade from 3 staff to 1 limit: existing 3 staff records kept, cannot add 4th. |
-| **Per-API-call billing (metered billing)** | "You called the AI API 847 times this month. That's 847 Kč." — SMB owners panic at variable costs. | Flat tier with generous limits. AI API calls are internal, not exposed as a cost driver. |
-
-### User Flows
-
-**Hitting the Free Booking Limit:**
-1. User creates booking #51 → API returns `HTTP 402` with `{ error: "LIMIT_REACHED", code: "BOOKING_LIMIT_MONTHLY", limit: 50, plan: "free" }`
-2. Frontend catches 402 → shows UpgradeModal: "You've reached your 50 booking limit for this month"
-3. Modal shows plan comparison focused on booking limits
-4. CTA: "Upgrade to Essential — 490 Kč/month, unlimited bookings"
-5. Click → subscription flow (Category 1)
-
-**Accessing Locked AI Feature (Essential Tier):**
-1. User navigates to AI Tools → No-show Predictor
-2. Page renders with feature preview (blurred/locked overlay)
-3. Banner: "No-show Predictor is available on Growth plan (1,490 Kč/month)"
-4. CTA button: "Upgrade to Growth"
-5. Optional: "Start 14-day free trial" (trial of AI tier)
-
-**Entitlement Middleware Flow (backend):**
-```
-POST /api/v1/bookings
-→ auth middleware (verify JWT)
-→ entitlement middleware:
-   - get company.plan, company.subscription_status
-   - if plan === 'free': count this month's bookings
-   - if count >= 50: return 402 BOOKING_LIMIT_MONTHLY
-   - if subscription_status === 'past_due': allow but add warning header
-→ booking creation handler
-```
-
-### Complexity Assessment
-
-| Aspect | Complexity | Reason |
-|--------|-----------|--------|
-| Entitlement middleware | MEDIUM | Straightforward but must cover all relevant API routes |
-| Booking count metering | LOW | COUNT query scoped to company + month; cached in Redis |
-| Upgrade modal + copy | MEDIUM | Multiple states, context-aware copy, plan comparison data |
-| 402 error handling frontend | MEDIUM | Must catch in all forms/actions that create resources |
-| AI feature preview/lock UI | LOW | CSS overlay + conditional render |
-| Overage billing | HIGH | New billing concept; defer to v1.4 |
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|--------------|-----------------|-------------|
+| **Glass on every surface, everywhere** | "If some is good, more is better" — full-page glass, glass-on-glass, glass navigation within glass panels | GPU cost multiplies per simultaneous blur. Mobile frame rate drops. Looks garish, not premium. The reference Behance uses glass sparingly. | Reserve glass for: cards, sidebar, modals, header. Keep table cells, list items, body text areas solid. |
+| **Animated blur intensity** | Animating `backdrop-filter: blur()` on hover looks impressive in isolation | CSS `backdrop-filter` transitions are NOT GPU-accelerated in the same way as `transform`. Animating blur causes jank (layout repaint vs. compositing). | Animate `opacity`, `shadow`, and `scale` instead. These are GPU-composited. |
+| **Fully transparent dark mode panels** | Dark glassmorphism reference images use very dark, barely-there glass | Very low opacity on dark backgrounds (< 5%) makes panels nearly invisible. Text fails WCAG. Looks like a bug, not a design. | Minimum `bg-slate-800/60` (60% opacity) in dark mode. Never below 50%. |
+| **Blur on large canvas areas** | Applying `backdrop-filter: blur()` to a full-width section (hero background panel, full-page overlay) | Large blur areas are extremely GPU-intensive. On mobile the cost is catastrophic. One large blur element can drop to 20fps on mid-range Android. | Use gradient opacity instead: `bg-gradient-to-b from-blue-950/80 to-transparent` achieves visual depth without blur cost. |
+| **Glassmorphism on the public booking widget** | The booking widget embeds on customer websites. Glass looks great on ScheduleBox's own blue gradient background. | The widget renders on unknown third-party backgrounds. Glass over a yellow or red background looks broken. Blur picks up the background website's content. | Keep booking widget styles solid and clean. Glass only within the ScheduleBox application shell. |
+| **Complex 3D perspective transformations on glass** | "Tilt effect" on cards looks impressive in showcases | 3D perspective + backdrop-filter together cause severe jank in Chrome. `transform: perspective()` forces glass off the GPU compositing layer. Known Chrome bug. | Use subtle `scale(1.02)` on hover instead of full 3D perspective tilt. |
+| **Dark text on dark glass** | Designers attempt subtle dark-on-dark for "sophisticated" feel | Fails WCAG 4.5:1 every time. Not subtle — just illegible. Accessibility tool flags immediate. | Always `text-white` or `text-slate-100` on dark glass panels. |
+| **Removing all solid colors** | Full glassmorphism purist approach: everything translucent | Destroys visual hierarchy. If cards, buttons, navigation, and content are all glass, users can't identify interactive elements or find primary actions. | Primary action buttons (`CTA`, `Save`, `Book`) must remain solid `bg-primary`. Glass is for containers and secondary surfaces. |
 
 ---
 
-## Category 4: Analytics Dashboards
-
-### How Competing Platforms Handle This
-
-**Fresha analytics:** Owner sees: revenue by day/week/month, top services by revenue, top staff by revenue, client retention rate, new vs returning clients, bookings by source. Filterable by location and date range.
-
-**Acuity/Calendly:** Simpler — booking count, no-show rate, top event types. Revenue only if payment collected.
-
-**Mindbody (enterprise):** Full P&L dashboard, class attendance trends, membership metrics, marketing attribution. Complex but the gold standard for fitness/wellness.
-
-**SaaS platform metrics (ChartMogul/Baremetrics pattern):** MRR, ARR, new MRR, churned MRR, expansion MRR, net revenue retention, plan distribution, churn rate by cohort. These are **operator-level** metrics (ScheduleBox internal), not the booking analytics shown to SMB owners.
-
-**Two distinct dashboards are needed:**
-1. **Business owner dashboard** — booking/revenue/customer analytics for SMB owners using ScheduleBox
-2. **Platform admin dashboard** — SaaS metrics for ScheduleBox operators (MRR, churn, plan distribution)
-
-### Table Stakes — Business Owner Dashboard
-
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **Revenue over time chart** | Core SMB KPI. Weekly/monthly/yearly. Line chart with comparison to prior period. | MEDIUM | Existing bookings + payments tables. Query by date range, aggregate by day/week. |
-| **Bookings count + cancellation rate** | "How busy am I? How many cancel?" — first thing owners ask | LOW | Existing booking status column. COUNT with GROUP BY status. |
-| **No-show rate** | Directly measures AI impact on business. Also shows value of no-show predictor. | LOW | Existing booking.status='no_show'. Simple ratio. |
-| **Top services by revenue** | "Which service makes me the most money?" | LOW | JOIN bookings + services, SUM amount, ORDER BY desc. |
-| **Top staff by revenue/bookings** | "Who's my best employee?" — important for commission structures | LOW | JOIN bookings + employees, aggregate. |
-| **New vs returning customer ratio** | Customer retention health. "Am I growing new business or just serving regulars?" | MEDIUM | First-booking date per customer. More complex query. |
-| **Occupancy rate** | "What % of my available slots are actually booked?" Peak hours visibility. | HIGH | Must compare booked slots to total available slots (working hours - blocked time). Complex. |
-| **Peak hours heatmap** | "When am I busiest?" — for staffing decisions | MEDIUM | COUNT bookings by hour of day, day of week. Heat map visualization. |
-| **Date range filter** | Today / This week / This month / Last month / Custom range | LOW | Standard dashboard filter, applied to all charts |
-| **Export to CSV** | Owners want data for their accountant | LOW | Existing pattern from customer export (Phase 8). |
-
-### Differentiators — Business Owner Dashboard
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-----------------|-----------|-------|
-| **AI prediction overlay** | Revenue chart shows "predicted next week: X Kč" as dotted line. Makes AI model value tangible. | HIGH | Requires trained demand forecasting model (from Phase 23). Overlay on existing chart. |
-| **No-show $ impact** | "Your AI prevented 12 no-shows this month, saving you estimated 3,600 Kč" | MEDIUM | (avg booking value) × (reduced no-show count). Gamified AI impact metric. CZ market loves this. |
-| **Staff performance comparison** | Bar chart: staff side-by-side on revenue, bookings, avg rating. With benchmark. | MEDIUM | Multiple metrics per staff. Benchmark line. Standard chart library. |
-| **Customer cohort retention** | "Of customers who first visited in January, 67% came back in February" | HIGH | True cohort analysis. Complex SQL with window functions. Meaningful only once platform has usage history. |
-| **Multi-location comparison** (v1.3 dependency) | "Prague branch: 94,500 Kč / Brno branch: 67,200 Kč this month" side-by-side | MEDIUM | Requires Category 2 (multi-location) to be built first. |
-
-### Table Stakes — Platform Admin Dashboard (ScheduleBox Operators)
-
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **MRR / ARR tracking** | Core SaaS health metric. Sum of all active subscription charges. | MEDIUM | Requires Category 1 (subscriptions) first. Sum of company_subscriptions.amount_czk where status='active'. |
-| **New MRR this month** | New subscriptions started × their monthly value | LOW | Filter subscriptions by created_at in current month |
-| **Churned MRR** | Subscriptions canceled × their monthly value. Churn rate % | LOW | Subscriptions where status changed to 'canceled' in period |
-| **Plan distribution** | How many companies on each plan. Visualizes upgrade funnel. | LOW | COUNT companies GROUP BY plan |
-| **Total companies / active companies** | Total registered vs active (at least 1 booking in 30 days) | LOW | Simple aggregate queries |
-| **Failed payment rate** | % of renewal attempts that fail. High rate = dunning problem. | LOW | Requires subscription billing (Category 1) |
-
-### Anti-Features — Analytics
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|-------------|----------|-------------------|
-| **Real-time dashboard (WebSocket)** | SMBs don't need live updates. Booking comes in every few hours. Over-engineering. | 5-minute cache. Refresh button. |
-| **OLAP / data warehouse** | ScheduleBox at CZ/SK scale (500-5000 customers) doesn't need BigQuery or Snowflake. | Optimized PostgreSQL queries + materialized views + Redis cache. |
-| **Custom report builder** | Drag-and-drop analytics = months of engineering. SMB owners won't use it. | Fixed, opinionated reports. Date range filter. Export to CSV. |
-| **Revenue recognition (GAAP)** | Deferred revenue, ASC 606 — enterprise accounting territory. | Cash basis reporting only. Show what was charged when. |
-| **Competitor intelligence in this phase** | Feature already documented in spec (Phase 12) but is low ROI. | Exclude from v1.3 scope. AI feature but not analytics category. |
-
-### User Flows
-
-**Owner Analytics Daily Check:**
-1. Dashboard → Analytics (or dedicated /analytics page)
-2. Default view: "This Month" date range
-3. Above-fold: Revenue total, bookings count, new customers, occupancy rate (4 KPI cards)
-4. Below-fold: Revenue chart (bar/line, day by day), Top Services table, Top Staff table
-5. Peak hours heatmap (bottom section)
-6. Filter: dropdown for date range → charts re-query automatically
-
-**Multi-Location Analytics:**
-1. Analytics page → Location dropdown: "All Locations" (default) / "Prague" / "Brno"
-2. "All Locations" = aggregated view with location breakdown table below charts
-3. Single location = same view as current single-location dashboard
-
-### Complexity Assessment
-
-| Aspect | Complexity | Reason |
-|--------|-----------|--------|
-| Revenue + booking charts | LOW-MEDIUM | Standard SQL aggregation. Already partial analytics in place. |
-| Occupancy rate | HIGH | Requires computing available slots from working hours, excluding blocked time |
-| Cohort retention analysis | HIGH | Window function SQL, only meaningful with sufficient data history |
-| AI prediction overlay | HIGH | Depends on trained forecasting model (Phase 23 output) |
-| Platform admin dashboard | MEDIUM | Depends on subscription billing existing first (Category 1) |
-| Multi-location analytics | HIGH | Depends on Category 2 (locations) being implemented |
-
----
-
-## Category 5: Frontend / Design System Polish
-
-### How Competing Platforms Handle This
-
-**Calendly 2024-2025:** Polished "product-led" aesthetic. Clean white with strategic purple accents. Heavy use of white space. Every button has hover state, disabled state, loading state. Motion is purposeful (200ms ease transitions). Top-tier typography hierarchy (Inter font, clear H1/H2/body contrast).
-
-**Fresha:** Dark sidebar, light content area. Consistent 8px grid. Color-coded status badges (green=confirmed, yellow=pending, red=canceled). The booking calendar is pixel-perfect.
-
-**Mangomint/Pabau (premium positioning):** $300-500/month tier pricing is justified visually. Every component feels intentional. Empty states have illustrations + CTAs. Loading skeletons instead of spinners. Responsive across tablet (salon owners use iPads).
-
-**shadcn/ui + Tailwind (2025 best practice):** Design tokens (CSS variables) as single source of truth. Component-level Storybook documentation. Dark mode via `class="dark"`. Consistent spacing via `space-y-*`, `gap-*` Tailwind utilities. No hardcoded colors.
-
-### Table Stakes
-
-| Feature | Why Expected | Complexity | Dependencies on Existing Features |
-|---------|-------------|-----------|----------------------------------|
-| **Consistent color palette enforcement** | Single CSS variable set drives all component colors. No rogue `#3B82F6` hardcoded. | LOW | Audit existing `globals.css`. Enforce via Tailwind config `theme.extend.colors`. |
-| **Loading states on all async actions** | Every button click that triggers API call shows spinner or loading text. No double-submit. | MEDIUM | Systematic audit of all form/button components. Add `disabled + loading` states. Currently inconsistent. |
-| **Empty states with CTAs** | "You have no bookings yet" + "Create your first booking" button. Every list view. | LOW | 5-8 components to add. shadcn `EmptyState` pattern. |
-| **Error states on forms** | Inline validation errors on all form fields. Not just red borders — text explaining the error. | MEDIUM | Existing Zod validation returns errors. Frontend must surface them consistently. |
-| **Toast notification consistency** | Success/error/warning toasts use the same component (shadcn Sonner). Not mix of alert types. | LOW | Audit and standardize. Already have toast infrastructure. |
-| **Mobile responsiveness (tablet-first)** | Salon owners use iPads. Calendar and booking list must work on 768px screen. | MEDIUM | Test and fix current breakpoints. Calendar component most problematic. |
-| **Typography hierarchy** | H1 → H2 → H3 → body → caption — all consistent sizes, weights, line-heights. | LOW | CSS variable or Tailwind typography config. |
-| **Button state completeness** | Every button: default, hover, active, disabled, loading. Consistent across all buttons. | MEDIUM | Systematic audit. shadcn Button component already has these variants; must be used consistently. |
-| **Skeleton loaders over spinners** | Page-level loading uses content skeletons (maintains layout). Spinners only for actions. | MEDIUM | Replace spinner patterns on main list pages (bookings, customers, analytics). |
-
-### Differentiators
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-----------------|-----------|-------|
-| **Dark mode** | Tech-forward SMB owners (barbershops, fitness studios) strongly prefer dark UI. Already documented in spec. | MEDIUM | Tailwind `dark:` classes + CSS variable flip. shadcn already supports `class="dark"`. System preference detection. |
-| **Micro-animations on state changes** | Booking status change: subtle fade transition. List item delete: slide-out animation. | LOW-MEDIUM | Tailwind `transition-*` utilities. Framer Motion for complex cases. Perceived quality increase. |
-| **Command palette (⌘K)** | Power users (owners who know keyboard shortcuts) love this. Modern SaaS standard. | MEDIUM | shadcn `cmdk` package. Search across bookings, customers, services. Navigate without mouse. |
-| **Onboarding progress indicator** | New users see "Setup Progress: 3/5 steps complete" in sidebar. Clear path to activation. | LOW | Existing onboarding wizard (Phase 27). Progress persistence in user profile. |
-| **Branded color customization** | Business can set their brand color used in booking widget and customer-facing emails. | MEDIUM | CSS variable override per company. Complicates dark mode interaction. |
-
-### Anti-Features
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|-------------|----------|-------------------|
-| **Full Figma design system documentation** | Internal dev tool. Doesn't ship product. | Code-only component standards. Comments in components. |
-| **Custom icon library** | Building proprietary icons = months of work. Lucide React (already used by shadcn) is comprehensive. | Stick with Lucide React. Use consistent icon sizes (16/20/24px). |
-| **Complex animation library** | Lottie/GSAP for loading animations = unnecessary dependency and bundle size. | CSS transitions + Tailwind. Framer Motion only for 2-3 key interactions. |
-| **Full Storybook setup** | Valuable but time-consuming. SMB SaaS at this stage needs shipping, not documentation. | README component usage notes. Add Storybook in v1.4 when team grows. |
-| **Complete accessibility audit** | WCAG 2.1 AA full audit = specialist work. | Maintain keyboard navigation and aria-labels on interactive elements. Screen reader basics only. |
-
-### User Flows (Design Audit Focus)
-
-**Highest-Impact Polish Areas (evidence-based priority):**
-
-1. **Booking creation flow** — Entry point for primary value. Any friction here = customer dissatisfaction. Audit: wizard steps, slot selection, confirmation page.
-
-2. **Dashboard (first screen after login)** — First impression daily. Must be scannable in 5 seconds. Audit: KPI cards, chart, today's appointments list.
-
-3. **Settings / Plan page** — Where subscription decisions happen. Must feel premium and trustworthy to justify CZK 2,990/month.
-
-4. **Public booking widget** — Customer-facing. Embeds on owner's website. Must work flawlessly and match owner's brand.
-
-5. **Mobile calendar view** — Salon owners check their schedule on mobile constantly. Must be pixel-perfect at 375px.
-
-### Complexity Assessment
-
-| Aspect | Complexity | Reason |
-|--------|-----------|--------|
-| Loading/error state audit | MEDIUM | Systematic but low-creativity work. All routes/forms must be touched. |
-| Empty states | LOW | New component, add to 5-8 pages. |
-| Dark mode | MEDIUM | CSS variable flip straightforward; must verify all custom styles use variables. |
-| Mobile calendar fix | MEDIUM-HIGH | Calendar grid is notoriously tricky at small viewports. |
-| Command palette | MEDIUM | cmdk library makes it fast; indexing data for search adds complexity. |
-| Typography/spacing | LOW | Config change + audit. |
-
----
-
-## Cross-Category Feature Dependencies
+## Feature Dependencies
 
 ```
-Category 1 (Billing) → Category 3 (Usage Gating)
-   Billing must exist to enforce plan-based limits meaningfully.
-   Without billing, limits are enforced but no upgrade path exists.
+[Gradient Background System]
+└──required by──> [Glass Card Variant]
+└──required by──> [Glass Sidebar Navigation]
+└──required by──> [Glass Header]
+└──required by──> [Animated Gradient / Aurora]
 
-Category 2 (Multi-Location) → Category 4 (Analytics)
-   Multi-location analytics requires location entity to exist.
-   Build location DB schema first, analytics aggregation second.
+[Glass Card Variant]
+└──required by──> [Glass KPI Cards on Dashboard]
+└──required by──> [Glass Badge / Status Pill]
+└──required by──> [Glass Dropdown / Select Menu]
+└──enhanced by──> [Hover Glass Intensify]
+└──enhanced by──> [Mouse-Tracking Border Effect]
+└──enhanced by──> [Entrance Animations]
 
-Category 1 (Billing) → Category 4 (Platform Admin Dashboard)
-   MRR/ARR dashboard requires subscription records to exist.
+[Dark Mode Glass Tokens]
+└──required by──> [All glass components in dark mode]
+└──conflicts──> [Fully transparent dark panels (anti-feature)]
 
-Category 3 (Usage Gating) → Category 1 (Billing)
-   Upgrade prompts (gating) must route to subscription flow (billing).
-   Both must exist for the loop to close.
+[Text Legibility Enforcement]
+└──required by──> [All glass components that contain text]
 
-Category 5 (Design Polish) — independent, but:
-   Plan/settings page polish should happen after billing is built
-   (you're polishing the page that shows subscription state).
+[Glass Modal/Dialog Overlay]
+└──depends on──> [Gradient Background System (for blur to show)]
+
+[Responsive Glass Degradation]
+└──applies to──> [All glass components on mobile viewport]
 ```
 
-**Recommended build order within v1.3:**
-1. Category 1 — Subscription Billing (enables everything else)
-2. Category 3 — Usage Gating (pairs with billing to close the upgrade loop)
-3. Category 2 — Multi-Location (independent, highest complexity, most value for Growth tier upsell)
-4. Category 4 — Analytics (parallel with multi-location; platform dashboard after billing)
-5. Category 5 — Design Polish (ongoing, highest priority on pages that subscription/billing build touches)
+### Dependency Notes
+
+- **Gradient Background System must ship first:** Without a gradient behind the glass, blur effects have nothing to show through. The first deliverable in the phase must be the CSS gradient system in `globals.css`.
+- **Dark Mode Glass Tokens are a prerequisite, not a follow-up:** If tokens are not set up in the CSS variable system before glass components are built, every component will need individual dark mode fixes later.
+- **Text Legibility Enforcement applies universally:** Must be baked into the `glass-card` base class, not added per-component. Adding it after components are built means auditing every glass surface.
+- **Mouse-Tracking Border is high complexity with no prerequisite:** Can be added as a standalone enhancement to the KPI card component. Does not block anything.
+- **Responsive Glass Degradation is cross-cutting:** Implemented via CSS media query in `globals.css`, applies automatically once `.glass-card` class is defined correctly.
 
 ---
 
-## MVP Recommendation
+## MVP Definition
 
-**Must have for v1.3 launch (revenue generation depends on these):**
+### Launch With (Glassmorphism v1 — Full Overhaul)
 
-1. Comgate recurring subscription integration (Category 1 — core)
-2. Subscription lifecycle state machine (Category 1 — core)
-3. Monthly renewal job + dunning email flow (Category 1 — core)
-4. Booking count entitlement check + upgrade prompt (Category 3 — core)
-5. Staff count + AI feature gating (Category 3 — core)
-6. Revenue + bookings analytics dashboard (Category 4 — owner)
-7. Loading/empty/error state audit (Category 5 — polish)
+Minimum feature set for the redesign to read as "premium glassmorphism" rather than "slightly transparent cards."
 
-**Should have for v1.3 (increases tier adoption and retention):**
+- [ ] **Gradient background system** — All app-shell layouts, landing hero, auth pages must have gradient background. Without this nothing else works.
+- [ ] **Glass card base class** — Single `glass-card` Tailwind utility class that all card variants use.
+- [ ] **Glass sidebar** — First visible element. Immediate premium signal.
+- [ ] **Frosted header bar** — Sticky header with backdrop-blur. Table stakes for glassmorphism.
+- [ ] **Glass modal/dialog overlay** — Booking detail, upgrade modal, all dialogs.
+- [ ] **Dark mode glass tokens** — Separate CSS variables for dark vs light glass. Non-negotiable for dark mode quality.
+- [ ] **Text legibility enforcement** — Baked into `glass-card`. WCAG compliance from day one.
+- [ ] **Glass KPI cards on dashboard** — Most-viewed component. Highest visual impact.
+- [ ] **Hover glass intensify** — Low cost, high perceived quality return on all interactive cards.
+- [ ] **Gradient text for hero/key headings** — Landing page `<h1>` and dashboard section headers.
+- [ ] **Glass badge / status pill** — Booking status across calendar, list, detail views.
+- [ ] **Responsive glass degradation** — CSS media query in `globals.css`. Must ship with phase, not as follow-up.
 
-8. Proration on upgrade + invoice PDF (Category 1)
-9. Multi-location entity + location switcher (Category 2)
-10. Central admin + location manager roles (Category 2)
-11. Peak hours heatmap + top staff/service charts (Category 4)
-12. Dark mode + skeleton loaders (Category 5)
+### Add After Core is Landed (v1.4.x)
 
-**Defer to v1.4 (complex, lower immediate revenue impact):**
+- [ ] **Loading state with glass shimmer** — Framer Motion shimmer animation. Enhances existing skeletons.
+- [ ] **Entrance animations** — `opacity + y` stagger on page load. Add once base glass is working.
+- [ ] **Glass dropdown / select menu** — Lower impact than sidebar/cards/modals. Polish pass.
+- [ ] **Glass tooltip** — Only affects hover states. Add during component polish sweep.
+- [ ] **Animated gradient background (aurora)** — Higher complexity. Add to landing page after core app glass lands.
+- [ ] **Depth layering system documentation** — Codify z-plane usage in a `design-tokens.md` file.
 
-- Cross-location booking (Category 2) — very high complexity
-- Per-location payout accounts (Category 2) — Comgate multi-merchant complexity
-- Customer cohort retention analysis (Category 4) — needs data history to be meaningful
-- Overage billing (Category 3) — new billing concept
-- Branch-level AI models (Category 2) — requires per-location training data
-- Annual billing cycle (Category 1) — lower urgency than monthly subscription
+### Future Consideration (v1.5+)
+
+- [ ] **Mouse-tracking "flashlight" border effect** — HIGH complexity JavaScript implementation. High wow factor but not essential for first ship. Add once product is stable.
+- [ ] **Per-company brand color + glass interaction** — Companies can set brand colors. Glass tint should optionally inherit brand color. Complex CSS variable interaction. Defer to when brand customization feature is revisited.
 
 ---
 
-## CZ/SK Market Considerations
+## Feature Prioritization Matrix
 
-| Consideration | Impact | Notes |
-|--------------|--------|-------|
-| **Czech invoice requirements** | HIGH | IČO mandatory on B2B invoices. 15-day issuance window. 10-year retention. Already have PDF generation — extend it. |
-| **Comgate is not Stripe** | HIGH | No built-in subscription management, proration, or dunning. All must be custom-built. Recurring feature requires account-level approval from Comgate. |
-| **GDPR on subscription data** | MEDIUM | Payment method tokens stored at Comgate — not in ScheduleBox DB (correct). Subscription records must be deletable per GDPR right-to-erasure (preserve for 10 years if invoice exists — legal conflict to resolve). |
-| **CZK pricing psychology** | MEDIUM | SMB owners compare to Reservio (250-1500 Kč) and Reservanto (200-800 Kč). Essential at 490 Kč is competitive. Growth at 1,490 Kč needs clear AI/multi-staff justification. |
-| **Seasonal business model** | MEDIUM | Ski instructors, summer camps, event photographers = high churn in off-season. Subscription pause feature (Category 1 differentiator) directly addresses this and reduces Czech/Slovak churn. |
-| **Preference for phone/face-to-face support** | LOW | Czech SMBs don't self-serve billing issues. In-app chat or email support link on billing pages reduces involuntary churn. |
-| **Slovak market VAT** | LOW | Slovak VAT is 20% (not Czech 21%). If billing Slovak companies, VAT rate must be configurable per company country. |
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Gradient background system | HIGH | LOW | P1 |
+| Glass card base class | HIGH | LOW | P1 |
+| Glass sidebar navigation | HIGH | LOW | P1 |
+| Frosted header bar | HIGH | LOW | P1 |
+| Dark mode glass tokens | HIGH | LOW | P1 |
+| Glass KPI cards on dashboard | HIGH | LOW-MEDIUM | P1 |
+| Glass modal/dialog overlay | HIGH | LOW | P1 |
+| Text legibility enforcement | HIGH | LOW | P1 |
+| Hover glass intensify | MEDIUM | LOW | P1 |
+| Gradient text for headings | MEDIUM | LOW | P1 |
+| Glass badge / status pill | MEDIUM | LOW | P1 |
+| Responsive glass degradation | HIGH | LOW | P1 |
+| Glass shimmer loading state | MEDIUM | MEDIUM | P2 |
+| Entrance animations | MEDIUM | LOW-MEDIUM | P2 |
+| Glass dropdown / select | MEDIUM | LOW | P2 |
+| Glass tooltip | LOW | LOW | P2 |
+| Animated aurora background | MEDIUM | MEDIUM | P2 |
+| Depth layering system | MEDIUM | LOW | P2 |
+| Mouse-tracking border effect | HIGH | HIGH | P3 |
+| Brand color + glass interaction | MEDIUM | HIGH | P3 |
+
+**Priority key:**
+- P1: Ships with the glassmorphism redesign phase
+- P2: Polish pass after P1 lands
+- P3: Future milestone
+
+---
+
+## Competitor Feature Analysis
+
+| Feature | Fresha | Linear.app | Calendly | ScheduleBox v1.4 Approach |
+|---------|--------|-----------|----------|--------------------------|
+| Background treatment | Flat dark sidebar, white content | Animated gradient landing, flat app | Clean white, minimal | Gradient backgrounds in key sections (app shell + landing). Flat in dense data tables. |
+| Card treatment | Flat white cards with shadow | Glass-adjacent on landing | Solid cards, subtle shadow | Medium glass throughout app — blur + border + translucency. |
+| Navigation | Solid dark sidebar | Glass-adjacent nav | Solid white/gray sidebar | Glass sidebar with gradient glow — highest-impact single change. |
+| Dark mode | Full dark UI (native feel) | Excellent dark mode | Good dark mode | Dark mode with separate glass tokens — darker tint, more opaque than light mode glass. |
+| Loading states | Standard spinners | Skeleton screens | Basic spinners | Glass shimmer skeletons — premium loading experience. |
+| Motion/animation | Minimal | Smooth page transitions | Minimal | Subtle entrance animations, hover intensify. No heavy animation in data-dense views. |
+| Typography | Clean, utilitarian | Gradient hero text | Clean, Inter-based | Gradient text on headings, high contrast on all glass surfaces. |
+| Mobile | Responsive but tablet-focused | Desktop-first | Responsive | Responsive glass degradation — reduces blur on mobile for GPU safety. |
+
+---
+
+## Implementation Notes for shadcn/ui Integration
+
+The glassmorphism layer should be **additive** — extending shadcn components via wrapper styles and Tailwind utilities, not replacing them. This preserves shadcn accessibility patterns (focus rings, aria attributes, keyboard navigation) while adding visual glass treatment.
+
+**Approach:**
+1. Define glass utility classes in `globals.css` (`glass-card`, `glass-overlay`, `glass-nav`, `glass-badge`)
+2. Apply to component wrappers and variant classes in shadcn components — do not alter internal shadcn markup
+3. Use CSS custom properties for glass values so dark mode override is a single variable swap
+4. Apply `@supports (backdrop-filter: blur(1px))` check to ensure graceful fallback on unsupported browsers (< 5% in 2025, but important for older Android devices in CZ/SK market)
+
+**Critical shadcn components to update:**
+- `Card` — add `glass-card` variant
+- `Dialog` — glass panel + blurred backdrop
+- `NavigationMenu`, `Sidebar` — glass surface treatment
+- `Badge` — glass pill variant
+- `Select`, `DropdownMenu` — glass dropdown panel
+- `Skeleton` — glass shimmer animation
+- `Tooltip` — glass tooltip style
+- `Button` — solid primary unchanged; secondary/ghost variants gain subtle glass tint
 
 ---
 
 ## Sources
 
-- [Comgate Recurring Payments](https://help.comgate.cz/docs/en/recurring-payments) — MEDIUM confidence (docs require auth to access full detail)
-- [Comgate Payment Methods Overview](https://apidoc.comgate.cz/en/metody-platebni-brany/) — MEDIUM confidence
-- [Fresha Multi-Location Management](https://www.fresha.com/blog/easy-ways-to-manage-multiple-locations) — HIGH confidence (official blog)
-- [Pabau Multi-Location Scheduling](https://pabau.com/blog/multi-location-scheduling-software/) — HIGH confidence (official platform)
-- [Stigg — Beyond Metering (Usage Limits)](https://www.stigg.io/blog-posts/beyond-metering-the-only-guide-youll-ever-need-to-implement-usage-based-pricing) — HIGH confidence (authoritative technical guide)
-- [Appcues — Freemium Upgrade Prompts](https://www.appcues.com/blog/best-freemium-upgrade-prompts) — MEDIUM confidence (industry blog with case studies)
-- [Stripe — Upgrade/Downgrade Subscriptions](https://docs.stripe.com/billing/subscriptions/upgrade-downgrade) — HIGH confidence (official docs)
-- [Chargebee — Proration](https://www.chargebee.com/subscription-management/handle-prorations/) — HIGH confidence (billing platform docs)
-- [Kinde — Dunning Strategies](https://kinde.com/learn/billing/churn/dunning-strategies-for-saas-email-flows-and-retry-logic/) — MEDIUM confidence
-- [Engageware — Appointment Analytics](https://engageware.com/blog/the-hidden-value-of-appointment-scheduling-analytics/) — MEDIUM confidence
-- [Eurofiscalis — Czech Invoice Requirements](https://www.eurofiscalis.com/en/invoicing-in-czech-republic/) — HIGH confidence (official tax advisory)
-- [Shadn/ui Design Tokens](https://shadisbaih.medium.com/building-a-scalable-design-system-with-shadcn-ui-tailwind-css-and-design-tokens-031474b03690) — MEDIUM confidence
-- [SaaS KPIs Dashboard — HubiFi](https://www.hubifi.com/blog/saas-kpi-dashboard-metrics) — MEDIUM confidence
-- [VisionWrights — Multi-Location Analytics](https://visionwrights.com/blog/multi-location-analytics-what-franchise-operators-need) — MEDIUM confidence
+- [NN/g — Glassmorphism: Definition and Best Practices](https://www.nngroup.com/articles/glassmorphism/) — HIGH confidence (Nielsen Norman Group authoritative UX source)
+- [Axess Lab — Glassmorphism Meets Accessibility: Can Glass Be Inclusive?](https://axesslab.com/glassmorphism-meets-accessibility-can-frosted-glass-be-inclusive/) — HIGH confidence (specialist accessibility research)
+- [UX Pilot — 12 Glassmorphism UI Features, Best Practices, and Examples](https://uxpilot.ai/blogs/glassmorphism-ui) — MEDIUM confidence (aggregated industry research)
+- [LogRocket — How to implement glassmorphism with CSS](https://blog.logrocket.com/implement-glassmorphism-css/) — HIGH confidence (technical implementation, verified with browser docs)
+- [LogRocket — What is glassmorphism?](https://blog.logrocket.com/ux-design/what-is-glassmorphism/) — MEDIUM confidence
+- [DEV Community — shadcn-glass-ui introduction](https://dev.to/yhooi2/introducing-shadcn-glass-ui-a-glassmorphism-component-library-for-react-4cpl) — MEDIUM confidence (real-world shadcn integration pattern)
+- [GitHub — glasscn-ui: shadcn/ui with glassmorphism variants](https://github.com/itsjavi/glasscn-ui) — MEDIUM confidence (open-source reference implementation)
+- [Epic Web Dev — Creating Glassmorphism Effects with Tailwind CSS](https://www.epicweb.dev/tips/creating-glassmorphism-effects-with-tailwind-css) — HIGH confidence (Tailwind-specific implementation, verified)
+- [Medium — Dark Glassmorphism: The Aesthetic That Will Define UI in 2026](https://medium.com/@developer_89726/dark-glassmorphism-the-aesthetic-that-will-define-ui-in-2026-93aa4153088f) — LOW confidence (single source, not independently verified)
+- [Playground.halfaccessible — Glassmorphism Design Trend: Complete Implementation Guide (2025)](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide) — MEDIUM confidence
+- [Everyday UX — Glassmorphism in 2025: How Apple's Liquid Glass is reshaping interface design](https://www.everydayux.net/glassmorphism-apple-liquid-glass-interface-design/) — MEDIUM confidence (covers browser support and GPU performance data)
+- [Behance — "X: AI Tech Start-Up" reference](https://www.behance.net/gallery/209372999/X-AI-Tech-Start-Up) — HIGH confidence (primary design reference, reviewed by project EP)
+- [WebAIM — WCAG 2.1 Contrast Requirements](https://webaim.org/articles/contrast/) — HIGH confidence (official accessibility standard)
+- [Framer Blog — Shimmer effect techniques](https://www.framer.com/blog/shimmer-effect/) — HIGH confidence (official Framer documentation)
+
+---
+
+*Feature research for: Glassmorphism design overhaul — premium SaaS booking platform*
+*Researched: 2026-02-25*
