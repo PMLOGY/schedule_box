@@ -184,6 +184,54 @@ class ApiClient {
   async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
+
+  /**
+   * GET request that returns a Blob (for PDF/file downloads).
+   * Handles 401 token refresh the same way as other methods.
+   */
+  async getBlob(endpoint: string, params?: Record<string, unknown>): Promise<Blob> {
+    let url = `${this.baseUrl}${endpoint}`;
+
+    if (params && Object.keys(params).length > 0) {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+      url = `${url}?${searchParams.toString()}`;
+    }
+
+    const doFetch = async (token: string | null): Promise<Response> => {
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return fetch(url, { headers });
+    };
+
+    let accessToken = useAuthStore.getState().accessToken;
+    let response = await doFetch(accessToken);
+
+    // Handle 401 with token refresh
+    if (response.status === 401) {
+      try {
+        await useAuthStore.getState().refreshToken();
+        accessToken = useAuthStore.getState().accessToken;
+        response = await doFetch(accessToken);
+      } catch {
+        useAuthStore.getState().logout();
+        throw { code: 'UNAUTHORIZED', message: 'Session expired', statusCode: 401 } as ApiError;
+      }
+    }
+
+    if (!response.ok) {
+      const json = await response.json().catch(() => ({}));
+      throw this.buildError(response, json);
+    }
+
+    return response.blob();
+  }
 }
 
 export const apiClient = new ApiClient();

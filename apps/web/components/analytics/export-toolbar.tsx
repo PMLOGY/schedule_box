@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/auth.store';
+import { apiClient } from '@/lib/api-client';
 import { downloadCSV, downloadBlob, formatCSVDate } from '@/lib/export/csv-exporter';
 
 interface CustomerRetentionData {
@@ -144,26 +144,11 @@ export function ExportToolbar({
     }
   };
 
-  const fetchPdfWithAuth = async (url: string): Promise<Response> => {
-    const accessToken = useAuthStore.getState().accessToken;
-    return fetch(url, {
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-    });
-  };
-
   const handleRevenuePDF = async () => {
     try {
       setIsExportingRevenuePdf(true);
 
-      const response = await fetchPdfWithAuth(
-        `/api/v1/reports/revenue/pdf?days=${days}&locale=${locale}`,
-      );
-
-      if (!response.ok) {
-        throw new Error('PDF generation failed');
-      }
-
-      const blob = await response.blob();
+      const blob = await apiClient.getBlob('/reports/revenue/pdf', { days, locale });
       const filename = `revenue-report-${new Date().toISOString().split('T')[0]}.pdf`;
       downloadBlob(blob, filename);
       toast.success(t('success'));
@@ -179,15 +164,7 @@ export function ExportToolbar({
     try {
       setIsExportingBookingsPdf(true);
 
-      const response = await fetchPdfWithAuth(
-        `/api/v1/reports/bookings/pdf?days=${days}&locale=${locale}`,
-      );
-
-      if (!response.ok) {
-        throw new Error('PDF generation failed');
-      }
-
-      const blob = await response.blob();
+      const blob = await apiClient.getBlob('/reports/bookings/pdf', { days, locale });
       const filename = `bookings-report-${new Date().toISOString().split('T')[0]}.pdf`;
       downloadBlob(blob, filename);
       toast.success(t('success'));
@@ -203,15 +180,7 @@ export function ExportToolbar({
     try {
       setIsExportingCustomerPdf(true);
 
-      const response = await fetchPdfWithAuth(
-        `/api/v1/reports/customers/pdf?days=${days}&locale=${locale}`,
-      );
-
-      if (!response.ok) {
-        throw new Error('PDF generation failed');
-      }
-
-      const blob = await response.blob();
+      const blob = await apiClient.getBlob('/reports/customers/pdf', { days, locale });
       const filename = `customer-report-${new Date().toISOString().split('T')[0]}.pdf`;
       downloadBlob(blob, filename);
       toast.success(t('success'));
