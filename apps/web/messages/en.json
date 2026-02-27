@@ -665,12 +665,15 @@
       "booking_no_show": "Customer no show",
       "payment_received": "Payment received",
       "customer_created": "Customer created",
-      "review_received": "Review received"
+      "review_received": "Review received",
+      "time_before_booking": "Time before booking",
+      "customer_inactive": "Customer inactive"
     },
     "actions": {
       "send_email": "Send email",
       "send_sms": "Send SMS",
-      "send_push": "Send push notification"
+      "send_push": "Send push notification",
+      "add_loyalty_points": "Add loyalty points"
     },
     "delays": {
       "immediate": "Immediately",

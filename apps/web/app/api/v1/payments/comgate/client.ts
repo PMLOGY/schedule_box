@@ -133,9 +133,10 @@ export async function initComgatePayment(
 
   if (code !== '0') {
     throw new AppError(
-      `Comgate payment creation failed: ${message || 'Unknown error'}`,
       'PAYMENT_GATEWAY_ERROR',
-      500,
+      `Comgate payment creation failed: ${message || 'Unknown error'}`,
+      502,
+      { comgateCode: code },
     );
   }
 
@@ -145,9 +146,10 @@ export async function initComgatePayment(
 
   if (!transactionId || !redirect) {
     throw new AppError(
-      'Comgate response missing transId or redirect URL',
       'PAYMENT_GATEWAY_ERROR',
-      500,
+      'Comgate response missing transId or redirect URL',
+      502,
+      { comgateCode: code },
     );
   }
 

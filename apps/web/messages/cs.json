@@ -665,12 +665,15 @@
       "booking_no_show": "Zákazník nedorazil",
       "payment_received": "Platba přijata",
       "customer_created": "Zákazník vytvořen",
-      "review_received": "Recenze přijata"
+      "review_received": "Recenze přijata",
+      "time_before_booking": "Čas před rezervací",
+      "customer_inactive": "Neaktivní zákazník"
     },
     "actions": {
       "send_email": "Odeslat email",
       "send_sms": "Odeslat SMS",
-      "send_push": "Odeslat push notifikaci"
+      "send_push": "Odeslat push notifikaci",
+      "add_loyalty_points": "Přidat věrnostní body"
     },
     "delays": {
       "immediate": "Okamžitě",
