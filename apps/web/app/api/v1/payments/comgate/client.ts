@@ -31,6 +31,7 @@ export interface ComgatePaymentResponse {
 // ============================================================================
 
 const COMGATE_API_URL = process.env.COMGATE_API_URL || 'https://payments.comgate.cz';
+const COMGATE_TEST_MODE = process.env.COMGATE_TEST_MODE !== 'false'; // default: true (safe)
 
 /** Lazily validate Comgate credentials when a Comgate function is actually called */
 function getComgateCredentials() {
@@ -98,7 +99,7 @@ export async function initComgatePayment(
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
   requestParams.set('secret', secret);
-  requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
+  requestParams.set('test', COMGATE_TEST_MODE ? 'true' : 'false');
   requestParams.set('price', priceInHellers.toString());
   requestParams.set('curr', currency.toUpperCase());
   requestParams.set('label', label);
@@ -271,7 +272,7 @@ export async function chargeRecurringPayment(params: {
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
   requestParams.set('secret', secret);
-  requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
+  requestParams.set('test', COMGATE_TEST_MODE ? 'true' : 'false');
   requestParams.set('price', Math.round(params.price * 100).toString());
   requestParams.set('curr', params.currency.toUpperCase());
   requestParams.set('label', params.label);
