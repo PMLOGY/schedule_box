@@ -78,14 +78,22 @@ const SQL_FILES: SqlFile[] = [
     description: 'Auto-log changes to critical tables in audit_logs',
   },
 
-  // 3. Composite indexes for query performance
+  // 3. Data migrations (idempotent — safe to re-run)
+  {
+    name: 'Subscription Plan Name Migration',
+    path: join(__dirname, 'sql', '28-01-subscription-plan-migration.sql'),
+    description:
+      'Rename old plan names (starter→essential, professional→growth, enterprise→ai_powered) and create invoice sequence',
+  },
+
+  // 4. Composite indexes for query performance
   {
     name: 'Composite Indexes',
     path: join(__dirname, 'functions', 'composite-indexes.sql'),
     description: 'Composite indexes for common query patterns (IF NOT EXISTS)',
   },
 
-  // 4. RLS policies (must come after helper functions)
+  // 5. RLS policies (must come after helper functions)
   {
     name: 'Row Level Security Policies',
     path: join(__dirname, 'rls', 'policies.sql'),
