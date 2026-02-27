@@ -247,6 +247,7 @@ function PlanComparisonGrid() {
   const tCommon = useTranslations('common');
   const { data: plans, isLoading: plansLoading } = useBillingPlans();
   const { data: subscription } = useCurrentSubscription();
+  const { plan: companyPlan } = usePlanFeatures();
   const subscribeMutation = useSubscribe();
   const upgradeMutation = useUpgrade();
 
@@ -254,7 +255,8 @@ function PlanComparisonGrid() {
   const [pendingDowngradePlan, setPendingDowngradePlan] = useState<SubscriptionPlan | null>(null);
   const downgradeMutation = useDowngrade();
 
-  const currentPlanKey = subscription?.plan || 'free';
+  // Use subscription plan if available, fall back to company settings plan
+  const currentPlanKey = subscription?.plan || companyPlan;
   const currentTier = PLAN_TIER_INDEX[currentPlanKey] ?? 0;
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
