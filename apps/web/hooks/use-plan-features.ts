@@ -11,7 +11,8 @@ function planIndex(plan: SubscriptionPlan): number {
 export function usePlanFeatures() {
   const { data: company, isLoading } = useCompanySettingsQuery();
 
-  const plan = (company?.subscription_plan ?? 'free') as SubscriptionPlan;
+  const rawPlan = company?.subscription_plan ?? 'free';
+  const plan: SubscriptionPlan = rawPlan in PLAN_CONFIG ? (rawPlan as SubscriptionPlan) : 'free';
 
   const result = useMemo(() => {
     const config = PLAN_CONFIG[plan];

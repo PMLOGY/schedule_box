@@ -23,7 +23,7 @@ export interface PlanLimits {
  * @returns Typed limits object with booking, employee, and service caps
  */
 export function getLimitsForPlan(plan: SubscriptionPlan): PlanLimits {
-  const config = PLAN_CONFIG[plan];
+  const config = PLAN_CONFIG[plan] ?? PLAN_CONFIG.free;
   return {
     maxBookingsPerMonth: config.features.maxBookingsPerMonth,
     maxEmployees: config.features.maxEmployees,
