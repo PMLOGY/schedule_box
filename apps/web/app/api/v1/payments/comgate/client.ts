@@ -94,9 +94,10 @@ export async function initComgatePayment(
   const priceInHellers = Math.round(price * 100);
 
   // Build request body (application/x-www-form-urlencoded)
-  const { merchantId } = getComgateCredentials();
+  const { merchantId, secret } = getComgateCredentials();
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
+  requestParams.set('secret', secret);
   requestParams.set('test', process.env.NODE_ENV !== 'production' ? 'true' : 'false');
   requestParams.set('price', priceInHellers.toString());
   requestParams.set('curr', currency.toUpperCase());
