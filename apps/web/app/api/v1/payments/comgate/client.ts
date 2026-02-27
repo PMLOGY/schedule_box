@@ -32,6 +32,7 @@ export interface ComgatePaymentResponse {
 
 const COMGATE_API_URL = process.env.COMGATE_API_URL || 'https://payments.comgate.cz';
 const COMGATE_TEST_MODE = process.env.COMGATE_TEST_MODE !== 'false'; // default: true (safe)
+const COMGATE_RECURRING_ENABLED = process.env.COMGATE_RECURRING_ENABLED === 'true'; // default: false
 
 /** Lazily validate Comgate credentials when a Comgate function is actually called */
 function getComgateCredentials() {
@@ -112,7 +113,8 @@ export async function initComgatePayment(
   requestParams.set('callback', callbackUrl);
 
   // Enable recurring payment token creation for subscription billing
-  if (params.initRecurring) {
+  // Only send initRecurring when Comgate has activated recurring for this merchant
+  if (params.initRecurring && COMGATE_RECURRING_ENABLED) {
     requestParams.set('initRecurring', 'true');
   }
 
