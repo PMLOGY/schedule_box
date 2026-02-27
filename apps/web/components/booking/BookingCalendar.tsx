@@ -125,7 +125,7 @@ export default function BookingCalendar() {
       apiClient.get<PaginatedResponse<Booking>>('/bookings', {
         date_from: dateFrom,
         date_to: dateTo,
-        limit: 200,
+        limit: 100,
       }),
   });
 
