@@ -268,7 +268,7 @@ export default async function PublicBookingPage({ params }: PageProps) {
                       </span>
                     </div>
                   </div>
-                  <Link href={`/${locale}/bookings/new?service=${service.uuid}&company=${slug}`}>
+                  <Link href={`/${locale}/${slug}/book?service=${service.uuid}`}>
                     <Button className="w-full">Rezervovat</Button>
                   </Link>
                 </CardContent>
