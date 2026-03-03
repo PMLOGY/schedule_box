@@ -29,17 +29,19 @@ const passwordSchema = z
  * - type='owner' (default): creates company + owner user (requires company_name)
  * - type='customer': creates customer user without company
  */
-export const registerSchema = z.object({
-  name: z.string().min(2).max(255),
-  email: z.string().email(),
-  password: passwordSchema,
-  phone: z.string().optional(),
-  company_name: z.string().min(2).optional(),
-  type: z.enum(['owner', 'customer']).default('owner'),
-}).refine(
-  (data) => data.type === 'customer' || (data.company_name && data.company_name.length >= 2),
-  { message: 'Company name is required for business registration', path: ['company_name'] }
-);
+export const registerSchema = z
+  .object({
+    name: z.string().min(2).max(255),
+    email: z.string().email(),
+    password: passwordSchema,
+    phone: z.string().optional(),
+    company_name: z.string().min(2).optional(),
+    type: z.enum(['owner', 'customer']).default('owner'),
+  })
+  .refine(
+    (data) => data.type === 'customer' || (data.company_name && data.company_name.length >= 2),
+    { message: 'Company name is required for business registration', path: ['company_name'] },
+  );
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
