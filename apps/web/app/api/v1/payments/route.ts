@@ -5,7 +5,7 @@
  */
 
 import { eq, and, isNull, gte, lte, desc, sql } from 'drizzle-orm';
-import { db, payments, bookings } from '@schedulebox/database';
+import { db, payments, bookings, customers, services } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { findCompanyId } from '@/lib/db/tenant-scope';
@@ -87,7 +87,7 @@ export const GET = createRouteHandler({
       }
     }
 
-    // Query payments
+    // Query payments with customer and service names via JOINs
     const data = await db
       .select({
         id: payments.id,
@@ -99,8 +99,13 @@ export const GET = createRouteHandler({
         gatewayTransactionId: payments.gatewayTransactionId,
         paidAt: payments.paidAt,
         createdAt: payments.createdAt,
+        customerName: customers.name,
+        serviceName: services.name,
       })
       .from(payments)
+      .innerJoin(customers, eq(payments.customerId, customers.id))
+      .innerJoin(bookings, eq(payments.bookingId, bookings.id))
+      .innerJoin(services, eq(bookings.serviceId, services.id))
       .where(and(...baseConditions))
       .orderBy(desc(payments.createdAt))
       .limit(limit)
@@ -123,6 +128,8 @@ export const GET = createRouteHandler({
       gateway_transaction_id: payment.gatewayTransactionId,
       paid_at: payment.paidAt,
       created_at: payment.createdAt,
+      customer_name: payment.customerName,
+      service_name: payment.serviceName,
     }));
 
     // Calculate pagination metadata

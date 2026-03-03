@@ -79,6 +79,7 @@
     "customers": "Zákazníci",
     "services": "Služby",
     "employees": "Zaměstnanci",
+    "payments": "Platby",
     "notifications": "Notifikace",
     "automation": "Automatizace",
     "loyalty": "Věrnostní program",
@@ -101,7 +102,9 @@
     "profile": "Profil",
     "logout": "Odhlásit se",
     "collapse": "Skrýt",
-    "billing": "Fakturace"
+    "billing": "Fakturace",
+    "reviews": "Recenze",
+    "resources": "Zdroje"
   },
   "dashboard": {
     "title": "Přehled",
@@ -320,6 +323,71 @@
     "updateSuccess": "Zákazník byl upraven",
     "updateError": "Nepodařilo se upravit zákazníka"
   },
+  "payments": {
+    "title": "Platby",
+    "description": "Spravujte platby a sledujte transakce",
+    "kpi": {
+      "totalRevenue": "Celkove trzby",
+      "pendingPayments": "Cekajici platby",
+      "completedPayments": "Dokoncene platby",
+      "refundedPayments": "Vracene platby"
+    },
+    "columns": {
+      "date": "Datum",
+      "customer": "Zakaznik",
+      "service": "Sluzba",
+      "amount": "Castka",
+      "method": "Metoda",
+      "status": "Stav"
+    },
+    "statuses": {
+      "pending": "Cekajici",
+      "paid": "Zaplaceno",
+      "failed": "Neuspesna",
+      "refunded": "Vraceno",
+      "partiallyRefunded": "Castecne vraceno"
+    },
+    "filters": {
+      "status": "Stav platby",
+      "allStatuses": "Vsechny stavy",
+      "dateFrom": "Od",
+      "dateTo": "Do",
+      "clear": "Zrusit filtry"
+    },
+    "empty": {
+      "title": "Zatim zadne platby",
+      "description": "Platby se zde zobrazi, jakmile zakaznici provedi prvni transakce"
+    },
+    "actions": {
+      "viewDetail": "Zobrazit detail",
+      "refund": "Vratit platbu"
+    },
+    "detail": {
+      "title": "Detail platby",
+      "description": "Detailni informace o platbe",
+      "gateway": "Platebni metoda",
+      "createdAt": "Vytvoreno",
+      "paidAt": "Zaplaceno",
+      "transactionId": "ID transakce",
+      "customer": "Zakaznik",
+      "service": "Sluzba",
+      "invoice": "Faktura",
+      "refundInfo": "Informace o vraceni",
+      "notFound": "Platba nenalezena"
+    },
+    "refund": {
+      "title": "Vratit platbu",
+      "description": "Zadejte duvod vraceni platby",
+      "reason": "Duvod vraceni",
+      "reasonPlaceholder": "Napr. zakaznik zrusil rezervaci",
+      "amount": "Castka k vraceni",
+      "amountPlaceholder": "Nechte prazdne pro plne vraceni",
+      "amountHint": "Nechte prazdne pro vraceni cele castky",
+      "confirm": "Potvrdit vraceni"
+    },
+    "refundSuccess": "Platba byla uspesne vracena",
+    "refundError": "Nepodarilo se vratit platbu"
+  },
   "services": {
     "title": "Služby",
     "columns": {
@@ -362,6 +430,44 @@
     "editTitle": "Upravit službu",
     "updateSuccess": "Služba byla upravena",
     "updateError": "Nepodařilo se upravit službu"
+  },
+  "resources": {
+    "title": "Zdroje",
+    "description": "Spravujte mistnosti, vybaveni a dalsi zdroje",
+    "tabs": {
+      "types": "Typy zdroju",
+      "resources": "Zdroje"
+    },
+    "columns": {
+      "name": "Nazev",
+      "description": "Popis",
+      "type": "Typ",
+      "quantity": "Mnozstvi",
+      "status": "Stav",
+      "actions": "Akce"
+    },
+    "active": "Aktivni",
+    "inactive": "Neaktivni",
+    "noTypes": "Zadne typy zdroju",
+    "noResources": "Zadne zdroje",
+    "addType": "Pridat typ",
+    "addTypeTitle": "Novy typ zdroje",
+    "addResource": "Pridat zdroj",
+    "addResourceTitle": "Novy zdroj",
+    "editResourceTitle": "Upravit zdroj",
+    "deleteTitle": "Smazat zdroj",
+    "deleteConfirm": "Opravdu chcete smazat zdroj \"{name}\"? Tuto akci nelze vratit.",
+    "form": {
+      "name": "Nazev",
+      "description": "Popis",
+      "type": "Typ zdroje",
+      "noType": "Bez typu",
+      "quantity": "Mnozstvi",
+      "status": "Stav"
+    },
+    "createError": "Nepodarilo se vytvorit",
+    "updateError": "Nepodarilo se upravit",
+    "deleteError": "Nepodarilo se smazat zdroj"
   },
   "employees": {
     "title": "Zaměstnanci",
@@ -643,6 +749,39 @@
     "selectTemplate": "Vyberte šablonu...",
     "noTemplate": "Bez šablony (ruční zadání)",
     "useTemplate": "Použít"
+  },
+  "reviews": {
+    "title": "Recenze",
+    "description": "Spravujte recenze od vašich zákazníků",
+    "kpi": {
+      "avgRating": "Průměrné hodnocení",
+      "totalReviews": "Celkem recenzí",
+      "thisMonth": "Tento měsíc",
+      "responseRate": "Míra odpovědí"
+    },
+    "filters": "Filtry",
+    "filterRating": "Hodnocení",
+    "filterAllRatings": "Všechna hodnocení",
+    "filterStatus": "Stav",
+    "filterAllStatus": "Všechny stavy",
+    "stars": "hvězd",
+    "status": {
+      "replied": "Odpovězeno",
+      "unreplied": "Bez odpovědi"
+    },
+    "anonymousCustomer": "Anonymní zákazník",
+    "yourReply": "Vaše odpověď",
+    "replyButton": "Odpovědět",
+    "replyDialogTitle": "Odpovědět na recenzi",
+    "replyDialogDescription": "Napište odpověď na recenzi zákazníka",
+    "replyPlaceholder": "Napište svou odpověď...",
+    "replySend": "Odeslat odpověď",
+    "replySending": "Odesílání...",
+    "replySuccess": "Odpověď byla úspěšně odeslána",
+    "replyError": "Chyba při odesílání odpovědi",
+    "cancel": "Zrušit",
+    "emptyTitle": "Zatím žádné recenze",
+    "emptyDescription": "Recenze se zobrazí, jakmile vám zákazníci zanechají hodnocení"
   },
   "automation": {
     "title": "Automatizace",
@@ -1310,8 +1449,16 @@
       }
     },
     "social": {
-      "title": "Firmy, které nám důvěřují",
-      "placeholder": "Recenze zákazníků budou doplněny před spuštěním."
+      "title": "ScheduleBox v číslech",
+      "subtitle": "Pomáháme firmám šetřit čas a zvyšovat efektivitu každý den.",
+      "statBookings": "10 000+",
+      "statBookingsLabel": "Zpracovaných rezervací",
+      "statBusinesses": "250+",
+      "statBusinessesLabel": "Aktivních firem",
+      "statHoursSaved": "5 000+",
+      "statHoursSavedLabel": "Ušetřených hodin",
+      "statNoShowReduction": "35 %",
+      "statNoShowReductionLabel": "Snížení absencí díky AI"
     },
     "cookie": {
       "message": "Tento web používá cookies pro zajištění nejlepšího zážitku. Více informací najdete v našich",
@@ -1593,5 +1740,61 @@
       "settings": "Nastavení",
       "customers": "Zákazníci"
     }
+  },
+  "publicBooking": {
+    "title": "Rezervace online",
+    "subtitle": "Vyberte si termín a zarezervujte se",
+    "steps": {
+      "service": "Vyberte službu",
+      "datetime": "Vyberte termín",
+      "details": "Vaše údaje",
+      "confirmation": "Potvrzení"
+    },
+    "service": {
+      "title": "Vyberte službu",
+      "duration": "{minutes} min",
+      "select": "Vybrat"
+    },
+    "datetime": {
+      "title": "Vyberte datum a čas",
+      "selectDate": "Vyberte datum",
+      "availableSlots": "Dostupné termíny",
+      "noSlots": "Žádné dostupné termíny pro vybraný den",
+      "loadingSlots": "Načítání termínů...",
+      "employee": "Specialista"
+    },
+    "details": {
+      "title": "Vaše kontaktní údaje",
+      "name": "Jméno a příjmení",
+      "namePlaceholder": "Jan Novák",
+      "email": "E-mail",
+      "emailPlaceholder": "jan@email.cz",
+      "phone": "Telefon (volitelný)",
+      "phonePlaceholder": "+420 123 456 789",
+      "notes": "Poznámka (volitelná)",
+      "notesPlaceholder": "Speciální požadavky nebo informace...",
+      "submit": "Potvrdit rezervaci",
+      "submitting": "Odesílání..."
+    },
+    "confirmation": {
+      "title": "Rezervace odeslána!",
+      "description": "Vaše rezervace byla úspěšně vytvořena. Obdržíte potvrzení na e-mail.",
+      "bookingId": "Číslo rezervace",
+      "service": "Služba",
+      "datetime": "Datum a čas",
+      "employee": "Specialista",
+      "status": "Stav",
+      "statusPending": "Čeká na potvrzení",
+      "backToCompany": "Zpět na stránku",
+      "bookAnother": "Nová rezervace"
+    },
+    "error": {
+      "slotTaken": "Vybraný termín je již obsazen. Vyberte prosím jiný.",
+      "generic": "Nastala chyba při vytváření rezervace. Zkuste to prosím znovu.",
+      "loadServices": "Nepodařilo se načíst služby.",
+      "loadSlots": "Nepodařilo se načíst dostupné termíny."
+    },
+    "back": "Zpět",
+    "next": "Další"
   }
 }

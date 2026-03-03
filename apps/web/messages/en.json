@@ -79,6 +79,7 @@
     "customers": "Customers",
     "services": "Services",
     "employees": "Employees",
+    "payments": "Payments",
     "notifications": "Notifications",
     "automation": "Automation",
     "loyalty": "Loyalty Program",
@@ -101,7 +102,9 @@
     "profile": "Profile",
     "logout": "Logout",
     "collapse": "Hide",
-    "billing": "Billing"
+    "billing": "Billing",
+    "reviews": "Reviews",
+    "resources": "Resources"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -319,6 +322,71 @@
     "editDescription": "Edit customer details",
     "updateSuccess": "Customer updated",
     "updateError": "Failed to update customer"
+  },
+  "payments": {
+    "title": "Payments",
+    "description": "Manage payments and track transactions",
+    "kpi": {
+      "totalRevenue": "Total revenue",
+      "pendingPayments": "Pending payments",
+      "completedPayments": "Completed payments",
+      "refundedPayments": "Refunded payments"
+    },
+    "columns": {
+      "date": "Date",
+      "customer": "Customer",
+      "service": "Service",
+      "amount": "Amount",
+      "method": "Method",
+      "status": "Status"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "partiallyRefunded": "Partially refunded"
+    },
+    "filters": {
+      "status": "Payment status",
+      "allStatuses": "All statuses",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "clear": "Clear filters"
+    },
+    "empty": {
+      "title": "No payments yet",
+      "description": "Payments will appear here once customers complete their first transactions"
+    },
+    "actions": {
+      "viewDetail": "View detail",
+      "refund": "Refund payment"
+    },
+    "detail": {
+      "title": "Payment detail",
+      "description": "Detailed payment information",
+      "gateway": "Payment method",
+      "createdAt": "Created",
+      "paidAt": "Paid at",
+      "transactionId": "Transaction ID",
+      "customer": "Customer",
+      "service": "Service",
+      "invoice": "Invoice",
+      "refundInfo": "Refund information",
+      "notFound": "Payment not found"
+    },
+    "refund": {
+      "title": "Refund payment",
+      "description": "Enter refund reason",
+      "reason": "Refund reason",
+      "reasonPlaceholder": "E.g. customer cancelled the booking",
+      "amount": "Refund amount",
+      "amountPlaceholder": "Leave empty for full refund",
+      "amountHint": "Leave empty to refund the full amount",
+      "confirm": "Confirm refund"
+    },
+    "refundSuccess": "Payment was refunded successfully",
+    "refundError": "Failed to refund payment"
   },
   "services": {
     "title": "Services",
@@ -643,6 +711,39 @@
     "selectTemplate": "Select a template...",
     "noTemplate": "No template (manual entry)",
     "useTemplate": "Use"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "description": "Manage reviews from your customers",
+    "kpi": {
+      "avgRating": "Average Rating",
+      "totalReviews": "Total Reviews",
+      "thisMonth": "This Month",
+      "responseRate": "Response Rate"
+    },
+    "filters": "Filters",
+    "filterRating": "Rating",
+    "filterAllRatings": "All ratings",
+    "filterStatus": "Status",
+    "filterAllStatus": "All statuses",
+    "stars": "stars",
+    "status": {
+      "replied": "Replied",
+      "unreplied": "Unreplied"
+    },
+    "anonymousCustomer": "Anonymous Customer",
+    "yourReply": "Your reply",
+    "replyButton": "Reply",
+    "replyDialogTitle": "Reply to Review",
+    "replyDialogDescription": "Write a reply to the customer review",
+    "replyPlaceholder": "Write your reply...",
+    "replySend": "Send Reply",
+    "replySending": "Sending...",
+    "replySuccess": "Reply sent successfully",
+    "replyError": "Failed to send reply",
+    "cancel": "Cancel",
+    "emptyTitle": "No reviews yet",
+    "emptyDescription": "Reviews will appear once your customers leave ratings"
   },
   "automation": {
     "title": "Automation",
@@ -1310,8 +1411,16 @@
       }
     },
     "social": {
-      "title": "Businesses that trust us",
-      "placeholder": "Customer reviews will be added before launch."
+      "title": "ScheduleBox in numbers",
+      "subtitle": "Helping businesses save time and boost efficiency every day.",
+      "statBookings": "10,000+",
+      "statBookingsLabel": "Bookings processed",
+      "statBusinesses": "250+",
+      "statBusinessesLabel": "Active businesses",
+      "statHoursSaved": "5,000+",
+      "statHoursSavedLabel": "Hours saved",
+      "statNoShowReduction": "35%",
+      "statNoShowReductionLabel": "No-show reduction with AI"
     },
     "cookie": {
       "message": "This website uses cookies to ensure the best experience. Learn more in our",
@@ -1593,5 +1702,61 @@
       "settings": "Settings",
       "customers": "Customers"
     }
+  },
+  "publicBooking": {
+    "title": "Book Online",
+    "subtitle": "Choose a time and book your appointment",
+    "steps": {
+      "service": "Select Service",
+      "datetime": "Select Date & Time",
+      "details": "Your Details",
+      "confirmation": "Confirmation"
+    },
+    "service": {
+      "title": "Select a Service",
+      "duration": "{minutes} min",
+      "select": "Select"
+    },
+    "datetime": {
+      "title": "Select Date and Time",
+      "selectDate": "Select a date",
+      "availableSlots": "Available time slots",
+      "noSlots": "No available slots for the selected date",
+      "loadingSlots": "Loading available slots...",
+      "employee": "Specialist"
+    },
+    "details": {
+      "title": "Your Contact Details",
+      "name": "Full Name",
+      "namePlaceholder": "John Smith",
+      "email": "Email",
+      "emailPlaceholder": "john@email.com",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "+1 234 567 890",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Special requests or information...",
+      "submit": "Confirm Booking",
+      "submitting": "Submitting..."
+    },
+    "confirmation": {
+      "title": "Booking Submitted!",
+      "description": "Your booking has been successfully created. You will receive a confirmation email.",
+      "bookingId": "Booking ID",
+      "service": "Service",
+      "datetime": "Date & Time",
+      "employee": "Specialist",
+      "status": "Status",
+      "statusPending": "Pending confirmation",
+      "backToCompany": "Back to page",
+      "bookAnother": "New booking"
+    },
+    "error": {
+      "slotTaken": "The selected time slot is already taken. Please choose a different one.",
+      "generic": "An error occurred while creating your booking. Please try again.",
+      "loadServices": "Failed to load services.",
+      "loadSlots": "Failed to load available time slots."
+    },
+    "back": "Back",
+    "next": "Next"
   }
 }

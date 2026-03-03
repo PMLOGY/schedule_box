@@ -13,6 +13,9 @@ import {
   Award,
   Brain,
   Building2,
+  Box,
+  MessageSquare,
+  Wallet,
   type LucideIcon,
 } from 'lucide-react';
 import type { SubscriptionPlan } from '@schedulebox/shared/types';
@@ -63,9 +66,21 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ['owner', 'manager'],
   },
   {
+    key: 'payments',
+    href: '/payments',
+    icon: Wallet,
+    roles: ['owner', 'manager'],
+  },
+  {
     key: 'notifications',
     href: '/notifications',
     icon: Bell,
+    roles: ['owner', 'manager'],
+  },
+  {
+    key: 'reviews',
+    href: '/reviews',
+    icon: MessageSquare,
     roles: ['owner', 'manager'],
   },
   {
@@ -114,6 +129,13 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/organization',
     icon: Building2,
     roles: ['owner'],
+  },
+  {
+    key: 'resources',
+    href: '/resources',
+    icon: Box,
+    roles: ['owner', 'manager'],
+    minPlan: 'essential',
   },
   {
     key: 'settings',

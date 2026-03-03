@@ -79,6 +79,7 @@
     "customers": "Zákazníci",
     "services": "Služby",
     "employees": "Zamestnanci",
+    "payments": "Platby",
     "notifications": "Notifikácie",
     "automation": "Automatizácia",
     "loyalty": "Vernostný program",
@@ -101,7 +102,8 @@
     "profile": "Profil",
     "logout": "Odhlásiť sa",
     "collapse": "Skryť",
-    "billing": "Fakturácia"
+    "billing": "Fakturácia",
+    "reviews": "Recenzie"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -319,6 +321,71 @@
     "editDescription": "Upravte údaje zákazníka",
     "updateSuccess": "Zákazník bol upravený",
     "updateError": "Nepodarilo sa upraviť zákazníka"
+  },
+  "payments": {
+    "title": "Platby",
+    "description": "Spravujte platby a sledujte transakcie",
+    "kpi": {
+      "totalRevenue": "Celkove trzby",
+      "pendingPayments": "Cakajuce platby",
+      "completedPayments": "Dokoncene platby",
+      "refundedPayments": "Vratene platby"
+    },
+    "columns": {
+      "date": "Datum",
+      "customer": "Zakaznik",
+      "service": "Sluzba",
+      "amount": "Suma",
+      "method": "Metoda",
+      "status": "Stav"
+    },
+    "statuses": {
+      "pending": "Cakajuca",
+      "paid": "Zaplatena",
+      "failed": "Neuspesna",
+      "refunded": "Vratena",
+      "partiallyRefunded": "Ciastocne vratena"
+    },
+    "filters": {
+      "status": "Stav platby",
+      "allStatuses": "Vsetky stavy",
+      "dateFrom": "Od",
+      "dateTo": "Do",
+      "clear": "Zrusit filtre"
+    },
+    "empty": {
+      "title": "Zatial ziadne platby",
+      "description": "Platby sa tu zobrazia, ked zakaznici vykonaju prve transakcie"
+    },
+    "actions": {
+      "viewDetail": "Zobrazit detail",
+      "refund": "Vratit platbu"
+    },
+    "detail": {
+      "title": "Detail platby",
+      "description": "Detailne informacie o platbe",
+      "gateway": "Platobna metoda",
+      "createdAt": "Vytvorene",
+      "paidAt": "Zaplatene",
+      "transactionId": "ID transakcie",
+      "customer": "Zakaznik",
+      "service": "Sluzba",
+      "invoice": "Faktura",
+      "refundInfo": "Informacie o vrateni",
+      "notFound": "Platba nenajdena"
+    },
+    "refund": {
+      "title": "Vratit platbu",
+      "description": "Zadajte dovod vratenia platby",
+      "reason": "Dovod vratenia",
+      "reasonPlaceholder": "Napr. zakaznik zrusil rezervaciu",
+      "amount": "Suma na vratenie",
+      "amountPlaceholder": "Nechajte prazdne pre plne vratenie",
+      "amountHint": "Nechajte prazdne pre vratenie celej sumy",
+      "confirm": "Potvrdit vratenie"
+    },
+    "refundSuccess": "Platba bola uspesne vratena",
+    "refundError": "Nepodarilo sa vratit platbu"
   },
   "services": {
     "title": "Služby",
@@ -643,6 +710,39 @@
     "selectTemplate": "Vyberte šablónu...",
     "noTemplate": "Bez šablóny (ručné zadanie)",
     "useTemplate": "Použiť"
+  },
+  "reviews": {
+    "title": "Recenzie",
+    "description": "Spravujte recenzie od vašich zákazníkov",
+    "kpi": {
+      "avgRating": "Priemerné hodnotenie",
+      "totalReviews": "Celkom recenzií",
+      "thisMonth": "Tento mesiac",
+      "responseRate": "Miera odpovedí"
+    },
+    "filters": "Filtre",
+    "filterRating": "Hodnotenie",
+    "filterAllRatings": "Všetky hodnotenia",
+    "filterStatus": "Stav",
+    "filterAllStatus": "Všetky stavy",
+    "stars": "hviezd",
+    "status": {
+      "replied": "Odpovedané",
+      "unreplied": "Bez odpovede"
+    },
+    "anonymousCustomer": "Anonymný zákazník",
+    "yourReply": "Vaša odpoveď",
+    "replyButton": "Odpovedať",
+    "replyDialogTitle": "Odpovedať na recenziu",
+    "replyDialogDescription": "Napíšte odpoveď na recenziu zákazníka",
+    "replyPlaceholder": "Napíšte svoju odpoveď...",
+    "replySend": "Odoslať odpoveď",
+    "replySending": "Odosielanie...",
+    "replySuccess": "Odpoveď bola úspešne odoslaná",
+    "replyError": "Chyba pri odosielaní odpovede",
+    "cancel": "Zrušiť",
+    "emptyTitle": "Zatiaľ žiadne recenzie",
+    "emptyDescription": "Recenzie sa zobrazia, keď vám zákazníci zanechajú hodnotenie"
   },
   "automation": {
     "title": "Automatizácia",
@@ -1118,8 +1218,16 @@
       }
     },
     "social": {
-      "title": "Firmy, ktoré nám dôverujú",
-      "placeholder": "Recenzie zákazníkov budú doplnené pred spustením."
+      "title": "ScheduleBox v číslach",
+      "subtitle": "Pomáhame firmám šetriť čas a zvyšovať efektivitu každý deň.",
+      "statBookings": "10 000+",
+      "statBookingsLabel": "Spracovaných rezervácií",
+      "statBusinesses": "250+",
+      "statBusinessesLabel": "Aktívnych firiem",
+      "statHoursSaved": "5 000+",
+      "statHoursSavedLabel": "Ušetrených hodín",
+      "statNoShowReduction": "35 %",
+      "statNoShowReductionLabel": "Zníženie absencií vďaka AI"
     },
     "cookie": {
       "message": "Tento web používa cookies pre zaistenie najlepšieho zážitku. Viac informácií nájdete v našich",
@@ -1519,5 +1627,61 @@
       "settings": "Nastavenia",
       "customers": "Zákazníci"
     }
+  },
+  "publicBooking": {
+    "title": "Rezervácia online",
+    "subtitle": "Vyberte si termín a zarezervujte sa",
+    "steps": {
+      "service": "Vyberte službu",
+      "datetime": "Vyberte termín",
+      "details": "Vaše údaje",
+      "confirmation": "Potvrdenie"
+    },
+    "service": {
+      "title": "Vyberte službu",
+      "duration": "{minutes} min",
+      "select": "Vybrať"
+    },
+    "datetime": {
+      "title": "Vyberte dátum a čas",
+      "selectDate": "Vyberte dátum",
+      "availableSlots": "Dostupné termíny",
+      "noSlots": "Žiadne dostupné termíny pre vybraný deň",
+      "loadingSlots": "Načítavanie termínov...",
+      "employee": "Špecialista"
+    },
+    "details": {
+      "title": "Vaše kontaktné údaje",
+      "name": "Meno a priezvisko",
+      "namePlaceholder": "Ján Novák",
+      "email": "E-mail",
+      "emailPlaceholder": "jan@email.sk",
+      "phone": "Telefón (voliteľný)",
+      "phonePlaceholder": "+421 123 456 789",
+      "notes": "Poznámka (voliteľná)",
+      "notesPlaceholder": "Špeciálne požiadavky alebo informácie...",
+      "submit": "Potvrdiť rezerváciu",
+      "submitting": "Odosielanie..."
+    },
+    "confirmation": {
+      "title": "Rezervácia odoslaná!",
+      "description": "Vaša rezervácia bola úspešne vytvorená. Potvrdenie dostanete na e-mail.",
+      "bookingId": "Číslo rezervácie",
+      "service": "Služba",
+      "datetime": "Dátum a čas",
+      "employee": "Špecialista",
+      "status": "Stav",
+      "statusPending": "Čaká na potvrdenie",
+      "backToCompany": "Späť na stránku",
+      "bookAnother": "Nová rezervácia"
+    },
+    "error": {
+      "slotTaken": "Vybraný termín je už obsadený. Vyberte prosím iný.",
+      "generic": "Nastala chyba pri vytváraní rezervácie. Skúste to prosím znova.",
+      "loadServices": "Nepodarilo sa načítať služby.",
+      "loadSlots": "Nepodarilo sa načítať dostupné termíny."
+    },
+    "back": "Späť",
+    "next": "Ďalej"
   }
 }
