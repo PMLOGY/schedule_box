@@ -1,8 +1,11 @@
-﻿/**
+/**
  * POST /api/v1/auth/register
- * User registration with company creation
+ * User registration with company creation (owner) or standalone customer registration
  *
- * Creates a new company and its owner user in a transaction.
+ * Two flows:
+ * - type='owner' (default): Creates a new company and its owner user in a transaction.
+ * - type='customer': Creates a standalone customer user without a company.
+ *
  * Returns JWT access and refresh tokens for immediate login.
  */
 
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
     // 1. Validate request body
     const input = await validateBody(registerSchema, req);
 
-    // 2. Check if email already exists
+    // 2. Check if email already exists (for customers, check users without company)
     const existingUser = await db
       .select({ id: users.id })
       .from(users)
@@ -54,97 +57,197 @@ export async function POST(req: NextRequest) {
       throw new ConflictError('Email already registered');
     }
 
-    // 3. Create company and user in transaction
-    const result = await db.transaction(async (tx) => {
-      // 3a. Create company
-      const slug = generateSlug(input.company_name);
-      const [company] = await tx
-        .insert(companies)
-        .values({
-          name: input.company_name,
-          slug,
-          email: input.email,
-        })
-        .returning({
-          id: companies.id,
-          uuid: companies.uuid,
-        });
+    // Branch based on registration type
+    if (input.type === 'customer') {
+      return await registerCustomer(input);
+    }
 
-      // 3b. Hash password
-      const passwordHash = await hashPassword(input.password);
-
-      // 3c. Find 'owner' role ID
-      const [ownerRole] = await tx
-        .select({ id: roles.id })
-        .from(roles)
-        .where(eq(roles.name, 'owner'))
-        .limit(1);
-
-      if (!ownerRole) {
-        throw new Error('Owner role not found in database');
-      }
-
-      // 3d. Create user
-      const [user] = await tx
-        .insert(users)
-        .values({
-          companyId: company.id,
-          roleId: ownerRole.id,
-          email: input.email,
-          passwordHash,
-          name: input.name,
-          phone: input.phone,
-        })
-        .returning({
-          id: users.id,
-          uuid: users.uuid,
-          email: users.email,
-          name: users.name,
-        });
-
-      // 3e. Insert initial password into password history
-      await tx.insert(passwordHistory).values({
-        userId: user.id,
-        passwordHash,
-      });
-
-      return { company, user, ownerRole };
-    });
-
-    // 4. Generate email verification token (matches verify-email route pattern)
-    const verifyToken = nanoid(64);
-    const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
-    // Store with 24-hour TTL (86400 seconds); value is the user's internal ID
-    await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
-    // Fire-and-forget — registration succeeds even if email delivery fails
-    sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
-      console.error('[Register] Failed to send verification email:', err),
-    );
-
-    // 5. Generate JWT token pair
-    const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
-      result.user.id,
-      result.user.uuid,
-      result.company.id,
-      result.ownerRole.id,
-      'owner',
-      false, // MFA not verified on registration
-    );
-
-    // 6. Return success with tokens
-    return createdResponse({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: expiresIn,
-      user: {
-        uuid: result.user.uuid,
-        email: result.user.email,
-        name: result.user.name,
-        role: 'owner',
-        company_id: result.company.uuid, // Return company UUID, not internal ID
-      },
-    });
+    return await registerOwner(input);
   } catch (error) {
     return handleRouteError(error);
   }
+}
+
+/**
+ * Register a customer user (no company creation)
+ */
+async function registerCustomer(input: {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}) {
+  const result = await db.transaction(async (tx) => {
+    // Hash password
+    const passwordHash = await hashPassword(input.password);
+
+    // Find 'customer' role ID
+    const [customerRole] = await tx
+      .select({ id: roles.id })
+      .from(roles)
+      .where(eq(roles.name, 'customer'))
+      .limit(1);
+
+    if (!customerRole) {
+      throw new Error('Customer role not found in database');
+    }
+
+    // Create user without company
+    const [user] = await tx
+      .insert(users)
+      .values({
+        companyId: null,
+        roleId: customerRole.id,
+        email: input.email,
+        passwordHash,
+        name: input.name,
+        phone: input.phone,
+      })
+      .returning({
+        id: users.id,
+        uuid: users.uuid,
+        email: users.email,
+        name: users.name,
+      });
+
+    // Insert initial password into password history
+    await tx.insert(passwordHistory).values({
+      userId: user.id,
+      passwordHash,
+    });
+
+    return { user, customerRole };
+  });
+
+  // Generate email verification token
+  const verifyToken = nanoid(64);
+  const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
+  await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
+  sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
+    console.error('[Register] Failed to send verification email:', err),
+  );
+
+  // Generate JWT token pair (companyId = 0 for customer without company)
+  const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
+    result.user.id,
+    result.user.uuid,
+    0, // No company for customer
+    result.customerRole.id,
+    'customer',
+    false,
+  );
+
+  return createdResponse({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_in: expiresIn,
+    user: {
+      uuid: result.user.uuid,
+      email: result.user.email,
+      name: result.user.name,
+      role: 'customer',
+      company_id: null,
+    },
+  });
+}
+
+/**
+ * Register a business owner (creates company + user)
+ */
+async function registerOwner(input: {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  company_name?: string;
+}) {
+  // company_name is guaranteed by schema refinement for owner type
+  const companyName = input.company_name!;
+
+  const result = await db.transaction(async (tx) => {
+    // Create company
+    const slug = generateSlug(companyName);
+    const [company] = await tx
+      .insert(companies)
+      .values({
+        name: companyName,
+        slug,
+        email: input.email,
+      })
+      .returning({
+        id: companies.id,
+        uuid: companies.uuid,
+      });
+
+    // Hash password
+    const passwordHash = await hashPassword(input.password);
+
+    // Find 'owner' role ID
+    const [ownerRole] = await tx
+      .select({ id: roles.id })
+      .from(roles)
+      .where(eq(roles.name, 'owner'))
+      .limit(1);
+
+    if (!ownerRole) {
+      throw new Error('Owner role not found in database');
+    }
+
+    // Create user
+    const [user] = await tx
+      .insert(users)
+      .values({
+        companyId: company.id,
+        roleId: ownerRole.id,
+        email: input.email,
+        passwordHash,
+        name: input.name,
+        phone: input.phone,
+      })
+      .returning({
+        id: users.id,
+        uuid: users.uuid,
+        email: users.email,
+        name: users.name,
+      });
+
+    // Insert initial password into password history
+    await tx.insert(passwordHistory).values({
+      userId: user.id,
+      passwordHash,
+    });
+
+    return { company, user, ownerRole };
+  });
+
+  // Generate email verification token
+  const verifyToken = nanoid(64);
+  const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
+  await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
+  sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
+    console.error('[Register] Failed to send verification email:', err),
+  );
+
+  // Generate JWT token pair
+  const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
+    result.user.id,
+    result.user.uuid,
+    result.company.id,
+    result.ownerRole.id,
+    'owner',
+    false,
+  );
+
+  return createdResponse({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_in: expiresIn,
+    user: {
+      uuid: result.user.uuid,
+      email: result.user.email,
+      name: result.user.name,
+      role: 'owner',
+      company_id: result.company.uuid,
+    },
+  });
 }
