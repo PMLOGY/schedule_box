@@ -104,7 +104,8 @@
     "collapse": "Hide",
     "billing": "Billing",
     "reviews": "Reviews",
-    "resources": "Resources"
+    "resources": "Resources",
+    "marketplace": "Marketplace"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -323,6 +324,39 @@
     "updateSuccess": "Customer updated",
     "updateError": "Failed to update customer"
   },
+  "customerDetail": {
+    "backToList": "Back to list",
+    "editCustomer": "Edit Customer",
+    "kpi": {
+      "healthScore": "Health Score",
+      "clvPredicted": "CLV Predicted",
+      "totalBookings": "Total Bookings",
+      "totalSpent": "Total Spent"
+    },
+    "tabs": {
+      "bookings": "Booking History",
+      "notes": "Notes",
+      "tags": "Tags"
+    },
+    "bookingColumns": {
+      "date": "Date",
+      "service": "Service",
+      "employee": "Employee",
+      "status": "Status",
+      "price": "Price"
+    },
+    "noBookings": "No bookings yet",
+    "noTags": "No tags assigned",
+    "addTag": "Add tag",
+    "saveTags": "Save Tags",
+    "saveNotes": "Save Notes",
+    "notesPlaceholder": "Write notes about this customer...",
+    "healthStatus": {
+      "good": "Good",
+      "average": "Average",
+      "atRisk": "At Risk"
+    }
+  },
   "payments": {
     "title": "Payments",
     "description": "Manage payments and track transactions",
@@ -499,7 +533,8 @@
     "createError": "Failed to create employee",
     "editTitle": "Edit Employee",
     "updateSuccess": "Employee updated",
-    "updateError": "Failed to update employee"
+    "updateError": "Failed to update employee",
+    "manageSchedule": "Working hours"
   },
   "analytics": {
     "title": "Analytics",
@@ -668,7 +703,66 @@
     "saveSuccess": "Settings saved successfully",
     "saveError": "Failed to save settings",
     "saving": "Saving...",
-    "currencyWarning": "Changing the currency only affects how values are displayed. Service prices and existing payments will not be converted automatically."
+    "currencyWarning": "Changing the currency only affects how values are displayed. Service prices and existing payments will not be converted automatically.",
+    "bookingSettings": {
+      "title": "Booking Settings",
+      "description": "Configure how customers can book appointments",
+      "minAdvanceHours": "Minimum advance booking time (hours)",
+      "maxAdvanceDays": "Maximum advance booking time (days)",
+      "defaultStatus": "Default booking status",
+      "statusPending": "Pending",
+      "statusConfirmed": "Confirmed",
+      "allowCancellation": "Allow cancellation",
+      "cancellationDeadlineHours": "Cancellation deadline (hours before)",
+      "autoConfirm": "Auto-confirm bookings",
+      "lookBusyPercent": "\"Look busy\" percentage (0-50%)",
+      "lookBusyDescription": "Artificially reduces available slots shown to customers, creating a sense of demand. 0% shows all available slots.",
+      "hours": "hours",
+      "days": "days"
+    },
+    "notificationPrefs": {
+      "title": "Notification Preferences",
+      "description": "Choose which notifications you receive and how",
+      "channels": "Channels",
+      "events": "Events",
+      "emailNotifications": "Email notifications",
+      "smsNotifications": "SMS notifications",
+      "pushNotifications": "Push notifications",
+      "bookingConfirmation": "Booking confirmation",
+      "bookingReminder": "Booking reminder",
+      "cancellationAlert": "Cancellation alert",
+      "noShowAlert": "No-show alert"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "description": "Manage API keys for external integrations and programmatic access",
+      "generate": "Generate new key",
+      "keyName": "Key name",
+      "keyNamePlaceholder": "e.g. My integration",
+      "cancelCreate": "Cancel",
+      "copy": "Copy",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to revoke this API key? This action cannot be undone.",
+      "noKeys": "No API keys created yet. Generate a key to enable external integrations.",
+      "loading": "Loading API keys...",
+      "created": "Created",
+      "lastUsed": "Last used",
+      "createSuccess": "API key created successfully",
+      "createError": "Failed to create API key",
+      "deleteSuccess": "API key revoked successfully",
+      "deleteError": "Failed to revoke API key",
+      "newKeyWarning": "Copy this key now. It will not be shown again.",
+      "dismiss": "I have copied the key"
+    },
+    "widgetEmbed": {
+      "title": "Booking Widget",
+      "description": "Embed the booking widget on your website so customers can book directly",
+      "embedCode": "Embed code",
+      "copyCode": "Copy code",
+      "copied": "Copied!",
+      "preview": "Preview",
+      "noCompany": "Company settings not loaded yet."
+    }
   },
   "profile": {
     "title": "User Profile",
@@ -899,6 +993,19 @@
         "reduce_hours": "reduce hours",
         "add_employee": "add employee"
       }
+    },
+    "comingSoon": "Coming soon",
+    "noShow": {
+      "title": "No-show Predictions",
+      "description": "AI analyzes booking patterns and customer history to predict which appointments are at risk of no-show, enabling proactive reminders."
+    },
+    "upselling": {
+      "title": "Smart Upselling",
+      "description": "AI recommends additional services and optimal time slots to increase revenue per customer based on their booking history."
+    },
+    "customerHealth": {
+      "title": "Customer Health",
+      "description": "AI monitors customer engagement patterns to identify at-risk clients and suggest retention actions before they churn."
     },
     "insights": {
       "title": "AI Overview",
@@ -1796,5 +1903,31 @@
     },
     "back": "Back",
     "next": "Next"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "description": "Browse business listings and manage your own marketplace profile.",
+    "tabs": {
+      "browse": "Browse",
+      "myListing": "My Listing"
+    },
+    "searchPlaceholder": "Search businesses...",
+    "noRating": "No rating",
+    "viewProfile": "View Profile",
+    "emptyTitle": "No listings",
+    "emptyDescription": "There are no marketplace listings yet.",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Your business name on the marketplace",
+      "description": "Description",
+      "descriptionPlaceholder": "A short description of your business and services...",
+      "category": "Category",
+      "categoryPlaceholder": "e.g. Hair Salon, Massage, Fitness",
+      "visibility": "Visibility",
+      "visibilityHelp": "Show your profile on the marketplace",
+      "save": "Save Listing"
+    },
+    "saveSuccess": "Marketplace listing saved successfully.",
+    "saveError": "Failed to save marketplace listing."
   }
 }

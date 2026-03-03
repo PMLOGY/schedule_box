@@ -104,7 +104,8 @@
     "collapse": "Skryť",
     "billing": "Fakturácia",
     "reviews": "Recenzie",
-    "resources": "Zdroje"
+    "resources": "Zdroje",
+    "marketplace": "Marketplace"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -323,6 +324,39 @@
     "updateSuccess": "Zákazník bol upravený",
     "updateError": "Nepodarilo sa upraviť zákazníka"
   },
+  "customerDetail": {
+    "backToList": "Spat na zoznam",
+    "editCustomer": "Upravit zakaznika",
+    "kpi": {
+      "healthScore": "Skore zdravia",
+      "clvPredicted": "Predikovana hodnota",
+      "totalBookings": "Celkom rezervacii",
+      "totalSpent": "Celkom utratene"
+    },
+    "tabs": {
+      "bookings": "Historia rezervacii",
+      "notes": "Poznamky",
+      "tags": "Stitky"
+    },
+    "bookingColumns": {
+      "date": "Datum",
+      "service": "Sluzba",
+      "employee": "Zamestnanec",
+      "status": "Stav",
+      "price": "Cena"
+    },
+    "noBookings": "Ziadne rezervacie",
+    "noTags": "Ziadne stitky",
+    "addTag": "Pridat stitok",
+    "saveTags": "Ulozit stitky",
+    "saveNotes": "Ulozit poznamky",
+    "notesPlaceholder": "Napiste poznamky o zakaznikovi...",
+    "healthStatus": {
+      "good": "Dobry",
+      "average": "Priemerny",
+      "atRisk": "V riziku"
+    }
+  },
   "payments": {
     "title": "Platby",
     "description": "Spravujte platby a sledujte transakcie",
@@ -499,7 +533,8 @@
     "createError": "Nepodarilo sa vytvoriť zamestnanca",
     "editTitle": "Upraviť zamestnanca",
     "updateSuccess": "Zamestnanec bol upravený",
-    "updateError": "Nepodarilo sa upraviť zamestnanca"
+    "updateError": "Nepodarilo sa upraviť zamestnanca",
+    "manageSchedule": "Pracovna doba"
   },
   "analytics": {
     "title": "Analytika",
@@ -668,7 +703,66 @@
     "saveSuccess": "Nastavenia úspešne uložené",
     "saveError": "Nepodarilo sa uložiť nastavenia",
     "saving": "Ukladanie...",
-    "currencyWarning": "Zmena meny ovplyvní iba zobrazenie. Ceny služieb a existujúce platby sa automaticky neprepočítajú."
+    "currencyWarning": "Zmena meny ovplyvní iba zobrazenie. Ceny služieb a existujúce platby sa automaticky neprepočítajú.",
+    "bookingSettings": {
+      "title": "Nastavenia rezervácií",
+      "description": "Nastavte, ako si zákazníci môžu rezervovať termíny",
+      "minAdvanceHours": "Minimálna doba vopred (hodiny)",
+      "maxAdvanceDays": "Maximálna doba vopred (dni)",
+      "defaultStatus": "Predvolený stav rezervácie",
+      "statusPending": "Čakajúca",
+      "statusConfirmed": "Potvrdená",
+      "allowCancellation": "Povoliť zrušenie",
+      "cancellationDeadlineHours": "Lehota na zrušenie (hodiny vopred)",
+      "autoConfirm": "Automatické potvrdzovanie",
+      "lookBusyPercent": "Percento \"zaneprázdnenosti\" (0-50%)",
+      "lookBusyDescription": "Umelo znižuje počet zobrazených voľných termínov, čo vytvára dojem dopytu. 0% zobrazuje všetky voľné termíny.",
+      "hours": "hodín",
+      "days": "dní"
+    },
+    "notificationPrefs": {
+      "title": "Nastavenia upozornení",
+      "description": "Zvoľte, ktoré upozornenia chcete prijímať a akým spôsobom",
+      "channels": "Kanály",
+      "events": "Udalosti",
+      "emailNotifications": "E-mailové upozornenia",
+      "smsNotifications": "SMS upozornenia",
+      "pushNotifications": "Push notifikácie",
+      "bookingConfirmation": "Potvrdenie rezervácie",
+      "bookingReminder": "Pripomienka rezervácie",
+      "cancellationAlert": "Upozornenie na zrušenie",
+      "noShowAlert": "Upozornenie na nedostavenie"
+    },
+    "apiKeys": {
+      "title": "API kľúče",
+      "description": "Spravujte API kľúče pre externé integrácie a programatický prístup",
+      "generate": "Vygenerovať nový kľúč",
+      "keyName": "Názov kľúča",
+      "keyNamePlaceholder": "napr. Moja integrácia",
+      "cancelCreate": "Zrušiť",
+      "copy": "Kopírovať",
+      "delete": "Zmazať",
+      "confirmDelete": "Naozaj chcete tento API kľúč zneplatniť? Túto akciu nemožno vrátiť.",
+      "noKeys": "Zatiaľ neboli vytvorené žiadne API kľúče. Vygenerujte kľúč pre externé integrácie.",
+      "loading": "Načítavanie API kľúčov...",
+      "created": "Vytvorené",
+      "lastUsed": "Naposledy použité",
+      "createSuccess": "API kľúč úspešne vytvorený",
+      "createError": "Nepodarilo sa vytvoriť API kľúč",
+      "deleteSuccess": "API kľúč úspešne zneplatnený",
+      "deleteError": "Nepodarilo sa zneplatniť API kľúč",
+      "newKeyWarning": "Skopírujte si tento kľúč teraz. Znova už nebude zobrazený.",
+      "dismiss": "Kľúč som si skopíroval/a"
+    },
+    "widgetEmbed": {
+      "title": "Rezervačný widget",
+      "description": "Vložte rezervačný widget na svoju webovú stránku, aby si zákazníci mohli rezervovať priamo",
+      "embedCode": "Kód na vloženie",
+      "copyCode": "Kopírovať kód",
+      "copied": "Skopírované!",
+      "preview": "Náhľad",
+      "noCompany": "Nastavenia spoločnosti ešte nie sú načítané."
+    }
   },
   "profile": {
     "title": "Profil používateľa",
@@ -899,6 +993,19 @@
         "reduce_hours": "skrátiť hodiny",
         "add_employee": "pridať zamestnanca"
       }
+    },
+    "comingSoon": "Pripravujeme",
+    "noShow": {
+      "title": "Predikcia nedostavenia",
+      "description": "AI analyzuje vzorce rezervacii a historiu zakaznikov a predikuje, ktore schodzky su ohrozene nedostavenim, a umoznuje proaktivne pripomienky."
+    },
+    "upselling": {
+      "title": "Chytry upselling",
+      "description": "AI odporuca doplnkove sluzby a optimalne casove sloty pre zvysenie trzby na zakaznika na zaklade jeho historie rezervacii."
+    },
+    "customerHealth": {
+      "title": "Zdravie zakaznikov",
+      "description": "AI monitoruje vzorce zapojenia zakaznikov, identifikuje ohrozenych klientov a navrhuje retencne akcie, kym neodidu."
     },
     "insights": {
       "title": "AI prehlad",
@@ -1722,5 +1829,31 @@
     },
     "back": "Späť",
     "next": "Ďalej"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "description": "Prechádzajte ponuky firiem a spravujte svoj vlastný profil na trhovisku.",
+    "tabs": {
+      "browse": "Prechádzať",
+      "myListing": "Môj profil"
+    },
+    "searchPlaceholder": "Hľadať firmy...",
+    "noRating": "Bez hodnotenia",
+    "viewProfile": "Zobraziť profil",
+    "emptyTitle": "Žiadne ponuky",
+    "emptyDescription": "Na trhovisku zatiaľ nie sú žiadne ponuky.",
+    "form": {
+      "title": "Názov",
+      "titlePlaceholder": "Názov vašej firmy na trhovisku",
+      "description": "Popis",
+      "descriptionPlaceholder": "Krátky popis vašej firmy a služieb...",
+      "category": "Kategória",
+      "categoryPlaceholder": "napr. Kaderníctvo, Masáže, Fitness",
+      "visibility": "Viditeľnosť",
+      "visibilityHelp": "Zobraziť váš profil na trhovisku",
+      "save": "Uložiť profil"
+    },
+    "saveSuccess": "Profil na trhovisku bol uložený.",
+    "saveError": "Nepodarilo sa uložiť profil."
   }
 }

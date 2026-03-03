@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -18,7 +19,19 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Link } from '@/lib/i18n/navigation';
-import { CreditCard } from 'lucide-react';
+import { apiClient } from '@/lib/api-client';
+import {
+  CreditCard,
+  Calendar,
+  Bell,
+  Key,
+  Code,
+  Plus,
+  Copy,
+  Check,
+  Trash2,
+  Loader2,
+} from 'lucide-react';
 import {
   useCompanySettingsQuery,
   useWorkingHoursQuery,
@@ -549,6 +562,719 @@ function WorkingHoursCard() {
 }
 
 // ============================================================================
+// BOOKING SETTINGS (localStorage-backed, no API yet)
+// ============================================================================
+
+interface BookingSettingsData {
+  minAdvanceHours: number;
+  maxAdvanceDays: number;
+  defaultStatus: 'pending' | 'confirmed';
+  allowCancellation: boolean;
+  cancellationDeadlineHours: number;
+  autoConfirm: boolean;
+  lookBusyPercent: number;
+}
+
+const BOOKING_SETTINGS_KEY = 'schedulebox_booking_settings';
+
+const DEFAULT_BOOKING_SETTINGS: BookingSettingsData = {
+  minAdvanceHours: 2,
+  maxAdvanceDays: 30,
+  defaultStatus: 'pending',
+  allowCancellation: true,
+  cancellationDeadlineHours: 24,
+  autoConfirm: false,
+  lookBusyPercent: 0,
+};
+
+function loadBookingSettings(): BookingSettingsData {
+  if (typeof window === 'undefined') return DEFAULT_BOOKING_SETTINGS;
+  try {
+    const stored = localStorage.getItem(BOOKING_SETTINGS_KEY);
+    if (stored) return { ...DEFAULT_BOOKING_SETTINGS, ...JSON.parse(stored) };
+  } catch {
+    // ignore parse errors
+  }
+  return DEFAULT_BOOKING_SETTINGS;
+}
+
+function BookingSettingsCard() {
+  const t = useTranslations('settings');
+  const tCommon = useTranslations('common');
+
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState<BookingSettingsData>(DEFAULT_BOOKING_SETTINGS);
+
+  useEffect(() => {
+    setForm(loadBookingSettings());
+  }, []);
+
+  const startEditing = () => setEditing(true);
+
+  const handleSave = () => {
+    try {
+      localStorage.setItem(BOOKING_SETTINGS_KEY, JSON.stringify(form));
+      toast.success(t('saveSuccess'));
+      setEditing(false);
+    } catch {
+      toast.error(t('saveError'));
+    }
+  };
+
+  const handleCancel = () => {
+    setForm(loadBookingSettings());
+    setEditing(false);
+  };
+
+  return (
+    <Card variant="glass">
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div className="flex items-start gap-3">
+          <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+          <div>
+            <CardTitle>{t('bookingSettings.title')}</CardTitle>
+            <CardDescription>{t('bookingSettings.description')}</CardDescription>
+          </div>
+        </div>
+        {!editing && (
+          <Button variant="outline" size="sm" onClick={startEditing}>
+            {tCommon('edit')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        {editing ? (
+          <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="min-advance">{t('bookingSettings.minAdvanceHours')}</Label>
+                <Input
+                  id="min-advance"
+                  type="number"
+                  min={0}
+                  max={168}
+                  value={form.minAdvanceHours}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, minAdvanceHours: Number(e.target.value) }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="max-advance">{t('bookingSettings.maxAdvanceDays')}</Label>
+                <Input
+                  id="max-advance"
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={form.maxAdvanceDays}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, maxAdvanceDays: Number(e.target.value) }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('bookingSettings.defaultStatus')}</Label>
+                <Select
+                  value={form.defaultStatus}
+                  onValueChange={(value: 'pending' | 'confirmed') =>
+                    setForm((prev) => ({ ...prev, defaultStatus: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">{t('bookingSettings.statusPending')}</SelectItem>
+                    <SelectItem value="confirmed">
+                      {t('bookingSettings.statusConfirmed')}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cancel-deadline">
+                  {t('bookingSettings.cancellationDeadlineHours')}
+                </Label>
+                <Input
+                  id="cancel-deadline"
+                  type="number"
+                  min={0}
+                  max={168}
+                  value={form.cancellationDeadlineHours}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      cancellationDeadlineHours: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <Label htmlFor="allow-cancel">{t('bookingSettings.allowCancellation')}</Label>
+                <Switch
+                  id="allow-cancel"
+                  checked={form.allowCancellation}
+                  onCheckedChange={(checked) =>
+                    setForm((prev) => ({ ...prev, allowCancellation: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <Label htmlFor="auto-confirm">{t('bookingSettings.autoConfirm')}</Label>
+                <Switch
+                  id="auto-confirm"
+                  checked={form.autoConfirm}
+                  onCheckedChange={(checked) =>
+                    setForm((prev) => ({ ...prev, autoConfirm: checked }))
+                  }
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="look-busy">{t('bookingSettings.lookBusyPercent')}</Label>
+                <Input
+                  id="look-busy"
+                  type="number"
+                  min={0}
+                  max={50}
+                  value={form.lookBusyPercent}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, lookBusyPercent: Number(e.target.value) }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t('bookingSettings.lookBusyDescription')}
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                {tCommon('cancel')}
+              </Button>
+              <Button onClick={handleSave}>{tCommon('save')}</Button>
+            </div>
+          </div>
+        ) : (
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.minAdvanceHours')}
+              </dt>
+              <dd className="mt-1">
+                {form.minAdvanceHours} {t('bookingSettings.hours')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.maxAdvanceDays')}
+              </dt>
+              <dd className="mt-1">
+                {form.maxAdvanceDays} {t('bookingSettings.days')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.defaultStatus')}
+              </dt>
+              <dd className="mt-1">
+                <Badge variant="secondary">
+                  {form.defaultStatus === 'pending'
+                    ? t('bookingSettings.statusPending')
+                    : t('bookingSettings.statusConfirmed')}
+                </Badge>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.cancellationDeadlineHours')}
+              </dt>
+              <dd className="mt-1">
+                {form.cancellationDeadlineHours} {t('bookingSettings.hours')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.allowCancellation')}
+              </dt>
+              <dd className="mt-1">
+                <Badge variant={form.allowCancellation ? 'default' : 'secondary'}>
+                  {form.allowCancellation ? tCommon('yes') : tCommon('no')}
+                </Badge>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.autoConfirm')}
+              </dt>
+              <dd className="mt-1">
+                <Badge variant={form.autoConfirm ? 'default' : 'secondary'}>
+                  {form.autoConfirm ? tCommon('yes') : tCommon('no')}
+                </Badge>
+              </dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t('bookingSettings.lookBusyPercent')}
+              </dt>
+              <dd className="mt-1">{form.lookBusyPercent}%</dd>
+            </div>
+          </dl>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// NOTIFICATION PREFERENCES (localStorage-backed, no API yet)
+// ============================================================================
+
+interface NotificationPreferencesData {
+  emailNotifications: boolean;
+  smsNotifications: boolean;
+  pushNotifications: boolean;
+  bookingConfirmation: boolean;
+  bookingReminder: boolean;
+  cancellationAlert: boolean;
+  noShowAlert: boolean;
+}
+
+const NOTIFICATION_PREFS_KEY = 'schedulebox_notification_prefs';
+
+const DEFAULT_NOTIFICATION_PREFS: NotificationPreferencesData = {
+  emailNotifications: true,
+  smsNotifications: false,
+  pushNotifications: false,
+  bookingConfirmation: true,
+  bookingReminder: true,
+  cancellationAlert: true,
+  noShowAlert: true,
+};
+
+function loadNotificationPrefs(): NotificationPreferencesData {
+  if (typeof window === 'undefined') return DEFAULT_NOTIFICATION_PREFS;
+  try {
+    const stored = localStorage.getItem(NOTIFICATION_PREFS_KEY);
+    if (stored) return { ...DEFAULT_NOTIFICATION_PREFS, ...JSON.parse(stored) };
+  } catch {
+    // ignore parse errors
+  }
+  return DEFAULT_NOTIFICATION_PREFS;
+}
+
+function NotificationPreferencesCard() {
+  const t = useTranslations('settings');
+  const tCommon = useTranslations('common');
+
+  const [editing, setEditing] = useState(false);
+  const [prefs, setPrefs] = useState<NotificationPreferencesData>(DEFAULT_NOTIFICATION_PREFS);
+
+  useEffect(() => {
+    setPrefs(loadNotificationPrefs());
+  }, []);
+
+  const handleSave = () => {
+    try {
+      localStorage.setItem(NOTIFICATION_PREFS_KEY, JSON.stringify(prefs));
+      toast.success(t('saveSuccess'));
+      setEditing(false);
+    } catch {
+      toast.error(t('saveError'));
+    }
+  };
+
+  const handleCancel = () => {
+    setPrefs(loadNotificationPrefs());
+    setEditing(false);
+  };
+
+  const toggleFields: Array<{
+    key: keyof NotificationPreferencesData;
+    labelKey: string;
+    isChannel?: boolean;
+  }> = [
+    {
+      key: 'emailNotifications',
+      labelKey: 'notificationPrefs.emailNotifications',
+      isChannel: true,
+    },
+    { key: 'smsNotifications', labelKey: 'notificationPrefs.smsNotifications', isChannel: true },
+    { key: 'pushNotifications', labelKey: 'notificationPrefs.pushNotifications', isChannel: true },
+    { key: 'bookingConfirmation', labelKey: 'notificationPrefs.bookingConfirmation' },
+    { key: 'bookingReminder', labelKey: 'notificationPrefs.bookingReminder' },
+    { key: 'cancellationAlert', labelKey: 'notificationPrefs.cancellationAlert' },
+    { key: 'noShowAlert', labelKey: 'notificationPrefs.noShowAlert' },
+  ];
+
+  return (
+    <Card variant="glass">
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div className="flex items-start gap-3">
+          <Bell className="h-5 w-5 text-muted-foreground mt-0.5" />
+          <div>
+            <CardTitle>{t('notificationPrefs.title')}</CardTitle>
+            <CardDescription>{t('notificationPrefs.description')}</CardDescription>
+          </div>
+        </div>
+        {!editing && (
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+            {tCommon('edit')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-1">
+          {toggleFields.map((field, idx) => (
+            <div key={field.key}>
+              {field.isChannel && idx === 0 && (
+                <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
+                  {t('notificationPrefs.channels')}
+                </p>
+              )}
+              {!field.isChannel && idx === 3 && (
+                <p className="text-xs font-medium uppercase text-muted-foreground mt-4 mb-2">
+                  {t('notificationPrefs.events')}
+                </p>
+              )}
+              <div className="flex items-center justify-between py-2 border-b last:border-0">
+                <Label htmlFor={`notif-${field.key}`}>{t(field.labelKey)}</Label>
+                {editing ? (
+                  <Switch
+                    id={`notif-${field.key}`}
+                    checked={prefs[field.key]}
+                    onCheckedChange={(checked) =>
+                      setPrefs((prev) => ({ ...prev, [field.key]: checked }))
+                    }
+                  />
+                ) : (
+                  <Badge variant={prefs[field.key] ? 'default' : 'secondary'}>
+                    {prefs[field.key] ? tCommon('yes') : tCommon('no')}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        {editing && (
+          <div className="mt-6 flex gap-2 justify-end">
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              {tCommon('cancel')}
+            </Button>
+            <Button onClick={handleSave}>{tCommon('save')}</Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// API KEYS (backed by real API endpoints)
+// ============================================================================
+
+interface ApiKeyData {
+  id: number;
+  name: string;
+  key_prefix: string;
+  scopes: string[];
+  created_at: string;
+  last_used_at: string | null;
+  expires_at: string | null;
+}
+
+interface ApiKeyCreateResponse {
+  id: number;
+  name: string;
+  key: string;
+  key_prefix: string;
+  created_at: string;
+}
+
+function ApiKeysCard() {
+  const t = useTranslations('settings');
+
+  const [keys, setKeys] = useState<ApiKeyData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [newKeyName, setNewKeyName] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<number | string | null>(null);
+
+  const fetchKeys = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await apiClient.get<{ data: ApiKeyData[] }>('/settings/api-keys');
+      setKeys(result.data ?? (result as unknown as ApiKeyData[]));
+    } catch {
+      // Silently handle - user may not have permission
+      setKeys([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchKeys();
+  }, [fetchKeys]);
+
+  const handleCreate = async () => {
+    if (!newKeyName.trim()) return;
+    try {
+      setCreating(true);
+      const result = await apiClient.post<ApiKeyCreateResponse>('/settings/api-keys', {
+        name: newKeyName.trim(),
+      });
+      setNewlyCreatedKey(result.key);
+      setNewKeyName('');
+      setShowCreateForm(false);
+      toast.success(t('apiKeys.createSuccess'));
+      fetchKeys();
+    } catch (error) {
+      const apiError = error as { message?: string };
+      toast.error(apiError.message || t('apiKeys.createError'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm(t('apiKeys.confirmDelete'))) return;
+    try {
+      await apiClient.delete(`/settings/api-keys/${id}`);
+      toast.success(t('apiKeys.deleteSuccess'));
+      setKeys((prev) => prev.filter((k) => k.id !== id));
+    } catch (error) {
+      const apiError = error as { message?: string };
+      toast.error(apiError.message || t('apiKeys.deleteError'));
+    }
+  };
+
+  const copyToClipboard = async (text: string, id: number | string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  };
+
+  return (
+    <Card variant="glass">
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div className="flex items-start gap-3">
+          <Key className="h-5 w-5 text-muted-foreground mt-0.5" />
+          <div>
+            <CardTitle>{t('apiKeys.title')}</CardTitle>
+            <CardDescription>{t('apiKeys.description')}</CardDescription>
+          </div>
+        </div>
+        {!showCreateForm && (
+          <Button variant="outline" size="sm" onClick={() => setShowCreateForm(true)}>
+            <Plus className="h-4 w-4 mr-1" />
+            {t('apiKeys.generate')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        {/* Create new key form */}
+        {showCreateForm && (
+          <div className="mb-4 p-4 rounded-lg border bg-muted/30">
+            <Label htmlFor="new-key-name">{t('apiKeys.keyName')}</Label>
+            <div className="flex gap-2 mt-2">
+              <Input
+                id="new-key-name"
+                value={newKeyName}
+                onChange={(e) => setNewKeyName(e.target.value)}
+                placeholder={t('apiKeys.keyNamePlaceholder')}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+              />
+              <Button onClick={handleCreate} disabled={creating || !newKeyName.trim()}>
+                {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : t('apiKeys.generate')}
+              </Button>
+              <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+                {t('apiKeys.cancelCreate')}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Newly created key (shown only once) */}
+        {newlyCreatedKey && (
+          <div className="mb-4 p-4 rounded-lg border border-green-500/50 bg-green-500/10">
+            <p className="text-sm font-medium mb-2">{t('apiKeys.newKeyWarning')}</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 p-2 bg-background/50 rounded text-sm font-mono break-all">
+                {newlyCreatedKey}
+              </code>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => copyToClipboard(newlyCreatedKey, 'new')}
+              >
+                {copiedId === 'new' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-2"
+              onClick={() => setNewlyCreatedKey(null)}
+            >
+              {t('apiKeys.dismiss')}
+            </Button>
+          </div>
+        )}
+
+        {/* Key list */}
+        {loading ? (
+          <div className="text-muted-foreground flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('apiKeys.loading')}
+          </div>
+        ) : keys.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t('apiKeys.noKeys')}</p>
+        ) : (
+          <div className="space-y-3">
+            {keys.map((key) => (
+              <div
+                key={key.id}
+                className="flex items-center justify-between py-3 px-3 rounded-lg border bg-muted/20"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm">{key.name}</p>
+                    <code className="text-xs text-muted-foreground font-mono">
+                      {key.key_prefix}...
+                    </code>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t('apiKeys.created')}: {new Date(key.created_at).toLocaleDateString()}
+                    {key.last_used_at && (
+                      <>
+                        {' | '}
+                        {t('apiKeys.lastUsed')}: {new Date(key.last_used_at).toLocaleDateString()}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(key.key_prefix + '...', key.id)}
+                    title={t('apiKeys.copy')}
+                  >
+                    {copiedId === key.id ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(key.id)}
+                    title={t('apiKeys.delete')}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// WIDGET EMBED
+// ============================================================================
+
+function WidgetEmbedCard() {
+  const t = useTranslations('settings');
+  const { data: company } = useCompanySettingsQuery();
+  const [copied, setCopied] = useState(false);
+
+  const embedCode = company
+    ? `<iframe src="https://schedulebox.cz/embed/${company.slug}" width="100%" height="600" frameborder="0"></iframe>`
+    : '';
+
+  const handleCopy = async () => {
+    if (!embedCode) return;
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      setCopied(true);
+      toast.success(t('widgetEmbed.copied'));
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  };
+
+  return (
+    <Card variant="glass">
+      <CardHeader>
+        <div className="flex items-start gap-3">
+          <Code className="h-5 w-5 text-muted-foreground mt-0.5" />
+          <div>
+            <CardTitle>{t('widgetEmbed.title')}</CardTitle>
+            <CardDescription>{t('widgetEmbed.description')}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {company ? (
+          <div className="space-y-4">
+            {/* Embed code */}
+            <div className="space-y-2">
+              <Label>{t('widgetEmbed.embedCode')}</Label>
+              <div className="relative">
+                <Textarea
+                  readOnly
+                  value={embedCode}
+                  className="font-mono text-sm resize-none h-20"
+                  onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={handleCopy}
+                >
+                  {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                  {copied ? t('widgetEmbed.copied') : t('widgetEmbed.copyCode')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="space-y-2">
+              <Label>{t('widgetEmbed.preview')}</Label>
+              <div className="border rounded-lg overflow-hidden bg-background">
+                <iframe
+                  src={`/embed/${company.slug}`}
+                  width="100%"
+                  height="400"
+                  frameBorder="0"
+                  title={t('widgetEmbed.preview')}
+                  className="block"
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">{t('widgetEmbed.noCompany')}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
 // SETTINGS PAGE
 // ============================================================================
 
@@ -561,6 +1287,8 @@ export default function SettingsPage() {
       <PageHeader title={t('title')} description={t('description')} />
       <CompanyProfileCard />
       <WorkingHoursCard />
+      <BookingSettingsCard />
+      <NotificationPreferencesCard />
 
       {/* Billing link */}
       <Card variant="glass">
@@ -577,6 +1305,9 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      <ApiKeysCard />
+      <WidgetEmbedCard />
     </div>
   );
 }

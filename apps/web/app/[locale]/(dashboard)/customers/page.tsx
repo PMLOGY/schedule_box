@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Plus, Search } from 'lucide-react';
+import { useRouter } from '@/lib/i18n/navigation';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,18 +27,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  useCustomersQuery,
-  useCreateCustomer,
-  useUpdateCustomer,
-  type Customer,
-} from '@/hooks/use-customers-query';
+import { useCustomersQuery, useCreateCustomer, type Customer } from '@/hooks/use-customers-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
 import { CustomersEmptyState } from '@/components/onboarding/empty-states/customers-empty';
 
 export default function CustomersPage() {
   const t = useTranslations('customers');
   const tCommon = useTranslations('common');
+  const router = useRouter();
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -47,11 +44,6 @@ export default function CustomersPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', notes: '' });
 
-  // Edit dialog state
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
-  const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', notes: '' });
-
   const { data, isLoading } = useCustomersQuery({
     page,
     limit,
@@ -60,7 +52,6 @@ export default function CustomersPage() {
   });
 
   const createMutation = useCreateCustomer();
-  const updateMutation = useUpdateCustomer();
   const { formatCurrency } = useCurrencyFormat();
 
   const handleCreate = async () => {
@@ -82,37 +73,7 @@ export default function CustomersPage() {
   };
 
   const handleRowClick = (customer: Customer) => {
-    setEditingCustomer(customer);
-    setEditFormData({
-      name: customer.name,
-      email: customer.email || '',
-      phone: customer.phone || '',
-      notes: customer.notes || '',
-    });
-    setEditDialogOpen(true);
-  };
-
-  const handleUpdate = async () => {
-    if (!editingCustomer || !editFormData.name.trim()) return;
-    try {
-      // Always send name, phone, notes; only skip email if unchanged
-      // (seeded emails may have diacritics that fail server-side validation)
-      const origEmail = editingCustomer.email || '';
-      const emailChanged = editFormData.email !== origEmail;
-      await updateMutation.mutateAsync({
-        uuid: editingCustomer.uuid,
-        name: editFormData.name,
-        ...(emailChanged && { email: editFormData.email || undefined }),
-        phone: editFormData.phone || undefined,
-        notes: editFormData.notes || undefined,
-      });
-      toast.success(t('updateSuccess'));
-      setEditDialogOpen(false);
-      setEditingCustomer(null);
-    } catch (error) {
-      const apiError = error as { message?: string };
-      toast.error(apiError.message || t('updateError'));
-    }
+    router.push(`/customers/${customer.uuid}`);
   };
 
   return (
@@ -284,70 +245,6 @@ export default function CustomersPage() {
               </Button>
               <Button type="submit" disabled={!formData.name.trim() || createMutation.isPending}>
                 {createMutation.isPending ? tCommon('loading') : tCommon('create')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Customer Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('editTitle')}</DialogTitle>
-            <DialogDescription>{t('editDescription')}</DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleUpdate();
-            }}
-          >
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="edit-name">{t('form.name')} *</Label>
-                <Input
-                  id="edit-name"
-                  value={editFormData.name}
-                  onChange={(e) => setEditFormData((prev) => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-email">{t('form.email')}</Label>
-                <Input
-                  id="edit-email"
-                  type="email"
-                  value={editFormData.email}
-                  onChange={(e) => setEditFormData((prev) => ({ ...prev, email: e.target.value }))}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-phone">{t('form.phone')}</Label>
-                <Input
-                  id="edit-phone"
-                  value={editFormData.phone}
-                  onChange={(e) => setEditFormData((prev) => ({ ...prev, phone: e.target.value }))}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-notes">{t('form.notes')}</Label>
-                <Input
-                  id="edit-notes"
-                  value={editFormData.notes}
-                  onChange={(e) => setEditFormData((prev) => ({ ...prev, notes: e.target.value }))}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
-                {tCommon('cancel')}
-              </Button>
-              <Button
-                type="submit"
-                disabled={!editFormData.name.trim() || updateMutation.isPending}
-              >
-                {updateMutation.isPending ? tCommon('loading') : tCommon('save')}
               </Button>
             </DialogFooter>
           </form>

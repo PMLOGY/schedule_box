@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
+import { Plus, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -39,6 +39,7 @@ import {
 } from '@/hooks/use-employees-query';
 import { useServicesQuery } from '@/hooks/use-services-query';
 import { EmployeesEmptyState } from '@/components/onboarding/empty-states/employees-empty';
+import { Link } from '@/lib/i18n/navigation';
 
 export default function EmployeesPage() {
   const t = useTranslations('employees');
@@ -347,7 +348,21 @@ export default function EmployeesPage() {
               <p className="text-sm text-destructive">{t('updateError')}</p>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            {editingEmployee && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mr-auto"
+                asChild
+                onClick={() => setEditDialogOpen(false)}
+              >
+                <Link href={`/settings`}>
+                  <Clock className="h-4 w-4 mr-2" />
+                  {t('manageSchedule')}
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               {tCommon('cancel')}
             </Button>

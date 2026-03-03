@@ -16,6 +16,7 @@ import {
   Box,
   MessageSquare,
   Wallet,
+  Store,
   type LucideIcon,
 } from 'lucide-react';
 import type { SubscriptionPlan } from '@schedulebox/shared/types';
@@ -136,6 +137,13 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Box,
     roles: ['owner', 'manager'],
     minPlan: 'essential',
+  },
+  {
+    key: 'marketplace',
+    href: '/marketplace',
+    icon: Store,
+    roles: ['owner'],
+    minPlan: 'growth',
   },
   {
     key: 'settings',

@@ -104,7 +104,8 @@
     "collapse": "Skrýt",
     "billing": "Fakturace",
     "reviews": "Recenze",
-    "resources": "Zdroje"
+    "resources": "Zdroje",
+    "marketplace": "Marketplace"
   },
   "dashboard": {
     "title": "Přehled",
@@ -323,6 +324,39 @@
     "updateSuccess": "Zákazník byl upraven",
     "updateError": "Nepodařilo se upravit zákazníka"
   },
+  "customerDetail": {
+    "backToList": "Zpět na seznam",
+    "editCustomer": "Upravit zákazníka",
+    "kpi": {
+      "healthScore": "Skóre zdraví",
+      "clvPredicted": "Predikovaná hodnota",
+      "totalBookings": "Celkem rezervací",
+      "totalSpent": "Celkem utraceno"
+    },
+    "tabs": {
+      "bookings": "Historie rezervací",
+      "notes": "Poznámky",
+      "tags": "Štítky"
+    },
+    "bookingColumns": {
+      "date": "Datum",
+      "service": "Služba",
+      "employee": "Zaměstnanec",
+      "status": "Stav",
+      "price": "Cena"
+    },
+    "noBookings": "Žádné rezervace",
+    "noTags": "Žádné štítky",
+    "addTag": "Přidat štítek",
+    "saveTags": "Uložit štítky",
+    "saveNotes": "Uložit poznámky",
+    "notesPlaceholder": "Napište poznámky o zákazníkovi...",
+    "healthStatus": {
+      "good": "Dobrý",
+      "average": "Průměrný",
+      "atRisk": "V riziku"
+    }
+  },
   "payments": {
     "title": "Platby",
     "description": "Spravujte platby a sledujte transakce",
@@ -499,7 +533,8 @@
     "createError": "Nepodařilo se vytvořit zaměstnance",
     "editTitle": "Upravit zaměstnance",
     "updateSuccess": "Zaměstnanec byl upraven",
-    "updateError": "Nepodařilo se upravit zaměstnance"
+    "updateError": "Nepodařilo se upravit zaměstnance",
+    "manageSchedule": "Pracovni doba"
   },
   "analytics": {
     "title": "Analytika",
@@ -668,7 +703,66 @@
     "saveSuccess": "Nastavení úspěšně uloženo",
     "saveError": "Nepodařilo se uložit nastavení",
     "saving": "Ukládání...",
-    "currencyWarning": "Změna měny ovlivní pouze zobrazení. Ceny služeb a existující platby se automaticky nepřepočítají."
+    "currencyWarning": "Změna měny ovlivní pouze zobrazení. Ceny služeb a existující platby se automaticky nepřepočítají.",
+    "bookingSettings": {
+      "title": "Nastavení rezervací",
+      "description": "Nastavte, jak si zákazníci mohou rezervovat termíny",
+      "minAdvanceHours": "Minimální doba předem (hodiny)",
+      "maxAdvanceDays": "Maximální doba předem (dny)",
+      "defaultStatus": "Výchozí stav rezervace",
+      "statusPending": "Čekající",
+      "statusConfirmed": "Potvrzena",
+      "allowCancellation": "Povolit zrušení",
+      "cancellationDeadlineHours": "Lhůta pro zrušení (hodiny předem)",
+      "autoConfirm": "Automatické potvrzování",
+      "lookBusyPercent": "Procento \"zaněprázdněnosti\" (0-50%)",
+      "lookBusyDescription": "Uměle snižuje počet zobrazených volných termínů, což vytváří dojem poptávky. 0% zobrazuje všechny volné termíny.",
+      "hours": "hodin",
+      "days": "dnů"
+    },
+    "notificationPrefs": {
+      "title": "Nastavení upozornění",
+      "description": "Zvolte, která upozornění chcete přijímat a jakým způsobem",
+      "channels": "Kanály",
+      "events": "Události",
+      "emailNotifications": "E-mailová upozornění",
+      "smsNotifications": "SMS upozornění",
+      "pushNotifications": "Push notifikace",
+      "bookingConfirmation": "Potvrzení rezervace",
+      "bookingReminder": "Připomínka rezervace",
+      "cancellationAlert": "Upozornění na zrušení",
+      "noShowAlert": "Upozornění na nedostavení"
+    },
+    "apiKeys": {
+      "title": "API klíče",
+      "description": "Spravujte API klíče pro externí integrace a programatický přístup",
+      "generate": "Vygenerovat nový klíč",
+      "keyName": "Název klíče",
+      "keyNamePlaceholder": "např. Moje integrace",
+      "cancelCreate": "Zrušit",
+      "copy": "Kopírovat",
+      "delete": "Smazat",
+      "confirmDelete": "Opravdu chcete tento API klíč zneplatnit? Tuto akci nelze vrátit.",
+      "noKeys": "Zatím nebyly vytvořeny žádné API klíče. Vygenerujte klíč pro externí integrace.",
+      "loading": "Načítání API klíčů...",
+      "created": "Vytvořeno",
+      "lastUsed": "Naposledy použito",
+      "createSuccess": "API klíč úspěšně vytvořen",
+      "createError": "Nepodařilo se vytvořit API klíč",
+      "deleteSuccess": "API klíč úspěšně zneplatněn",
+      "deleteError": "Nepodařilo se zneplatnit API klíč",
+      "newKeyWarning": "Zkopírujte si tento klíč nyní. Znovu již nebude zobrazen.",
+      "dismiss": "Klíč jsem si zkopíroval/a"
+    },
+    "widgetEmbed": {
+      "title": "Rezervační widget",
+      "description": "Vložte rezervační widget na své webové stránky, aby si zákazníci mohli rezervovat přímo",
+      "embedCode": "Kód pro vložení",
+      "copyCode": "Kopírovat kód",
+      "copied": "Zkopírováno!",
+      "preview": "Náhled",
+      "noCompany": "Nastavení společnosti ještě není načteno."
+    }
   },
   "profile": {
     "title": "Profil uživatele",
@@ -899,6 +993,19 @@
         "reduce_hours": "zkrátit hodiny",
         "add_employee": "přidat zaměstnance"
       }
+    },
+    "comingSoon": "Pripravujeme",
+    "noShow": {
+      "title": "Predikce nedostaveni",
+      "description": "AI analyzuje vzorce rezervaci a historii zakazniku a predikuje, ktere schuzky jsou ohrozeny nedostavenim, a umoznuje proaktivni pripominky."
+    },
+    "upselling": {
+      "title": "Chytry upselling",
+      "description": "AI doporucuje doplnkove sluzby a optimalni casove sloty pro zvyseni trzeb na zakaznika na zaklade jeho historie rezervaci."
+    },
+    "customerHealth": {
+      "title": "Zdravi zakazniku",
+      "description": "AI monitoruje vzorce zapojeni zakazniku, identifikuje ohrozene klienty a navrhuje retencni akce, nez odejdou."
     },
     "insights": {
       "title": "AI prehled",
@@ -1796,5 +1903,31 @@
     },
     "back": "Zpět",
     "next": "Další"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "description": "Procházejte nabídky firem a spravujte svůj vlastní profil na tržišti.",
+    "tabs": {
+      "browse": "Procházet",
+      "myListing": "Můj profil"
+    },
+    "searchPlaceholder": "Hledat firmy...",
+    "noRating": "Bez hodnocení",
+    "viewProfile": "Zobrazit profil",
+    "emptyTitle": "Žádné nabídky",
+    "emptyDescription": "Na tržišti zatím nejsou žádné nabídky.",
+    "form": {
+      "title": "Název",
+      "titlePlaceholder": "Název vaší firmy na tržišti",
+      "description": "Popis",
+      "descriptionPlaceholder": "Krátký popis vaší firmy a služeb...",
+      "category": "Kategorie",
+      "categoryPlaceholder": "např. Kadeřnictví, Masáže, Fitness",
+      "visibility": "Viditelnost",
+      "visibilityHelp": "Zobrazit váš profil na tržišti",
+      "save": "Uložit profil"
+    },
+    "saveSuccess": "Profil na tržišti byl uložen.",
+    "saveError": "Nepodařilo se uložit profil."
   }
 }
