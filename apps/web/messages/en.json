@@ -431,6 +431,44 @@
     "updateSuccess": "Service updated",
     "updateError": "Failed to update service"
   },
+  "resources": {
+    "title": "Resources",
+    "description": "Manage rooms, equipment, and other resources",
+    "tabs": {
+      "types": "Resource Types",
+      "resources": "Resources"
+    },
+    "columns": {
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "quantity": "Quantity",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "noTypes": "No resource types",
+    "noResources": "No resources",
+    "addType": "Add type",
+    "addTypeTitle": "New Resource Type",
+    "addResource": "Add resource",
+    "addResourceTitle": "New Resource",
+    "editResourceTitle": "Edit Resource",
+    "deleteTitle": "Delete Resource",
+    "deleteConfirm": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "type": "Resource Type",
+      "noType": "No type",
+      "quantity": "Quantity",
+      "status": "Status"
+    },
+    "createError": "Failed to create",
+    "updateError": "Failed to update",
+    "deleteError": "Failed to delete resource"
+  },
   "employees": {
     "title": "Employees",
     "columns": {

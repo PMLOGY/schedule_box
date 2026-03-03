@@ -103,7 +103,8 @@
     "logout": "Odhlásiť sa",
     "collapse": "Skryť",
     "billing": "Fakturácia",
-    "reviews": "Recenzie"
+    "reviews": "Recenzie",
+    "resources": "Zdroje"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -429,6 +430,44 @@
     "editTitle": "Upraviť službu",
     "updateSuccess": "Služba bola upravená",
     "updateError": "Nepodarilo sa upraviť službu"
+  },
+  "resources": {
+    "title": "Zdroje",
+    "description": "Spravujte miestnosti, vybavenie a dalsie zdroje",
+    "tabs": {
+      "types": "Typy zdrojov",
+      "resources": "Zdroje"
+    },
+    "columns": {
+      "name": "Nazov",
+      "description": "Popis",
+      "type": "Typ",
+      "quantity": "Mnozstvo",
+      "status": "Stav",
+      "actions": "Akcie"
+    },
+    "active": "Aktivny",
+    "inactive": "Neaktivny",
+    "noTypes": "Ziadne typy zdrojov",
+    "noResources": "Ziadne zdroje",
+    "addType": "Pridat typ",
+    "addTypeTitle": "Novy typ zdroja",
+    "addResource": "Pridat zdroj",
+    "addResourceTitle": "Novy zdroj",
+    "editResourceTitle": "Upravit zdroj",
+    "deleteTitle": "Zmazat zdroj",
+    "deleteConfirm": "Naozaj chcete zmazat zdroj \"{name}\"? Tuto akciu nie je mozne vratit.",
+    "form": {
+      "name": "Nazov",
+      "description": "Popis",
+      "type": "Typ zdroja",
+      "noType": "Bez typu",
+      "quantity": "Mnozstvo",
+      "status": "Stav"
+    },
+    "createError": "Nepodarilo sa vytvorit",
+    "updateError": "Nepodarilo sa upravit",
+    "deleteError": "Nepodarilo sa zmazat zdroj"
   },
   "employees": {
     "title": "Zamestnanci",
