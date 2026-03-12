@@ -22,7 +22,7 @@ function MobileNav({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+        <Button variant="glass-ghost" size="icon" className="md:hidden" aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
@@ -90,7 +90,7 @@ export function MarketingNavbar() {
             <LocaleSwitcher />
           </div>
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+          <Button asChild variant="glass-ghost" size="sm" className="hidden md:inline-flex">
             <Link href="/register">{t('cta')}</Link>
           </Button>
           <Button asChild size="sm" className="hidden md:inline-flex">

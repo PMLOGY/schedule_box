@@ -16,7 +16,7 @@ export function ThemeToggle() {
   if (!mounted) {
     // Render placeholder to avoid layout shift
     return (
-      <Button variant="ghost" size="icon" disabled suppressHydrationWarning>
+      <Button variant="glass-ghost" size="icon" disabled suppressHydrationWarning>
         <Sun className="h-4 w-4" />
         <span className="sr-only">Toggle theme</span>
       </Button>
@@ -25,7 +25,7 @@ export function ThemeToggle() {
 
   return (
     <Button
-      variant="ghost"
+      variant="glass-ghost"
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       suppressHydrationWarning

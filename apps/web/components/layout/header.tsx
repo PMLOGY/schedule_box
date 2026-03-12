@@ -23,7 +23,7 @@ export function Header() {
       >
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="glass-ghost"
             size="icon"
             className="md:hidden"
             onClick={toggleMobileSidebar}
