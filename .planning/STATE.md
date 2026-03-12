@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v1.4
+milestone_name: Design Overhaul
+status: verifying
+stopped_at: Completed 38-01-PLAN.md
+last_updated: "2026-03-12T17:58:00.838Z"
+last_activity: 2026-03-12 — 37-02 glass shimmer skeletons + dark mode QA + KPI stagger
+progress:
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 11
+  completed_plans: 11
+  percent: 98
+---
+
 # ScheduleBox — State
 
 ## Project Reference
@@ -15,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-02-25)
 - **Status:** POLSH-01/02/05/06 implemented; awaiting human visual verification
 - **Last activity:** 2026-03-12 — 37-02 glass shimmer skeletons + dark mode QA + KPI stagger
 
-Progress: [█████████▓] 95% (v1.4 — awaiting final visual QA)
+Progress: [██████████] 98%
 
 ## What's Done
 
@@ -51,6 +67,7 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 **37-01 (Decision 25):** Auth layout converted to client component for Motion -- child page.tsx server components retain metadata exports (Next.js App Router pattern). TooltipContent uses glass-surface-subtle (lighter frost) while Select/DropdownMenu use glass-surface (standard frost) for appropriate visual weight. Glass applied only to Radix Portal Content wrappers, never triggers/items.
 
 **37-02 (Decision 26):** Motion variants at module scope prevent stagger replay on re-renders. initial="hidden" animate="show" fires on mount, not scroll. Dark mode glass uses white-based rgba (not slate) -- POLSH-05 met by bumping to 0.12/0.08/0.18 opacity.
+- [Phase 38-glass-polish-gaps]: PricingTable uses Card variant=glass for all tiers; featured tier ring via cn() only. FormVariant label skeletons stay base Skeleton (small inline). GlassShimmer for all large block placeholders (>=h-10 full-width).
 
 ## Blockers
 
@@ -66,9 +83,10 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 | v1.2 | 5 | 20 | 4 days |
 | v1.3 | 5 | 21 | 1 day |
 | v1.4 | 5 | TBD | In progress |
+| Phase 38 P01 | 3 | 2 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: 37-02 Task 3 checkpoint:human-verify (Tasks 1+2 complete, awaiting visual QA approval).
+Last session: 2026-03-12T17:57:51.548Z
+Stopped at: Completed 38-01-PLAN.md
 Resume file: None
