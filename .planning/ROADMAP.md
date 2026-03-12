@@ -199,7 +199,7 @@ Plans:
 
 **Requirements:** AUTH-01, AUTH-02, AUTH-03, POLSH-01, POLSH-02, POLSH-03, POLSH-04, POLSH-05, POLSH-06
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 37-01-PLAN.md — Auth layout glass card + entrance animation + glass dropdowns and tooltips
@@ -256,7 +256,7 @@ Plans:
 | 34. Component Glass Variants | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 35. Dashboard Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
-| 37. Auth and Polish | v1.4 | TBD | Not started | - |
+| 37. Auth and Polish | 2/2 | Complete   | 2026-03-12 | - |
 
 ---
 *Roadmap created: 2026-02-10*

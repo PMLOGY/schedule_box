@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-25)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v1.4 Design Overhaul — Phase 37 in progress (37-01 complete, 37-02 next)
+**Current focus:** v1.4 Design Overhaul — Phase 37 final checkpoint (37-02 tasks complete, awaiting visual QA)
 
 ## Current Position
 
 - **Milestone:** v1.4 Design Overhaul (Phases 33-37)
 - **Phase:** 37 of 37 — Auth & Polish
-- **Plan:** 1/2 complete (37-01 done, 37-02 next)
-- **Status:** 37-01 complete (AUTH-01..03, POLSH-03..04 met)
-- **Last activity:** 2026-02-25 — 37-01 glass auth layout + portaled components
+- **Plan:** 2/2 auto tasks complete (awaiting Task 3: human-verify checkpoint)
+- **Status:** POLSH-01/02/05/06 implemented; awaiting human visual verification
+- **Last activity:** 2026-03-12 — 37-02 glass shimmer skeletons + dark mode QA + KPI stagger
 
-Progress: [█████████░] 90% (v1.4)
+Progress: [█████████▓] 95% (v1.4 — awaiting final visual QA)
 
 ## What's Done
 
@@ -50,6 +50,8 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 **37-01 (Decision 25):** Auth layout converted to client component for Motion -- child page.tsx server components retain metadata exports (Next.js App Router pattern). TooltipContent uses glass-surface-subtle (lighter frost) while Select/DropdownMenu use glass-surface (standard frost) for appropriate visual weight. Glass applied only to Radix Portal Content wrappers, never triggers/items.
 
+**37-02 (Decision 26):** Motion variants at module scope prevent stagger replay on re-renders. initial="hidden" animate="show" fires on mount, not scroll. Dark mode glass uses white-based rgba (not slate) -- POLSH-05 met by bumping to 0.12/0.08/0.18 opacity.
+
 ## Blockers
 
 - Real testimonials needed for landing page social proof — placeholder content in place (pre-existing, not v1.4 scope)
@@ -67,6 +69,6 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-15 logged there).
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Completed 37-01-PLAN.md (glass auth layout + portaled components). Next: 37-02-PLAN.md.
+Last session: 2026-03-12
+Stopped at: 37-02 Task 3 checkpoint:human-verify (Tasks 1+2 complete, awaiting visual QA approval).
 Resume file: None
