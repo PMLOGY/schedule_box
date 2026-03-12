@@ -90,7 +90,7 @@
 | DSYS-06 | Phase 33 | Pending |
 | DSYS-07 | Phase 33 | Pending |
 | COMP-01 | Phase 34 | Pending |
-| COMP-02 | Phase 34 | Pending |
+| COMP-02 | Phase 38 (gap closure) | Pending |
 | COMP-03 | Phase 34 | Pending |
 | COMP-04 | Phase 34 | Pending |
 | COMP-05 | Phase 34 | Pending |
@@ -109,7 +109,7 @@
 | AUTH-02 | Phase 37 | Pending |
 | AUTH-03 | Phase 37 | Pending |
 | POLSH-01 | Phase 37 | Pending |
-| POLSH-02 | Phase 37 | Pending |
+| POLSH-02 | Phase 38 (gap closure) | Pending |
 | POLSH-03 | Phase 37 | Pending |
 | POLSH-04 | Phase 37 | Pending |
 | POLSH-05 | Phase 37 | Pending |

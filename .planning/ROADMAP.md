@@ -6,7 +6,7 @@
 - **v1.1 Production Hardening** — Phases 16-22 (shipped 2026-02-21)
 - **v1.2 Product Readiness** — Phases 23-27 (shipped 2026-02-24)
 - **v1.3 Revenue & Growth** — Phases 28-32 (shipped 2026-02-25)
-- **v1.4 Design Overhaul** — Phases 33-37 (in progress)
+- **v1.4 Design Overhaul** — Phases 33-38 (in progress)
 
 ## Phases
 
@@ -216,6 +216,29 @@ Plans:
 
 ---
 
+### Phase 38: Glass Polish Gaps
+
+**Goal:** Close remaining v1.4 audit gaps — extend GlassShimmer to all skeleton variants, fix PricingTable to use Card CVA variant, and resolve orphaned Button glass variants.
+
+**Dependencies:** Phase 37 (all glass components and pages must exist).
+
+**Requirements:** COMP-02, POLSH-02
+
+**Gap Closure:** Closes gaps from v1.4-MILESTONE-AUDIT.md
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 38-01-PLAN.md — GlassShimmer skeleton expansion + PricingTable CVA fix + Button glass variant cleanup
+
+**Success Criteria** (what must be TRUE):
+
+1. All PageSkeleton variants (cards, form, detail) use GlassShimmer instead of base Skeleton component when rendered in glass contexts.
+2. PricingTable uses `<Card variant="glass">` instead of raw `glass-surface` className, gaining the hover:shadow-glass-hover transition consistent with all other glass cards.
+3. Button glass variants are either used in at least one place or removed as dead code — no orphaned CVA variants remain.
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -256,7 +279,8 @@ Plans:
 | 34. Component Glass Variants | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 35. Dashboard Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
-| 37. Auth and Polish | 2/2 | Complete   | 2026-03-12 | - |
+| 37. Auth and Polish | v1.4 | 2/2 | Complete | 2026-03-12 |
+| 38. Glass Polish Gaps | v1.4 | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
