@@ -51,7 +51,7 @@ function CardsVariant() {
       <HeaderSkeleton />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[180px] rounded-xl" />
+          <GlassShimmer key={i} className="h-[180px]" />
         ))}
       </div>
     </div>
@@ -66,7 +66,7 @@ function FormVariant() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="space-y-2">
             <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
+            <GlassShimmer className="h-10 w-full" />
           </div>
         ))}
       </div>
@@ -80,13 +80,13 @@ function DetailVariant() {
       <HeaderSkeleton />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
-          <Skeleton className="h-[200px] rounded-xl" />
-          <Skeleton className="h-[120px] rounded-xl" />
+          <GlassShimmer className="h-[200px]" />
+          <GlassShimmer className="h-[120px]" />
         </div>
         <div className="lg:col-span-2 space-y-4">
-          <Skeleton className="h-[160px] rounded-xl" />
-          <Skeleton className="h-[160px] rounded-xl" />
-          <Skeleton className="h-[120px] rounded-xl" />
+          <GlassShimmer className="h-[160px]" />
+          <GlassShimmer className="h-[160px]" />
+          <GlassShimmer className="h-[120px]" />
         </div>
       </div>
     </div>

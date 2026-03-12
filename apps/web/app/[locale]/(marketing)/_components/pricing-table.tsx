@@ -112,10 +112,8 @@ export function PricingTable() {
           return (
             <Card
               key={planKey}
-              className={cn(
-                'relative flex flex-col',
-                isFeatured ? 'glass-surface ring-2 ring-primary/70' : 'glass-surface-subtle',
-              )}
+              variant="glass"
+              className={cn('relative flex flex-col', isFeatured && 'ring-2 ring-primary/70')}
             >
               {isFeatured && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
