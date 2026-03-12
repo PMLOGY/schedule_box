@@ -20,7 +20,7 @@
 ### Component Glass Variants (COMP)
 
 - [ ] **COMP-01**: Card component glass variant via CVA — variant="glass" prop with glass-surface styling, defaultVariants preserving all existing Card usage unchanged
-- [ ] **COMP-02**: Button component glass variant via CVA — secondary/ghost buttons gain subtle glass tint, primary CTA buttons remain solid for contrast
+- [x] **COMP-02**: Button component glass variant via CVA — secondary/ghost buttons gain subtle glass tint, primary CTA buttons remain solid for contrast
 - [ ] **COMP-03**: Dialog/modal glass treatment — glass panel with glass-surface-heavy for content, backdrop with bg-black/40 backdrop-blur-sm overlay
 - [ ] **COMP-04**: Badge glass variant — booking status pills (Confirmed, Cancelled, No-show) as translucent glass badges with color-coded tints
 - [ ] **COMP-05**: GlassPanel primitive component (glass-panel.tsx) — reusable wrapper for arbitrary glass content with configurable intensity
@@ -51,7 +51,7 @@
 ### Polish and Animations (POLSH)
 
 - [ ] **POLSH-01**: Entrance animations on dashboard KPI cards — stagger fade+slide (50ms per card, 300ms ease-out) on initial page load using Motion
-- [ ] **POLSH-02**: Glass shimmer loading skeletons replacing flat PageSkeleton/TableSkeleton in glass contexts — Motion-powered shimmer wave over glass-shaped placeholders
+- [x] **POLSH-02**: Glass shimmer loading skeletons replacing flat PageSkeleton/TableSkeleton in glass contexts — Motion-powered shimmer wave over glass-shaped placeholders
 - [ ] **POLSH-03**: Glass dropdown/select menus in settings and filter contexts — glass treatment on shadcn Select and DropdownMenu components
 - [ ] **POLSH-04**: Glass tooltip style override for shadcn Tooltip — frosted glass instead of default black rectangle
 - [ ] **POLSH-05**: Dark mode comprehensive QA — all glass components verified on #191919 base with correct opacity, border prominence, and gradient orb saturation per dark mode glass recipe
@@ -90,7 +90,7 @@
 | DSYS-06 | Phase 33 | Pending |
 | DSYS-07 | Phase 33 | Pending |
 | COMP-01 | Phase 34 | Pending |
-| COMP-02 | Phase 38 (gap closure) | Pending |
+| COMP-02 | Phase 38 (gap closure) | Complete |
 | COMP-03 | Phase 34 | Pending |
 | COMP-04 | Phase 34 | Pending |
 | COMP-05 | Phase 34 | Pending |
@@ -109,7 +109,7 @@
 | AUTH-02 | Phase 37 | Pending |
 | AUTH-03 | Phase 37 | Pending |
 | POLSH-01 | Phase 37 | Pending |
-| POLSH-02 | Phase 38 (gap closure) | Pending |
+| POLSH-02 | Phase 38 (gap closure) | Complete |
 | POLSH-03 | Phase 37 | Pending |
 | POLSH-04 | Phase 37 | Pending |
 | POLSH-05 | Phase 37 | Pending |

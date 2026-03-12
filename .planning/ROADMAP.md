@@ -226,7 +226,7 @@ Plans:
 
 **Gap Closure:** Closes gaps from v1.4-MILESTONE-AUDIT.md
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 38-01-PLAN.md — GlassShimmer skeleton expansion + PricingTable CVA fix + Button glass variant cleanup
@@ -280,7 +280,7 @@ Plans:
 | 35. Dashboard Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 37. Auth and Polish | v1.4 | 2/2 | Complete | 2026-03-12 |
-| 38. Glass Polish Gaps | v1.4 | 0/1 | Not started | - |
+| 38. Glass Polish Gaps | v1.4 | Complete    | 2026-03-12 | - |
 
 ---
 *Roadmap created: 2026-02-10*
