@@ -124,10 +124,11 @@
     --warning-foreground: 0 0% 100%;
 
     /* === GLASS TOKENS (dark) === */
-    --glass-bg-light: rgba(255, 255, 255, 0.08);
-    --glass-bg-subtle-light: rgba(255, 255, 255, 0.05);
-    --glass-bg-heavy-light: rgba(255, 255, 255, 0.12);
-    --glass-border-light: rgba(255, 255, 255, 0.15);
+    /* POLSH-05: Bumped opacities for visibility on dark backgrounds */
+    --glass-bg-light: rgba(255, 255, 255, 0.12);
+    --glass-bg-subtle-light: rgba(255, 255, 255, 0.08);
+    --glass-bg-heavy-light: rgba(255, 255, 255, 0.18);
+    --glass-border-light: rgba(255, 255, 255, 0.18);
     --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
     --glass-shadow-hover-light: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.35);
   }
