@@ -61,11 +61,6 @@ const config: Config = {
           foreground: 'hsl(var(--warning-foreground))',
         },
       },
-      backdropBlur: {
-        'glass-sm': '8px',
-        'glass-md': '16px',
-        'glass-lg': '24px',
-      },
       backgroundColor: {
         glass: 'var(--glass-bg-light)',
         'glass-subtle': 'var(--glass-bg-subtle-light)',
