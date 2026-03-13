@@ -49,13 +49,22 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  _hasHydrated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: User | null) => void;
   setAccessToken: (token: string | null) => void;
   refreshToken: () => Promise<void>;
   switchLocation: (companyUuid: string) => Promise<void>;
+  setHasHydrated: (hydrated: boolean) => void;
+  startBackgroundRefresh: () => void;
+  stopBackgroundRefresh: () => void;
 }
+
+// Module-level variable to hold the refresh interval ID (not persisted in state)
+let backgroundRefreshIntervalId: ReturnType<typeof setInterval> | null = null;
+
+const BACKGROUND_REFRESH_INTERVAL_MS = 12 * 60 * 1000; // 12 minutes
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -63,6 +72,31 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       isAuthenticated: false,
+      _hasHydrated: false,
+
+      setHasHydrated: (hydrated: boolean) => {
+        set({ _hasHydrated: hydrated });
+      },
+
+      startBackgroundRefresh: () => {
+        // Clear any existing interval to avoid duplicates
+        if (backgroundRefreshIntervalId !== null) {
+          clearInterval(backgroundRefreshIntervalId);
+        }
+        backgroundRefreshIntervalId = setInterval(() => {
+          const state = get();
+          if (state.isAuthenticated) {
+            state.refreshToken();
+          }
+        }, BACKGROUND_REFRESH_INTERVAL_MS);
+      },
+
+      stopBackgroundRefresh: () => {
+        if (backgroundRefreshIntervalId !== null) {
+          clearInterval(backgroundRefreshIntervalId);
+          backgroundRefreshIntervalId = null;
+        }
+      },
 
       // login() throws on error - caller must catch
       login: async (email: string, password: string) => {
@@ -85,9 +119,13 @@ export const useAuthStore = create<AuthState>()(
           accessToken: response.access_token,
           isAuthenticated: true,
         });
+        // Start background refresh after successful login
+        get().startBackgroundRefresh();
       },
 
       logout: () => {
+        // Stop background refresh before clearing state
+        get().stopBackgroundRefresh();
         // Fire-and-forget logout API call, catch errors silently
         apiClient.post('/auth/logout').catch(() => {
           // Ignore errors - we're logging out anyway
@@ -142,6 +180,14 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Mark hydration complete
+        state?.setHasHydrated(true);
+        // Resume background refresh if user was authenticated before reload
+        if (state?.isAuthenticated) {
+          state.startBackgroundRefresh();
+        }
+      },
     },
   ),
 );
