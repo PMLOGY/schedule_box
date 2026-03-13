@@ -32,10 +32,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### End Customer (Public Booking)
 
-- [ ] **CUST-01**: Public booking wizard works end-to-end — select service → pick slot → enter details → booking created
-- [ ] **CUST-02**: Booking confirmation shows booking ID and status, trackable via URL
-- [ ] **CUST-03**: Customer can leave a review after completed booking
-- [ ] **CUST-04**: Loyalty points accumulate for returning customers and discounts apply
+- [x] **CUST-01**: Public booking wizard works end-to-end — select service → pick slot → enter details → booking created
+- [x] **CUST-02**: Booking confirmation shows booking ID and status, trackable via URL
+- [x] **CUST-03**: Customer can leave a review after completed booking
+- [x] **CUST-04**: Loyalty points accumulate for returning customers and discounts apply
 
 ### Admin (Platform)
 
@@ -89,10 +89,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 | EMP-02 | Phase 41 | Complete |
 | EMP-03 | Phase 41 | Complete |
 | EMP-04 | Phase 41 | Complete |
-| CUST-01 | Phase 42 | Pending |
-| CUST-02 | Phase 42 | Pending |
-| CUST-03 | Phase 42 | Pending |
-| CUST-04 | Phase 42 | Pending |
+| CUST-01 | Phase 42 | Complete |
+| CUST-02 | Phase 42 | Complete |
+| CUST-03 | Phase 42 | Complete |
+| CUST-04 | Phase 42 | Complete |
 | ADMIN-01 | Phase 43 | Complete |
 | ADMIN-02 | Phase 43 | Complete |
 | ADMIN-03 | Phase 43 | Complete |
