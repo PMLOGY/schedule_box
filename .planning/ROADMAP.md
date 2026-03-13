@@ -212,7 +212,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 37. Auth and Polish | v1.4 | 2/2 | Complete | 2026-03-12 |
 | 38. Glass Polish Gaps | v1.4 | 1/1 | Complete | 2026-03-12 |
-| 39. Auth & Session | v2.0 | TBD | Not started | - |
+| 39. Auth & Session | v2.0 | 0/2 | Not started | - |
 | 40. Business Owner Flow | v2.0 | TBD | Not started | - |
 | 41. Employee Flow | v2.0 | TBD | Not started | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |
