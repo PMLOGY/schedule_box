@@ -3,11 +3,27 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
+stopped_at: Completed 39-auth-session-01-PLAN.md
+last_updated: "2026-03-13T13:43:28.392Z"
+last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
+progress:
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 97
+---
+
+---
+gsd_state_version: 1.0
+milestone: v2.0
+milestone_name: Full Functionality & Production Readiness
+status: active
 stopped_at: null
 last_updated: "2026-03-13T00:00:00.000Z"
 last_activity: 2026-03-13 — Roadmap created, 6 phases defined (39-44)
 progress:
-  total_phases: 6
+  [██████████] 97%
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -48,6 +64,7 @@ Recent decisions affecting v2.0:
 - Docker Compose on VPS is the deployment target (not Kubernetes/Helm)
 - Public booking works without customer auth (simpler UX)
 - CI/CD pipeline out of scope — deployment config only
+- [Phase 39-auth-session]: Background refresh interval stored at module level (not in Zustand state) to avoid serialization; cookie path /api/v1/auth covers all auth sub-routes; companyId null guard removed in rotateRefreshToken to unblock admin/customer refresh
 
 ## Blockers
 
@@ -63,9 +80,10 @@ Recent decisions affecting v2.0:
 | v1.2 | 5 | 20 | 4 days |
 | v1.3 | 5 | 21 | 1 day |
 | v1.4 | 6 | 11 | 16 days |
+| Phase 39-auth-session P01 | 3 | 2 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13
-Stopped at: v2.0 roadmap created — ready to plan Phase 39
+Last session: 2026-03-13T13:43:28.389Z
+Stopped at: Completed 39-auth-session-01-PLAN.md
 Resume file: None
