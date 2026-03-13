@@ -211,6 +211,7 @@
     },
     "list": {
       "title": "Zoznam rezervácií",
+      "myBookings": "Moje rezervácie",
       "filters": {
         "status": "Stav",
         "allStatuses": "Všetky stavy",

@@ -211,6 +211,7 @@
     },
     "list": {
       "title": "Seznam rezervací",
+      "myBookings": "Moje rezervace",
       "filters": {
         "status": "Stav",
         "allStatuses": "Všechny stavy",

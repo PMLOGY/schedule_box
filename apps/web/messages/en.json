@@ -211,6 +211,7 @@
     },
     "list": {
       "title": "Booking List",
+      "myBookings": "My Bookings",
       "filters": {
         "status": "Status",
         "allStatuses": "All statuses",

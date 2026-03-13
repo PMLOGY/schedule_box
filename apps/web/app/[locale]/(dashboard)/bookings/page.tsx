@@ -26,6 +26,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useBookingsQuery } from '@/hooks/use-bookings-query';
+import { useMyBookings } from '@/hooks/use-my-bookings';
+import { useAuthStore } from '@/stores/auth.store';
 import BookingStatusBadge from '@/components/booking/BookingStatusBadge';
 import BookingDetailPanel from '@/components/booking/BookingDetailPanel';
 import { NoShowRiskBadge } from '@/components/ai/NoShowRiskBadge';
@@ -39,6 +41,10 @@ export default function BookingsPage() {
   const locale = useLocale();
   const dateLocale = { cs, sk, en: enUS }[locale] || cs;
 
+  // Determine role for employee-specific behaviour
+  const { user } = useAuthStore();
+  const isEmployee = user?.role === 'employee';
+
   // Filter state
   const [status, setStatus] = useState<BookingStatus | undefined>(undefined);
   const [search, setSearch] = useState('');
@@ -48,14 +54,10 @@ export default function BookingsPage() {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  // Fetch bookings with filters
-  const { data, isLoading } = useBookingsQuery({
-    page,
-    limit: 20,
-    status,
-    // Note: API doesn't support customer search by name yet, would need to add
-    // For MVP, we'll filter client-side if needed
-  });
+  // Employee sees only their own bookings; owner/manager sees all company bookings
+  const employeeQuery = useMyBookings({ page, limit: 20, status });
+  const ownerQuery = useBookingsQuery({ page, limit: 20, status });
+  const { data, isLoading } = isEmployee ? employeeQuery : ownerQuery;
 
   const handleRowClick = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -78,18 +80,24 @@ export default function BookingsPage() {
     }).format(parseFloat(price));
   };
 
+  // Column count changes when employee column is hidden for employees
+  const colSpan = isEmployee ? 6 : 7;
+
   return (
     <>
       <div className="space-y-4">
         <Card variant="glass" className="p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <PageHeader title={t('title')} />
-            <Button asChild>
-              <Link href="/bookings/new">
-                <Plus className="h-4 w-4 mr-2" />
-                {tBooking('new.title')}
-              </Link>
-            </Button>
+            <PageHeader title={isEmployee ? t('myBookings') : t('title')} />
+            {/* Employees don't create bookings — hide the button for them */}
+            {!isEmployee && (
+              <Button asChild>
+                <Link href="/bookings/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {tBooking('new.title')}
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Filters */}
@@ -133,7 +141,8 @@ export default function BookingsPage() {
                 <TableHead>{t('columns.dateTime')}</TableHead>
                 <TableHead>{t('columns.customer')}</TableHead>
                 <TableHead>{t('columns.service')}</TableHead>
-                <TableHead>{t('columns.employee')}</TableHead>
+                {/* Employee column hidden for employees — all their bookings are already theirs */}
+                {!isEmployee && <TableHead>{t('columns.employee')}</TableHead>}
                 <TableHead>{t('columns.status')}</TableHead>
                 <TableHead>{t('columns.risk')}</TableHead>
                 <TableHead className="text-right">{t('columns.price')}</TableHead>
@@ -142,13 +151,13 @@ export default function BookingsPage() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={colSpan} className="text-center py-8 text-muted-foreground">
                     {tCommon('loading')}
                   </TableCell>
                 </TableRow>
               ) : !data || data.data.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-0">
+                  <TableCell colSpan={colSpan} className="p-0">
                     <BookingsEmptyState />
                   </TableCell>
                 </TableRow>
@@ -183,7 +192,8 @@ export default function BookingsPage() {
                         </div>
                       </TableCell>
                       <TableCell>{booking.service.name}</TableCell>
-                      <TableCell>{booking.employee?.name || '-'}</TableCell>
+                      {/* Employee column hidden for employees */}
+                      {!isEmployee && <TableCell>{booking.employee?.name || '-'}</TableCell>}
                       <TableCell>
                         <BookingStatusBadge status={booking.status} />
                       </TableCell>
