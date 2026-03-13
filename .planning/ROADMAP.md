@@ -154,7 +154,10 @@ Plans:
   2. After booking, customer receives a confirmation page with a booking ID and a shareable URL they can return to later to check the status
   3. After a booking is marked completed, customer receives a link to leave a review — review appears on the business's profile
   4. Loyalty points are awarded to returning customers (matched by email) after a completed booking, and a discount coupon from the loyalty program applies during the next booking checkout
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 42-01-PLAN.md — Fix tracking API + tracking link on confirmation + review link on tracking page (CUST-01, CUST-02, CUST-03)
+- [ ] 42-02-PLAN.md — Synchronous loyalty points on complete + public loyalty lookup + discount in booking (CUST-04)
 
 ### Phase 43: Admin Platform
 **Goal**: Platform administrators can monitor real activity across all companies and manage company and user accounts
@@ -222,8 +225,8 @@ Plans:
 | 38. Glass Polish Gaps | v1.4 | 1/1 | Complete | 2026-03-12 |
 | 39. Auth & Session | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 40. Business Owner Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 41. Employee Flow | 2/2 | Complete    | 2026-03-13 | - |
-| 42. End Customer Booking | v2.0 | TBD | Not started | - |
+| 41. Employee Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
+| 42. End Customer Booking | v2.0 | 0/2 | Not started | - |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | TBD | Not started | - |
 
