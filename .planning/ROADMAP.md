@@ -161,7 +161,9 @@ Plans:
   1. Admin dashboard displays live counts of total companies, registered users, bookings, and platform revenue — numbers match the actual database state
   2. Admin can view the full list of company accounts, see their status, and toggle a company between active and deactivated — deactivated companies cannot log in
   3. Admin can search and view all users across all companies, see their role and associated company, and disable individual user accounts
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 43-01-PLAN.md — Company toggle API + login enforcement + UI toggle button + translations
 
 ### Phase 44: Production Deployment
 **Goal**: The application can be built and deployed to a VPS using Docker Compose with a documented, validated environment configuration
@@ -219,7 +221,7 @@ Plans:
 | 40. Business Owner Flow | v2.0 | 0/2 | In progress | - |
 | 41. Employee Flow | v2.0 | TBD | Not started | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |
-| 43. Admin Platform | v2.0 | TBD | Not started | - |
+| 43. Admin Platform | v2.0 | 0/1 | Not started | - |
 | 44. Production Deployment | v2.0 | TBD | Not started | - |
 
 ---
