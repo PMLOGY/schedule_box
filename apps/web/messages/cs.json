@@ -1988,7 +1988,9 @@
         "emailPlaceholder": "vas@email.cz",
         "back": "Zpět",
         "confirm": "Potvrdit zrušení"
-      }
+      },
+      "reviewCta": "Jak se vám líbilo?",
+      "leaveReview": "Napsat recenzi"
     }
   },
   "publicReview": {

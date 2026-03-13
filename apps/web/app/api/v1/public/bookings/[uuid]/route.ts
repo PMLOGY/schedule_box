@@ -59,14 +59,9 @@ export const GET = createRouteHandler<undefined, BookingUuidParam>({
       currency: row.currency,
       created_at: row.createdAt.toISOString(),
       cancelled_at: row.cancelledAt?.toISOString() || null,
-      service: {
-        name: row.serviceName,
-        duration_minutes: row.serviceDuration,
-      },
-      company: {
-        name: row.companyName,
-        slug: row.companySlug,
-      },
+      service_name: row.serviceName,
+      company_name: row.companyName,
+      company_slug: row.companySlug,
       employee_name: row.employeeName || null,
     });
   },

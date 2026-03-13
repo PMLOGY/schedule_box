@@ -1914,7 +1914,9 @@
         "emailPlaceholder": "vas@email.com",
         "back": "Späť",
         "confirm": "Potvrdiť zrušenie"
-      }
+      },
+      "reviewCta": "Ako sa vám páčilo?",
+      "leaveReview": "Napísať recenziu"
     }
   },
   "publicReview": {

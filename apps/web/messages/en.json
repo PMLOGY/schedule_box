@@ -1988,7 +1988,9 @@
         "emailPlaceholder": "you@email.com",
         "back": "Back",
         "confirm": "Confirm Cancellation"
-      }
+      },
+      "reviewCta": "How was your experience?",
+      "leaveReview": "Leave a Review"
     }
   },
   "publicReview": {
