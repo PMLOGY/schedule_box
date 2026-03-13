@@ -140,7 +140,10 @@ Plans:
   2. Employee can submit a time-off request with a reason and date range — request appears as pending for owner review
   3. Employee's booking list shows only bookings assigned to them — no bookings from other employees are visible
   4. Employee can mark a booking as confirmed, completed, or no-show — status updates immediately and is visible to the owner
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 41-01-PLAN.md — Employee-scoped booking list and status actions (EMP-03, EMP-04)
+- [ ] 41-02-PLAN.md — Working hours and time-off request audit and fixes (EMP-01, EMP-02)
 
 ### Phase 42: End Customer Booking
 **Goal**: A customer with only a public booking URL can complete a booking end-to-end, track it, leave a review, and accumulate loyalty points
@@ -218,10 +221,10 @@ Plans:
 | 37. Auth and Polish | v1.4 | 2/2 | Complete | 2026-03-12 |
 | 38. Glass Polish Gaps | v1.4 | 1/1 | Complete | 2026-03-12 |
 | 39. Auth & Session | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 40. Business Owner Flow | 2/2 | Complete    | 2026-03-13 | - |
-| 41. Employee Flow | v2.0 | TBD | Not started | - |
+| 40. Business Owner Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
+| 41. Employee Flow | v2.0 | 0/2 | Not started | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |
-| 43. Admin Platform | 1/1 | Complete    | 2026-03-13 | - |
+| 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | TBD | Not started | - |
 
 ---
