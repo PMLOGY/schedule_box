@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 44-production-deployment-01-PLAN.md
-last_updated: "2026-03-13T16:50:57.266Z"
+stopped_at: Completed 44-production-deployment-02-PLAN.md
+last_updated: "2026-03-13T17:03:18.806Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 97
 ---
 
@@ -80,6 +80,7 @@ Recent decisions affecting v2.0:
 - [Phase 42-end-customer-booking]: Synchronous awardPointsForBooking after RabbitMQ publish in completeBooking — idempotent, non-critical fallback for dev/single-server deployments
 - [Phase 42-end-customer-booking]: Public loyalty GET returns has_card=false for unknown email/company rather than 404 — prevents information leakage on public endpoint
 - [Phase 44]: Migration service uses builder target with profiles for on-demand schema updates
+- [Phase 44]: Windows symlink EPERM does not block production: Docker builds run on Linux
 
 ## Blockers
 
@@ -104,9 +105,10 @@ Recent decisions affecting v2.0:
 | Phase 42-end-customer-booking P01 | 12 | 2 tasks | 7 files |
 | Phase 42-end-customer-booking P02 | 15 | 2 tasks | 3 files |
 | Phase 44 P01 | 2min | 1 tasks | 4 files |
+| Phase 44 P02 | 11min | 1 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T16:50:57.263Z
-Stopped at: Completed 44-production-deployment-01-PLAN.md
+Last session: 2026-03-13T17:03:18.802Z
+Stopped at: Completed 44-production-deployment-02-PLAN.md
 Resume file: None
