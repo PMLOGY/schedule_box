@@ -25,10 +25,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### Employee
 
-- [ ] **EMP-01**: Employee can set weekly working hours (per-day start/end times)
-- [ ] **EMP-02**: Employee can request days off with reason
-- [ ] **EMP-03**: Employee sees only their assigned bookings
-- [ ] **EMP-04**: Employee can confirm, complete, or mark no-show on their bookings
+- [x] **EMP-01**: Employee can set weekly working hours (per-day start/end times)
+- [x] **EMP-02**: Employee can request days off with reason
+- [x] **EMP-03**: Employee sees only their assigned bookings
+- [x] **EMP-04**: Employee can confirm, complete, or mark no-show on their bookings
 
 ### End Customer (Public Booking)
 
@@ -85,10 +85,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 | OWNER-04 | Phase 40 | Complete |
 | OWNER-05 | Phase 40 | Complete |
 | OWNER-06 | Phase 40 | Complete |
-| EMP-01 | Phase 41 | Pending |
-| EMP-02 | Phase 41 | Pending |
-| EMP-03 | Phase 41 | Pending |
-| EMP-04 | Phase 41 | Pending |
+| EMP-01 | Phase 41 | Complete |
+| EMP-02 | Phase 41 | Complete |
+| EMP-03 | Phase 41 | Complete |
+| EMP-04 | Phase 41 | Complete |
 | CUST-01 | Phase 42 | Pending |
 | CUST-02 | Phase 42 | Pending |
 | CUST-03 | Phase 42 | Pending |

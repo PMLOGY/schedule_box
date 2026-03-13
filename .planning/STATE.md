@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 40-business-owner-flow-02-PLAN.md
-last_updated: "2026-03-13T14:47:15.002Z"
+stopped_at: Completed 41-employee-flow-01-PLAN.md
+last_updated: "2026-03-13T15:08:22.605Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 4
+  total_plans: 7
+  completed_plans: 7
   percent: 97
 ---
 
@@ -72,6 +72,9 @@ Recent decisions affecting v2.0:
 - [Phase 43-admin-platform]: useToggleCompanyActive invalidates both companies and stats queries so KPI dashboard stays fresh after company state changes
 - [Phase 40-business-owner-flow]: Booking UUID pattern: always use booking.uuid for API calls, booking.id is internal DB reference only
 - [Phase 40-business-owner-flow]: RevenueMiniChart uses synthetic daily distribution from analytics totals — dedicated daily-revenue endpoint deferred
+- [Phase 41-employee-flow]: Working hours: handleSave sends all 7 days unconditionally so inactive days persist in DB
+- [Phase 41-employee-flow]: Time-off date range creates N separate override records (one per day) matching existing schema
+- [Phase 41-employee-flow]: Employee /me/bookings: employee_id filter forced server-side; both hooks called unconditionally with ternary selection to satisfy rules-of-hooks
 
 ## Blockers
 
@@ -91,9 +94,11 @@ Recent decisions affecting v2.0:
 | Phase 39-auth-session P02 | 15 | 2 tasks | 7 files |
 | Phase 40-business-owner-flow P01 | 15 | 2 tasks | 7 files |
 | Phase 40-business-owner-flow P02 | 13 | 2 tasks | 3 files |
+| Phase 41-employee-flow P02 | 4 | 2 tasks | 4 files |
+| Phase 41-employee-flow P01 | 4 | 2 tasks | 6 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T14:39:46.802Z
-Stopped at: Completed 40-business-owner-flow-02-PLAN.md
+Last session: 2026-03-13T15:08:22.601Z
+Stopped at: Completed 41-employee-flow-01-PLAN.md
 Resume file: None

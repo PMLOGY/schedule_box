@@ -97,7 +97,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 - [x] **Phase 39: Auth & Session** - Session persistence, silent token refresh, role-based routing, employee invite (completed 2026-03-13)
 - [x] **Phase 40: Business Owner Flow** - Public booking URL, service/employee CRUD, booking management, dashboard with real data (completed 2026-03-13)
-- [ ] **Phase 41: Employee Flow** - Working hours, time-off requests, personal booking view and status actions
+- [x] **Phase 41: Employee Flow** - Working hours, time-off requests, personal booking view and status actions (completed 2026-03-13)
 - [ ] **Phase 42: End Customer Booking** - End-to-end public booking wizard, confirmation tracking, reviews, loyalty points
 - [x] **Phase 43: Admin Platform** - Platform-wide stats dashboard, company management, user management (completed 2026-03-13)
 - [ ] **Phase 44: Production Deployment** - Docker Compose, production build, environment variable validation
@@ -222,7 +222,7 @@ Plans:
 | 38. Glass Polish Gaps | v1.4 | 1/1 | Complete | 2026-03-12 |
 | 39. Auth & Session | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 40. Business Owner Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 41. Employee Flow | v2.0 | 0/2 | Not started | - |
+| 41. Employee Flow | 2/2 | Complete   | 2026-03-13 | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | TBD | Not started | - |
