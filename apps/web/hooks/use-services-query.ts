@@ -106,3 +106,15 @@ export function useCreateServiceCategory() {
     },
   });
 }
+
+export function useDeleteService() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (uuid: string) => {
+      return apiClient.delete(`/services/${uuid}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+    },
+  });
+}

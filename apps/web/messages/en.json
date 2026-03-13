@@ -477,7 +477,11 @@
     "createError": "Failed to create service",
     "editTitle": "Edit Service",
     "updateSuccess": "Service updated",
-    "updateError": "Failed to update service"
+    "updateError": "Failed to update service",
+    "deleteConfirmTitle": "Delete Service",
+    "deleteConfirmMessage": "Are you sure? This action cannot be undone.",
+    "deleteSuccess": "Service deleted",
+    "deleteError": "Failed to delete service"
   },
   "resources": {
     "title": "Resources",
@@ -2050,7 +2054,12 @@
         "created": "Created"
       },
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "activated": "Company has been activated",
+      "deactivated": "Company has been deactivated",
+      "toggleError": "Failed to change company status"
     },
     "users": {
       "title": "User Management",

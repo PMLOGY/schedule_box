@@ -477,7 +477,11 @@
     "createError": "Nepodařilo se vytvořit službu",
     "editTitle": "Upravit službu",
     "updateSuccess": "Služba byla upravena",
-    "updateError": "Nepodařilo se upravit službu"
+    "updateError": "Nepodařilo se upravit službu",
+    "deleteConfirmTitle": "Smazat službu",
+    "deleteConfirmMessage": "Jste si jisti? Tuto akci nelze vrátit.",
+    "deleteSuccess": "Služba smazána",
+    "deleteError": "Nepodařilo se smazat službu"
   },
   "resources": {
     "title": "Zdroje",
@@ -2050,7 +2054,12 @@
         "created": "Vytvořeno"
       },
       "active": "Aktivní",
-      "inactive": "Neaktivní"
+      "inactive": "Neaktivní",
+      "activate": "Aktivovat",
+      "deactivate": "Deaktivovat",
+      "activated": "Firma byla aktivována",
+      "deactivated": "Firma byla deaktivována",
+      "toggleError": "Nepodařilo se změnit stav firmy"
     },
     "users": {
       "title": "Správa uživatelů",

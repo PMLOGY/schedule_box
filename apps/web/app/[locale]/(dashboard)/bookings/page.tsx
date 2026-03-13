@@ -167,7 +167,7 @@ export default function BookingsPage() {
                     <TableRow
                       key={booking.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleRowClick(String(booking.id))}
+                      onClick={() => handleRowClick(booking.uuid)}
                     >
                       <TableCell className="font-medium">
                         {formatDateTime(booking.startTime)}

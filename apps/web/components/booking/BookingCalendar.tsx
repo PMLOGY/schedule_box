@@ -146,8 +146,8 @@ export default function BookingCalendar() {
     }
 
     return bookingList.map((booking) => ({
-      id: String(booking.id),
-      title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
+      id: String(booking.uuid),
+      title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}${booking.employee?.name ? ` (${booking.employee.name})` : ''}`,
       start: new Date(booking.startTime),
       end: new Date(booking.endTime),
       resource: booking.employee ? String(booking.employee.id) : undefined,

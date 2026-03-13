@@ -73,7 +73,7 @@ export function useBookingsForCalendar(dateFrom: string, dateTo: string, employe
 
       const events: EventInput[] = response.data.map((booking) => ({
         id: String(booking.uuid),
-        title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}`,
+        title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}${booking.employee?.name ? ` (${booking.employee.name})` : ''}`,
         start: booking.startTime,
         end: booking.endTime,
         backgroundColor: statusColors[booking.status] ?? '#3B82F6',

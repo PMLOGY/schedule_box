@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ import {
   useCreateService,
   useUpdateService,
   useCreateServiceCategory,
+  useDeleteService,
   type Service,
 } from '@/hooks/use-services-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
@@ -77,6 +79,9 @@ export default function ServicesPage() {
     is_active: 'true',
   });
 
+  // Delete confirmation dialog state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
   // New category dialog
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -86,6 +91,7 @@ export default function ServicesPage() {
   const { data: categories } = useServiceCategoriesQuery();
   const createMutation = useCreateService();
   const updateMutation = useUpdateService();
+  const deleteMutation = useDeleteService();
   const createCategoryMutation = useCreateServiceCategory();
 
   const { formatCurrency: formatPrice } = useCurrencyFormat();
@@ -140,6 +146,19 @@ export default function ServicesPage() {
       setEditingService(null);
     } catch {
       // Error handled by mutation state
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!editingService) return;
+    try {
+      await deleteMutation.mutateAsync(editingService.uuid);
+      toast.success(t('deleteSuccess'));
+      setDeleteConfirmOpen(false);
+      setEditDialogOpen(false);
+      setEditingService(null);
+    } catch {
+      toast.error(t('deleteError'));
     }
   };
 
@@ -486,6 +505,16 @@ export default function ServicesPage() {
             )}
           </div>
           <DialogFooter>
+            <Button
+              variant="outline"
+              size="icon"
+              className="mr-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => setDeleteConfirmOpen(true)}
+              disabled={deleteMutation.isPending}
+              title={tCommon('delete')}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               {tCommon('cancel')}
             </Button>
@@ -494,6 +523,28 @@ export default function ServicesPage() {
               disabled={!editFormData.name.trim() || updateMutation.isPending}
             >
               {updateMutation.isPending ? tCommon('loading') : tCommon('save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">{t('deleteConfirmMessage')}</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? tCommon('loading') : tCommon('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
