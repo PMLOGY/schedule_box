@@ -137,7 +137,14 @@
     "noBookingsYet": "Zatiaľ žiadne rezervácie",
     "aiUpgradeTitle": "AI funkcie dostupné na pláne Growth",
     "aiUpgradeDescription": "Získajte AI predikcie, odporúčania a dynamické ceny pre vaše podnikanie.",
-    "aiUpgradeCta": "Upgradovať"
+    "aiUpgradeCta": "Upgradovať",
+    "bookingLink": {
+      "title": "Verejný odkaz na rezerváciu",
+      "description": "Zdieľajte tento odkaz so svojimi zákazníkmi",
+      "copied": "Odkaz skopírovaný!",
+      "copy": "Kopírovať",
+      "noSlug": "Najprv nastavte profil firmy"
+    }
   },
   "calendar": {
     "title": "Kalendár",

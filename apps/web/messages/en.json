@@ -137,7 +137,14 @@
     "noBookingsYet": "No bookings yet",
     "aiUpgradeTitle": "AI features available on Growth plan",
     "aiUpgradeDescription": "Get AI predictions, recommendations, and dynamic pricing for your business.",
-    "aiUpgradeCta": "Upgrade"
+    "aiUpgradeCta": "Upgrade",
+    "bookingLink": {
+      "title": "Public Booking Link",
+      "description": "Share this link with your customers",
+      "copied": "Link copied!",
+      "copy": "Copy",
+      "noSlug": "Set up your company profile first"
+    }
   },
   "calendar": {
     "title": "Calendar",

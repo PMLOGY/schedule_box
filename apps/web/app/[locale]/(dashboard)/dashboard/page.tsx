@@ -10,9 +10,11 @@ import { RecentBookings } from '@/components/dashboard/recent-bookings';
 import { AiInsightsPanel } from '@/components/ai/AiInsightsPanel';
 import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
 import { DemoDataCard } from '@/components/onboarding/demo-data-card';
+import { BookingLinkCard } from '@/components/dashboard/booking-link-card';
 import { useOnboardingRedirect } from '@/hooks/use-onboarding';
 import { usePlanFeatures } from '@/hooks/use-plan-features';
 import { UsageWidget } from '@/components/dashboard/usage-widget';
+import { useAuthStore } from '@/stores/auth.store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
@@ -23,6 +25,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const { shouldRedirect, isLoading } = useOnboardingRedirect();
   const { canAccess } = usePlanFeatures();
+  const user = useAuthStore((s) => s.user);
+  const isEmployee = user?.role === 'employee';
 
   // Redirect to /onboarding when wizard has not been completed
   useEffect(() => {
@@ -51,6 +55,31 @@ export default function DashboardPage() {
     );
   }
 
+  // Employee sees a simplified dashboard
+  if (isEmployee) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            {t('title')}
+          </h1>
+        </div>
+
+        {/* Employee KPIs + Recent Bookings */}
+        <DashboardGrid />
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <RevenueMiniChart />
+          </div>
+          <div className="lg:col-span-1">
+            <RecentBookings />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header row with quick actions */}
@@ -64,6 +93,9 @@ export default function DashboardPage() {
       {/* Onboarding (conditional, above KPIs for new users) */}
       <OnboardingChecklist />
       <DemoDataCard />
+
+      {/* Public Booking Link */}
+      <BookingLinkCard />
 
       {/* KPI Summary Row */}
       <DashboardGrid />
