@@ -16,12 +16,12 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### Business Owner
 
-- [ ] **OWNER-01**: Owner can see and copy their public booking URL from the dashboard
-- [ ] **OWNER-02**: Service CRUD fully functional — create, edit, delete services with all fields persisting
-- [ ] **OWNER-03**: Employee CRUD fully functional — create, edit, deactivate employees with service assignments
-- [ ] **OWNER-04**: Incoming bookings visible with confirm, cancel, complete, no-show actions working
-- [ ] **OWNER-05**: Calendar displays real bookings with correct times and employee assignments
-- [ ] **OWNER-06**: All dashboard pages load real data — settings, payments, customers, reviews, loyalty, analytics
+- [x] **OWNER-01**: Owner can see and copy their public booking URL from the dashboard
+- [x] **OWNER-02**: Service CRUD fully functional — create, edit, delete services with all fields persisting
+- [x] **OWNER-03**: Employee CRUD fully functional — create, edit, deactivate employees with service assignments
+- [x] **OWNER-04**: Incoming bookings visible with confirm, cancel, complete, no-show actions working
+- [x] **OWNER-05**: Calendar displays real bookings with correct times and employee assignments
+- [x] **OWNER-06**: All dashboard pages load real data — settings, payments, customers, reviews, loyalty, analytics
 
 ### Employee
 
@@ -39,9 +39,9 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### Admin (Platform)
 
-- [ ] **ADMIN-01**: Admin dashboard shows real platform-wide stats (total companies, users, bookings, revenue)
-- [ ] **ADMIN-02**: Admin can view, activate, and deactivate company accounts
-- [ ] **ADMIN-03**: Admin can view and manage all users across companies
+- [x] **ADMIN-01**: Admin dashboard shows real platform-wide stats (total companies, users, bookings, revenue)
+- [x] **ADMIN-02**: Admin can view, activate, and deactivate company accounts
+- [x] **ADMIN-03**: Admin can view and manage all users across companies
 
 ### Production Deployment
 
@@ -79,12 +79,12 @@ Requirements for making the app fully functional across all 4 user views and pro
 | AUTH-02 | Phase 39 | Complete |
 | AUTH-03 | Phase 39 | Complete |
 | AUTH-04 | Phase 39 | Complete |
-| OWNER-01 | Phase 40 | Pending |
-| OWNER-02 | Phase 40 | Pending |
-| OWNER-03 | Phase 40 | Pending |
-| OWNER-04 | Phase 40 | Pending |
-| OWNER-05 | Phase 40 | Pending |
-| OWNER-06 | Phase 40 | Pending |
+| OWNER-01 | Phase 40 | Complete |
+| OWNER-02 | Phase 40 | Complete |
+| OWNER-03 | Phase 40 | Complete |
+| OWNER-04 | Phase 40 | Complete |
+| OWNER-05 | Phase 40 | Complete |
+| OWNER-06 | Phase 40 | Complete |
 | EMP-01 | Phase 41 | Pending |
 | EMP-02 | Phase 41 | Pending |
 | EMP-03 | Phase 41 | Pending |
@@ -93,9 +93,9 @@ Requirements for making the app fully functional across all 4 user views and pro
 | CUST-02 | Phase 42 | Pending |
 | CUST-03 | Phase 42 | Pending |
 | CUST-04 | Phase 42 | Pending |
-| ADMIN-01 | Phase 43 | Pending |
-| ADMIN-02 | Phase 43 | Pending |
-| ADMIN-03 | Phase 43 | Pending |
+| ADMIN-01 | Phase 43 | Complete |
+| ADMIN-02 | Phase 43 | Complete |
+| ADMIN-03 | Phase 43 | Complete |
 | DEPLOY-01 | Phase 44 | Pending |
 | DEPLOY-02 | Phase 44 | Pending |
 | DEPLOY-03 | Phase 44 | Pending |
