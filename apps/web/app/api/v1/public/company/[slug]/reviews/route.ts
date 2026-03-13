@@ -118,7 +118,7 @@ export const GET = createRouteHandler<undefined, CompanySlugParam>({
         ),
       );
 
-    const averageRating = avgResult?.average ? parseFloat(avgResult.average.toFixed(2)) : 0;
+    const averageRating = avgResult?.average ? parseFloat(Number(avgResult.average).toFixed(2)) : 0;
 
     // Format rating distribution (ensure all ratings 1-5 are present)
     const distributionMap: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };

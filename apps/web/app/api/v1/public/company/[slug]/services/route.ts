@@ -4,7 +4,7 @@
  */
 
 import { eq, and, isNull, asc } from 'drizzle-orm';
-import { db, companies, services, serviceCategories } from '@schedulebox/database';
+import { db, companies, services } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { NotFoundError } from '@schedulebox/shared';
 import { successResponse } from '@/lib/utils/response';
@@ -47,7 +47,7 @@ export const GET = createRouteHandler<undefined, CompanySlugParam>({
       with: {
         category: true,
       },
-      orderBy: [asc(serviceCategories.sortOrder), asc(services.sortOrder), asc(services.name)],
+      orderBy: [asc(services.sortOrder), asc(services.name)],
     });
 
     // Map to response format
