@@ -179,7 +179,10 @@ Plans:
   1. Running `docker compose up` with the production compose file starts Next.js, PostgreSQL, and Redis — the app is reachable in a browser with no manual intervention beyond supplying env vars
   2. Running `pnpm build` (or the Docker build) completes with zero TypeScript errors, zero ESLint errors, and zero missing environment variable warnings
   3. A documented `.env.example` file lists every required variable with descriptions — the app validates presence of required vars on startup and logs a clear error (not a silent crash) for any missing ones
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 44-01-PLAN.md — Production Docker Compose + env validation + .env.example update (DEPLOY-01, DEPLOY-03)
+- [ ] 44-02-PLAN.md — Build verification and error fixes (DEPLOY-02)
 
 ## Progress
 
@@ -226,9 +229,9 @@ Plans:
 | 39. Auth & Session | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 40. Business Owner Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 41. Employee Flow | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 42. End Customer Booking | 2/2 | Complete    | 2026-03-13 | - |
+| 42. End Customer Booking | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
-| 44. Production Deployment | v2.0 | TBD | Not started | - |
+| 44. Production Deployment | v2.0 | 2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
