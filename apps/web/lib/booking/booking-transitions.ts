@@ -26,6 +26,7 @@ import {
 } from '@schedulebox/events';
 import type { BookingWithRelations } from './booking-service';
 import { getBooking } from './booking-service';
+import { awardPointsForBooking } from '@/lib/loyalty/points-engine';
 
 // ============================================================================
 // STATE MACHINE DEFINITION
@@ -278,6 +279,15 @@ export async function completeBooking(
     );
   } catch (error) {
     console.error('[Booking Transitions] Failed to publish booking.completed event:', error);
+  }
+
+  // Award loyalty points synchronously (fallback for when RabbitMQ is not running)
+  // awardPointsForBooking is idempotent — safe to call even if consumer also processes the event
+  try {
+    await awardPointsForBooking(existing.id, companyId);
+  } catch (error) {
+    // Non-critical: log but don't fail the booking completion
+    console.error('[Booking Transitions] Failed to award loyalty points:', error);
   }
 
   // Return updated booking
