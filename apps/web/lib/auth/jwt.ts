@@ -203,15 +203,16 @@ export async function rotateRefreshToken(refreshToken: string): Promise<{
       .innerJoin(roles, eq(users.roleId, roles.id))
       .where(eq(users.id, tokenRecord.userId));
 
-    if (!user || !user.companyId) {
-      throw new UnauthorizedError('User not found or not associated with a company');
+    if (!user) {
+      throw new UnauthorizedError('User not found');
     }
 
     // Generate new token pair
+    // companyId ?? 0 handles admin and customer users who have no company
     const newTokenPair = await generateTokenPair(
       user.id,
       user.uuid,
-      user.companyId,
+      user.companyId ?? 0,
       user.roleId,
       user.roleName,
       user.mfaEnabled ?? false,

@@ -166,8 +166,12 @@ export async function POST(req: NextRequest) {
       await redis.del(mfaAttemptKey);
     }
 
-    // 6. Ensure user has a company (superadmins may not)
-    if (!userRecord.companyId) {
+    // 6. Ensure user has a company (admins and customers bypass this check)
+    if (
+      !userRecord.companyId &&
+      userRecord.roleName !== 'admin' &&
+      userRecord.roleName !== 'customer'
+    ) {
       throw new UnauthorizedError('User is not associated with a company');
     }
 
@@ -175,7 +179,7 @@ export async function POST(req: NextRequest) {
     const { accessToken, refreshToken, expiresIn } = await generateTokenPair(
       userRecord.id,
       userRecord.uuid,
-      userRecord.companyId,
+      userRecord.companyId ?? 0,
       userRecord.roleId,
       userRecord.roleName,
       userRecord.mfaEnabled ?? false, // mfa_verified = true if MFA was verified
@@ -208,7 +212,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
-      path: '/api/v1/auth/refresh',
+      path: '/api/v1/auth',
     });
 
     return response;
