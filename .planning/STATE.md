@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 42-end-customer-booking-02-PLAN.md
-last_updated: "2026-03-13T16:39:19.410Z"
+stopped_at: Completed 44-production-deployment-01-PLAN.md
+last_updated: "2026-03-13T16:50:57.266Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
   percent: 97
 ---
 
@@ -79,6 +79,7 @@ Recent decisions affecting v2.0:
 - [Phase 42-end-customer-booking]: Review link on tracking page uses plain href (not next-intl Link) since public review route is outside i18n navigation helper scope
 - [Phase 42-end-customer-booking]: Synchronous awardPointsForBooking after RabbitMQ publish in completeBooking — idempotent, non-critical fallback for dev/single-server deployments
 - [Phase 42-end-customer-booking]: Public loyalty GET returns has_card=false for unknown email/company rather than 404 — prevents information leakage on public endpoint
+- [Phase 44]: Migration service uses builder target with profiles for on-demand schema updates
 
 ## Blockers
 
@@ -102,9 +103,10 @@ Recent decisions affecting v2.0:
 | Phase 41-employee-flow P01 | 4 | 2 tasks | 6 files |
 | Phase 42-end-customer-booking P01 | 12 | 2 tasks | 7 files |
 | Phase 42-end-customer-booking P02 | 15 | 2 tasks | 3 files |
+| Phase 44 P01 | 2min | 1 tasks | 4 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T16:35:46.958Z
-Stopped at: Completed 42-end-customer-booking-02-PLAN.md
+Last session: 2026-03-13T16:50:57.263Z
+Stopped at: Completed 44-production-deployment-01-PLAN.md
 Resume file: None

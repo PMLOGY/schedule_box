@@ -45,9 +45,9 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### Production Deployment
 
-- [ ] **DEPLOY-01**: Production Docker Compose with Next.js, PostgreSQL, Redis, and proper environment config
+- [x] **DEPLOY-01**: Production Docker Compose with Next.js, PostgreSQL, Redis, and proper environment config
 - [ ] **DEPLOY-02**: Production build succeeds with no errors
-- [ ] **DEPLOY-03**: Environment variable configuration documented and validated on startup
+- [x] **DEPLOY-03**: Environment variable configuration documented and validated on startup
 
 ## Future Requirements
 
@@ -96,9 +96,9 @@ Requirements for making the app fully functional across all 4 user views and pro
 | ADMIN-01 | Phase 43 | Complete |
 | ADMIN-02 | Phase 43 | Complete |
 | ADMIN-03 | Phase 43 | Complete |
-| DEPLOY-01 | Phase 44 | Pending |
+| DEPLOY-01 | Phase 44 | Complete |
 | DEPLOY-02 | Phase 44 | Pending |
-| DEPLOY-03 | Phase 44 | Pending |
+| DEPLOY-03 | Phase 44 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 24 total
