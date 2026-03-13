@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 40-business-owner-flow-01-PLAN.md
-last_updated: "2026-03-13T14:35:05.214Z"
+stopped_at: Completed 43-admin-platform-01-PLAN.md
+last_updated: "2026-03-13T14:36:51.615Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 97
 ---
 
@@ -68,6 +68,8 @@ Recent decisions affecting v2.0:
 - [Phase 39-auth-session]: Employee invite: POST /employees/invite validates company scope + 409 guards + transaction links users.id to employees.userId
 - [Phase 40-business-owner-flow]: BookingLinkCard placed after DemoDataCard — prominent for owners without blocking onboarding
 - [Phase 40-business-owner-flow]: Two-step delete: Trash2 icon (mr-auto in DialogFooter) -> confirmation Dialog for services
+- [Phase 43-admin-platform]: Company deactivation check in login uses strict === false to safely handle NULL from LEFT JOIN; admin role excluded via roleName check
+- [Phase 43-admin-platform]: useToggleCompanyActive invalidates both companies and stats queries so KPI dashboard stays fresh after company state changes
 
 ## Blockers
 
@@ -89,6 +91,6 @@ Recent decisions affecting v2.0:
 
 ## Session Continuity
 
-Last session: 2026-03-13T14:35:05.209Z
-Stopped at: Completed 40-business-owner-flow-01-PLAN.md
+Last session: 2026-03-13T14:36:45.748Z
+Stopped at: Completed 43-admin-platform-01-PLAN.md
 Resume file: None

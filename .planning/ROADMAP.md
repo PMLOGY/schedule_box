@@ -99,7 +99,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 - [ ] **Phase 40: Business Owner Flow** - Public booking URL, service/employee CRUD, booking management, dashboard with real data
 - [ ] **Phase 41: Employee Flow** - Working hours, time-off requests, personal booking view and status actions
 - [ ] **Phase 42: End Customer Booking** - End-to-end public booking wizard, confirmation tracking, reviews, loyalty points
-- [ ] **Phase 43: Admin Platform** - Platform-wide stats dashboard, company management, user management
+- [x] **Phase 43: Admin Platform** - Platform-wide stats dashboard, company management, user management (completed 2026-03-13)
 - [ ] **Phase 44: Production Deployment** - Docker Compose, production build, environment variable validation
 
 ## Phase Details
@@ -221,7 +221,7 @@ Plans:
 | 40. Business Owner Flow | 1/2 | In Progress|  | - |
 | 41. Employee Flow | v2.0 | TBD | Not started | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |
-| 43. Admin Platform | v2.0 | 0/1 | Not started | - |
+| 43. Admin Platform | 1/1 | Complete   | 2026-03-13 | - |
 | 44. Production Deployment | v2.0 | TBD | Not started | - |
 
 ---
