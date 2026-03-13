@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Clock } from 'lucide-react';
+import { Plus, Clock, KeyRound, ShieldCheck, ShieldOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -35,6 +37,7 @@ import {
   useCreateEmployee,
   useUpdateEmployee,
   useAssignEmployeeServices,
+  useInviteEmployee,
   type Employee,
 } from '@/hooks/use-employees-query';
 import { useServicesQuery } from '@/hooks/use-services-query';
@@ -61,11 +64,21 @@ export default function EmployeesPage() {
   });
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([]);
 
+  // Invite dialog state
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteSelectedUuid, setInviteSelectedUuid] = useState<string>('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [invitePassword, setInvitePassword] = useState('');
+
   const { data, isLoading } = useEmployeesQuery();
   const { data: allServices } = useServicesQuery();
   const createMutation = useCreateEmployee();
   const updateMutation = useUpdateEmployee();
   const assignServicesMutation = useAssignEmployeeServices();
+  const inviteMutation = useInviteEmployee();
+
+  // Employees without a login account (eligible for invite)
+  const employeesWithoutAccount = data?.filter((e) => !e.has_account) ?? [];
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;
@@ -128,6 +141,41 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleInviteOpen = () => {
+    setInviteSelectedUuid('');
+    setInviteEmail('');
+    setInvitePassword('');
+    setInviteDialogOpen(true);
+  };
+
+  const handleInviteEmployeeSelect = (uuid: string) => {
+    setInviteSelectedUuid(uuid);
+    // Pre-fill email from employee record if available
+    const emp = data?.find((e) => e.uuid === uuid);
+    if (emp?.email) {
+      setInviteEmail(emp.email);
+    }
+  };
+
+  const handleInvite = async () => {
+    if (!inviteSelectedUuid || !inviteEmail || invitePassword.length < 8) return;
+    try {
+      await inviteMutation.mutateAsync({
+        employee_uuid: inviteSelectedUuid,
+        email: inviteEmail,
+        password: invitePassword,
+      });
+      toast.success(t('inviteSuccess'));
+      setInviteDialogOpen(false);
+      setInviteSelectedUuid('');
+      setInviteEmail('');
+      setInvitePassword('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('inviteError');
+      toast.error(message);
+    }
+  };
+
   const toggleService = (serviceId: number) => {
     setSelectedServiceIds((prev) =>
       prev.includes(serviceId) ? prev.filter((id) => id !== serviceId) : [...prev, serviceId],
@@ -140,10 +188,20 @@ export default function EmployeesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <PageHeader title={t('title')} />
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('add')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleInviteOpen}
+            disabled={employeesWithoutAccount.length === 0}
+          >
+            <KeyRound className="h-4 w-4 mr-2" />
+            {t('inviteEmployee')}
+          </Button>
+          <Button onClick={() => setDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('add')}
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -157,18 +215,19 @@ export default function EmployeesPage() {
               <TableHead>{t('columns.phone')}</TableHead>
               <TableHead>{t('columns.services')}</TableHead>
               <TableHead>{t('columns.status')}</TableHead>
+              <TableHead>Login</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
             ) : !data || data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="p-0">
+                <TableCell colSpan={7} className="p-0">
                   <EmployeesEmptyState onAddEmployee={() => setDialogOpen(true)} />
                 </TableCell>
               </TableRow>
@@ -202,6 +261,19 @@ export default function EmployeesPage() {
                     <Badge variant={employee.is_active ? 'default' : 'secondary'}>
                       {employee.is_active ? t('active') : t('inactive')}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {employee.has_account ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        {t('hasAccount')}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <ShieldOff className="h-3.5 w-3.5" />
+                        {t('noAccount')}
+                      </span>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -368,6 +440,68 @@ export default function EmployeesPage() {
             </Button>
             <Button onClick={handleUpdate} disabled={!editFormData.name.trim() || isSaving}>
               {isSaving ? tCommon('loading') : tCommon('save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite Employee Dialog */}
+      <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('inviteTitle')}</DialogTitle>
+            <DialogDescription>{t('inviteDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label>{t('selectEmployee')} *</Label>
+              <Select value={inviteSelectedUuid} onValueChange={handleInviteEmployeeSelect}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('selectEmployee')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {employeesWithoutAccount.map((emp) => (
+                    <SelectItem key={emp.uuid} value={emp.uuid}>
+                      {emp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="invite-email">{t('form.email')} *</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="invite-password">{t('setPassword')} *</Label>
+              <Input
+                id="invite-password"
+                type="password"
+                value={invitePassword}
+                onChange={(e) => setInvitePassword(e.target.value)}
+                placeholder="min. 8 characters"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              onClick={handleInvite}
+              disabled={
+                !inviteSelectedUuid ||
+                !inviteEmail ||
+                invitePassword.length < 8 ||
+                inviteMutation.isPending
+              }
+            >
+              {inviteMutation.isPending ? tCommon('loading') : t('inviteEmployee')}
             </Button>
           </DialogFooter>
         </DialogContent>

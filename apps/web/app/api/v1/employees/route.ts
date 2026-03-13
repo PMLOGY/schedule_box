@@ -71,6 +71,7 @@ export const GET = createRouteHandler({
         color: employees.color,
         sort_order: employees.sortOrder,
         is_active: employees.isActive,
+        user_id: employees.userId,
         created_at: employees.createdAt,
         updated_at: employees.updatedAt,
         service_id: services.id,
@@ -100,6 +101,7 @@ export const GET = createRouteHandler({
         color: string | null;
         sort_order: number | null;
         is_active: boolean | null;
+        has_account: boolean;
         created_at: Date;
         updated_at: Date;
         services: Array<{
@@ -126,6 +128,7 @@ export const GET = createRouteHandler({
           color: row.color,
           sort_order: row.sort_order,
           is_active: row.is_active,
+          has_account: row.user_id !== null,
           created_at: row.created_at,
           updated_at: row.updated_at,
           services: [],

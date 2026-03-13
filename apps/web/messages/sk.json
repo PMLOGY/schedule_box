@@ -53,7 +53,9 @@
       "login": "Prihlásiť sa",
       "termsAgree": "Súhlasím s",
       "termsLink": "podmienkami používania",
-      "privacyLink": "zásadami ochrany osobných údajov"
+      "privacyLink": "zásadami ochrany osobných údajov",
+      "businessOwner": "Majiteľ firmy",
+      "customer": "Zákazník"
     },
     "forgotPassword": {
       "title": "Zabudnuté heslo",
@@ -105,7 +107,12 @@
     "billing": "Fakturácia",
     "reviews": "Recenzie",
     "resources": "Zdroje",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "schedule": "Môj rozvrh",
+    "admin": "Administrácia",
+    "companies": "Firmy",
+    "users": "Používatelia",
+    "adminAnalytics": "Admin analytika"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -534,7 +541,16 @@
     "editTitle": "Upraviť zamestnanca",
     "updateSuccess": "Zamestnanec bol upravený",
     "updateError": "Nepodarilo sa upraviť zamestnanca",
-    "manageSchedule": "Pracovna doba"
+    "manageSchedule": "Pracovna doba",
+    "inviteEmployee": "Vytvoriť prihlásenie",
+    "inviteTitle": "Vytvoriť prihlásenie zamestnanca",
+    "inviteDescription": "Nastavte prihlasovacie údaje, aby sa zamestnanec mohol prihlásiť do systému.",
+    "inviteSuccess": "Prihlásenie zamestnanca bolo úspešne vytvorené",
+    "inviteError": "Nepodarilo sa vytvoriť prihlásenie zamestnanca",
+    "selectEmployee": "Vyberte zamestnanca",
+    "setPassword": "Počiatočné heslo",
+    "hasAccount": "Má prihlásenie",
+    "noAccount": "Bez prihlásenia"
   },
   "analytics": {
     "title": "Analytika",
@@ -1774,6 +1790,31 @@
       "customers": "Zákazníci"
     }
   },
+  "schedule": {
+    "title": "Môj rozvrh",
+    "description": "Spravujte svoju pracovnú dobu a voľná",
+    "workingHours": "Pracovná doba",
+    "edit": "Upraviť",
+    "cancel": "Zrušiť",
+    "save": "Uložiť zmeny",
+    "saving": "Ukladanie...",
+    "submit": "Uložiť",
+    "dayOff": "Voľno",
+    "hoursUpdated": "Pracovná doba uložená.",
+    "hoursUpdateError": "Nepodarilo sa uložiť pracovnú dobu.",
+    "scheduleOverrides": "Výnimky a voľná",
+    "requestDayOff": "Pridať voľno",
+    "requestDayOffDescription": "Požiadajte o voľno alebo upravte rozvrh pre konkrétny deň.",
+    "noOverrides": "Žiadne plánované výnimky.",
+    "overrideCreated": "Výnimka bola pridaná.",
+    "overrideCreateError": "Nepodarilo sa pridať výnimku.",
+    "date": "Dátum",
+    "fullDayOff": "Celý deň voľno",
+    "startTime": "Od",
+    "endTime": "Do",
+    "reason": "Dôvod",
+    "reasonPlaceholder": "Voliteľný dôvod..."
+  },
   "publicBooking": {
     "title": "Rezervácia online",
     "subtitle": "Vyberte si termín a zarezervujte sa",
@@ -1828,7 +1869,49 @@
       "loadSlots": "Nepodarilo sa načítať dostupné termíny."
     },
     "back": "Späť",
-    "next": "Ďalej"
+    "next": "Ďalej",
+    "tracking": {
+      "title": "Detail rezervácie",
+      "notFound": "Rezervácia nebola nájdená",
+      "notFoundDescription": "Táto rezervácia neexistuje alebo bola odstránená.",
+      "status": {
+        "pending": "Čaká na potvrdenie",
+        "confirmed": "Potvrdená",
+        "completed": "Dokončená",
+        "cancelled": "Zrušená",
+        "no_show": "Neprítomnosť"
+      },
+      "cancelBooking": "Zrušiť rezerváciu",
+      "createAccountCta": "Vytvorte si účet a spravujte všetky rezervácie na jednom mieste.",
+      "createAccount": "Vytvoriť účet",
+      "cancelDialog": {
+        "title": "Zrušiť rezerváciu",
+        "description": "Zadajte e-mail, ktorý ste použili pri rezervácii, na overenie identity.",
+        "emailPlaceholder": "vas@email.com",
+        "back": "Späť",
+        "confirm": "Potvrdiť zrušenie"
+      }
+    }
+  },
+  "publicReview": {
+    "title": "Napíšte recenziu",
+    "ratingLabel": "Ako hodnotíte svoju skúsenosť?",
+    "starLabel": "{count, plural, one {# hviezda} few {# hviezdy} other {# hviezd}}",
+    "ratingText": "{rating} z 5 hviezd",
+    "commentLabel": "Vaša recenzia (voliteľné)",
+    "commentPlaceholder": "Povedzte nám o svojej skúsenosti...",
+    "emailLabel": "Váš e-mail",
+    "emailPlaceholder": "Zadajte e-mail použitý pri rezervácii",
+    "emailHelp": "E-mail slúži na overenie, že ste zákazník, ktorý vykonal rezerváciu.",
+    "submit": "Odoslať recenziu",
+    "thankYou": "Ďakujeme za vašu recenziu!",
+    "thankYouDescription": "Vaša spätná väzba nám pomáha zlepšovať naše služby.",
+    "error": {
+      "generic": "Nastala chyba. Skúste to prosím znova.",
+      "notFound": "Rezervácia nenájdená",
+      "notFoundDescription": "Táto rezervácia nebola nájdená. Skontrolujte prosím odkaz a skúste to znova.",
+      "notCompleted": "Táto rezervácia ešte nebola dokončená. Recenziu môžete zanechať po skončení stretnutia."
+    }
   },
   "marketplace": {
     "title": "Marketplace",
@@ -1855,5 +1938,94 @@
     },
     "saveSuccess": "Profil na trhovisku bol uložený.",
     "saveError": "Nepodarilo sa uložiť profil."
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Prehľad",
+      "companies": "Firmy",
+      "users": "Používatelia",
+      "backToDashboard": "Späť na dashboard",
+      "collapse": "Skryť"
+    },
+    "dashboard": {
+      "title": "Administrácia",
+      "totalCompanies": "Celkom firiem",
+      "totalUsers": "Celkom používateľov",
+      "totalBookings": "Celkom rezervácií",
+      "totalRevenue": "Celkové tržby",
+      "newCompanies30d": "Nové firmy (30 dní)",
+      "bookings7d": "Rezervácie (7 dní)"
+    },
+    "companies": {
+      "title": "Správa firiem",
+      "columns": {
+        "name": "Názov",
+        "email": "E-mail",
+        "plan": "Plán",
+        "users": "Používatelia",
+        "bookings": "Rezervácie",
+        "revenue": "Tržby",
+        "status": "Stav",
+        "created": "Vytvorené"
+      },
+      "active": "Aktívna",
+      "inactive": "Neaktívna"
+    },
+    "users": {
+      "title": "Správa používateľov",
+      "search": "Hľadať používateľov...",
+      "allRoles": "Všetky role",
+      "roles": {
+        "admin": "Admin",
+        "owner": "Vlastník",
+        "employee": "Zamestnanec",
+        "customer": "Zákazník"
+      },
+      "columns": {
+        "name": "Meno",
+        "email": "E-mail",
+        "role": "Rola",
+        "company": "Firma",
+        "status": "Stav",
+        "lastLogin": "Posledné prihlásenie"
+      },
+      "active": "Aktívny",
+      "inactive": "Neaktívny",
+      "activate": "Aktivovať",
+      "deactivate": "Deaktivovať",
+      "activated": "Používateľ bol aktivovaný",
+      "deactivated": "Používateľ bol deaktivovaný",
+      "toggleError": "Nepodarilo sa zmeniť stav používateľa"
+    }
+  },
+  "portal": {
+    "nav": {
+      "bookings": "Moje rezervácie",
+      "profile": "Profil",
+      "collapse": "Skryť"
+    },
+    "bookings": {
+      "title": "Moje rezervácie",
+      "tabs": {
+        "upcoming": "Nadchádzajúce",
+        "completed": "Dokončené",
+        "cancelled": "Zrušené"
+      },
+      "empty": "Žiadne rezervácie na zobrazenie.",
+      "leaveReview": "Napísať recenziu",
+      "trackBooking": "Detail"
+    },
+    "profile": {
+      "title": "Môj profil",
+      "personalInfo": "Osobné údaje",
+      "name": "Meno",
+      "email": "E-mail",
+      "emailReadOnly": "E-mail nie je možné zmeniť.",
+      "phone": "Telefón",
+      "save": "Uložiť",
+      "saving": "Ukladám...",
+      "saved": "Profil bol uložený.",
+      "saveError": "Nepodarilo sa uložiť profil."
+    }
   }
 }

@@ -53,7 +53,9 @@
       "login": "Sign in",
       "termsAgree": "I agree to the",
       "termsLink": "terms of service",
-      "privacyLink": "privacy policy"
+      "privacyLink": "privacy policy",
+      "businessOwner": "Business owner",
+      "customer": "Customer"
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -105,7 +107,12 @@
     "billing": "Billing",
     "reviews": "Reviews",
     "resources": "Resources",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "schedule": "My Schedule",
+    "admin": "Admin",
+    "companies": "Companies",
+    "users": "Users",
+    "adminAnalytics": "Admin Analytics"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -534,7 +541,16 @@
     "editTitle": "Edit Employee",
     "updateSuccess": "Employee updated",
     "updateError": "Failed to update employee",
-    "manageSchedule": "Working hours"
+    "manageSchedule": "Working hours",
+    "inviteEmployee": "Create Login",
+    "inviteTitle": "Create Employee Login",
+    "inviteDescription": "Set up login credentials so this employee can access the system.",
+    "inviteSuccess": "Employee login created successfully",
+    "inviteError": "Failed to create employee login",
+    "selectEmployee": "Select employee",
+    "setPassword": "Initial password",
+    "hasAccount": "Has login",
+    "noAccount": "No login"
   },
   "analytics": {
     "title": "Analytics",
@@ -1848,6 +1864,31 @@
       "customers": "Customers"
     }
   },
+  "schedule": {
+    "title": "My Schedule",
+    "description": "Manage your working hours and days off",
+    "workingHours": "Working Hours",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "submit": "Save",
+    "dayOff": "Day Off",
+    "hoursUpdated": "Working hours saved.",
+    "hoursUpdateError": "Failed to save working hours.",
+    "scheduleOverrides": "Exceptions & Days Off",
+    "requestDayOff": "Add Day Off",
+    "requestDayOffDescription": "Request a day off or modify your schedule for a specific date.",
+    "noOverrides": "No planned exceptions.",
+    "overrideCreated": "Exception added.",
+    "overrideCreateError": "Failed to add exception.",
+    "date": "Date",
+    "fullDayOff": "Full Day Off",
+    "startTime": "From",
+    "endTime": "To",
+    "reason": "Reason",
+    "reasonPlaceholder": "Optional reason..."
+  },
   "publicBooking": {
     "title": "Book Online",
     "subtitle": "Choose a time and book your appointment",
@@ -1902,7 +1943,49 @@
       "loadSlots": "Failed to load available time slots."
     },
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "tracking": {
+      "title": "Booking Details",
+      "notFound": "Booking not found",
+      "notFoundDescription": "This booking does not exist or has been removed.",
+      "status": {
+        "pending": "Pending confirmation",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No show"
+      },
+      "cancelBooking": "Cancel Booking",
+      "createAccountCta": "Create an account to manage all your bookings in one place.",
+      "createAccount": "Create Account",
+      "cancelDialog": {
+        "title": "Cancel Booking",
+        "description": "Enter the email you used when making the booking to verify your identity.",
+        "emailPlaceholder": "you@email.com",
+        "back": "Back",
+        "confirm": "Confirm Cancellation"
+      }
+    }
+  },
+  "publicReview": {
+    "title": "Leave a Review",
+    "ratingLabel": "How would you rate your experience?",
+    "starLabel": "{count, plural, one {# star} other {# stars}}",
+    "ratingText": "{rating} out of 5 stars",
+    "commentLabel": "Your review (optional)",
+    "commentPlaceholder": "Tell us about your experience...",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "Enter the email used for booking",
+    "emailHelp": "We use this to verify you are the customer who made the booking.",
+    "submit": "Submit Review",
+    "thankYou": "Thank you for your review!",
+    "thankYouDescription": "Your feedback helps us improve our services.",
+    "error": {
+      "generic": "An error occurred. Please try again.",
+      "notFound": "Booking Not Found",
+      "notFoundDescription": "This booking could not be found. Please check the link and try again.",
+      "notCompleted": "This booking has not been completed yet. You can leave a review once the appointment is finished."
+    }
   },
   "marketplace": {
     "title": "Marketplace",
@@ -1929,5 +2012,94 @@
     },
     "saveSuccess": "Marketplace listing saved successfully.",
     "saveError": "Failed to save marketplace listing."
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "companies": "Companies",
+      "users": "Users",
+      "backToDashboard": "Back to Dashboard",
+      "collapse": "Hide"
+    },
+    "dashboard": {
+      "title": "Administration",
+      "totalCompanies": "Total Companies",
+      "totalUsers": "Total Users",
+      "totalBookings": "Total Bookings",
+      "totalRevenue": "Total Revenue",
+      "newCompanies30d": "New Companies (30d)",
+      "bookings7d": "Bookings (7d)"
+    },
+    "companies": {
+      "title": "Company Management",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "plan": "Plan",
+        "users": "Users",
+        "bookings": "Bookings",
+        "revenue": "Revenue",
+        "status": "Status",
+        "created": "Created"
+      },
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "users": {
+      "title": "User Management",
+      "search": "Search users...",
+      "allRoles": "All Roles",
+      "roles": {
+        "admin": "Admin",
+        "owner": "Owner",
+        "employee": "Employee",
+        "customer": "Customer"
+      },
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "company": "Company",
+        "status": "Status",
+        "lastLogin": "Last Login"
+      },
+      "active": "Active",
+      "inactive": "Inactive",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "activated": "User has been activated",
+      "deactivated": "User has been deactivated",
+      "toggleError": "Failed to change user status"
+    }
+  },
+  "portal": {
+    "nav": {
+      "bookings": "My Bookings",
+      "profile": "Profile",
+      "collapse": "Collapse"
+    },
+    "bookings": {
+      "title": "My Bookings",
+      "tabs": {
+        "upcoming": "Upcoming",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "empty": "No bookings to display.",
+      "leaveReview": "Leave Review",
+      "trackBooking": "Details"
+    },
+    "profile": {
+      "title": "My Profile",
+      "personalInfo": "Personal Information",
+      "name": "Name",
+      "email": "Email",
+      "emailReadOnly": "Email cannot be changed.",
+      "phone": "Phone",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Profile saved successfully.",
+      "saveError": "Failed to save profile."
+    }
   }
 }

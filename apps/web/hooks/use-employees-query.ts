@@ -18,6 +18,7 @@ export interface Employee {
   title: string | null;
   color: string;
   is_active: boolean;
+  has_account: boolean;
   services: EmployeeService[];
   created_at: string;
 }
@@ -71,6 +72,23 @@ export function useAssignEmployeeServices() {
   return useMutation({
     mutationFn: async ({ uuid, service_ids }: { uuid: string; service_ids: number[] }) => {
       return apiClient.put(`/employees/${uuid}/services`, { service_ids });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+  });
+}
+
+export function useInviteEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      employee_uuid: string;
+      email: string;
+      password: string;
+      name?: string;
+    }) => {
+      return apiClient.post('/employees/invite', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
