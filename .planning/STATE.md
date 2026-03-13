@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 42-end-customer-booking-01-PLAN.md
-last_updated: "2026-03-13T16:35:06.762Z"
+stopped_at: Completed 42-end-customer-booking-02-PLAN.md
+last_updated: "2026-03-13T16:35:46.962Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 97
 ---
 
@@ -77,6 +77,8 @@ Recent decisions affecting v2.0:
 - [Phase 41-employee-flow]: Employee /me/bookings: employee_id filter forced server-side; both hooks called unconditionally with ternary selection to satisfy rules-of-hooks
 - [Phase 42-end-customer-booking]: Public booking API returns flat service_name/company_name/company_slug to match frontend PublicBooking interface exactly
 - [Phase 42-end-customer-booking]: Review link on tracking page uses plain href (not next-intl Link) since public review route is outside i18n navigation helper scope
+- [Phase 42-end-customer-booking]: Synchronous awardPointsForBooking after RabbitMQ publish in completeBooking — idempotent, non-critical fallback for dev/single-server deployments
+- [Phase 42-end-customer-booking]: Public loyalty GET returns has_card=false for unknown email/company rather than 404 — prevents information leakage on public endpoint
 
 ## Blockers
 
@@ -99,9 +101,10 @@ Recent decisions affecting v2.0:
 | Phase 41-employee-flow P02 | 4 | 2 tasks | 4 files |
 | Phase 41-employee-flow P01 | 4 | 2 tasks | 6 files |
 | Phase 42-end-customer-booking P01 | 12 | 2 tasks | 7 files |
+| Phase 42-end-customer-booking P02 | 15 | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T16:35:06.758Z
-Stopped at: Completed 42-end-customer-booking-01-PLAN.md
+Last session: 2026-03-13T16:35:46.958Z
+Stopped at: Completed 42-end-customer-booking-02-PLAN.md
 Resume file: None
