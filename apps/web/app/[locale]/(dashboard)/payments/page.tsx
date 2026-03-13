@@ -3,9 +3,9 @@
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Search, ArrowUpDown, RotateCcw, Eye, Calendar, X } from 'lucide-react';
+import { RotateCcw, Eye, Calendar, X } from 'lucide-react';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +49,10 @@ import { Wallet } from 'lucide-react';
 
 type PaymentStatus = PaymentListItem['status'];
 
-const STATUS_BADGE_VARIANT: Record<PaymentStatus, 'glass-green' | 'glass-amber' | 'glass-red' | 'glass-gray'> = {
+const STATUS_BADGE_VARIANT: Record<
+  PaymentStatus,
+  'glass-green' | 'glass-amber' | 'glass-red' | 'glass-gray'
+> = {
   pending: 'glass-amber',
   paid: 'glass-green',
   failed: 'glass-red',
@@ -116,14 +119,10 @@ export default function PaymentsPage() {
     }
     const items = data.data;
     return {
-      total: items.reduce(
-        (sum, p) => sum + (p.status === 'paid' ? parseFloat(p.amount) : 0),
-        0,
-      ),
+      total: items.reduce((sum, p) => sum + (p.status === 'paid' ? parseFloat(p.amount) : 0), 0),
       pending: items.filter((p) => p.status === 'pending').length,
-      refunded: items.filter(
-        (p) => p.status === 'refunded' || p.status === 'partially_refunded',
-      ).length,
+      refunded: items.filter((p) => p.status === 'refunded' || p.status === 'partially_refunded')
+        .length,
       completed: items.filter((p) => p.status === 'paid').length,
     };
   }, [data]);
@@ -231,7 +230,9 @@ export default function PaymentsPage() {
                 <SelectItem value="paid">{t('statuses.paid')}</SelectItem>
                 <SelectItem value="failed">{t('statuses.failed')}</SelectItem>
                 <SelectItem value="refunded">{t('statuses.refunded')}</SelectItem>
-                <SelectItem value="partially_refunded">{t('statuses.partiallyRefunded')}</SelectItem>
+                <SelectItem value="partially_refunded">
+                  {t('statuses.partiallyRefunded')}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -315,12 +316,8 @@ export default function PaymentsPage() {
                   <TableCell className="text-muted-foreground whitespace-nowrap">
                     {formatDate(payment.created_at)}
                   </TableCell>
-                  <TableCell className="font-medium">
-                    {payment.customer_name}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {payment.service_name}
-                  </TableCell>
+                  <TableCell className="font-medium">{payment.customer_name}</TableCell>
+                  <TableCell className="text-muted-foreground">{payment.service_name}</TableCell>
                   <TableCell className="text-right font-medium whitespace-nowrap">
                     {formatCurrency(payment.amount)}
                   </TableCell>
@@ -331,7 +328,9 @@ export default function PaymentsPage() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_BADGE_VARIANT[payment.status]}>
-                      {t(`statuses.${payment.status === 'partially_refunded' ? 'partiallyRefunded' : payment.status}`)}
+                      {t(
+                        `statuses.${payment.status === 'partially_refunded' ? 'partiallyRefunded' : payment.status}`,
+                      )}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -422,11 +421,11 @@ export default function PaymentsPage() {
               {/* Status + Amount */}
               <div className="flex items-center justify-between">
                 <Badge variant={STATUS_BADGE_VARIANT[paymentDetail.status]} className="text-sm">
-                  {t(`statuses.${paymentDetail.status === 'partially_refunded' ? 'partiallyRefunded' : paymentDetail.status}`)}
+                  {t(
+                    `statuses.${paymentDetail.status === 'partially_refunded' ? 'partiallyRefunded' : paymentDetail.status}`,
+                  )}
                 </Badge>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(paymentDetail.amount)}
-                </div>
+                <div className="text-2xl font-bold">{formatCurrency(paymentDetail.amount)}</div>
               </div>
 
               {/* Payment Info */}
@@ -462,7 +461,9 @@ export default function PaymentsPage() {
                 <div className="text-sm text-muted-foreground mb-1">{t('detail.customer')}</div>
                 <div className="font-medium">{paymentDetail.customer.name}</div>
                 {paymentDetail.customer.email && (
-                  <div className="text-sm text-muted-foreground">{paymentDetail.customer.email}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {paymentDetail.customer.email}
+                  </div>
                 )}
               </div>
 
@@ -487,7 +488,8 @@ export default function PaymentsPage() {
               )}
 
               {/* Refund Info */}
-              {(paymentDetail.status === 'refunded' || paymentDetail.status === 'partially_refunded') && (
+              {(paymentDetail.status === 'refunded' ||
+                paymentDetail.status === 'partially_refunded') && (
                 <div className="border-t pt-3">
                   <div className="text-sm text-muted-foreground mb-1">{t('detail.refundInfo')}</div>
                   {paymentDetail.refund_amount && (
@@ -514,7 +516,8 @@ export default function PaymentsPage() {
 
           <DialogFooter>
             {paymentDetail &&
-              (paymentDetail.status === 'paid' || paymentDetail.status === 'partially_refunded') && (
+              (paymentDetail.status === 'paid' ||
+                paymentDetail.status === 'partially_refunded') && (
                 <Button
                   variant="destructive"
                   onClick={() => {
@@ -572,11 +575,7 @@ export default function PaymentsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setRefundDialogOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setRefundDialogOpen(false)}>
                 {tCommon('cancel')}
               </Button>
               <Button
