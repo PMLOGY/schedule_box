@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 41-employee-flow-01-PLAN.md
-last_updated: "2026-03-13T15:11:53.939Z"
+stopped_at: Completed 42-end-customer-booking-01-PLAN.md
+last_updated: "2026-03-13T16:35:06.762Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
   percent: 97
 ---
 
@@ -75,6 +75,8 @@ Recent decisions affecting v2.0:
 - [Phase 41-employee-flow]: Working hours: handleSave sends all 7 days unconditionally so inactive days persist in DB
 - [Phase 41-employee-flow]: Time-off date range creates N separate override records (one per day) matching existing schema
 - [Phase 41-employee-flow]: Employee /me/bookings: employee_id filter forced server-side; both hooks called unconditionally with ternary selection to satisfy rules-of-hooks
+- [Phase 42-end-customer-booking]: Public booking API returns flat service_name/company_name/company_slug to match frontend PublicBooking interface exactly
+- [Phase 42-end-customer-booking]: Review link on tracking page uses plain href (not next-intl Link) since public review route is outside i18n navigation helper scope
 
 ## Blockers
 
@@ -96,9 +98,10 @@ Recent decisions affecting v2.0:
 | Phase 40-business-owner-flow P02 | 13 | 2 tasks | 3 files |
 | Phase 41-employee-flow P02 | 4 | 2 tasks | 4 files |
 | Phase 41-employee-flow P01 | 4 | 2 tasks | 6 files |
+| Phase 42-end-customer-booking P01 | 12 | 2 tasks | 7 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T15:08:22.601Z
-Stopped at: Completed 41-employee-flow-01-PLAN.md
+Last session: 2026-03-13T16:35:06.758Z
+Stopped at: Completed 42-end-customer-booking-01-PLAN.md
 Resume file: None
