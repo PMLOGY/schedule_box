@@ -95,7 +95,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** Every feature works end-to-end across all 4 user views (Admin, Business Owner, Employee, End Customer). Auth is stable, the complete booking chain is functional, and the app is deployable to production via Docker Compose.
 
-- [ ] **Phase 39: Auth & Session** - Session persistence, silent token refresh, role-based routing, employee invite
+- [x] **Phase 39: Auth & Session** - Session persistence, silent token refresh, role-based routing, employee invite (completed 2026-03-13)
 - [ ] **Phase 40: Business Owner Flow** - Public booking URL, service/employee CRUD, booking management, dashboard with real data
 - [ ] **Phase 41: Employee Flow** - Working hours, time-off requests, personal booking view and status actions
 - [ ] **Phase 42: End Customer Booking** - End-to-end public booking wizard, confirmation tracking, reviews, loyalty points
@@ -212,7 +212,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 36. Marketing Glass | v1.4 | 2/2 | Complete | 2026-02-25 |
 | 37. Auth and Polish | v1.4 | 2/2 | Complete | 2026-03-12 |
 | 38. Glass Polish Gaps | v1.4 | 1/1 | Complete | 2026-03-12 |
-| 39. Auth & Session | 1/2 | In Progress|  | - |
+| 39. Auth & Session | 2/2 | Complete   | 2026-03-13 | - |
 | 40. Business Owner Flow | v2.0 | TBD | Not started | - |
 | 41. Employee Flow | v2.0 | TBD | Not started | - |
 | 42. End Customer Booking | v2.0 | TBD | Not started | - |

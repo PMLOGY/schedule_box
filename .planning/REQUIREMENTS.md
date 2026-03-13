@@ -9,10 +9,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 ### Authentication & Session
 
-- [ ] **AUTH-01**: User session persists across browser refresh without random logouts
-- [ ] **AUTH-02**: Token refresh works silently — no mid-session expiration
-- [ ] **AUTH-03**: Each role routes to correct view after login (admin→admin panel, owner→dashboard, employee→dashboard, customer→portal)
-- [ ] **AUTH-04**: Owner can create employee accounts with credentials/invite
+- [x] **AUTH-01**: User session persists across browser refresh without random logouts
+- [x] **AUTH-02**: Token refresh works silently — no mid-session expiration
+- [x] **AUTH-03**: Each role routes to correct view after login (admin→admin panel, owner→dashboard, employee→dashboard, customer→portal)
+- [x] **AUTH-04**: Owner can create employee accounts with credentials/invite
 
 ### Business Owner
 
@@ -75,10 +75,10 @@ Requirements for making the app fully functional across all 4 user views and pro
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 39 | Pending |
-| AUTH-02 | Phase 39 | Pending |
-| AUTH-03 | Phase 39 | Pending |
-| AUTH-04 | Phase 39 | Pending |
+| AUTH-01 | Phase 39 | Complete |
+| AUTH-02 | Phase 39 | Complete |
+| AUTH-03 | Phase 39 | Complete |
+| AUTH-04 | Phase 39 | Complete |
 | OWNER-01 | Phase 40 | Pending |
 | OWNER-02 | Phase 40 | Pending |
 | OWNER-03 | Phase 40 | Pending |
