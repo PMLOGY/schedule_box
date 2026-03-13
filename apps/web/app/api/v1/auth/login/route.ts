@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         emailVerified: users.emailVerified,
         companyId: users.companyId,
         companyUuid: companies.uuid,
+        companyIsActive: companies.isActive,
         roleId: users.roleId,
         roleName: roles.name,
       })
@@ -84,6 +85,15 @@ export async function POST(req: NextRequest) {
 
     if (!userRecord.isActive) {
       throw new UnauthorizedError('Account is inactive');
+    }
+
+    // 3.5. Check if user's company is active (applies to owners and employees only)
+    if (
+      userRecord.companyId &&
+      userRecord.companyIsActive === false &&
+      userRecord.roleName !== 'admin'
+    ) {
+      throw new UnauthorizedError('Company account is deactivated');
     }
 
     // 4. Verify password
