@@ -1,7 +1,7 @@
 # ScheduleBox — Project Context
 
 ## What
-ScheduleBox is an all-in-one AI-powered business platform for service-based businesses (salons, fitness, medical, auto service, etc.). It combines booking, payments, CRM, loyalty, automation, and 7 AI models into one platform.
+ScheduleBox is an all-in-one AI-powered business platform for service-based businesses (salons, fitness, medical, auto service, etc.). It combines booking, payments, CRM, loyalty, automation, and 7 AI models into one platform — now with a premium glassmorphism visual identity.
 
 ## Why
 Czech/Slovak SMB market lacks an integrated, AI-powered booking solution. Competitors (Reservio, Bookio, SuperSaaS) cover basics but miss AI optimization, integrated payments, and loyalty programs.
@@ -23,33 +23,35 @@ Freemium with 4 tiers:
 - **3 services** (Next.js web, Python AI, Node.js notification worker)
 - **49 database tables** with Row Level Security (Drizzle ORM)
 - **~94 API endpoints** (REST, Next.js API Routes)
-- **16 shadcn/ui components** + booking wizard + calendar + automation builder
+- **16 shadcn/ui components** + booking wizard + calendar + automation builder + glass primitives (GlassPanel, GradientMesh, GlassShimmer)
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v1.4 Design Overhaul
+## Current Milestone: v2.0 Full Functionality & Production Readiness
 
-**Goal:** Transform ScheduleBox from a functional AI-generated-looking app into a premium, distinctive SaaS product through a full visual redesign applying glassmorphism + Behance blue aesthetic across every page.
+**Goal:** Make every feature work end-to-end across all 4 user views (Admin, Business Owner, Employee, End Customer), fix all broken flows, and prepare for production deployment.
 
 **Target features:**
-- Design system foundation: new color tokens (#0057FF blue palette), glassmorphism components (frosted glass cards, blur overlays), typography scale, 8px spacing grid
-- Landing page redesign: hero section with glass effects, feature sections, social proof, pricing — stunning first impression
-- Auth pages redesign: glass panel login/register/reset on gradient backgrounds
-- Dashboard & app shell redesign: glass sidebar, KPI cards, navigation, consistent page layouts
-- All app pages: calendar, bookings, customers, analytics, settings, billing — full glassmorphism treatment
-- Dark mode polish: proper glass effects on #191919 base, not just inverted colors
-- Responsive QA: all pages verified at 375px / 768px / 1280px breakpoints
+- Full audit and fix of all pages across 4 views
+- Auth/session persistence fix (no random logouts)
+- Business owner can share public booking link with customers
+- End-to-end flow: owner setup → share link → customer books → employee sees booking → admin monitors
+- Every page functional — not just scaffolded
+- Production-ready Docker Compose deployment
 
 ## Current State
 
-**v1.2 Product Readiness shipped** (2026-02-24). All three milestones complete:
-- **v1.0** (2026-02-12): Full-stack platform with 49 tables, ~94 API endpoints, 7 AI models, deployed to Railway
+**v1.4 Design Overhaul shipped** (2026-03-12). All five milestones complete:
+- **v1.0** (2026-02-12): Full-stack platform with 49 tables, ~94 API endpoints, 7 AI models
 - **v1.1** (2026-02-21): Testing foundation (243 unit + 31 integration + 10 E2E), email/SMS delivery, Comgate payments, monitoring
 - **v1.2** (2026-02-24): AI training pipeline, AI-powered UI, Czech landing page, booking UX polish, onboarding wizard
+- **v1.3** (2026-02-25): Subscription billing, usage limits, multi-location orgs, analytics, frontend polish
+- **v1.4** (2026-03-12): Full glassmorphism redesign — glass tokens, Tailwind plugin, CVA glass variants, gradient mesh backgrounds, aurora animation, Plus Jakarta Sans, dark mode QA, responsive QA
 
-**Codebase:** ~65,000 LOC (52k TypeScript, 6k Python, 5k YAML/JSON)
+**Codebase:** ~73,000 LOC (60k TypeScript, 6k Python, 5k YAML/JSON)
 **Tests:** 243 unit + 31 integration + 10 E2E, 80% CI coverage gate
 **Deployed:** Railway (web + notification worker + PostgreSQL + Redis + RabbitMQ)
 **Integrations:** Twilio SMS (Alpha Sender ID), Comgate payments (merchant 498621), SMTP email
+**Design system:** Glassmorphism + Behance blue #0057FF, Plus Jakarta Sans, glass-surface/subtle/heavy utilities, gradient mesh backgrounds
 
 ## Requirements
 
@@ -85,9 +87,15 @@ Freemium with 4 tiers:
 - ✓ ORG-01..06 — Multi-location organizations, context switching, location management — v1.3
 - ✓ ANLYT-01..08 — Analytics, reporting, admin dashboard, exports — v1.3
 - ✓ UI-01..06 — Dark mode, skeletons, dashboard KPIs, responsive polish — v1.3
+- ✓ DSYS-01..07 — Glass CSS tokens, gradient mesh backgrounds, Tailwind glass plugin, Plus Jakarta Sans, responsive degradation, accessibility fallbacks — v1.4
+- ✓ COMP-01..06 — Card/Button/Dialog/Badge glass CVA variants, GlassPanel, GradientMesh primitives — v1.4
+- ✓ DASH-01..05 — Dashboard gradient mesh, glass KPI cards, frosted header, glass sub-pages, solid sidebar — v1.4
+- ✓ MKTG-01..05 — Marketing gradient mesh, glass navbar, aurora hero, glass pricing/testimonial cards, glass footer — v1.4
+- ✓ AUTH-01..03 — Auth glass card, opaque form inputs, Motion entrance animation — v1.4
+- ✓ POLSH-01..06 — KPI stagger animation, GlassShimmer skeletons, glass dropdowns/tooltips, dark mode QA, responsive QA — v1.4
 
 ### Active
-See `.planning/REQUIREMENTS.md` for v1.4 requirements.
+See `.planning/REQUIREMENTS.md` for v2.0 requirements.
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
@@ -97,6 +105,7 @@ See `.planning/REQUIREMENTS.md` for v1.4 requirements.
 - Per-tenant AI models — SMBs have 50-500 bookings, need >10K for meaningful per-tenant training
 - Voice/NL booking — 3+ months to build reliably, defer to v2.0
 - Capacity forecast chart — Prophet needs real data, not synthetic, to be credible
+- Glass on sidebar/data tables/calendar cells/chart canvases/form inputs/primary CTAs — readability and GPU performance constraints (v1.4 Decision 16)
 
 ## Key Decisions
 1. Next.js 14 monorepo with standalone microservices for AI/notifications — ✓ Good
@@ -114,7 +123,11 @@ See `.planning/REQUIREMENTS.md` for v1.4 requirements.
 13. Driver.js (not react-joyride) — smaller bundle, fewer bugs — ✓ Good (v1.2)
 14. Twilio Messaging Service with Alpha Sender ID — no phone number needed, one-way SMS — ✓ Good (v1.1)
 15. Models baked into Docker image (not R2) — simple for v1.2 scale — ⚠️ Revisit if deploys >5min
-16. Glassmorphism + Behance blue #0057FF as v1.4 design direction — blend of clean structure with frosted glass effects — Pending
+16. Glassmorphism + Behance blue #0057FF — zero new npm packages, CVA variant="glass" additive approach, no glass on sidebar/tables/inputs/CTAs — ✓ Good (v1.4)
+17. Hardcoded px blur values (not CSS variables) — Safari -webkit-backdrop-filter MDN#25914 bug workaround — ✓ Good (v1.4)
+18. Plus Jakarta Sans with latin-ext subset — proper Czech diacritics support — ✓ Good (v1.4)
+19. CVA defaultVariants for backward compatibility — zero usage-site changes for 476+ Card instances — ✓ Good (v1.4)
+20. GlassPanel forwardRef / GradientMesh plain function — interactive vs decorative use pattern — ✓ Good (v1.4)
 
 ## Team
 - Multi-agent development with Claude Code
@@ -122,4 +135,4 @@ See `.planning/REQUIREMENTS.md` for v1.4 requirements.
 
 ---
 
-_Last updated: 2026-02-25 after v1.4 milestone start_
+_Last updated: 2026-03-13 after v2.0 milestone started_
