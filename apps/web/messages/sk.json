@@ -1824,7 +1824,19 @@
     "startTime": "Od",
     "endTime": "Do",
     "reason": "Dôvod",
-    "reasonPlaceholder": "Voliteľný dôvod..."
+    "reasonPlaceholder": "Voliteľný dôvod...",
+    "endDate": "Dátum do",
+    "dateRange": "Obdobie",
+    "active": "Aktívne",
+    "days": {
+      "0": "Nedeľa",
+      "1": "Pondelok",
+      "2": "Utorok",
+      "3": "Streda",
+      "4": "Štvrtok",
+      "5": "Piatok",
+      "6": "Sobota"
+    }
   },
   "publicBooking": {
     "title": "Rezervácia online",

@@ -1898,7 +1898,19 @@
     "startTime": "From",
     "endTime": "To",
     "reason": "Reason",
-    "reasonPlaceholder": "Optional reason..."
+    "reasonPlaceholder": "Optional reason...",
+    "endDate": "End Date",
+    "dateRange": "Date Range",
+    "active": "Active",
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    }
   },
   "publicBooking": {
     "title": "Book Online",
