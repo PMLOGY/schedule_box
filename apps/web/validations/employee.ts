@@ -89,6 +89,20 @@ export const scheduleOverrideSchema = z.object({
 export type ScheduleOverrideInput = z.infer<typeof scheduleOverrideSchema>;
 
 /**
+ * Employee invite schema
+ * POST /api/v1/employees/invite
+ * Creates a user account linked to an existing employee record
+ */
+export const employeeInviteSchema = z.object({
+  employee_uuid: z.string().uuid('Invalid employee UUID'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  name: z.string().min(1, 'Name is required').optional(),
+});
+
+export type EmployeeInviteInput = z.infer<typeof employeeInviteSchema>;
+
+/**
  * Employee ID param schema (UUID)
  */
 export const employeeIdParamSchema = z.object({
