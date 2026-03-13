@@ -21,14 +21,18 @@ import {
   employeeServices,
   customers,
   bookings,
+  loyaltyCards,
+  loyaltyPrograms,
+  rewards,
 } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { AppError, NotFoundError, ValidationError } from '@schedulebox/shared';
 import { successResponse } from '@/lib/utils/response';
 import { publishEvent, createBookingCreatedEvent } from '@schedulebox/events';
 import { checkBookingLimit, incrementBookingCounter } from '@/lib/usage/usage-service';
+import { redeemPoints } from '@/lib/loyalty/points-engine';
 import { z } from 'zod';
-import { lt, gt, or } from 'drizzle-orm';
+import { lt, gt, or, sql } from 'drizzle-orm';
 
 // ============================================================================
 // SCHEMAS
@@ -52,6 +56,7 @@ const publicBookingCreateSchema = z.object({
   customer_email: z.string().email('Invalid email address').max(255),
   customer_phone: z.string().max(50).optional(),
   notes: z.string().max(1000).optional(),
+  reward_id: z.number().int().positive().optional(),
 });
 
 type PublicBookingCreate = z.infer<typeof publicBookingCreateSchema>;
@@ -258,6 +263,112 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
       }
     }
 
+    // 6a. Apply loyalty reward discount (if reward_id provided)
+    let discountAmount = '0';
+
+    if (body.reward_id) {
+      // Find the company's active loyalty program
+      const [program] = await db
+        .select({ id: loyaltyPrograms.id })
+        .from(loyaltyPrograms)
+        .where(and(eq(loyaltyPrograms.companyId, companyId), eq(loyaltyPrograms.isActive, true)))
+        .limit(1);
+
+      if (!program) {
+        throw new ValidationError('No active loyalty program found for this company');
+      }
+
+      // Find customer's loyalty card
+      const [card] = await db
+        .select({
+          id: loyaltyCards.id,
+          pointsBalance: loyaltyCards.pointsBalance,
+          programId: loyaltyCards.programId,
+          isActive: loyaltyCards.isActive,
+        })
+        .from(loyaltyCards)
+        .where(
+          and(eq(loyaltyCards.programId, program.id), eq(loyaltyCards.customerId, customer!.id)),
+        )
+        .limit(1);
+
+      if (!card) {
+        throw new ValidationError('No loyalty card found for this customer');
+      }
+
+      if (!card.isActive) {
+        throw new ValidationError('Loyalty card is inactive');
+      }
+
+      // Look up and validate the reward
+      const [reward] = await db
+        .select({
+          id: rewards.id,
+          programId: rewards.programId,
+          pointsCost: rewards.pointsCost,
+          rewardType: rewards.rewardType,
+          rewardValue: rewards.rewardValue,
+          maxRedemptions: rewards.maxRedemptions,
+          currentRedemptions: rewards.currentRedemptions,
+          isActive: rewards.isActive,
+        })
+        .from(rewards)
+        .where(eq(rewards.id, body.reward_id))
+        .limit(1);
+
+      if (!reward) {
+        throw new ValidationError('Reward not found');
+      }
+
+      if (!reward.isActive) {
+        throw new ValidationError('Reward is not active');
+      }
+
+      // Verify reward belongs to the company's program
+      if (reward.programId !== program.id) {
+        throw new ValidationError('Reward does not belong to this company loyalty program');
+      }
+
+      // Verify reward stock
+      if (
+        reward.maxRedemptions !== null &&
+        (reward.currentRedemptions ?? 0) >= reward.maxRedemptions
+      ) {
+        throw new ValidationError('Reward no longer available (redemption limit reached)');
+      }
+
+      // Verify customer has enough points
+      const pointsBalance = card.pointsBalance ?? 0;
+      if (pointsBalance < reward.pointsCost) {
+        throw new ValidationError(
+          `Insufficient points balance. Have: ${pointsBalance}, Need: ${reward.pointsCost}`,
+        );
+      }
+
+      // Calculate discount amount
+      const servicePrice = parseFloat(service.price ?? '0');
+      const rewardValue = parseFloat(reward.rewardValue ?? '0');
+
+      if (reward.rewardType === 'discount_percentage') {
+        discountAmount = ((servicePrice * rewardValue) / 100).toFixed(2);
+      } else if (reward.rewardType === 'discount_fixed') {
+        discountAmount = Math.min(rewardValue, servicePrice).toFixed(2);
+      }
+      // free_service and gift types do not produce a numeric discount amount here
+
+      // Deduct points from card
+      await redeemPoints(card.id, reward.pointsCost, `Redeemed reward: ${body.reward_id}`);
+
+      // Increment reward current_redemptions counter
+      await db
+        .update(rewards)
+        .set({
+          currentRedemptions: sql`${rewards.currentRedemptions} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(rewards.id, reward.id));
+    }
+
     // 6. Create booking with double-booking prevention (transaction with SELECT FOR UPDATE)
     const booking = await db.transaction(async (tx) => {
       // Lock employee row
@@ -310,7 +421,7 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
           notes: body.notes || null,
           price: service.price,
           currency: service.currency,
-          discountAmount: '0',
+          discountAmount,
         })
         .returning();
 
