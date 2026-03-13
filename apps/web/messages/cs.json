@@ -1958,7 +1958,9 @@
       "status": "Stav",
       "statusPending": "Čeká na potvrzení",
       "backToCompany": "Zpět na stránku",
-      "bookAnother": "Nová rezervace"
+      "bookAnother": "Nová rezervace",
+      "trackBooking": "Sledovat rezervaci",
+      "trackDescription": "Uložte si tento odkaz pro kontrolu stavu rezervace."
     },
     "error": {
       "slotTaken": "Vybraný termín je již obsazen. Vyberte prosím jiný.",

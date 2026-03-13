@@ -28,6 +28,7 @@ import {
   CalendarDays,
   User,
   AlertCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -674,6 +675,9 @@ export default function PublicBookingPage() {
                 <span className="text-muted-foreground">{t('confirmation.bookingId')}</span>
                 <span className="font-mono text-sm">{bookingResult.id.slice(0, 8)}...</span>
               </div>
+              <p className="text-xs text-muted-foreground pb-1">
+                {t('confirmation.trackDescription')}
+              </p>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-muted-foreground">{t('confirmation.service')}</span>
                 <span className="font-medium">{bookingResult.service.name}</span>
@@ -698,6 +702,16 @@ export default function PublicBookingPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Link
+            href={`/${locale}/${companySlug}/booking/${bookingResult.id}`}
+            className="block w-full"
+          >
+            <Button variant="outline" className="w-full">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              {t('confirmation.trackBooking')}
+            </Button>
+          </Link>
 
           <div className="flex gap-3">
             <Link href={`/${locale}/${companySlug}`} className="flex-1">

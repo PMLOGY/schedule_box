@@ -1958,7 +1958,9 @@
       "status": "Status",
       "statusPending": "Pending confirmation",
       "backToCompany": "Back to page",
-      "bookAnother": "New booking"
+      "bookAnother": "New booking",
+      "trackBooking": "Track Your Booking",
+      "trackDescription": "Save this link to check your booking status anytime."
     },
     "error": {
       "slotTaken": "The selected time slot is already taken. Please choose a different one.",
