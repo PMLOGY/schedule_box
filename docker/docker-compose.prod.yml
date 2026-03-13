@@ -1,0 +1,83 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: schedulebox-postgres
+    env_file: ../.env
+    environment:
+      POSTGRES_DB: schedulebox
+      POSTGRES_USER: schedulebox
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U schedulebox -d schedulebox']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - schedulebox
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: schedulebox-redis
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - schedulebox
+    restart: unless-stopped
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    container_name: schedulebox-app
+    ports:
+      - '${PORT:-3000}:3000'
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - schedulebox
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: builder
+    container_name: schedulebox-migrate
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "cd /app && pnpm --filter @schedulebox/database db:migrate && pnpm --filter @schedulebox/database db:apply-sql"
+    networks:
+      - schedulebox
+    restart: 'no'
+    profiles: ['migrate']
+
+networks:
+  schedulebox:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
