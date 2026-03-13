@@ -5,9 +5,9 @@ milestone_name: Full Functionality & Production Readiness
 status: active
 stopped_at: null
 last_updated: "2026-03-13T00:00:00.000Z"
-last_activity: 2026-03-13 — Milestone v2.0 started
+last_activity: 2026-03-13 — Roadmap created, 6 phases defined (39-44)
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** v2.0 Full Functionality & Production Readiness
+**Current focus:** Phase 39 — Auth & Session
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 39 of 44 (Auth & Session)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-13 — Milestone v2.0 started
+Status: Ready to plan
+Last activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -43,6 +43,11 @@ Progress: [░░░░░░░░░░] 0%
 ## Decisions
 
 See `.planning/PROJECT.md` Key Decisions section (decisions 1-20 logged there).
+
+Recent decisions affecting v2.0:
+- Docker Compose on VPS is the deployment target (not Kubernetes/Helm)
+- Public booking works without customer auth (simpler UX)
+- CI/CD pipeline out of scope — deployment config only
 
 ## Blockers
 
@@ -61,6 +66,6 @@ See `.planning/PROJECT.md` Key Decisions section (decisions 1-20 logged there).
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: v1.4 milestone archived
+Last session: 2026-03-13
+Stopped at: v2.0 roadmap created — ready to plan Phase 39
 Resume file: None
