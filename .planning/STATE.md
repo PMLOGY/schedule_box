@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Full Functionality & Production Readiness
 status: active
-stopped_at: Completed 43-admin-platform-01-PLAN.md
-last_updated: "2026-03-13T14:36:51.615Z"
+stopped_at: Completed 40-business-owner-flow-02-PLAN.md
+last_updated: "2026-03-13T14:39:46.805Z"
 last_activity: 2026-03-13 — Roadmap created for v2.0 (24 requirements, 6 phases)
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 97
 ---
 
@@ -70,6 +70,8 @@ Recent decisions affecting v2.0:
 - [Phase 40-business-owner-flow]: Two-step delete: Trash2 icon (mr-auto in DialogFooter) -> confirmation Dialog for services
 - [Phase 43-admin-platform]: Company deactivation check in login uses strict === false to safely handle NULL from LEFT JOIN; admin role excluded via roleName check
 - [Phase 43-admin-platform]: useToggleCompanyActive invalidates both companies and stats queries so KPI dashboard stays fresh after company state changes
+- [Phase 40-business-owner-flow]: Booking UUID pattern: always use booking.uuid for API calls, booking.id is internal DB reference only
+- [Phase 40-business-owner-flow]: RevenueMiniChart uses synthetic daily distribution from analytics totals — dedicated daily-revenue endpoint deferred
 
 ## Blockers
 
@@ -88,9 +90,10 @@ Recent decisions affecting v2.0:
 | Phase 39-auth-session P01 | 3 | 2 tasks | 5 files |
 | Phase 39-auth-session P02 | 15 | 2 tasks | 7 files |
 | Phase 40-business-owner-flow P01 | 15 | 2 tasks | 7 files |
+| Phase 40-business-owner-flow P02 | 13 | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-13T14:36:45.748Z
-Stopped at: Completed 43-admin-platform-01-PLAN.md
+Last session: 2026-03-13T14:39:46.802Z
+Stopped at: Completed 40-business-owner-flow-02-PLAN.md
 Resume file: None
