@@ -8,7 +8,6 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   transpilePackages: [
     '@schedulebox/ui',
     '@schedulebox/shared',
@@ -28,7 +27,6 @@ const nextConfig = {
     'pdfkit',
     '@react-pdf/renderer',
     'argon2',
-    'ioredis',
     'jsonwebtoken',
     'otplib',
     'opossum',
@@ -37,6 +35,7 @@ const nextConfig = {
     'passkit-generator',
     'drizzle-orm',
     '@schedulebox/database',
+    '@neondatabase/serverless',
     '@opentelemetry/sdk-node',
     '@opentelemetry/api',
     '@opentelemetry/instrumentation',

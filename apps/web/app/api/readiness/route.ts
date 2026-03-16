@@ -9,8 +9,8 @@ interface ServiceCheck {
 
 /**
  * GET /api/readiness
- * Readiness probe - checks connectivity to PostgreSQL, Redis, and RabbitMQ.
- * Used by Kubernetes readiness probes and Docker health checks.
+ * Readiness probe - checks connectivity to PostgreSQL and Redis (Upstash).
+ * Used by Vercel health checks.
  *
  * Returns 200 if all services are reachable, 503 if any service is down.
  */
@@ -20,8 +20,6 @@ export async function GET() {
 
   // Check PostgreSQL
   const pgCheck = await checkService('PostgreSQL', async () => {
-    // In Phase 1, just verify the env var is set
-    // Actual DB connection check added in Phase 2 when Drizzle is configured
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL not configured');
     }
@@ -30,25 +28,18 @@ export async function GET() {
   checks.push(pgCheck);
   if (pgCheck.status === 'error') allHealthy = false;
 
-  // Check Redis
-  const redisCheck = await checkService('Redis', async () => {
-    if (!process.env.REDIS_URL) {
-      throw new Error('REDIS_URL not configured');
+  // Check Upstash Redis
+  const redisCheck = await checkService('Redis (Upstash)', async () => {
+    if (!process.env.UPSTASH_REDIS_REST_URL) {
+      throw new Error('UPSTASH_REDIS_REST_URL not configured');
+    }
+    if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
+      throw new Error('UPSTASH_REDIS_REST_TOKEN not configured');
     }
     return true;
   });
   checks.push(redisCheck);
   if (redisCheck.status === 'error') allHealthy = false;
-
-  // Check RabbitMQ (optional — app degrades gracefully without it)
-  const rmqCheck = await checkService('RabbitMQ', async () => {
-    if (!process.env.RABBITMQ_URL) {
-      throw new Error('RABBITMQ_URL not configured');
-    }
-    return true;
-  });
-  checks.push(rmqCheck);
-  // RabbitMQ is not required for core functionality — don't mark unhealthy
 
   const response = {
     status: allHealthy ? ('ok' as const) : ('degraded' as const),
