@@ -5,7 +5,7 @@
  */
 
 import { eq, and, isNull, gte, lte, desc, sql } from 'drizzle-orm';
-import { db, payments, bookings, customers, services } from '@schedulebox/database';
+import { db, dbTx, payments, bookings, customers, services } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { findCompanyId } from '@/lib/db/tenant-scope';
@@ -253,7 +253,7 @@ export const POST = createRouteHandler({
     });
 
     // Create invoice within transaction
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await createInvoiceForPayment(updatedPayment.id, companyId, tx as any);
     });

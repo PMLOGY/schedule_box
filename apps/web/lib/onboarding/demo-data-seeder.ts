@@ -10,7 +10,7 @@
  */
 
 import { eq, inArray } from 'drizzle-orm';
-import { db } from '@/lib/db/client';
+import { db, dbTx } from '@/lib/db/client';
 import { companies, services, customers, bookings } from '@schedulebox/database';
 
 export interface SeedResult {
@@ -48,7 +48,7 @@ export async function hasDemoData(companyId: number): Promise<boolean> {
  * Tags all created records in company.settings for later removal.
  */
 export async function seedDemoData(companyId: number): Promise<SeedResult> {
-  return db.transaction(async (tx) => {
+  return dbTx.transaction(async (tx) => {
     // -- 1. Create services --
     const createdServices = await tx
       .insert(services)
@@ -337,7 +337,7 @@ export async function seedDemoData(companyId: number): Promise<SeedResult> {
  * in a single transaction, then clears the demo_data flags from settings.
  */
 export async function removeDemoData(companyId: number): Promise<void> {
-  return db.transaction(async (tx) => {
+  return dbTx.transaction(async (tx) => {
     // Read demo data IDs from company settings
     const [company] = await tx
       .select({ settings: companies.settings })

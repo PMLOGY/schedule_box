@@ -4,7 +4,7 @@
  */
 
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, employees, employeeServices, services } from '@schedulebox/database';
+import { db, dbTx, employees, employeeServices, services } from '@schedulebox/database';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse } from '@/lib/utils/response';
@@ -91,7 +91,7 @@ export const PUT = createRouteHandler({
     }
 
     // Replace service assignments in transaction
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // 1. Delete existing assignments
       await tx.delete(employeeServices).where(eq(employeeServices.employeeId, employee.id));
 

@@ -14,7 +14,7 @@
  */
 
 import { eq, and, isNull, or, lt, gt, ne } from 'drizzle-orm';
-import { db, bookings, services, employees, employeeServices } from '@schedulebox/database';
+import { db, dbTx, bookings, services, employees, employeeServices } from '@schedulebox/database';
 import { AppError, NotFoundError, ValidationError } from '@schedulebox/shared';
 import {
   publishEvent,
@@ -401,7 +401,7 @@ export async function rescheduleBooking(
   const newStartTime = new Date(input.start_time);
 
   // Use transaction for atomic reschedule with availability check
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // Get booking's internal data
     const [bookingData] = await tx
       .select({

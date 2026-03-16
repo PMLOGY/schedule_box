@@ -10,7 +10,7 @@
  */
 import argon2 from 'argon2';
 import { eq, desc, inArray } from 'drizzle-orm';
-import { db } from '../db/client';
+import { db, dbTx } from '../db/client';
 import { users, passwordHistory } from '@schedulebox/database';
 
 // Argon2id parameters matching OWASP recommendations (Doc sec 24.1)
@@ -84,7 +84,7 @@ export async function updatePassword(userId: number, newPassword: string): Promi
   const passwordHash = await hashPassword(newPassword);
   const passwordChangedAt = new Date();
 
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // Update user's password
     await tx
       .update(users)

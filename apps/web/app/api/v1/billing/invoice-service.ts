@@ -16,6 +16,7 @@ import PDFDocument from 'pdfkit';
 import { eq, desc, sql } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   subscriptionInvoices,
   subscriptions,
   companies,
@@ -186,7 +187,7 @@ export async function createSubscriptionInvoice(
     return doCreate(txOuter);
   }
 
-  return db.transaction(async (tx) => doCreate(tx as unknown as Database));
+  return dbTx.transaction(async (tx) => doCreate(tx as unknown as Database));
 }
 
 // ============================================================================

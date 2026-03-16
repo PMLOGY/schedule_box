@@ -11,6 +11,7 @@
 import { eq, and, isNull, or, gte, lt, gt, sql } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   bookings,
   bookingResources,
   services,
@@ -97,8 +98,8 @@ export async function createBooking(
   // Parse start time to Date
   const startTime = new Date(input.start_time);
 
-  // Use db.transaction for atomic operations with rollback on error
-  const booking = await db.transaction(async (tx) => {
+  // Use dbTx.transaction for atomic operations with SELECT FOR UPDATE (WebSocket Pool required)
+  const booking = await dbTx.transaction(async (tx) => {
     // 1. Fetch service and validate
     const [service] = await tx
       .select({
@@ -633,7 +634,7 @@ export async function updateBooking(
   if (input.start_time) {
     const newStartTime = new Date(input.start_time);
 
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // Get booking internal ID and related data
       const [bookingData] = await tx
         .select({

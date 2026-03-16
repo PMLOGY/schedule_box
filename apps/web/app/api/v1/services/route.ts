@@ -7,7 +7,7 @@
  */
 
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, services, serviceCategories, serviceResources } from '@schedulebox/database';
+import { db, dbTx, services, serviceCategories, serviceResources } from '@schedulebox/database';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse, createdResponse } from '@/lib/utils/response';
@@ -117,7 +117,7 @@ export const POST = createRouteHandler({
     const { resource_ids, ...serviceData } = body;
 
     // Create service in transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await dbTx.transaction(async (tx) => {
       // Insert service
       const [service] = await tx
         .insert(services)

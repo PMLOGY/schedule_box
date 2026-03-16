@@ -10,7 +10,7 @@
 
 import { z } from 'zod';
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, services, workingHours, companies } from '@schedulebox/database';
+import { dbTx, services, workingHours, companies } from '@schedulebox/database';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse } from '@/lib/utils/response';
@@ -41,7 +41,7 @@ export const POST = createRouteHandler({
     }
 
     // Apply template in a transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await dbTx.transaction(async (tx) => {
       // 1. Create all services from the template
       let servicesCreated = 0;
       for (const svc of template.services) {

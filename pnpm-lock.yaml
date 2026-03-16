@@ -346,6 +346,9 @@ importers:
       drizzle-kit:
         specifier: ^0.31.0
         version: 0.31.9
+      postgres:
+        specifier: ^3.4.8
+        version: 3.4.8
       tsx:
         specifier: ^4.19.2
         version: 4.21.0
@@ -10599,8 +10602,7 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
-  postgres@3.4.8:
-    optional: true
+  postgres@3.4.8: {}
 
   preact@10.12.1: {}
 

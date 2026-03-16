@@ -1,16 +1,15 @@
 import { defineConfig } from 'drizzle-kit';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required');
+const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+if (!url) {
+  throw new Error('DATABASE_URL_UNPOOLED or DATABASE_URL environment variable is required');
 }
 
 export default defineConfig({
   schema: './src/schema/index.ts',
   out: './src/migrations',
   dialect: 'postgresql',
-  dbCredentials: {
-    url: process.env.DATABASE_URL,
-  },
+  dbCredentials: { url },
   verbose: true,
   strict: true,
 });

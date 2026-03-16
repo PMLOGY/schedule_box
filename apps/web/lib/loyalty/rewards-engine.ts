@@ -12,6 +12,7 @@
 import { eq, sql } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   loyaltyCards,
   loyaltyTransactions,
   rewards,
@@ -41,7 +42,7 @@ import { publishEvent, createRewardRedeemedEvent } from '@schedulebox/events';
  * @throws ValidationError if card not found, reward not found, reward unavailable, or insufficient balance
  */
 export async function redeemReward(cardId: number, rewardId: number): Promise<void> {
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // SELECT reward (validate exists, is_active, stock)
     const [reward] = await tx
       .select({

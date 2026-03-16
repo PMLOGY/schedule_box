@@ -15,6 +15,7 @@
 import { eq, and, isNull } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   companies,
   services,
   employees,
@@ -370,7 +371,7 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
     }
 
     // 6. Create booking with double-booking prevention (transaction with SELECT FOR UPDATE)
-    const booking = await db.transaction(async (tx) => {
+    const booking = await dbTx.transaction(async (tx) => {
       // Lock employee row
       await tx
         .select({ id: employees.id })

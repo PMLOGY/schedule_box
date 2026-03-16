@@ -12,7 +12,7 @@ import { nanoid } from 'nanoid';
 import { createHash } from 'crypto';
 import { eq } from 'drizzle-orm';
 import { redis } from '../redis/client';
-import { db } from '../db/client';
+import { db, dbTx } from '../db/client';
 import { refreshTokens, rolePermissions, permissions, users, roles } from '@schedulebox/database';
 import { UnauthorizedError } from '@schedulebox/shared';
 
@@ -159,7 +159,7 @@ export async function rotateRefreshToken(refreshToken: string): Promise<{
 }> {
   const tokenHash = hashToken(refreshToken);
 
-  return await db.transaction(async (tx) => {
+  return await dbTx.transaction(async (tx) => {
     // Lock the refresh token row to prevent concurrent rotation
     const [tokenRecord] = await tx
       .select({

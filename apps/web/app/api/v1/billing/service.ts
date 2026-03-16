@@ -14,7 +14,7 @@
  */
 
 import { eq, and, ne, desc } from 'drizzle-orm';
-import { db, subscriptions, subscriptionEvents, companies } from '@schedulebox/database';
+import { db, dbTx, subscriptions, subscriptionEvents, companies } from '@schedulebox/database';
 import {
   type SubscriptionPlan,
   type SubscriptionStatus,
@@ -220,7 +220,7 @@ export async function transitionSubscriptionStatus(
   }
 
   // Otherwise create a new transaction
-  return db.transaction(async (newTx) => doTransition(newTx));
+  return dbTx.transaction(async (newTx) => doTransition(newTx));
 }
 
 // ============================================================================
@@ -240,7 +240,7 @@ export async function transitionSubscriptionStatus(
  * @returns Updated subscription
  */
 export async function activateSubscription(subscriptionId: number, comgateTransactionId: string) {
-  return db.transaction(async (tx) => {
+  return dbTx.transaction(async (tx) => {
     // Transition to active (handles locking and validation)
     const updated = await transitionSubscriptionStatus(subscriptionId, 'active', tx);
 
@@ -518,7 +518,7 @@ export async function processSubscriptionWebhook(
     return { alreadyProcessed: true };
   }
 
-  return db.transaction(async (tx) => {
+  return dbTx.transaction(async (tx) => {
     // Find subscription by comgateInitTransactionId (recurring token)
     // or by matching a refId pattern in subscription_events metadata
     let [subscription] = await tx

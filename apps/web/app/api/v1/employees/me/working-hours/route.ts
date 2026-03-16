@@ -9,7 +9,7 @@
 
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { db, users, employees, workingHours } from '@schedulebox/database';
+import { db, dbTx, users, employees, workingHours } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse } from '@/lib/utils/response';
 import { NotFoundError, ForbiddenError } from '@schedulebox/shared';
@@ -94,7 +94,7 @@ export const PUT = createRouteHandler({
     const employee = await resolveEmployee(user.sub, user.company_id);
 
     // Replace all working hours for this employee in a transaction
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // Delete existing working hours for this employee
       await tx
         .delete(workingHours)

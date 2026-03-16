@@ -14,6 +14,7 @@
 import { eq, and } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   loyaltyCards,
   loyaltyTransactions,
   loyaltyPrograms,
@@ -50,7 +51,7 @@ export async function earnPoints(
     throw new ValidationError('Points must be positive');
   }
 
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // SELECT FOR UPDATE: Lock the card row to prevent concurrent modifications
     const [card] = await tx
       .select({
@@ -174,7 +175,7 @@ export async function redeemPoints(
     throw new ValidationError('Points to redeem must be positive');
   }
 
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // SELECT FOR UPDATE: Lock the card row
     const [card] = await tx
       .select({
@@ -251,7 +252,7 @@ export async function adjustPoints(
     throw new ValidationError('Adjustment cannot be zero');
   }
 
-  await db.transaction(async (tx) => {
+  await dbTx.transaction(async (tx) => {
     // SELECT FOR UPDATE: Lock the card row
     const [card] = await tx
       .select({

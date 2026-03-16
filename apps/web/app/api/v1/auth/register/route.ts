@@ -13,7 +13,7 @@ import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { createHash } from 'crypto';
-import { db } from '@/lib/db/client';
+import { db, dbTx } from '@/lib/db/client';
 import { companies, users, roles, passwordHistory } from '@schedulebox/database';
 import { redis } from '@/lib/redis/client';
 import { hashPassword } from '@/lib/auth/password';
@@ -77,7 +77,7 @@ async function registerCustomer(input: {
   password: string;
   phone?: string;
 }) {
-  const result = await db.transaction(async (tx) => {
+  const result = await dbTx.transaction(async (tx) => {
     // Hash password
     const passwordHash = await hashPassword(input.password);
 
@@ -164,7 +164,7 @@ async function registerOwner(input: {
   // company_name is guaranteed by schema refinement for owner type
   const companyName = input.company_name!;
 
-  const result = await db.transaction(async (tx) => {
+  const result = await dbTx.transaction(async (tx) => {
     // Create company
     const slug = generateSlug(companyName);
     const [company] = await tx

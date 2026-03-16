@@ -6,6 +6,7 @@
 import { eq, and, sql } from 'drizzle-orm';
 import {
   db,
+  dbTx,
   payments,
   bookings,
   invoices,
@@ -121,7 +122,7 @@ export async function updatePaymentStatus(
   newStatus: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded',
   extras?: UpdatePaymentExtras,
 ) {
-  return await db.transaction(async (tx) => {
+  return await dbTx.transaction(async (tx) => {
     // Lock payment row with SELECT FOR UPDATE
     const [payment] = await tx
       .select()

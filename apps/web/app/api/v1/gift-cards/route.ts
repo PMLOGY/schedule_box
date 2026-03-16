@@ -6,7 +6,7 @@
 
 import crypto from 'crypto';
 import { eq, and, ilike, or, desc, sql } from 'drizzle-orm';
-import { db, giftCards, giftCardTransactions, customers } from '@schedulebox/database';
+import { db, dbTx, giftCards, giftCardTransactions, customers } from '@schedulebox/database';
 import { NotFoundError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
@@ -153,7 +153,7 @@ export const POST = createRouteHandler({
     }
 
     // Insert gift card and purchase transaction in a single transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await dbTx.transaction(async (tx) => {
       // Insert gift card
       const [giftCard] = await tx
         .insert(giftCards)

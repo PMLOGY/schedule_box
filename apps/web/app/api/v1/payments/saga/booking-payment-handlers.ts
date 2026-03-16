@@ -7,7 +7,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { db, bookings } from '@schedulebox/database';
+import { dbTx, bookings } from '@schedulebox/database';
 import { publishEvent } from '@schedulebox/events';
 import { createBookingConfirmedEvent, createBookingCancelledEvent } from '@schedulebox/events';
 import type {
@@ -27,7 +27,7 @@ export async function handlePaymentCompleted(data: PaymentCompletedPayload): Pro
 
   try {
     // Use transaction with SELECT FOR UPDATE to prevent race conditions
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // Lock the booking row
       const [booking] = await tx
         .select({
@@ -110,7 +110,7 @@ export async function handlePaymentFailed(data: PaymentFailedPayload): Promise<v
 
   try {
     // Use transaction with SELECT FOR UPDATE to prevent race conditions
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // Lock the booking row
       const [booking] = await tx
         .select({
@@ -198,7 +198,7 @@ export async function handlePaymentExpired(data: PaymentExpiredPayload): Promise
 
   try {
     // Use transaction with SELECT FOR UPDATE to prevent race conditions
-    await db.transaction(async (tx) => {
+    await dbTx.transaction(async (tx) => {
       // Lock the booking row
       const [booking] = await tx
         .select({

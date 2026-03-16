@@ -15,7 +15,7 @@
  */
 
 import { eq, and, gte, lte, isNull } from 'drizzle-orm';
-import { db, employees, workingHours, workingHoursOverrides } from '@schedulebox/database';
+import { db, dbTx, employees, workingHours, workingHoursOverrides } from '@schedulebox/database';
 import { NotFoundError, ValidationError } from '@schedulebox/shared';
 
 /**
@@ -57,7 +57,7 @@ export async function blockTimeSlot(
     throw new ValidationError('Block end time must be after start time');
   }
 
-  return await db.transaction(async (tx) => {
+  return await dbTx.transaction(async (tx) => {
     // Verify employee exists and belongs to company
     const [employee] = await tx
       .select({ id: employees.id })

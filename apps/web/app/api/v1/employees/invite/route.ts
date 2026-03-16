@@ -10,7 +10,7 @@
  */
 
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, users, roles, employees, passwordHistory } from '@schedulebox/database';
+import { db, dbTx, users, roles, employees, passwordHistory } from '@schedulebox/database';
 import { hashPassword } from '@/lib/auth/password';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { findCompanyId } from '@/lib/db/tenant-scope';
@@ -67,7 +67,7 @@ export const POST = createRouteHandler({
     }
 
     // Run everything in a transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await dbTx.transaction(async (tx) => {
       // Hash the password
       const passwordHash = await hashPassword(body.password);
 

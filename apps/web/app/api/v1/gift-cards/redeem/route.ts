@@ -4,7 +4,7 @@
  */
 
 import { eq, and } from 'drizzle-orm';
-import { db, giftCards, giftCardTransactions } from '@schedulebox/database';
+import { dbTx, giftCards, giftCardTransactions } from '@schedulebox/database';
 import { NotFoundError, ValidationError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { findCompanyId } from '@/lib/db/tenant-scope';
@@ -29,7 +29,7 @@ export const POST = createRouteHandler({
     const { companyId } = await findCompanyId(userSub);
 
     // Execute redemption in atomic transaction with row locking
-    const result = await db.transaction(async (tx) => {
+    const result = await dbTx.transaction(async (tx) => {
       // 1. SELECT gift card with row lock (FOR UPDATE)
       const [giftCard] = await tx
         .select()
