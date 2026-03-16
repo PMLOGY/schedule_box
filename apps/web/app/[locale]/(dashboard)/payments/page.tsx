@@ -124,7 +124,7 @@ export default function PaymentsPage() {
   // KPI — from API aggregates (company-wide, not affected by filters)
   // ============================================================================
 
-  const agg = (data?.meta as Record<string, unknown>)?.aggregates as
+  const agg = (data?.meta as unknown as Record<string, unknown>)?.aggregates as
     | {
         total_revenue: string;
         paid_count: number;

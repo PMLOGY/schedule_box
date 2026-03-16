@@ -61,15 +61,16 @@ export const GET = createRouteHandler({
     `);
 
     // Query 2: Total company bookings (for AI activation threshold)
-    const [totalCompanyRow] = await db.execute<CountRow>(sql`
+    const totalCompanyResult = await db.execute<CountRow>(sql`
       SELECT COUNT(*) AS count
       FROM bookings
       WHERE company_id = ${companyId}
         AND status IN ('completed', 'confirmed', 'no_show', 'pending')
     `);
+    const totalCompanyRow = totalCompanyResult.rows[0];
 
     // Query 3: Today's total upcoming bookings
-    const [todayTotalRow] = await db.execute<CountRow>(sql`
+    const todayTotalResult = await db.execute<CountRow>(sql`
       SELECT COUNT(*) AS count
       FROM bookings
       WHERE company_id = ${companyId}
@@ -77,13 +78,14 @@ export const GET = createRouteHandler({
         AND start_time >= NOW()
         AND start_time < NOW() + INTERVAL '24 hours'
     `);
+    const todayTotalRow = todayTotalResult.rows[0];
 
     const totalCompanyBookings = parseInt(totalCompanyRow?.count ?? '0', 10);
     const totalTodayBookings = parseInt(todayTotalRow?.count ?? '0', 10);
     const aiActive = totalCompanyBookings >= AI_ACTIVATION_THRESHOLD;
 
     // Map high-risk bookings with computed riskLevel
-    const highRiskBookings = (highRiskRows as HighRiskBookingRow[]).map((row) => {
+    const highRiskBookings = highRiskRows.rows.map((row) => {
       const probability = parseFloat(String(row.no_show_probability));
       return {
         bookingId: row.booking_id,

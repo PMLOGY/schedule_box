@@ -38,6 +38,7 @@ import {
   useDowngrade,
   type BillingPlan,
 } from '@/hooks/use-billing-query';
+import { PLAN_CONFIG } from '@schedulebox/shared/types';
 import type { SubscriptionPlan } from '@schedulebox/shared';
 import { usePlanFeatures } from '@/hooks/use-plan-features';
 
@@ -377,11 +378,11 @@ function PlanComparisonGrid() {
         (key) =>
           plans.find((p) => p.key === key) || {
             key,
-            name: key,
-            price: 0,
-            priceAnnual: 0,
+            name: PLAN_CONFIG[key as keyof typeof PLAN_CONFIG]?.name ?? key,
+            price: PLAN_CONFIG[key as keyof typeof PLAN_CONFIG]?.price ?? 0,
+            priceAnnual: PLAN_CONFIG[key as keyof typeof PLAN_CONFIG]?.priceAnnual ?? 0,
             currency: 'CZK',
-            features: {
+            features: PLAN_CONFIG[key as keyof typeof PLAN_CONFIG]?.features ?? {
               maxBookingsPerMonth: 0,
               maxEmployees: 0,
               maxServices: 0,

@@ -319,12 +319,15 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <PageHeader title={t('title')} description={t('description')} />
+      <PageHeader title={String(t('title'))} description={String(t('description'))} />
 
       {/* KPI Cards — always visible, server-side aggregates (unaffected by filters) */}
-      {(data?.meta as Record<string, unknown>)?.aggregates && (
+      {Boolean((data?.meta as unknown as Record<string, unknown>)?.aggregates) && (
         <ReviewKpiCards
-          aggregates={(data.meta as Record<string, unknown>).aggregates as ReviewAggregates}
+          aggregates={
+            ((data?.meta ?? {}) as unknown as Record<string, unknown>)
+              .aggregates as ReviewAggregates
+          }
           t={t}
         />
       )}

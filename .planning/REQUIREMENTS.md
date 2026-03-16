@@ -11,8 +11,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 ### Infrastructure
 
 - [ ] **INFRA-01**: publishEvent becomes safe no-op — app boots without RabbitMQ
-- [ ] **INFRA-02**: PostgreSQL migrated to Neon serverless (pooled + direct URLs)
-- [ ] **INFRA-03**: Redis migrated to Upstash (HTTP transport, drop-in for get/set/incr/expire)
+- [x] **INFRA-02**: PostgreSQL migrated to Neon serverless (pooled + direct URLs)
+- [x] **INFRA-03**: Redis migrated to Upstash (HTTP transport, drop-in for get/set/incr/expire)
 - [ ] **INFRA-04**: App deployed to Vercel with production env vars and DNS
 - [ ] **INFRA-05**: Next.js patched to >=14.2.25 (CVE-2025-29927 middleware bypass fix)
 
@@ -121,8 +121,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | INFRA-01 | Phase 45 | Pending |
-| INFRA-02 | Phase 45 | Pending |
-| INFRA-03 | Phase 45 | Pending |
+| INFRA-02 | Phase 45 | Complete |
+| INFRA-03 | Phase 45 | Complete |
 | INFRA-04 | Phase 45 | Pending |
 | INFRA-05 | Phase 45 | Pending |
 | FIX-01 | Phase 45 | Pending |
