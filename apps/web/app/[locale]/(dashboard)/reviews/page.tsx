@@ -53,52 +53,39 @@ function StarRating({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md
 // KPI CARDS
 // ============================================================================
 
+interface ReviewAggregates {
+  avg_rating: number;
+  total_reviews: number;
+  this_month: number;
+  response_rate: number;
+}
+
 function ReviewKpiCards({
-  reviews,
-  total,
+  aggregates,
   t,
 }: {
-  reviews: Review[];
-  total: number;
+  aggregates: ReviewAggregates;
   t: ReturnType<typeof useTranslations<'reviews'>>;
 }) {
-  const stats = useMemo(() => {
-    if (reviews.length === 0) {
-      return { avgRating: 0, totalReviews: total, thisMonth: 0, responseRate: 0 };
-    }
-
-    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-    const avgRating = reviews.length > 0 ? sum / reviews.length : 0;
-
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const thisMonth = reviews.filter((r) => new Date(r.created_at) >= startOfMonth).length;
-
-    const replied = reviews.filter((r) => r.reply !== null).length;
-    const responseRate = reviews.length > 0 ? Math.round((replied / reviews.length) * 100) : 0;
-
-    return { avgRating, totalReviews: total, thisMonth, responseRate };
-  }, [reviews, total]);
-
   const kpis = [
     {
       label: t('kpi.avgRating'),
-      value: stats.avgRating > 0 ? stats.avgRating.toFixed(1) : '-',
+      value: aggregates.avg_rating > 0 ? aggregates.avg_rating.toFixed(1) : '-',
       icon: <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />,
     },
     {
       label: t('kpi.totalReviews'),
-      value: stats.totalReviews.toString(),
+      value: aggregates.total_reviews.toString(),
       icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
     },
     {
       label: t('kpi.thisMonth'),
-      value: stats.thisMonth.toString(),
+      value: aggregates.this_month.toString(),
       icon: <Star className="h-5 w-5 text-green-500" />,
     },
     {
       label: t('kpi.responseRate'),
-      value: `${stats.responseRate}%`,
+      value: `${aggregates.response_rate}%`,
       icon: <MessageSquare className="h-5 w-5 text-purple-500" />,
     },
   ];
@@ -296,19 +283,16 @@ export default function ReviewsPage() {
 
   const limit = 20;
 
-  // Build query params from filters
-  const queryParams = useMemo(() => {
-    const params: Record<string, unknown> = { page, limit };
-    if (ratingFilter !== 'all') {
-      params.rating_min = Number(ratingFilter);
-    }
-    if (statusFilter === 'replied') {
-      params.status = 'approved';
-    } else if (statusFilter === 'unreplied') {
-      params.status = 'pending';
-    }
-    return params;
-  }, [page, ratingFilter, statusFilter]);
+  // Build query params from filters — no useMemo, recalculated every render
+  const queryParams: Record<string, unknown> = { page, limit };
+  if (ratingFilter !== 'all') {
+    queryParams.rating = parseInt(ratingFilter, 10);
+  }
+  if (statusFilter === 'replied') {
+    queryParams.status = 'approved';
+  } else if (statusFilter === 'unreplied') {
+    queryParams.status = 'pending';
+  }
 
   const { data, isLoading } = useReviewsQuery(queryParams);
 
@@ -337,9 +321,12 @@ export default function ReviewsPage() {
       {/* Page Header */}
       <PageHeader title={t('title')} description={t('description')} />
 
-      {/* KPI Cards */}
-      {!isLoading && reviews.length > 0 && (
-        <ReviewKpiCards reviews={reviews} total={totalCount} t={t} />
+      {/* KPI Cards — always visible, server-side aggregates (unaffected by filters) */}
+      {(data?.meta as Record<string, unknown>)?.aggregates && (
+        <ReviewKpiCards
+          aggregates={(data.meta as Record<string, unknown>).aggregates as ReviewAggregates}
+          t={t}
+        />
       )}
 
       {/* Filters */}
@@ -361,11 +348,11 @@ export default function ReviewsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('filterAllRatings')}</SelectItem>
-              <SelectItem value="5">5 {t('stars')}</SelectItem>
-              <SelectItem value="4">4+ {t('stars')}</SelectItem>
-              <SelectItem value="3">3+ {t('stars')}</SelectItem>
-              <SelectItem value="2">2+ {t('stars')}</SelectItem>
-              <SelectItem value="1">1+ {t('stars')}</SelectItem>
+              <SelectItem value="5">★★★★★ (5)</SelectItem>
+              <SelectItem value="4">★★★★ (4)</SelectItem>
+              <SelectItem value="3">★★★ (3)</SelectItem>
+              <SelectItem value="2">★★ (2)</SelectItem>
+              <SelectItem value="1">★ (1)</SelectItem>
             </SelectContent>
           </Select>
           <Select

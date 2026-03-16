@@ -15,13 +15,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, addDays, type Locale } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
-import Link from 'next/link';
+import { Link } from '@/lib/i18n/navigation';
 import {
   Clock,
-  Euro,
   Check,
   ChevronLeft,
   Loader2,
@@ -57,6 +56,7 @@ interface AvailabilitySlot {
   startTime: string;
   endTime: string;
   employeeId: number;
+  employeeUuid: string;
   employeeName: string;
   isAvailable: boolean;
 }
@@ -100,6 +100,21 @@ const DATE_LOCALES: Record<string, Locale> = {
   en: enUS,
 };
 
+const INTL_LOCALES: Record<string, string> = {
+  cs: 'cs-CZ',
+  sk: 'sk-SK',
+  en: 'en-US',
+};
+
+function formatPrice(price: number, currency: string, locale: string): string {
+  return new Intl.NumberFormat(INTL_LOCALES[locale] || locale, {
+    style: 'currency',
+    currency: currency || 'CZK',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
 // ============================================================================
 // PAGE COMPONENT
 // ============================================================================
@@ -111,6 +126,7 @@ export default function PublicBookingPage() {
 
   const locale = params.locale;
   const companySlug = params.company_slug;
+  const queryClient = useQueryClient();
   const preselectedServiceId = searchParams.get('service');
 
   // Step state
@@ -201,6 +217,7 @@ export default function PublicBookingPage() {
 
       const body = {
         service_id: selectedService.uuid,
+        employee_id: selectedSlot.employeeUuid,
         start_time: new Date(`${selectedSlot.date}T${selectedSlot.startTime}:00`).toISOString(),
         customer_name: customerName.trim(),
         customer_email: customerEmail.trim(),
@@ -230,6 +247,8 @@ export default function PublicBookingPage() {
       setBookingResult(data);
       setCurrentStep('confirmation');
       setFormError('');
+      // Invalidate availability cache so booked slots disappear
+      queryClient.invalidateQueries({ queryKey: ['public-availability'] });
     },
     onError: (error: Error) => {
       if (error.message === 'SLOT_TAKEN') {
@@ -246,7 +265,6 @@ export default function PublicBookingPage() {
 
   const filteredSlots = useMemo(() => {
     if (!slotsData) return [];
-    // Filter out past slots for today
     const now = new Date();
     const today = format(now, 'yyyy-MM-dd');
     return slotsData.filter((slot) => {
@@ -257,6 +275,19 @@ export default function PublicBookingPage() {
       return true;
     });
   }, [slotsData]);
+
+  // Group slots by employee for display
+  const slotsByEmployee = useMemo(() => {
+    const groups: Record<string, { name: string; id: number; slots: AvailabilitySlot[] }> = {};
+    for (const slot of filteredSlots) {
+      const key = String(slot.employeeId);
+      if (!groups[key]) {
+        groups[key] = { name: slot.employeeName, id: slot.employeeId, slots: [] };
+      }
+      groups[key].slots.push(slot);
+    }
+    return Object.values(groups);
+  }, [filteredSlots]);
 
   // ============================================================================
   // DATE NAVIGATION
@@ -407,9 +438,8 @@ export default function PublicBookingPage() {
                           <Clock className="w-4 h-4" />
                           {t('service.duration', { minutes: service.durationMinutes })}
                         </span>
-                        <span className="flex items-center gap-1 font-semibold">
-                          <Euro className="w-4 h-4" />
-                          {service.price.toFixed(0)} {service.currency}
+                        <span className="font-semibold">
+                          {formatPrice(service.price, service.currency, locale)}
                         </span>
                       </div>
                       <Button size="sm" variant="outline">
@@ -442,8 +472,8 @@ export default function PublicBookingPage() {
               <div>
                 <p className="font-medium">{selectedService.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  {selectedService.durationMinutes} min &middot; {selectedService.price.toFixed(0)}{' '}
-                  {selectedService.currency}
+                  {selectedService.durationMinutes} min &middot;{' '}
+                  {formatPrice(selectedService.price, selectedService.currency, locale)}
                 </p>
               </div>
             </CardContent>
@@ -511,26 +541,40 @@ export default function PublicBookingPage() {
             )}
 
             {!slotsLoading && filteredSlots.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                {filteredSlots.map((slot, idx) => {
-                  const isSelected =
-                    selectedSlot?.startTime === slot.startTime &&
-                    selectedSlot?.employeeId === slot.employeeId;
-                  return (
-                    <button
-                      key={`${slot.startTime}-${slot.employeeId}-${idx}`}
-                      onClick={() => handleSlotSelect(slot)}
-                      className={cn(
-                        'py-2 px-3 rounded-md border text-sm font-medium transition-colors',
-                        isSelected
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border hover:border-primary/50 hover:bg-muted/50',
-                      )}
-                    >
-                      {slot.startTime}
-                    </button>
-                  );
-                })}
+              <div className="space-y-5">
+                {slotsByEmployee.map((group) => (
+                  <div key={group.id}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium">{group.name}</span>
+                    </div>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                      {group.slots.map((slot, idx) => {
+                        const isSelected =
+                          selectedSlot?.startTime === slot.startTime &&
+                          selectedSlot?.employeeId === slot.employeeId;
+                        const isAvailable = slot.isAvailable !== false;
+                        return (
+                          <button
+                            key={`${slot.startTime}-${slot.employeeId}-${idx}`}
+                            onClick={() => isAvailable && handleSlotSelect(slot)}
+                            disabled={!isAvailable}
+                            className={cn(
+                              'py-2 px-3 rounded-md border text-sm font-medium transition-colors',
+                              isSelected
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : isAvailable
+                                  ? 'border-green-300 bg-green-50 text-green-800 hover:bg-green-100 hover:border-green-400 dark:border-green-700 dark:bg-green-950/40 dark:text-green-300 dark:hover:bg-green-900/50'
+                                  : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500',
+                            )}
+                          >
+                            {slot.startTime}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -703,10 +747,7 @@ export default function PublicBookingPage() {
             </CardContent>
           </Card>
 
-          <Link
-            href={`/${locale}/${companySlug}/booking/${bookingResult.id}`}
-            className="block w-full"
-          >
+          <Link href={`/${companySlug}/booking/${bookingResult.id}`} className="block w-full">
             <Button variant="outline" className="w-full">
               <ExternalLink className="w-4 h-4 mr-2" />
               {t('confirmation.trackBooking')}
@@ -714,7 +755,7 @@ export default function PublicBookingPage() {
           </Link>
 
           <div className="flex gap-3">
-            <Link href={`/${locale}/${companySlug}`} className="flex-1">
+            <Link href={`/${companySlug}`} className="flex-1">
               <Button variant="outline" className="w-full">
                 {t('confirmation.backToCompany')}
               </Button>

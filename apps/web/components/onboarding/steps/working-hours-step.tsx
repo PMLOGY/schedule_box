@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useOnboardingWizard, type WorkingHourEntry } from '@/stores/onboarding-wizard.store';
+import { apiClient } from '@/lib/api-client';
 
 // Generate time options from 06:00 to 22:00 in 30-minute increments
 function generateTimeOptions(): string[] {
@@ -125,16 +126,7 @@ export function WorkingHoursStep() {
         is_active: h.isActive,
       }));
 
-      const response = await fetch('/api/v1/settings/working-hours', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message ?? 'Failed to save working hours');
-      }
+      await apiClient.put('/settings/working-hours', payload);
 
       updateData({ workingHours: hours });
       markStepCompleted(3);

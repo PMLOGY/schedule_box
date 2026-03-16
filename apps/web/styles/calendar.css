@@ -1,53 +1,116 @@
-/* react-big-calendar CSS overrides for ScheduleBox shadcn theme */
+/* react-big-calendar CSS overrides for ScheduleBox glassmorphism theme */
 
 .rbc-calendar {
   font-family: inherit;
+  background: transparent;
 }
 
-/* Time gutter and header */
+/* ── Reduce visual noise: soften all grid lines ── */
+.rbc-calendar,
+.rbc-time-view,
+.rbc-month-view,
 .rbc-time-header,
-.rbc-time-gutter {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.rbc-header {
-  background-color: hsl(var(--muted));
-  font-weight: 500;
-  font-size: 0.875rem;
-  padding: 0.5rem;
-  border-color: hsl(var(--border));
-}
-
-.rbc-header + .rbc-header {
-  border-left-color: hsl(var(--border));
-}
-
-/* Day and time cells */
+.rbc-time-content,
 .rbc-day-bg,
-.rbc-time-slot {
-  border-color: hsl(var(--border));
+.rbc-time-slot,
+.rbc-timeslot-group,
+.rbc-month-row,
+.rbc-month-row + .rbc-month-row,
+.rbc-header,
+.rbc-header + .rbc-header,
+.rbc-day-bg + .rbc-day-bg,
+.rbc-time-header-content {
+  border-color: hsl(var(--border) / 0.35) !important;
 }
 
-.rbc-time-content {
-  border-top-color: hsl(var(--border));
-}
-
+/* Only show hour lines, hide 15-min subdivision lines */
 .rbc-timeslot-group {
-  border-bottom-color: hsl(var(--border));
+  border-bottom: 1px solid hsl(var(--border) / 0.35);
+  min-height: 56px;
 }
 
-/* Today highlight */
+.rbc-time-slot {
+  border-top: none !important;
+}
+
+.rbc-time-slot:first-child {
+  border-top: none !important;
+}
+
+/* ── Time gutter ── */
+.rbc-time-gutter {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground) / 0.7);
+  background: hsl(var(--muted) / 0.3);
+}
+
+.rbc-time-gutter .rbc-timeslot-group {
+  min-height: 56px;
+  padding-right: 8px;
+}
+
+.rbc-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Column / day headers ── */
+.rbc-header {
+  background: hsl(var(--muted) / 0.5);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 0.625rem 0.5rem;
+  color: hsl(var(--foreground) / 0.8);
+}
+
+/* ── Today column highlight ── */
 .rbc-today {
-  background-color: hsl(var(--primary) / 0.05);
+  background-color: hsl(var(--primary) / 0.04);
 }
 
-/* Events */
+/* ── Time content area ── */
+.rbc-time-content {
+  border-top: 1px solid hsl(var(--border) / 0.35);
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid hsl(var(--border) / 0.35);
+}
+
+/* ── Day/Week view backgrounds ── */
+.rbc-day-bg {
+  background: transparent;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid hsl(var(--border) / 0.25);
+}
+
+/* ── Events — polished cards ── */
 .rbc-event {
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
   border: none !important;
-  padding: 2px 4px;
+  padding: 4px 8px;
+  line-height: 1.35;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  color: #fff;
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s;
+}
+
+.rbc-event:hover {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
 .rbc-event:focus {
@@ -56,36 +119,97 @@
 }
 
 .rbc-event-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  opacity: 0.95;
+  display: block;
+  margin-bottom: 1px;
+}
+
+.rbc-event-content {
   font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Selection highlight */
-.rbc-slot-selection {
-  background-color: hsl(var(--primary) / 0.1);
+/* ── Day/Week view events ── */
+.rbc-day-slot .rbc-event {
+  padding: 4px 8px;
+  min-height: 28px;
 }
 
-/* Month view cells */
-.rbc-month-row + .rbc-month-row {
-  border-top-color: hsl(var(--border));
+.rbc-day-slot .rbc-event-content {
+  white-space: normal;
+  line-height: 1.35;
 }
 
+/* ── Month view events — compact but informative ── */
+.rbc-month-view .rbc-event {
+  padding: 2px 6px;
+  font-size: 0.6875rem;
+  border-radius: 4px;
+  margin-bottom: 1px;
+}
+
+.rbc-month-view .rbc-event-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rbc-month-view .rbc-row-segment {
+  padding: 0 2px 1px 2px;
+}
+
+/* Show more link in month view */
+.rbc-show-more {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  padding: 2px 4px;
+}
+
+/* ── Month view rows — taller to fit event info ── */
+.rbc-month-row {
+  min-height: 100px;
+}
+
+/* ── Month view cells ── */
 .rbc-date-cell {
   padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
 }
 
-/* Current time indicator */
+.rbc-date-cell.rbc-now {
+  font-weight: 700;
+  color: hsl(var(--primary));
+}
+
+/* ── Off-range days (month view) ── */
+.rbc-off-range-bg {
+  background-color: hsl(var(--muted) / 0.25);
+}
+
+.rbc-off-range {
+  color: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* ── Current time indicator ── */
 .rbc-current-time-indicator {
   background-color: hsl(var(--destructive));
   height: 2px;
+  z-index: 3;
 }
 
-/* Off-range days (month view) */
-.rbc-off-range-bg {
-  background-color: hsl(var(--muted) / 0.5);
+/* ── Selection ── */
+.rbc-slot-selection {
+  background-color: hsl(var(--primary) / 0.08);
+  border: 1px dashed hsl(var(--primary) / 0.3);
+  border-radius: 4px;
 }
 
-/* DnD addon styles */
+/* ── DnD ── */
 .rbc-addons-dnd .rbc-event {
   cursor: grab;
 }
@@ -98,12 +222,36 @@
   opacity: 0.7;
 }
 
-/* Scrollbar for week/day views */
+/* ── Scrollbar ── */
 .rbc-time-content::-webkit-scrollbar {
   width: 6px;
 }
 
+.rbc-time-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .rbc-time-content::-webkit-scrollbar-thumb {
-  background-color: hsl(var(--muted-foreground) / 0.3);
+  background-color: hsl(var(--muted-foreground) / 0.2);
   border-radius: 3px;
+}
+
+.rbc-time-content::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.35);
+}
+
+/* ── Agenda view ── */
+.rbc-agenda-view table.rbc-agenda-table {
+  border-color: hsl(var(--border) / 0.35);
+}
+
+.rbc-agenda-view table.rbc-agenda-table thead > tr > th {
+  border-bottom-color: hsl(var(--border) / 0.35);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+  border-top-color: hsl(var(--border) / 0.2);
+  padding: 0.5rem;
 }

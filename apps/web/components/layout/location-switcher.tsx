@@ -38,6 +38,9 @@ export function LocationSwitcher() {
   const t = useTranslations('organization');
   const { user, switchLocation } = useAuthStore();
 
+  const isAdmin = user?.role === 'admin';
+  const isCustomer = user?.role === 'customer';
+
   const { data: org, isLoading } = useQuery({
     queryKey: ['organization'],
     queryFn: async () => {
@@ -45,6 +48,7 @@ export function LocationSwitcher() {
       return result;
     },
     staleTime: 5 * 60 * 1000, // 5 min - org data rarely changes
+    enabled: !!user && !isAdmin && !isCustomer, // Only for owner/employee/manager with company context
   });
 
   // Don't render anything if user has no organization

@@ -28,6 +28,7 @@ export const GET = createRouteHandler({
     // Find employee record linked to this user in their company
     const [employee] = await db
       .select({
+        id: employees.id,
         uuid: employees.uuid,
         name: employees.name,
         email: employees.email,
@@ -42,6 +43,7 @@ export const GET = createRouteHandler({
     if (!employee) throw new NotFoundError('Employee record not found');
 
     return successResponse({
+      id: employee.id,
       uuid: employee.uuid,
       name: employee.name,
       email: employee.email,

@@ -30,12 +30,14 @@ export const GET = createRouteHandler({
     const userSub = user?.sub ?? '';
     const { companyId } = await findCompanyId(userSub);
 
-    // Date thresholds for churn analysis (same as v_customer_metrics)
+    // Date thresholds for churn analysis (as ISO strings for SQL interpolation)
     const now = new Date();
     const ninetyDaysAgo = new Date(now);
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     const oneEightyDaysAgo = new Date(now);
     oneEightyDaysAgo.setDate(oneEightyDaysAgo.getDate() - 180);
+    const ninetyStr = ninetyDaysAgo.toISOString();
+    const oneEightyStr = oneEightyDaysAgo.toISOString();
 
     // --- Repeat Booking Rate ---
     const [repeatBookingResult] = await db
@@ -55,47 +57,33 @@ export const GET = createRouteHandler({
     const [churnResult] = await db
       .select({
         // Churned: lastVisitAt older than 180 days or null
-        churned: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} IS NULL OR ${customers.lastVisitAt} <= ${oneEightyDaysAgo})::int`,
+        churned: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} IS NULL OR ${customers.lastVisitAt} <= ${oneEightyStr}::timestamptz)::int`,
         // At risk: lastVisitAt between 90-180 days ago
-        atRisk: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${oneEightyDaysAgo} AND ${customers.lastVisitAt} <= ${ninetyDaysAgo})::int`,
+        atRisk: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${oneEightyStr}::timestamptz AND ${customers.lastVisitAt} <= ${ninetyStr}::timestamptz)::int`,
         // Active: lastVisitAt within 90 days
-        active: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${ninetyDaysAgo})::int`,
+        active: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${ninetyStr}::timestamptz)::int`,
       })
       .from(customers)
       .where(and(eq(customers.companyId, companyId), isNull(customers.deletedAt)));
 
-    // --- CLV Distribution ---
-    const clvResults = await db
-      .select({
-        range: sql<string>`CASE
-          WHEN ${customers.clvPredicted}::numeric < 500 THEN '0-500'
-          WHEN ${customers.clvPredicted}::numeric < 2000 THEN '500-2000'
-          WHEN ${customers.clvPredicted}::numeric < 5000 THEN '2000-5000'
-          WHEN ${customers.clvPredicted}::numeric < 10000 THEN '5000-10000'
+    // --- CLV Distribution --- (raw SQL to avoid Drizzle GROUP BY issues)
+    const clvResults = await db.execute<{ range: string; count: number }>(sql`
+      SELECT
+        CASE
+          WHEN clv_predicted::numeric < 500 THEN '0-500'
+          WHEN clv_predicted::numeric < 2000 THEN '500-2000'
+          WHEN clv_predicted::numeric < 5000 THEN '2000-5000'
+          WHEN clv_predicted::numeric < 10000 THEN '5000-10000'
           ELSE '10000+'
-        END`,
-        count: sql<number>`COUNT(*)::int`,
-      })
-      .from(customers)
-      .where(
-        and(
-          eq(customers.companyId, companyId),
-          isNull(customers.deletedAt),
-          sql`${customers.clvPredicted} IS NOT NULL`,
-        ),
-      ).groupBy(sql`CASE
-        WHEN ${customers.clvPredicted}::numeric < 500 THEN '0-500'
-        WHEN ${customers.clvPredicted}::numeric < 2000 THEN '500-2000'
-        WHEN ${customers.clvPredicted}::numeric < 5000 THEN '2000-5000'
-        WHEN ${customers.clvPredicted}::numeric < 10000 THEN '5000-10000'
-        ELSE '10000+'
-      END`).orderBy(sql`CASE
-        WHEN ${customers.clvPredicted}::numeric < 500 THEN 1
-        WHEN ${customers.clvPredicted}::numeric < 2000 THEN 2
-        WHEN ${customers.clvPredicted}::numeric < 5000 THEN 3
-        WHEN ${customers.clvPredicted}::numeric < 10000 THEN 4
-        ELSE 5
-      END`);
+        END AS range,
+        COUNT(*)::int AS count
+      FROM customers
+      WHERE company_id = ${companyId}
+        AND deleted_at IS NULL
+        AND clv_predicted IS NOT NULL
+      GROUP BY 1
+      ORDER BY MIN(clv_predicted::numeric)
+    `);
 
     return successResponse({
       repeatBooking: {
@@ -108,7 +96,7 @@ export const GET = createRouteHandler({
         atRisk: churnResult?.atRisk ?? 0,
         active: churnResult?.active ?? 0,
       },
-      clvDistribution: clvResults,
+      clvDistribution: clvResults.rows ?? clvResults,
     });
   },
 });

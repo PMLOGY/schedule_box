@@ -118,6 +118,17 @@ export const GET = createRouteHandler({
       .where(and(...baseConditions));
     const totalCount = countResult.count;
 
+    // Aggregate stats for KPI cards (respects active filters)
+    const [aggregates] = await db
+      .select({
+        total_revenue: sql<string>`coalesce(sum(case when ${payments.status} = 'paid' then ${payments.amount}::numeric else 0 end), 0)::text`,
+        paid_count: sql<number>`count(*) filter (where ${payments.status} = 'paid')::int`,
+        pending_count: sql<number>`count(*) filter (where ${payments.status} = 'pending')::int`,
+        refunded_count: sql<number>`count(*) filter (where ${payments.status} in ('refunded', 'partially_refunded'))::int`,
+      })
+      .from(payments)
+      .where(and(...baseConditions));
+
     // Map to response format (use UUID, not SERIAL id, and snake_case)
     const responseData = data.map((payment) => ({
       id: payment.uuid,
@@ -140,6 +151,12 @@ export const GET = createRouteHandler({
       page,
       limit,
       total_pages: totalPages,
+      aggregates: {
+        total_revenue: aggregates.total_revenue,
+        paid_count: aggregates.paid_count,
+        pending_count: aggregates.pending_count,
+        refunded_count: aggregates.refunded_count,
+      },
     });
   },
 });

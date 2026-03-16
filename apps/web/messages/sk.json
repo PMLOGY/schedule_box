@@ -37,7 +37,11 @@
       "noAccount": "Nemáte účet?",
       "register": "Registrovať sa",
       "invalidCredentials": "Neplatné prihlasovacie údaje",
-      "mfaRequired": "Vyžadované dvojfázové overenie"
+      "mfaRequired": "Vyžadované dvojfázové overenie",
+      "validation": {
+        "emailInvalid": "Neplatná e-mailová adresa",
+        "passwordRequired": "Heslo je povinné"
+      }
     },
     "register": {
       "title": "Registrácia",
@@ -55,7 +59,17 @@
       "termsLink": "podmienkami používania",
       "privacyLink": "zásadami ochrany osobných údajov",
       "businessOwner": "Majiteľ firmy",
-      "customer": "Zákazník"
+      "customer": "Zákazník",
+      "validation": {
+        "nameMin": "Meno musí mať aspoň 2 znaky",
+        "emailInvalid": "Neplatná e-mailová adresa",
+        "passwordMin": "Heslo musí mať aspoň 12 znakov",
+        "passwordComplexity": "Heslo musí obsahovať veľké písmeno, malé písmeno, číslo a špeciálny znak",
+        "passwordsDoNotMatch": "Heslá sa nezhodujú",
+        "companyNameMin": "Názov spoločnosti musí mať aspoň 2 znaky"
+      },
+      "successOwner": "Registrácia prebehla úspešne! Presmerovanie na prihlásenie...",
+      "successCustomer": "Registrácia prebehla úspešne! Presmerovanie..."
     },
     "forgotPassword": {
       "title": "Zabudnuté heslo",
@@ -112,7 +126,9 @@
     "admin": "Administrácia",
     "companies": "Firmy",
     "users": "Používatelia",
-    "adminAnalytics": "Admin analytika"
+    "adminAnalytics": "Admin analytika",
+    "portal": "Portál",
+    "onboarding": "Sprievodca nastavením"
   },
   "dashboard": {
     "title": "Prehľad",
@@ -121,6 +137,12 @@
     "monthlyRevenue": "Mesačné tržby",
     "newCustomers": "Noví zákazníci",
     "averageRating": "Dokončené rezervácie",
+    "employee": {
+      "totalBookings": "Celkom rezervácií",
+      "completedBookings": "Dokončené",
+      "myRevenue": "Moje tržby",
+      "upcomingBookings": "Nadchádzajúce"
+    },
     "noShowRate": "Miera nedostavenia",
     "occupancyRate": "Miera obsadenosti",
     "vsLastMonth": "oproti minulému mesiacu",
@@ -379,7 +401,8 @@
       "totalRevenue": "Celkove trzby",
       "pendingPayments": "Cakajuce platby",
       "completedPayments": "Dokoncene platby",
-      "refundedPayments": "Vratene platby"
+      "refundedPayments": "Vrátené platby",
+      "totalFiltered": "Celkom výsledkov"
     },
     "columns": {
       "date": "Datum",
@@ -401,7 +424,16 @@
       "allStatuses": "Vsetky stavy",
       "dateFrom": "Od",
       "dateTo": "Do",
-      "clear": "Zrusit filtre"
+      "clear": "Zrusit filtre",
+      "method": "Platobna metoda",
+      "allMethods": "Vsetky metody"
+    },
+    "methods": {
+      "comgate": "Comgate",
+      "cash": "Hotovosť",
+      "bankTransfer": "Bankový prevod",
+      "qr": "QR platba",
+      "giftCard": "Darčekový poukaz"
     },
     "empty": {
       "title": "Zatial ziadne platby",
@@ -501,8 +533,9 @@
     },
     "active": "Aktivny",
     "inactive": "Neaktivny",
-    "noTypes": "Ziadne typy zdrojov",
-    "noResources": "Ziadne zdroje",
+    "noTypes": "Žiadne typy zdrojov",
+    "noResources": "Žiadne zdroje",
+    "noTypesHint": "Najskôr vytvorte typ zdroja (napr. Miestnosti, Vybavenie), potom môžete pridávať konkrétne zdroje.",
     "addType": "Pridat typ",
     "addTypeTitle": "Novy typ zdroja",
     "addResource": "Pridat zdroj",
@@ -872,6 +905,48 @@
     "noTemplate": "Bez šablóny (ručné zadanie)",
     "useTemplate": "Použiť"
   },
+  "notificationTemplates": {
+    "title": "Šablóny notifikácií",
+    "description": "Spravujte šablóny emailov, SMS a push notifikácií",
+    "newTemplate": "Nová šablóna",
+    "loading": "Načítavanie...",
+    "empty": "Zatiaľ žiadne šablóny",
+    "emptyDescription": "Vytvorte prvú šablónu pomocou tlačidla vyššie",
+    "active": "Aktívna",
+    "inactive": "Neaktívna",
+    "use": "Použiť",
+    "deleteConfirm": "Naozaj chcete zmazať túto šablónu?",
+    "types": {
+      "booking_confirmation": "Potvrdenie rezervácie",
+      "booking_reminder": "Pripomienka",
+      "booking_cancellation": "Zrušenie rezervácie",
+      "payment_confirmation": "Potvrdenie platby",
+      "payment_reminder": "Pripomienka platby",
+      "review_request": "Žiadosť o recenziu",
+      "welcome": "Uvítacia správa",
+      "loyalty_update": "Vernostný program",
+      "follow_up": "Follow-up",
+      "custom": "Vlastná"
+    },
+    "form": {
+      "createTitle": "Vytvoriť novú šablónu",
+      "createDescription": "Vytvorte šablónu pre email, SMS alebo push notifikáciu",
+      "editTitle": "Upraviť šablónu",
+      "editDescription": "Upravte šablónu notifikácie",
+      "type": "Typ šablóny",
+      "channel": "Kanál",
+      "subject": "Predmet",
+      "subjectPlaceholder": "Napr. Potvrdenie rezervácie",
+      "body": "Obsah šablóny",
+      "bodyPlaceholder": "Použite premenné: {{customer_name}}, {{service_name}}, {{booking_date}}",
+      "status": "Stav",
+      "create": "Vytvoriť",
+      "creating": "Vytváranie...",
+      "save": "Uložiť",
+      "saving": "Ukladanie...",
+      "cancel": "Zrušiť"
+    }
+  },
   "reviews": {
     "title": "Recenzie",
     "description": "Spravujte recenzie od vašich zákazníkov",
@@ -934,7 +1009,8 @@
       "send_email": "Odoslať email",
       "send_sms": "Odoslať SMS",
       "send_push": "Odoslať push notifikáciu",
-      "add_loyalty_points": "Pridať vernostné body"
+      "add_loyalty_points": "Pridať vernostné body",
+      "ai_follow_up": "AI follow-up"
     },
     "delays": {
       "immediate": "Okamžite",
@@ -1940,6 +2016,20 @@
       "notFoundDescription": "Táto rezervácia nebola nájdená. Skontrolujte prosím odkaz a skúste to znova.",
       "notCompleted": "Táto rezervácia ešte nebola dokončená. Recenziu môžete zanechať po skončení stretnutia."
     }
+  },
+  "publicCompany": {
+    "services": "Naše služby",
+    "book": "Rezervovať",
+    "reviews": "Recenzie zákazníkov",
+    "verifiedCustomer": "Overený zákazník",
+    "ownerReply": "Odpoveď majiteľa:",
+    "contact": "Kontakt",
+    "phone": "Telefón",
+    "email": "E-mail",
+    "web": "Web",
+    "reviewCount": "{count, plural, one {# recenzia} few {# recenzie} other {# recenzií}}",
+    "noServices": "Momentálne nie sú k dispozícii žiadne služby.",
+    "poweredBy": "Vytvorené pomocou"
   },
   "marketplace": {
     "title": "Marketplace",

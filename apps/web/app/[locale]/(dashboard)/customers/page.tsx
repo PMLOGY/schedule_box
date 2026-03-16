@@ -30,11 +30,14 @@ import {
 import { useCustomersQuery, useCreateCustomer, type Customer } from '@/hooks/use-customers-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
 import { CustomersEmptyState } from '@/components/onboarding/empty-states/customers-empty';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function CustomersPage() {
   const t = useTranslations('customers');
   const tCommon = useTranslations('common');
   const router = useRouter();
+  const userRole = useAuthStore((s) => s.user?.role);
+  const canAddCustomer = userRole !== 'employee';
 
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -81,10 +84,12 @@ export default function CustomersPage() {
       <Card variant="glass" className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <PageHeader title={t('title')} />
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            {t('add')}
-          </Button>
+          {canAddCustomer && (
+            <Button onClick={() => setDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('add')}
+            </Button>
+          )}
         </div>
 
         {/* Search */}

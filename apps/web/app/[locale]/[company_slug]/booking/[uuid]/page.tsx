@@ -176,10 +176,10 @@ export default function BookingTrackingPage() {
                 <Star className="h-6 w-6 mx-auto text-amber-500" />
                 <p className="text-sm font-medium">{t('reviewCta')}</p>
                 <Button variant="outline" size="sm" asChild>
-                  <a href={`/${locale}/${params.company_slug}/review/${params.uuid}`}>
+                  <Link href={`/${params.company_slug}/review/${params.uuid}`}>
                     <ExternalLink className="h-4 w-4 mr-1" />
                     {t('leaveReview')}
-                  </a>
+                  </Link>
                 </Button>
               </div>
             )}

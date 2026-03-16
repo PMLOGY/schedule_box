@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useAuthStore } from '@/stores/auth.store';
 
 interface CompanyOnboardingStatus {
   onboarding_completed: boolean;
@@ -15,14 +16,17 @@ export function useOnboardingRedirect(): {
   shouldRedirect: boolean;
   isLoading: boolean;
 } {
+  const user = useAuthStore((s) => s.user);
+  const hasCompany = !!user && user.role !== 'admin';
+
   const { data, isLoading } = useQuery({
     queryKey: ['settings', 'company', 'onboarding'],
     queryFn: async () => {
-      const result = await apiClient.get<{ data: CompanyOnboardingStatus }>('/settings/company');
-      return result.data;
+      return apiClient.get<CompanyOnboardingStatus>('/settings/company');
     },
     staleTime: 60_000,
     retry: false,
+    enabled: hasCompany,
   });
 
   if (isLoading) {

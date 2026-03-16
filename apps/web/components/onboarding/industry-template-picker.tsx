@@ -17,6 +17,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { INDUSTRY_TEMPLATES } from '@/lib/onboarding/industry-templates';
+import { apiClient } from '@/lib/api-client';
 
 // ============================================================================
 // ICON MAP — maps template.icon string to Lucide component
@@ -53,16 +54,7 @@ export function IndustryTemplatePicker({ onTemplateApplied }: IndustryTemplatePi
   const handleApplyTemplate = async (industryType: string) => {
     setApplyingTemplate(industryType);
     try {
-      const response = await fetch('/api/v1/onboarding/apply-template', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ industry_type: industryType }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error((data as { message?: string }).message ?? 'Failed to apply template');
-      }
+      await apiClient.post('/onboarding/apply-template', { industry_type: industryType });
 
       toast.success(t('applied'));
       onTemplateApplied?.(industryType);

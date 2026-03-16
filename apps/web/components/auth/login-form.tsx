@@ -20,17 +20,19 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-// Zod schema for login form
-const loginFormSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-  mfaCode: z.string().optional(),
-});
+function createLoginFormSchema(tv: (key: string) => string) {
+  return z.object({
+    email: z.string().email(tv('emailInvalid')),
+    password: z.string().min(1, tv('passwordRequired')),
+    mfaCode: z.string().optional(),
+  });
+}
 
-type LoginFormValues = z.infer<typeof loginFormSchema>;
+type LoginFormValues = z.infer<ReturnType<typeof createLoginFormSchema>>;
 
 export function LoginForm() {
   const t = useTranslations('auth.login');
+  const tv = useTranslations('auth.login.validation');
   const tCommon = useTranslations('common');
   const _tErrors = useTranslations('errors');
   const router = useRouter();
@@ -40,6 +42,8 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaInput, setShowMfaInput] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const loginFormSchema = createLoginFormSchema(tv);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -56,8 +60,15 @@ export function LoginForm() {
 
     try {
       await login(values.email, values.password);
-      // On success, redirect to dashboard
-      router.push('/dashboard');
+      // Role-based routing after login
+      const user = useAuthStore.getState().user;
+      if (user?.role === 'admin') {
+        router.push('/admin');
+      } else if (user?.role === 'customer') {
+        router.push('/portal/bookings');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
       // Handle MFA challenge
       if (error && typeof error === 'object' && 'code' in error) {

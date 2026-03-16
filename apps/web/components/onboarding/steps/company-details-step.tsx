@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useOnboardingWizard } from '@/stores/onboarding-wizard.store';
+import { apiClient } from '@/lib/api-client';
 import {
   companyDetailsSchema,
   type CompanyDetailsInput,
@@ -52,24 +53,15 @@ export function CompanyDetailsStep() {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch('/api/v1/settings/company', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: values.name,
-          phone: values.phone || undefined,
-          description: values.description || undefined,
-          address_street: values.address_street || undefined,
-          address_city: values.address_city || undefined,
-          address_zip: values.address_zip || undefined,
-          industry_type: values.industry_type,
-        }),
+      await apiClient.put('/settings/company', {
+        name: values.name,
+        phone: values.phone || undefined,
+        description: values.description || undefined,
+        address_street: values.address_street || undefined,
+        address_city: values.address_city || undefined,
+        address_zip: values.address_zip || undefined,
+        industry_type: values.industry_type,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message ?? 'Failed to save company details');
-      }
 
       updateData({
         companyName: values.name,

@@ -20,29 +20,36 @@ import {
   startOfWeek,
   getDay,
   startOfDay,
-  endOfDay,
   startOfMonth,
   endOfMonth,
   subDays,
   addDays,
 } from 'date-fns';
 import { cs } from 'date-fns/locale/cs';
+import { sk } from 'date-fns/locale/sk';
+import { enUS } from 'date-fns/locale/en-US';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useCalendarStore } from '@/stores/calendar.store';
 import { useRescheduleBooking } from '@/hooks/use-reschedule-booking';
+import { useAuthStore } from '@/stores/auth.store';
 import { apiClient } from '@/lib/api-client';
 import type { Booking, PaginatedResponse } from '@schedulebox/shared/types';
 import BookingDetailPanel from './BookingDetailPanel';
 import '../../styles/calendar.css';
 
-// date-fns localizer for Czech locale
-const locales = { cs };
+// date-fns locales mapped by next-intl locale code
+const DATE_LOCALES: Record<string, Locale> = { cs, sk, en: enUS };
+
+// react-big-calendar locales (needs at least one entry)
+const locales = { cs, sk, en: enUS };
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek,
+  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
   getDay,
   locales,
 });
@@ -82,12 +89,12 @@ function computeDateRange(view: string, selectedDate: Date) {
   switch (view) {
     case 'day': {
       const dayStart = startOfDay(selectedDate);
-      const dayEnd = endOfDay(selectedDate);
+      const dayEnd = addDays(dayStart, 1); // next day so API lt filter includes today
       return { dateFrom: toDateStr(dayStart), dateTo: toDateStr(dayEnd) };
     }
     case 'week': {
       const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-      const weekEnd = addDays(weekStart, 6);
+      const weekEnd = addDays(weekStart, 7); // day after last day so API lt filter includes whole week
       return { dateFrom: toDateStr(weekStart), dateTo: toDateStr(weekEnd) };
     }
     case 'month': {
@@ -106,6 +113,11 @@ function computeDateRange(view: string, selectedDate: Date) {
 
 export default function BookingCalendar() {
   const { view, selectedDate, selectedEmployeeIds, showCancelled } = useCalendarStore();
+  const tStatus = useTranslations('booking.status');
+  const locale = useLocale();
+  const dateLocale = DATE_LOCALES[locale] ?? cs;
+
+  const isEmployee = useAuthStore((s) => s.user?.role) === 'employee';
 
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
@@ -119,10 +131,12 @@ export default function BookingCalendar() {
   );
 
   // Fetch bookings for the visible date range
+  // Employees see only their own bookings via /employees/me/bookings
+  const bookingsEndpoint = isEmployee ? '/employees/me/bookings' : '/bookings';
   const { data: bookingsData } = useQuery({
-    queryKey: ['bookings', 'calendar', dateFrom, dateTo],
+    queryKey: [bookingsEndpoint, 'calendar', dateFrom, dateTo],
     queryFn: () =>
-      apiClient.get<PaginatedResponse<Booking>>('/bookings', {
+      apiClient.get<PaginatedResponse<Booking>>(bookingsEndpoint, {
         date_from: dateFrom,
         date_to: dateTo,
         limit: 100,
@@ -146,8 +160,8 @@ export default function BookingCalendar() {
     }
 
     return bookingList.map((booking) => ({
-      id: String(booking.uuid),
-      title: `${booking.customer?.name ?? ''} - ${booking.service?.name ?? ''}${booking.employee?.name ? ` (${booking.employee.name})` : ''}`,
+      id: String(booking.id),
+      title: `${booking.customer?.name ?? ''} — ${booking.service?.name ?? ''}${booking.employee?.name ? ` · ${booking.employee.name}` : ''}`,
       start: new Date(booking.startTime),
       end: new Date(booking.endTime),
       resource: booking.employee ? String(booking.employee.id) : undefined,
@@ -195,9 +209,64 @@ export default function BookingCalendar() {
     setSelectedBookingId(null);
   };
 
+  const statusLabels: Record<string, string> = {
+    pending: tStatus('pending'),
+    confirmed: tStatus('confirmed'),
+    completed: tStatus('completed'),
+    cancelled: tStatus('cancelled'),
+    no_show: tStatus('no_show'),
+  };
+
+  // Custom event renderer — shows time + customer + service clearly
+  const EventComponent = useCallback(
+    ({ event }: { event: CalendarEvent }) => {
+      const b = event.booking;
+      const time = format(event.start, 'HH:mm');
+      const customerName = b.customer?.name ?? '';
+      const serviceName = b.service?.name ?? '';
+
+      // Month view: show time, customer, and service
+      if (view === 'month') {
+        return (
+          <span
+            className="truncate text-[11px] leading-tight"
+            title={`${time} ${customerName} — ${serviceName}${b.employee?.name ? ` · ${b.employee.name}` : ''}`}
+          >
+            <strong>{time}</strong> {customerName}{' '}
+            <span className="opacity-75">— {serviceName}</span>
+          </span>
+        );
+      }
+
+      // Day/Week view: multi-line with full info
+      return (
+        <div className="leading-tight overflow-hidden">
+          <div className="font-semibold text-[11px] opacity-90">{customerName}</div>
+          <div className="text-[10px] opacity-80 truncate">{serviceName}</div>
+          {b.employee?.name && (
+            <div className="text-[10px] opacity-70 truncate">{b.employee.name}</div>
+          )}
+        </div>
+      );
+    },
+    [view],
+  );
+
   return (
     <>
-      <div className="relative rounded-lg border bg-card p-4">
+      <div className="relative rounded-lg border bg-card p-4 space-y-3">
+        {/* Status legend */}
+        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pb-2 border-b">
+          {Object.entries(STATUS_COLORS).map(([status, color]) => (
+            <div key={status} className="flex items-center gap-1.5">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-sm"
+                style={{ backgroundColor: color }}
+              />
+              <span>{statusLabels[status] ?? status}</span>
+            </div>
+          ))}
+        </div>
         <DnDCalendar
           localizer={localizer}
           events={calendarEvents}
@@ -208,18 +277,34 @@ export default function BookingCalendar() {
           onEventDrop={handleEventDrop}
           onSelectEvent={handleSelectEvent}
           eventPropGetter={eventPropGetter}
+          components={{
+            event: EventComponent as never,
+          }}
+          tooltipAccessor={(event) => {
+            const b = (event as CalendarEvent).booking;
+            const time = `${format((event as CalendarEvent).start, 'HH:mm')} – ${format((event as CalendarEvent).end, 'HH:mm')}`;
+            return `${time}\n${b.customer?.name ?? ''}\n${b.service?.name ?? ''}${b.employee?.name ? `\n${b.employee.name}` : ''}`;
+          }}
           draggableAccessor={(event) => (event as CalendarEvent).isDraggable}
           min={new Date(0, 0, 0, 6, 0, 0)}
           max={new Date(0, 0, 0, 22, 0, 0)}
-          step={15}
-          timeslots={4}
+          step={30}
+          timeslots={2}
           toolbar={false}
-          culture="cs"
+          culture={locale}
           style={{ minHeight: 600 }}
           formats={{
             timeGutterFormat: 'HH:mm',
             eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
-              `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`,
+              `${format(start, 'HH:mm')} – ${format(end, 'HH:mm')}`,
+            dayHeaderFormat: (date: Date) =>
+              format(date, 'EEEE d. MMMM yyyy', { locale: dateLocale }),
+            dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) => {
+              // react-big-calendar passes the first and last visible day
+              const s = format(start, 'd. MMM', { locale: dateLocale });
+              const e = format(end, 'd. MMM yyyy', { locale: dateLocale });
+              return s === e ? s : `${s} – ${e}`;
+            },
           }}
         />
       </div>

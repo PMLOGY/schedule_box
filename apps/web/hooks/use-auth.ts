@@ -44,7 +44,7 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
   if (pathname.startsWith('/portal')) {
     return role === 'customer';
   }
-  // Dashboard routes — owner, employee, manager (not customer, not admin in normal dashboard)
+  // Dashboard routes — owner, employee, manager (admin should use /admin panel)
   if (
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/bookings') ||
@@ -65,9 +65,10 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
     pathname.startsWith('/marketplace') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/onboarding') ||
-    pathname.startsWith('/schedule')
+    pathname.startsWith('/schedule') ||
+    pathname.startsWith('/profile')
   ) {
-    return ['owner', 'manager', 'employee', 'admin'].includes(role);
+    return ['owner', 'manager', 'employee'].includes(role);
   }
   // Allow everything else (public booking pages, etc.)
   return true;

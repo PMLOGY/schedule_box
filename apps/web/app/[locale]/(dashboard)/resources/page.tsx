@@ -291,8 +291,21 @@ export default function ResourcesPage() {
       {/* Resources Tab */}
       {activeTab === 'resources' && (
         <div className="space-y-4">
+          {/* Hint: create types first if none exist */}
+          {!typesLoading && (!resourceTypes || resourceTypes.length === 0) && (
+            <div className="rounded-lg border border-dashed p-4 text-center space-y-2">
+              <p className="text-sm text-muted-foreground">{t('noTypesHint')}</p>
+              <Button variant="outline" size="sm" onClick={() => setActiveTab('types')}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('addType')}
+              </Button>
+            </div>
+          )}
           <div className="flex justify-end">
-            <Button onClick={() => setResourceDialogOpen(true)}>
+            <Button
+              onClick={() => setResourceDialogOpen(true)}
+              disabled={!resourceTypes || resourceTypes.length === 0}
+            >
               <Plus className="h-4 w-4 mr-2" />
               {t('addResource')}
             </Button>

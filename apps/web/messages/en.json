@@ -37,7 +37,11 @@
       "noAccount": "Don't have an account?",
       "register": "Register",
       "invalidCredentials": "Invalid credentials",
-      "mfaRequired": "Two-factor authentication required"
+      "mfaRequired": "Two-factor authentication required",
+      "validation": {
+        "emailInvalid": "Invalid email address",
+        "passwordRequired": "Password is required"
+      }
     },
     "register": {
       "title": "Register",
@@ -55,7 +59,17 @@
       "termsLink": "terms of service",
       "privacyLink": "privacy policy",
       "businessOwner": "Business owner",
-      "customer": "Customer"
+      "customer": "Customer",
+      "validation": {
+        "nameMin": "Name must be at least 2 characters",
+        "emailInvalid": "Invalid email address",
+        "passwordMin": "Password must be at least 12 characters",
+        "passwordComplexity": "Password must contain uppercase, lowercase, number, and special character",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "companyNameMin": "Company name must be at least 2 characters"
+      },
+      "successOwner": "Registration successful! Redirecting to login...",
+      "successCustomer": "Registration successful! Redirecting..."
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -112,7 +126,9 @@
     "admin": "Admin",
     "companies": "Companies",
     "users": "Users",
-    "adminAnalytics": "Admin Analytics"
+    "adminAnalytics": "Admin Analytics",
+    "portal": "Portal",
+    "onboarding": "Setup Wizard"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -121,6 +137,12 @@
     "monthlyRevenue": "Monthly revenue",
     "newCustomers": "New customers",
     "averageRating": "Completed bookings",
+    "employee": {
+      "totalBookings": "Total bookings",
+      "completedBookings": "Completed",
+      "myRevenue": "My revenue",
+      "upcomingBookings": "Upcoming"
+    },
     "noShowRate": "No-show rate",
     "occupancyRate": "Occupancy rate",
     "vsLastMonth": "vs last month",
@@ -379,7 +401,8 @@
       "totalRevenue": "Total revenue",
       "pendingPayments": "Pending payments",
       "completedPayments": "Completed payments",
-      "refundedPayments": "Refunded payments"
+      "refundedPayments": "Refunded payments",
+      "totalFiltered": "Total results"
     },
     "columns": {
       "date": "Date",
@@ -401,7 +424,16 @@
       "allStatuses": "All statuses",
       "dateFrom": "From",
       "dateTo": "To",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "method": "Payment method",
+      "allMethods": "All methods"
+    },
+    "methods": {
+      "comgate": "Comgate",
+      "cash": "Cash",
+      "bankTransfer": "Bank transfer",
+      "qr": "QR payment",
+      "giftCard": "Gift card"
     },
     "empty": {
       "title": "No payments yet",
@@ -503,6 +535,7 @@
     "inactive": "Inactive",
     "noTypes": "No resource types",
     "noResources": "No resources",
+    "noTypesHint": "Create a resource type first (e.g. Rooms, Equipment), then you can add individual resources.",
     "addType": "Add type",
     "addTypeTitle": "New Resource Type",
     "addResource": "Add resource",
@@ -872,6 +905,48 @@
     "noTemplate": "No template (manual entry)",
     "useTemplate": "Use"
   },
+  "notificationTemplates": {
+    "title": "Notification Templates",
+    "description": "Manage templates for emails, SMS, and push notifications",
+    "newTemplate": "New Template",
+    "loading": "Loading...",
+    "empty": "No templates yet",
+    "emptyDescription": "Create your first template using the button above",
+    "active": "Active",
+    "inactive": "Inactive",
+    "use": "Use",
+    "deleteConfirm": "Are you sure you want to delete this template?",
+    "types": {
+      "booking_confirmation": "Booking confirmation",
+      "booking_reminder": "Reminder",
+      "booking_cancellation": "Booking cancellation",
+      "payment_confirmation": "Payment confirmation",
+      "payment_reminder": "Payment reminder",
+      "review_request": "Review request",
+      "welcome": "Welcome message",
+      "loyalty_update": "Loyalty update",
+      "follow_up": "Follow-up",
+      "custom": "Custom"
+    },
+    "form": {
+      "createTitle": "Create new template",
+      "createDescription": "Create a template for email, SMS, or push notification",
+      "editTitle": "Edit template",
+      "editDescription": "Edit notification template",
+      "type": "Template type",
+      "channel": "Channel",
+      "subject": "Subject",
+      "subjectPlaceholder": "e.g. Booking confirmation",
+      "body": "Template body",
+      "bodyPlaceholder": "Use variables: {{customer_name}}, {{service_name}}, {{booking_date}}",
+      "status": "Status",
+      "create": "Create",
+      "creating": "Creating...",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
+  },
   "reviews": {
     "title": "Reviews",
     "description": "Manage reviews from your customers",
@@ -934,7 +1009,8 @@
       "send_email": "Send email",
       "send_sms": "Send SMS",
       "send_push": "Send push notification",
-      "add_loyalty_points": "Add loyalty points"
+      "add_loyalty_points": "Add loyalty points",
+      "ai_follow_up": "AI follow-up"
     },
     "delays": {
       "immediate": "Immediately",
@@ -2014,6 +2090,20 @@
       "notFoundDescription": "This booking could not be found. Please check the link and try again.",
       "notCompleted": "This booking has not been completed yet. You can leave a review once the appointment is finished."
     }
+  },
+  "publicCompany": {
+    "services": "Our Services",
+    "book": "Book Now",
+    "reviews": "Customer Reviews",
+    "verifiedCustomer": "Verified customer",
+    "ownerReply": "Owner reply:",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "web": "Web",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "noServices": "No services available at the moment.",
+    "poweredBy": "Powered by"
   },
   "marketplace": {
     "title": "Marketplace",

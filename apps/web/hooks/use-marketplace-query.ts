@@ -86,13 +86,13 @@ export function useMyListing() {
 
 /**
  * Hook for creating or updating the current company's marketplace listing
- * POST /api/v1/marketplace/my-listing
+ * PUT /api/v1/marketplace/my-listing (upsert)
  */
 export function useUpdateMyListing() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: MyListingData) => {
-      return apiClient.post('/marketplace/my-listing', data);
+      return apiClient.put('/marketplace/my-listing', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['marketplace'] });

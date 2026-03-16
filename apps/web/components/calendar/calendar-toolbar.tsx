@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   format,
@@ -10,14 +10,21 @@ import {
   subWeeks,
   addMonths,
   subMonths,
+  startOfWeek,
   endOfWeek,
 } from 'date-fns';
 import { cs } from 'date-fns/locale/cs';
+import { sk } from 'date-fns/locale/sk';
+import { enUS } from 'date-fns/locale/en-US';
 import { Button } from '@/components/ui/button';
 import { useCalendarStore } from '@/stores/calendar.store';
 
+const DATE_LOCALES: Record<string, Locale> = { cs, sk, en: enUS };
+
 export function CalendarToolbar() {
   const t = useTranslations('calendar');
+  const locale = useLocale();
+  const dateLocale = DATE_LOCALES[locale] ?? cs;
   const { view, selectedDate, setView, setSelectedDate } = useCalendarStore();
 
   const handlePrev = () => {
@@ -55,17 +62,14 @@ export function CalendarToolbar() {
   const formatDateLabel = () => {
     switch (view) {
       case 'day':
-        return format(selectedDate, 'EEEE d. MMMM yyyy', { locale: cs });
+        return format(selectedDate, 'EEEE d. MMMM yyyy', { locale: dateLocale });
       case 'week': {
+        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
         const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
-        return (
-          format(selectedDate, 'd. MMM', { locale: cs }) +
-          ' - ' +
-          format(weekEnd, 'd. MMM yyyy', { locale: cs })
-        );
+        return `${format(weekStart, 'd. MMM', { locale: dateLocale })} – ${format(weekEnd, 'd. MMM yyyy', { locale: dateLocale })}`;
       }
       case 'month':
-        return format(selectedDate, 'MMMM yyyy', { locale: cs });
+        return format(selectedDate, 'LLLL yyyy', { locale: dateLocale });
     }
   };
 

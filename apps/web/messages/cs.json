@@ -37,7 +37,11 @@
       "noAccount": "Nemáte účet?",
       "register": "Registrovat se",
       "invalidCredentials": "Neplatné přihlašovací údaje",
-      "mfaRequired": "Vyžadováno dvoufázové ověření"
+      "mfaRequired": "Vyžadováno dvoufázové ověření",
+      "validation": {
+        "emailInvalid": "Neplatná e-mailová adresa",
+        "passwordRequired": "Heslo je povinné"
+      }
     },
     "register": {
       "title": "Registrace",
@@ -55,7 +59,17 @@
       "termsLink": "podmínkami použití",
       "privacyLink": "zásadami ochrany osobních údajů",
       "businessOwner": "Majitel firmy",
-      "customer": "Zákazník"
+      "customer": "Zákazník",
+      "validation": {
+        "nameMin": "Jméno musí mít alespoň 2 znaky",
+        "emailInvalid": "Neplatná e-mailová adresa",
+        "passwordMin": "Heslo musí mít alespoň 12 znaků",
+        "passwordComplexity": "Heslo musí obsahovat velké písmeno, malé písmeno, číslo a speciální znak",
+        "passwordsDoNotMatch": "Hesla se neshodují",
+        "companyNameMin": "Název společnosti musí mít alespoň 2 znaky"
+      },
+      "successOwner": "Registrace proběhla úspěšně! Přesměrování na přihlášení...",
+      "successCustomer": "Registrace proběhla úspěšně! Přesměrování..."
     },
     "forgotPassword": {
       "title": "Zapomenuté heslo",
@@ -112,7 +126,9 @@
     "admin": "Administrace",
     "companies": "Firmy",
     "users": "Uživatelé",
-    "adminAnalytics": "Admin analytika"
+    "adminAnalytics": "Admin analytika",
+    "portal": "Portál",
+    "onboarding": "Průvodce nastavením"
   },
   "dashboard": {
     "title": "Přehled",
@@ -121,6 +137,12 @@
     "monthlyRevenue": "Měsíční tržby",
     "newCustomers": "Noví zákazníci",
     "averageRating": "Dokončené rezervace",
+    "employee": {
+      "totalBookings": "Celkem rezervací",
+      "completedBookings": "Dokončené",
+      "myRevenue": "Moje tržby",
+      "upcomingBookings": "Nadcházející"
+    },
     "noShowRate": "Míra nedostavení",
     "occupancyRate": "Míra obsazenosti",
     "vsLastMonth": "oproti minulému měsíci",
@@ -379,7 +401,8 @@
       "totalRevenue": "Celkove trzby",
       "pendingPayments": "Cekajici platby",
       "completedPayments": "Dokoncene platby",
-      "refundedPayments": "Vracene platby"
+      "refundedPayments": "Vrácené platby",
+      "totalFiltered": "Celkem výsledků"
     },
     "columns": {
       "date": "Datum",
@@ -401,7 +424,16 @@
       "allStatuses": "Vsechny stavy",
       "dateFrom": "Od",
       "dateTo": "Do",
-      "clear": "Zrusit filtry"
+      "clear": "Zrusit filtry",
+      "method": "Platebni metoda",
+      "allMethods": "Vsechny metody"
+    },
+    "methods": {
+      "comgate": "Comgate",
+      "cash": "Hotovost",
+      "bankTransfer": "Bankovní převod",
+      "qr": "QR platba",
+      "giftCard": "Dárkový poukaz"
     },
     "empty": {
       "title": "Zatim zadne platby",
@@ -501,8 +533,9 @@
     },
     "active": "Aktivni",
     "inactive": "Neaktivni",
-    "noTypes": "Zadne typy zdroju",
-    "noResources": "Zadne zdroje",
+    "noTypes": "Žádné typy zdrojů",
+    "noResources": "Žádné zdroje",
+    "noTypesHint": "Nejdříve vytvořte typ zdroje (např. Místnosti, Vybavení), pak můžete přidávat konkrétní zdroje.",
     "addType": "Pridat typ",
     "addTypeTitle": "Novy typ zdroje",
     "addResource": "Pridat zdroj",
@@ -872,6 +905,48 @@
     "noTemplate": "Bez šablony (ruční zadání)",
     "useTemplate": "Použít"
   },
+  "notificationTemplates": {
+    "title": "Šablony notifikací",
+    "description": "Spravujte šablony emailů, SMS a push notifikací",
+    "newTemplate": "Nová šablona",
+    "loading": "Načítání...",
+    "empty": "Zatím žádné šablony",
+    "emptyDescription": "Vytvořte první šablonu pomocí tlačítka výše",
+    "active": "Aktivní",
+    "inactive": "Neaktivní",
+    "use": "Použít",
+    "deleteConfirm": "Opravdu chcete smazat tuto šablonu?",
+    "types": {
+      "booking_confirmation": "Potvrzení rezervace",
+      "booking_reminder": "Připomenutí",
+      "booking_cancellation": "Zrušení rezervace",
+      "payment_confirmation": "Potvrzení platby",
+      "payment_reminder": "Připomenutí platby",
+      "review_request": "Žádost o recenzi",
+      "welcome": "Uvítací zpráva",
+      "loyalty_update": "Věrnostní program",
+      "follow_up": "Follow-up",
+      "custom": "Vlastní"
+    },
+    "form": {
+      "createTitle": "Vytvořit novou šablonu",
+      "createDescription": "Vytvořte šablonu pro email, SMS nebo push notifikaci",
+      "editTitle": "Upravit šablonu",
+      "editDescription": "Upravte šablonu notifikace",
+      "type": "Typ šablony",
+      "channel": "Kanál",
+      "subject": "Předmět",
+      "subjectPlaceholder": "Např. Potvrzení rezervace",
+      "body": "Obsah šablony",
+      "bodyPlaceholder": "Použijte proměnné: {{customer_name}}, {{service_name}}, {{booking_date}}",
+      "status": "Stav",
+      "create": "Vytvořit",
+      "creating": "Vytváření...",
+      "save": "Uložit",
+      "saving": "Ukládání...",
+      "cancel": "Zrušit"
+    }
+  },
   "reviews": {
     "title": "Recenze",
     "description": "Spravujte recenze od vašich zákazníků",
@@ -934,7 +1009,8 @@
       "send_email": "Odeslat email",
       "send_sms": "Odeslat SMS",
       "send_push": "Odeslat push notifikaci",
-      "add_loyalty_points": "Přidat věrnostní body"
+      "add_loyalty_points": "Přidat věrnostní body",
+      "ai_follow_up": "AI follow-up"
     },
     "delays": {
       "immediate": "Okamžitě",
@@ -2014,6 +2090,20 @@
       "notFoundDescription": "Tato rezervace nebyla nalezena. Zkontrolujte prosím odkaz a zkuste to znovu.",
       "notCompleted": "Tato rezervace ještě nebyla dokončena. Recenzi můžete zanechat po skončení schůzky."
     }
+  },
+  "publicCompany": {
+    "services": "Naše služby",
+    "book": "Rezervovat",
+    "reviews": "Recenze zákazníků",
+    "verifiedCustomer": "Ověřený zákazník",
+    "ownerReply": "Odpověď majitele:",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "web": "Web",
+    "reviewCount": "{count, plural, one {# recenze} few {# recenze} other {# recenzí}}",
+    "noServices": "Momentálně nejsou k dispozici žádné služby.",
+    "poweredBy": "Vytvořeno pomocí"
   },
   "marketplace": {
     "title": "Marketplace",

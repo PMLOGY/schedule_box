@@ -19,7 +19,10 @@ import type { PaginatedResponse, Booking } from '@schedulebox/shared/types';
  * Accepts the same filter params as useBookingsQuery (page, limit, status, etc.)
  * but ignores any employee_id the caller might pass — the server forces its own.
  */
-export function useMyBookings(params: Partial<BookingListQuery> = {}) {
+export function useMyBookings(
+  params: Partial<BookingListQuery> = {},
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: ['me', 'bookings', params],
     queryFn: async () => {
@@ -30,5 +33,6 @@ export function useMyBookings(params: Partial<BookingListQuery> = {}) {
       return response;
     },
     staleTime: 30_000, // 30 seconds — same as regular bookings
+    enabled: options?.enabled ?? true,
   });
 }

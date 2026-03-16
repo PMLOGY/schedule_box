@@ -45,6 +45,7 @@ export interface AvailabilitySlot {
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   employeeId: number;
+  employeeUuid: string;
   employeeName: string;
   isAvailable: boolean;
 }
@@ -96,6 +97,7 @@ export async function calculateAvailability(
   const serviceEmployees = await db
     .select({
       employeeId: employeeServices.employeeId,
+      employeeUuid: employees.uuid,
       employeeName: employees.name,
     })
     .from(employeeServices)
@@ -172,6 +174,7 @@ export async function calculateAvailability(
             startTime: format(currentSlotStart, 'HH:mm'),
             endTime: format(currentSlotEnd, 'HH:mm'),
             employeeId: period.employeeId,
+            employeeUuid: employee.employeeUuid,
             employeeName: employee.employeeName,
             isAvailable: true,
           });

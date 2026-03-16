@@ -107,7 +107,7 @@ export default function CustomerDetailPage() {
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [tagsInitialized, setTagsInitialized] = useState(false);
 
-  const customer = customerData?.data;
+  const customer = customerData;
   const bookings = bookingsData?.data || [];
   const allTags = tagsData?.data || [];
 

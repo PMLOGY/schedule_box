@@ -21,7 +21,7 @@ export function UserMenu() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   const getInitials = (name: string) => {
@@ -34,6 +34,12 @@ export function UserMenu() {
   };
 
   if (!user) return null;
+
+  const isCustomer = user.role === 'customer';
+  const isAdmin = user.role === 'admin';
+  const profilePath = isCustomer ? '/portal/profile' : '/profile';
+  const showProfileLink = !isAdmin;
+  const showSettingsLink = !isCustomer && !isAdmin;
 
   return (
     <DropdownMenu>
@@ -51,15 +57,18 @@ export function UserMenu() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push('/profile')}>
-          <User className="mr-2 h-4 w-4" />
-          {t('profile')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push('/settings')}>
-          <Settings className="mr-2 h-4 w-4" />
-          {t('settings')}
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        {showProfileLink && (
+          <DropdownMenuItem onClick={() => router.push(profilePath)}>
+            <User className="mr-2 h-4 w-4" />
+            {t('profile')}
+          </DropdownMenuItem>
+        )}
+        {showSettingsLink && (
+          <DropdownMenuItem onClick={() => router.push('/settings')}>
+            <Settings className="mr-2 h-4 w-4" />
+            {t('settings')}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           {t('logout')}

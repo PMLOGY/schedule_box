@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/lib/i18n/navigation';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button';
 import { Loader2, Copy, Check, Download, PartyPopper } from 'lucide-react';
 import { useOnboardingWizard } from '@/stores/onboarding-wizard.store';
+import { apiClient } from '@/lib/api-client';
 
 export function ShareLinkStep() {
   const t = useTranslations();
-  const locale = useLocale();
   const router = useRouter();
   const { data, prevStep, setSubmitting, setError, isSubmitting } = useOnboardingWizard();
 
@@ -21,18 +21,22 @@ export function ShareLinkStep() {
   // Fetch slug if not already in store data
   useEffect(() => {
     if (companySlug) return;
-    fetch('/api/v1/settings/company')
-      .then((r) => r.json())
-      .then((body) => {
-        const slug = body?.data?.slug;
+    apiClient
+      .get<Record<string, unknown>>('/settings/company')
+      .then((data) => {
+        const slug = data?.slug as string | undefined;
         if (slug) setCompanySlug(slug);
       })
-      .catch(() => {
-        // Non-critical — user can still complete setup
+      .catch((err) => {
+        console.error('[ShareLinkStep] Failed to fetch company slug:', err);
       });
   }, [companySlug]);
 
-  const bookingUrl = companySlug ? `https://schedulebox.cz/${companySlug}` : '';
+  const baseUrl =
+    typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? `${window.location.origin}`
+      : 'https://schedulebox.cz';
+  const bookingUrl = companySlug ? `${baseUrl}/${companySlug}` : '';
 
   // Generate QR code once we have the booking URL
   useEffect(() => {
@@ -69,18 +73,9 @@ export function ShareLinkStep() {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch('/api/v1/settings/company', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ onboarding_completed: true }),
-      });
+      await apiClient.put('/settings/company', { onboarding_completed: true });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message ?? 'Failed to complete onboarding');
-      }
-
-      router.push(`/${locale}/dashboard`);
+      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Nastala chyba. Zkuste to znovu.');
     } finally {

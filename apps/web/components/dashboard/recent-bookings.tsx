@@ -7,14 +7,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import BookingStatusBadge from '@/components/booking/BookingStatusBadge';
 import { useBookingsQuery } from '@/hooks/use-bookings-query';
+import { useMyBookings } from '@/hooks/use-my-bookings';
+import { useAuthStore } from '@/stores/auth.store';
 
 /**
  * Recent bookings card for the dashboard.
  * Shows the latest 5 bookings with customer name, service, time, and status.
+ * Employees see only their own bookings.
  */
 export function RecentBookings() {
   const t = useTranslations('dashboard');
-  const { data, isLoading } = useBookingsQuery({ page: 1, limit: 5 });
+  const isEmployee = useAuthStore((s) => s.user?.role) === 'employee';
+  const ownerQuery = useBookingsQuery({ page: 1, limit: 5 });
+  const employeeQuery = useMyBookings({ page: 1, limit: 5 }, { enabled: isEmployee });
+  const { data, isLoading } = isEmployee ? employeeQuery : ownerQuery;
 
   if (isLoading) {
     return (
@@ -47,7 +53,7 @@ export function RecentBookings() {
           <div className="space-y-3">
             {bookings.map((booking) => (
               <div
-                key={booking.uuid ?? String(booking.id)}
+                key={booking.id}
                 className="flex items-center justify-between gap-2 rounded-lg border p-3"
               >
                 <div className="min-w-0 flex-1">

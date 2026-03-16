@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth.store';
 import { UpsellingSuggestions } from '@/components/booking/UpsellingSuggestions';
 
 interface Service {
@@ -40,13 +41,35 @@ export function Step1ServiceSelect() {
   const t = useTranslations('booking.wizard.step1');
   const tCommon = useTranslations('common');
   const { data, updateData, nextStep } = useBookingWizard();
+  const user = useAuthStore((s) => s.user);
+  const isEmployee = user?.role === 'employee';
 
-  const { data: services, isLoading: isLoadingServices } = useQuery<Service[]>({
-    queryKey: ['services', { is_active: true }],
+  // Fetch employee's own info to get their employee ID and UUID
+  const { data: meData } = useQuery<{ id: number; uuid: string; name: string }>({
+    queryKey: ['auth', 'me', 'employee'],
     queryFn: async () => {
+      const res = await apiClient.get<{ id: number; uuid: string; name: string }>(
+        '/auth/me/employee',
+      );
+      return res;
+    },
+    enabled: isEmployee,
+  });
+
+  // Fetch all active services (owner/manager) or employee's assigned services only
+  const { data: services, isLoading: isLoadingServices } = useQuery<Service[]>({
+    queryKey: ['services', { is_active: true, employee: isEmployee ? meData?.uuid : undefined }],
+    queryFn: async () => {
+      if (isEmployee && meData?.uuid) {
+        // Fetch only services assigned to this employee
+        const res = await apiClient.get<{ data: Service[] }>(`/employees/${meData.uuid}/services`);
+        const list = Array.isArray(res) ? res : (res.data ?? []);
+        return list;
+      }
       const res = await apiClient.get<{ data: Service[] }>('/services', { is_active: true });
       return Array.isArray(res) ? res : res.data;
     },
+    enabled: !isEmployee || !!meData?.uuid,
   });
 
   const { data: employees, isLoading: isLoadingEmployees } = useQuery<Employee[]>({
@@ -61,12 +84,18 @@ export function Step1ServiceSelect() {
   });
 
   const handleServiceSelect = (service: Service) => {
-    updateData({
+    const updates: Record<string, unknown> = {
       serviceId: service.id,
       serviceName: service.name,
       serviceDuration: service.duration_minutes,
       servicePrice: `${service.price} ${service.currency}`,
-    });
+    };
+    // Auto-assign employee when an employee creates a booking (use numeric ID for availability API)
+    if (isEmployee && meData) {
+      updates.employeeId = meData.id;
+      updates.employeeName = meData.name;
+    }
+    updateData(updates);
   };
 
   const handleEmployeeSelect = (employeeId: string) => {
@@ -148,26 +177,29 @@ export function Step1ServiceSelect() {
 
       {data.serviceId && (
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t('preferredEmployee')}</Label>
-            <Select
-              value={data.employeeId?.toString() || 'any'}
-              onValueChange={handleEmployeeSelect}
-              disabled={isLoadingEmployees}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t('anyEmployee')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">{t('anyEmployee')}</SelectItem>
-                {employees?.map((employee) => (
-                  <SelectItem key={employee.id} value={employee.id.toString()}>
-                    {employee.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Employee selector — hidden for employees (auto-assigned to themselves) */}
+          {!isEmployee && (
+            <div className="space-y-2">
+              <Label>{t('preferredEmployee')}</Label>
+              <Select
+                value={data.employeeId?.toString() || 'any'}
+                onValueChange={handleEmployeeSelect}
+                disabled={isLoadingEmployees}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('anyEmployee')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">{t('anyEmployee')}</SelectItem>
+                  {employees?.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id.toString()}>
+                      {employee.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <Button onClick={handleContinue} className="w-full">
             {tCommon('next')}

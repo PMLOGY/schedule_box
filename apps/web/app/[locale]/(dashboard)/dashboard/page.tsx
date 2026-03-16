@@ -55,7 +55,7 @@ export default function DashboardPage() {
     );
   }
 
-  // Employee sees a simplified dashboard
+  // Employee sees a simplified dashboard — only their own data
   if (isEmployee) {
     return (
       <div className="space-y-6">
@@ -65,17 +65,11 @@ export default function DashboardPage() {
           </h1>
         </div>
 
-        {/* Employee KPIs + Recent Bookings */}
+        {/* Employee KPIs (own bookings only) */}
         <DashboardGrid />
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <RevenueMiniChart />
-          </div>
-          <div className="lg:col-span-1">
-            <RecentBookings />
-          </div>
-        </div>
+        {/* Recent bookings (own only) */}
+        <RecentBookings />
       </div>
     );
   }

@@ -20,7 +20,7 @@ import { NotFoundError } from '@schedulebox/shared';
 export const GET = createRouteHandler({
   requiresAuth: true,
   handler: async ({ user }) => {
-    // Find user by UUID with role name and company UUID
+    // Find user by UUID with role name and company UUID (LEFT JOIN for admin users without company)
     const [userRecord] = await db
       .select({
         uuid: users.uuid,
@@ -36,7 +36,7 @@ export const GET = createRouteHandler({
       })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
-      .innerJoin(companies, eq(users.companyId, companies.id))
+      .leftJoin(companies, eq(users.companyId, companies.id))
       .where(eq(users.uuid, user!.sub))
       .limit(1);
 
@@ -88,7 +88,7 @@ export const PUT = createRouteHandler({
       })
       .where(eq(users.id, userRecord.id));
 
-    // Fetch updated user profile with role name and company UUID
+    // Fetch updated user profile with role name and company UUID (LEFT JOIN for admin users without company)
     const [updatedUser] = await db
       .select({
         uuid: users.uuid,
@@ -104,7 +104,7 @@ export const PUT = createRouteHandler({
       })
       .from(users)
       .innerJoin(roles, eq(users.roleId, roles.id))
-      .innerJoin(companies, eq(users.companyId, companies.id))
+      .leftJoin(companies, eq(users.companyId, companies.id))
       .where(eq(users.id, userRecord.id))
       .limit(1);
 

@@ -20,6 +20,7 @@ import { Info, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useOnboardingWizard } from '@/stores/onboarding-wizard.store';
 import { firstServiceSchema, type FirstServiceInput } from '@/validations/onboarding';
 import { IndustryTemplatePicker } from '@/components/onboarding/industry-template-picker';
+import { apiClient } from '@/lib/api-client';
 
 const DURATION_OPTIONS = [15, 30, 45, 60, 90, 120] as const;
 
@@ -72,22 +73,13 @@ export function FirstServiceStep() {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch('/api/v1/services', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: values.name,
-          duration_minutes: values.duration_minutes,
-          price: values.price,
-          description: values.description || undefined,
-          online_booking_enabled: true,
-        }),
+      await apiClient.post('/services', {
+        name: values.name,
+        duration_minutes: values.duration_minutes,
+        price: values.price,
+        description: values.description || undefined,
+        online_booking_enabled: true,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error((errorData as { message?: string }).message ?? 'Failed to create service');
-      }
 
       updateData({
         serviceName: values.name,

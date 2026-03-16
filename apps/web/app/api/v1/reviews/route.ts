@@ -31,14 +31,22 @@ export const GET = createRouteHandler({
     const query = validateQuery(reviewListQuerySchema, req);
     const { page = 1, limit = 20, rating_min, status } = query;
 
+    // Also check for exact rating param (not in schema, parsed manually)
+    const ratingExact = req.nextUrl.searchParams.get('rating');
+
     // Calculate pagination
     const offset = (page - 1) * limit;
 
     // Build base WHERE conditions (company scoped + not deleted)
     const baseConditions = [eq(reviews.companyId, companyId), isNull(reviews.deletedAt)];
 
-    // Add rating filter
-    if (rating_min !== undefined) {
+    // Add rating filter — exact match takes priority over min
+    if (ratingExact) {
+      const parsed = parseInt(ratingExact, 10);
+      if (parsed >= 1 && parsed <= 5) {
+        baseConditions.push(eq(reviews.rating, parsed));
+      }
+    } else if (rating_min !== undefined) {
       baseConditions.push(gte(reviews.rating, rating_min));
     }
 
@@ -108,6 +116,24 @@ export const GET = createRouteHandler({
       updated_at: review.updatedAt?.toISOString(),
     }));
 
+    // Company-wide aggregates for KPI cards (unaffected by filters)
+    const companyConditions = [eq(reviews.companyId, companyId), isNull(reviews.deletedAt)];
+    const now = new Date();
+    const startOfMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+
+    const [agg] = await db
+      .select({
+        avg_rating: sql<string>`coalesce(round(avg(${reviews.rating})::numeric, 1), 0)::text`,
+        total_reviews: sql<number>`count(*)::int`,
+        this_month: sql<number>`count(*) filter (where ${reviews.createdAt} >= ${startOfMonthStr}::timestamptz)::int`,
+        replied_count: sql<number>`count(*) filter (where ${reviews.reply} is not null)::int`,
+      })
+      .from(reviews)
+      .where(and(...companyConditions));
+
+    const responseRate =
+      agg.total_reviews > 0 ? Math.round((agg.replied_count / agg.total_reviews) * 100) : 0;
+
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -116,6 +142,12 @@ export const GET = createRouteHandler({
       page,
       limit,
       total_pages: totalPages,
+      aggregates: {
+        avg_rating: parseFloat(agg.avg_rating),
+        total_reviews: agg.total_reviews,
+        this_month: agg.this_month,
+        response_rate: responseRate,
+      },
     });
   },
 });

@@ -1,5 +1,27 @@
 # Milestones
 
+## v1.4 Design Overhaul (Shipped: 2026-03-12)
+
+**Phases completed:** 6 phases (33-38), 11 plans
+
+**Key accomplishments:**
+- Glass CSS token system with --glass-* primitives, gradient mesh backgrounds (dashboard/marketing/auth presets), @supports progressive enhancement, prefers-reduced-transparency fallbacks, and WCAG 4.5:1 contrast scrim
+- Tailwind glass plugin (glass-surface/subtle/heavy utilities), shadow-glass/border-glass tokens, Plus Jakarta Sans font swap replacing Inter
+- CVA glass variants on Card, Button, Dialog, Badge — zero breaking changes to 476+ existing Card instances; GlassPanel and GradientMesh primitive components
+- Full dashboard glass treatment: frosted header bar, glass KPI stat cards with Motion stagger animation, 7 sub-pages wrapped in glass cards (data tables/calendar/charts remain opaque)
+- Marketing pages: aurora CSS animation on hero, glass navbar, glass pricing/feature/testimonial cards, gradient text headings, GlassPanel-wrapped legal pages
+- Auth glass card with Motion entrance animation, glass-styled Select/DropdownMenu/Tooltip portaled components, GlassShimmer skeleton replacement
+- Dark mode QA (white-based rgba at 0.12/0.08/0.18 opacity), responsive QA at 375/768/1280px with mobile blur degradation
+
+**Stats:**
+- 51 commits over 16 days (2026-02-25 → 2026-03-12)
+- 85 files modified, +8,293 / -790 lines (frontend only, zero backend changes)
+- 31 requirements delivered with 100% coverage
+- Git range: a300d0c..9f58a61
+
+---
+
+
 ## v1.0 ScheduleBox Platform (Shipped: 2026-02-12)
 
 **Phases completed:** 15 phases, 101 plans, 87 tasks
@@ -71,12 +93,4 @@
 
 ---
 
-## v1.3 Revenue & Growth (Shipped: 2026-02-25)
-
-**Phases completed:** 34 phases, 166 plans, 91 tasks
-
-**Key accomplishments:**
-- (none recorded)
-
----
 

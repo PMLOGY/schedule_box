@@ -16,8 +16,9 @@ export function BookingLinkCard() {
   const { data: settings, isLoading } = useCompanySettingsQuery();
   const [copied, setCopied] = useState(false);
 
+  const localePrefix = locale === 'cs' ? '' : `/${locale}`;
   const bookingUrl = settings?.slug
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/${locale}/${settings.slug}/booking`
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}${localePrefix}/${settings.slug}/book`
     : null;
 
   const handleCopy = async () => {

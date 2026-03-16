@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/lib/i18n/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Building2, UserCircle } from 'lucide-react';
+import { useAuthStore } from '@/stores/auth.store';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,34 +19,46 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { cn } from '@/lib/utils';
 
 // Password complexity regex from Phase 3: uppercase + lowercase + number + special
 const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
 
-// Zod schema for registration form
-const registerFormSchema = z
-  .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Invalid email address'),
-    password: z
-      .string()
-      .min(12, 'Password must be at least 12 characters')
-      .regex(
-        passwordComplexityRegex,
-        'Password must contain uppercase, lowercase, number, and special character',
-      ),
-    confirmPassword: z.string(),
-    companyName: z.string().min(2, 'Company name must be at least 2 characters'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+/**
+ * Creates a Zod schema with translated validation messages.
+ * Must be called inside a component that has access to useTranslations.
+ */
+function createRegisterFormSchema(tv: (key: string) => string) {
+  return z
+    .object({
+      name: z.string().min(2, tv('nameMin')),
+      email: z.string().email(tv('emailInvalid')),
+      password: z
+        .string()
+        .min(12, tv('passwordMin'))
+        .regex(passwordComplexityRegex, tv('passwordComplexity')),
+      confirmPassword: z.string(),
+      companyName: z.string().optional(),
+      type: z.enum(['owner', 'customer']).default('owner'),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: tv('passwordsDoNotMatch'),
+      path: ['confirmPassword'],
+    })
+    .refine(
+      (data) => data.type === 'customer' || (data.companyName && data.companyName.length >= 2),
+      {
+        message: tv('companyNameMin'),
+        path: ['companyName'],
+      },
+    );
+}
 
-type RegisterFormValues = z.infer<typeof registerFormSchema>;
+type RegisterFormValues = z.infer<ReturnType<typeof createRegisterFormSchema>>;
 
 export function RegisterForm() {
   const t = useTranslations('auth.register');
+  const tv = useTranslations('auth.register.validation');
   const tCommon = useTranslations('common');
   const router = useRouter();
 
@@ -54,6 +67,9 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [registrationType, setRegistrationType] = useState<'owner' | 'customer'>('owner');
+
+  const registerFormSchema = createRegisterFormSchema(tv);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -63,8 +79,18 @@ export function RegisterForm() {
       password: '',
       confirmPassword: '',
       companyName: '',
+      type: 'owner',
     },
   });
+
+  const handleTypeChange = (type: 'owner' | 'customer') => {
+    setRegistrationType(type);
+    form.setValue('type', type);
+    if (type === 'customer') {
+      form.setValue('companyName', '');
+      form.clearErrors('companyName');
+    }
+  };
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
@@ -81,22 +107,45 @@ export function RegisterForm() {
           name: values.name,
           email: values.email,
           password: values.password,
-          company_name: values.companyName,
+          ...(registrationType === 'owner' ? { company_name: values.companyName } : {}),
+          type: registrationType,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        throw new Error(error.error?.message || error.message || 'Registration failed');
       }
 
-      // On success, show success message and redirect to login
-      setSuccessMessage('Registration successful! Redirecting to login...');
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+      const result = await response.json();
+      const data = result.data || result;
+
+      if (registrationType === 'customer') {
+        // Auto-login for customer registration
+        const nameParts = values.name.split(' ');
+        useAuthStore.getState().setAccessToken(data.access_token);
+        useAuthStore.getState().setUser({
+          id: data.user.uuid,
+          email: data.user.email,
+          firstName: nameParts[0] || values.name,
+          lastName: nameParts.slice(1).join(' ') || '',
+          role: 'customer',
+          companyId: '',
+          companyName: '',
+        });
+
+        setSuccessMessage(t('successCustomer'));
+        setTimeout(() => {
+          router.push('/portal/bookings');
+        }, 1000);
+      } else {
+        // Owner: redirect to login
+        setSuccessMessage(t('successOwner'));
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      }
     } catch (error) {
-      // Handle server errors
       setErrorMessage(error instanceof Error ? error.message : 'Registration failed');
     } finally {
       setIsLoading(false);
@@ -111,6 +160,36 @@ export function RegisterForm() {
           <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
 
+        {/* Registration type toggle */}
+        <div className="grid grid-cols-2 gap-2 p-1 rounded-lg bg-muted">
+          <button
+            type="button"
+            onClick={() => handleTypeChange('owner')}
+            className={cn(
+              'flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              registrationType === 'owner'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <Building2 className="h-4 w-4" />
+            {t('businessOwner')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTypeChange('customer')}
+            className={cn(
+              'flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              registrationType === 'customer'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <UserCircle className="h-4 w-4" />
+            {t('customer')}
+          </button>
+        </div>
+
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -119,7 +198,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>{t('firstName')}</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Jan Novák" disabled={isLoading} {...field} />
+                  <Input type="text" placeholder="Jan Novak" disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,24 +224,26 @@ export function RegisterForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="companyName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('companyName')}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Má firma s.r.o."
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {registrationType === 'owner' && (
+            <FormField
+              control={form.control}
+              name="companyName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('companyName')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Ma firma s.r.o."
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -174,7 +255,7 @@ export function RegisterForm() {
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••••••"
+                      placeholder="************"
                       disabled={isLoading}
                       {...field}
                     />
@@ -203,7 +284,7 @@ export function RegisterForm() {
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? 'text' : 'password'}
-                      placeholder="••••••••••••"
+                      placeholder="************"
                       disabled={isLoading}
                       {...field}
                     />

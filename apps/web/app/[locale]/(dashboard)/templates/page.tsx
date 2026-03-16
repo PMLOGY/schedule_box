@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,18 +68,18 @@ const channelIcons = {
   push: Bell,
 };
 
-const typeLabels: Record<NotificationTemplateType, string> = {
-  booking_confirmation: 'Potvrzení rezervace',
-  booking_reminder: 'Připomenutí',
-  booking_cancellation: 'Zrušení rezervace',
-  payment_confirmation: 'Potvrzení platby',
-  payment_reminder: 'Připomenutí platby',
-  review_request: 'Žádost o recenzi',
-  welcome: 'Uvítací zpráva',
-  loyalty_update: 'Aktualizace věrnostního programu',
-  follow_up: 'Follow-up',
-  custom: 'Vlastní',
-};
+const TEMPLATE_TYPES: NotificationTemplateType[] = [
+  'booking_confirmation',
+  'booking_reminder',
+  'booking_cancellation',
+  'payment_confirmation',
+  'payment_reminder',
+  'review_request',
+  'welcome',
+  'loyalty_update',
+  'follow_up',
+  'custom',
+];
 
 const defaultForm: TemplateForm = {
   type: 'booking_confirmation',
@@ -99,6 +100,7 @@ function TemplateFormDialog({
   description,
   submitLabel,
   pendingLabel,
+  t,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -110,6 +112,7 @@ function TemplateFormDialog({
   description: string;
   submitLabel: string;
   pendingLabel: string;
+  t: ReturnType<typeof useTranslations<'notificationTemplates'>>;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -120,7 +123,7 @@ function TemplateFormDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="type">Typ šablony</Label>
+            <Label htmlFor="type">{t('form.type')}</Label>
             <Select
               value={form.type}
               onValueChange={(value) =>
@@ -131,9 +134,9 @@ function TemplateFormDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(typeLabels) as NotificationTemplateType[]).map((type) => (
+                {TEMPLATE_TYPES.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {typeLabels[type]}
+                    {t(`types.${type}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -141,7 +144,7 @@ function TemplateFormDialog({
           </div>
 
           <div>
-            <Label>Kanál</Label>
+            <Label>{t('form.channel')}</Label>
             <div className="mt-2 flex gap-4">
               {(['email', 'sms', 'push'] as NotificationChannel[]).map((channel) => {
                 const Icon = channelIcons[channel];
@@ -149,7 +152,7 @@ function TemplateFormDialog({
                   <label
                     key={channel}
                     className={`flex cursor-pointer items-center gap-2 rounded-md border-2 p-3 transition-colors ${
-                      form.channel === channel ? 'border-primary bg-primary/5' : 'border-gray-300'
+                      form.channel === channel ? 'border-primary bg-primary/5' : 'border-muted'
                     }`}
                   >
                     <input
@@ -166,7 +169,7 @@ function TemplateFormDialog({
                       className="sr-only"
                     />
                     <Icon className="h-5 w-5" />
-                    <span className="font-medium capitalize">{channel}</span>
+                    <span className="font-medium uppercase text-xs">{channel}</span>
                   </label>
                 );
               })}
@@ -175,32 +178,32 @@ function TemplateFormDialog({
 
           {(form.channel === 'email' || form.channel === 'push') && (
             <div>
-              <Label htmlFor="subject">Předmět</Label>
+              <Label htmlFor="subject">{t('form.subject')}</Label>
               <Input
                 id="subject"
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="Např. Potvrzení rezervace"
+                placeholder={t('form.subjectPlaceholder')}
               />
             </div>
           )}
 
           <div>
-            <Label htmlFor="bodyTemplate">Obsah šablony</Label>
+            <Label htmlFor="bodyTemplate">{t('form.body')}</Label>
             <Textarea
               id="bodyTemplate"
               value={form.bodyTemplate}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setForm({ ...form, bodyTemplate: e.target.value })
               }
-              placeholder="Použijte proměnné: {{customer_name}}, {{service_name}}, {{booking_date}}, atd."
+              placeholder={t('form.bodyPlaceholder')}
               rows={8}
               className="font-mono text-sm"
             />
           </div>
 
           <div>
-            <Label>Stav</Label>
+            <Label>{t('form.status')}</Label>
             <div className="mt-2 flex rounded-md border">
               <button
                 type="button"
@@ -212,7 +215,7 @@ function TemplateFormDialog({
                 )}
                 onClick={() => setForm({ ...form, isActive: true })}
               >
-                Aktivní
+                {t('active')}
               </button>
               <button
                 type="button"
@@ -224,14 +227,14 @@ function TemplateFormDialog({
                 )}
                 onClick={() => setForm({ ...form, isActive: false })}
               >
-                Neaktivní
+                {t('inactive')}
               </button>
             </div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Zrušit
+            {t('form.cancel')}
           </Button>
           <Button onClick={onSubmit} disabled={isPending}>
             {isPending ? pendingLabel : submitLabel}
@@ -243,6 +246,7 @@ function TemplateFormDialog({
 }
 
 export default function TemplatesPage() {
+  const t = useTranslations('notificationTemplates');
   const queryClient = useQueryClient();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
@@ -311,7 +315,7 @@ export default function TemplatesPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Opravdu chcete smazat tuto šablonu?')) {
+    if (confirm(t('deleteConfirm'))) {
       deleteMutation.mutate(id);
     }
   };
@@ -320,14 +324,14 @@ export default function TemplatesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Šablony notifikací</h1>
-          <p className="text-muted-foreground">Spravujte šablony emailů, SMS a push notifikací</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Nová šablona
+              {t('newTemplate')}
             </Button>
           </DialogTrigger>
         </Dialog>
@@ -341,10 +345,11 @@ export default function TemplatesPage() {
         setForm={setCreateForm}
         onSubmit={handleCreate}
         isPending={createMutation.isPending}
-        title="Vytvořit novou šablonu"
-        description="Vytvořte šablonu pro email, SMS nebo push notifikaci"
-        submitLabel="Vytvořit"
-        pendingLabel="Vytváření..."
+        title={t('form.createTitle')}
+        description={t('form.createDescription')}
+        submitLabel={t('form.create')}
+        pendingLabel={t('form.creating')}
+        t={t}
       />
 
       {/* Edit dialog */}
@@ -357,24 +362,23 @@ export default function TemplatesPage() {
         setForm={setEditForm}
         onSubmit={handleUpdate}
         isPending={updateMutation.isPending}
-        title="Upravit šablonu"
-        description="Upravte šablonu notifikace"
-        submitLabel="Uložit"
-        pendingLabel="Ukládání..."
+        title={t('form.editTitle')}
+        description={t('form.editDescription')}
+        submitLabel={t('form.save')}
+        pendingLabel={t('form.saving')}
+        t={t}
       />
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
-          <p className="text-muted-foreground">Načítání...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       ) : !templates || templates.length === 0 ? (
         <Card>
           <CardContent className="flex h-64 flex-col items-center justify-center space-y-2">
             <Mail className="h-12 w-12 text-muted-foreground" />
-            <p className="text-lg font-medium">Zatím žádné šablony</p>
-            <p className="text-sm text-muted-foreground">
-              Vytvořte první šablonu pomocí tlačítka výše
-            </p>
+            <p className="text-lg font-medium">{t('empty')}</p>
+            <p className="text-sm text-muted-foreground">{t('emptyDescription')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -382,32 +386,30 @@ export default function TemplatesPage() {
           {templates.map((template) => {
             const Icon = channelIcons[template.channel];
             return (
-              <Card key={template.id}>
+              <Card key={template.id} className="flex flex-col">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       <Icon className="h-5 w-5" />
-                      <CardTitle className="text-lg">{typeLabels[template.type]}</CardTitle>
+                      <CardTitle className="text-lg">{t(`types.${template.type}`)}</CardTitle>
                     </div>
                     <Badge variant={template.isActive ? 'default' : 'secondary'}>
-                      {template.isActive ? 'Aktivní' : 'Neaktivní'}
+                      {template.isActive ? t('active') : t('inactive')}
                     </Badge>
                   </div>
                   {template.subject && (
                     <CardDescription className="line-clamp-1">{template.subject}</CardDescription>
                   )}
                 </CardHeader>
-                <CardContent>
-                  <div className="mb-4">
-                    <p className="line-clamp-3 text-sm text-muted-foreground">
-                      {template.bodyTemplate}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
+                <CardContent className="flex flex-1 flex-col">
+                  <p className="line-clamp-3 text-sm text-muted-foreground flex-1">
+                    {template.bodyTemplate}
+                  </p>
+                  <div className="flex gap-2 mt-4">
                     <Button variant="default" size="sm" asChild className="flex-1">
                       <Link href={`/notifications?template_id=${template.id}`}>
                         <Send className="mr-2 h-4 w-4" />
-                        Použít
+                        {t('use')}
                       </Link>
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => handleEdit(template)}>

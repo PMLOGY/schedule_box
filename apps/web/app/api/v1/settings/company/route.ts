@@ -56,7 +56,7 @@ export const GET = createRouteHandler({
       throw new NotFoundError('Company not found');
     }
 
-    return successResponse({ data: company });
+    return successResponse(company);
   },
 });
 

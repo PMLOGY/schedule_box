@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Calendar,
+  CalendarDays,
   BookOpen,
   Users,
   Scissors,
@@ -13,7 +14,6 @@ import {
   Award,
   Brain,
   Building2,
-  Box,
   MessageSquare,
   Wallet,
   Store,
@@ -53,6 +53,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/customers',
     icon: Users,
     roles: ['owner', 'manager', 'employee'],
+  },
+  {
+    key: 'schedule',
+    href: '/schedule',
+    icon: CalendarDays,
+    roles: ['employee'],
   },
   {
     key: 'services',
@@ -131,13 +137,14 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Building2,
     roles: ['owner'],
   },
-  {
-    key: 'resources',
-    href: '/resources',
-    icon: Box,
-    roles: ['owner', 'manager'],
-    minPlan: 'essential',
-  },
+  // Resources hidden — not yet integrated into booking flow
+  // {
+  //   key: 'resources',
+  //   href: '/resources',
+  //   icon: Box,
+  //   roles: ['owner', 'manager'],
+  //   minPlan: 'essential',
+  // },
   {
     key: 'marketplace',
     href: '/marketplace',

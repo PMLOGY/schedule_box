@@ -4,8 +4,6 @@ import { motion } from 'motion/react';
 import { CheckCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { AddToCalendarButton } from './AddToCalendarButton';
 
 interface BookingConfirmationSuccessProps {
   bookingUuid: string;
@@ -16,7 +14,7 @@ interface BookingConfirmationSuccessProps {
 }
 
 export function BookingConfirmationSuccess({
-  bookingUuid,
+  bookingUuid: _bookingUuid,
   serviceName,
   dateTime,
   employeeName,
@@ -78,9 +76,6 @@ export function BookingConfirmationSuccess({
                 <span className="font-medium">{price}</span>
               </div>
             )}
-            <Separator />
-            {/* Add to calendar download button */}
-            <AddToCalendarButton bookingUuid={bookingUuid} className="w-full" />
           </CardContent>
         </Card>
       </motion.div>

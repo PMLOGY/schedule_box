@@ -27,7 +27,10 @@ export function useResourceTypesQuery() {
   return useQuery({
     queryKey: ['resource-types'],
     queryFn: async () => {
-      return apiClient.get<ResourceType[]>('/resource-types');
+      const result = await apiClient.get<ResourceType[] | { data: ResourceType[] }>(
+        '/resource-types',
+      );
+      return Array.isArray(result) ? result : (result.data ?? []);
     },
     staleTime: 60_000,
   });
@@ -37,7 +40,8 @@ export function useResourcesQuery() {
   return useQuery({
     queryKey: ['resources'],
     queryFn: async () => {
-      return apiClient.get<Resource[]>('/resources');
+      const result = await apiClient.get<Resource[] | { data: Resource[] }>('/resources');
+      return Array.isArray(result) ? result : (result.data ?? []);
     },
     staleTime: 60_000,
   });

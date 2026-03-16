@@ -72,8 +72,12 @@ export const GET = createRouteHandler({
  */
 const workingHourSchema = z.object({
   day_of_week: z.number().int().min(0).max(6),
-  start_time: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be HH:MM'),
-  end_time: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be HH:MM'),
+  start_time: z
+    .string()
+    .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Time must be HH:MM or HH:MM:SS'),
+  end_time: z
+    .string()
+    .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Time must be HH:MM or HH:MM:SS'),
   is_active: z.boolean(),
 });
 

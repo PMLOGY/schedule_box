@@ -1,17 +1,60 @@
 /**
- * PUT /api/v1/employees/[id]/services
- * Replace all service assignments for an employee
- * Uses delete + insert pattern for atomic replacement
+ * GET /api/v1/employees/[id]/services - List employee's assigned services
+ * PUT /api/v1/employees/[id]/services - Replace all service assignments
  */
 
 import { eq, and, isNull } from 'drizzle-orm';
-import { db, employees, employeeServices } from '@schedulebox/database';
+import { db, employees, employeeServices, services } from '@schedulebox/database';
 import { findCompanyId } from '@/lib/db/tenant-scope';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse } from '@/lib/utils/response';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { employeeServicesSchema, employeeIdParamSchema } from '@/validations/employee';
 import { NotFoundError } from '@schedulebox/shared';
+
+/**
+ * GET /api/v1/employees/[id]/services
+ * List services assigned to an employee
+ */
+export const GET = createRouteHandler({
+  paramsSchema: employeeIdParamSchema,
+  requiresAuth: true,
+  handler: async ({ params, user }) => {
+    if (!user) throw new Error('User not authenticated');
+    const { companyId } = await findCompanyId(user.sub);
+
+    const [employee] = await db
+      .select({ id: employees.id })
+      .from(employees)
+      .where(
+        and(
+          eq(employees.uuid, params.id),
+          eq(employees.companyId, companyId),
+          isNull(employees.deletedAt),
+        ),
+      )
+      .limit(1);
+
+    if (!employee) throw new NotFoundError('Employee not found');
+
+    const assignedServices = await db
+      .select({
+        id: services.id,
+        uuid: services.uuid,
+        name: services.name,
+        duration_minutes: services.durationMinutes,
+        price: services.price,
+        currency: services.currency,
+        category_id: services.categoryId,
+        is_active: services.isActive,
+      })
+      .from(employeeServices)
+      .innerJoin(services, eq(employeeServices.serviceId, services.id))
+      .where(eq(employeeServices.employeeId, employee.id));
+
+    return successResponse(assignedServices);
+  },
+});
 
 /**
  * Replace employee service assignments

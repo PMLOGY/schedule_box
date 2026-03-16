@@ -6,16 +6,13 @@ import { useQuery } from '@tanstack/react-query';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import { apiClient } from '@/lib/api-client';
+import { useAuthStore } from '@/stores/auth.store';
 
 const TOUR_KEY_PREFIX = 'sb_tour_completed_';
 
 interface CompanyOnboardingStatus {
   onboarding_completed: boolean;
   uuid: string;
-}
-
-interface CompanyStatusResponse {
-  data: CompanyOnboardingStatus;
 }
 
 /**
@@ -30,16 +27,16 @@ interface CompanyStatusResponse {
 export function DashboardTour() {
   const t = useTranslations('onboarding.tour');
   const hasStarted = useRef(false);
+  const user = useAuthStore((s) => s.user);
+  const hasCompany = !!user && user.role !== 'admin';
 
   const { data: companyData } = useQuery({
     queryKey: ['settings', 'company', 'tour-check'],
     queryFn: async () => {
-      // apiClient auto-unwraps envelope; server returns { data: { data: company } }
-      // after unwrap we get { data: company } which we type as CompanyStatusResponse
-      const result = await apiClient.get<CompanyStatusResponse>('/settings/company');
-      return result.data; // CompanyOnboardingStatus
+      return apiClient.get<CompanyOnboardingStatus>('/settings/company');
     },
     staleTime: 120_000,
+    enabled: hasCompany,
   });
 
   useEffect(() => {

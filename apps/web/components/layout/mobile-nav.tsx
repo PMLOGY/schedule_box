@@ -1,6 +1,6 @@
 'use client';
 
-import { Link, usePathname, useRouter } from '@/lib/i18n/navigation';
+import { Link, usePathname } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useUIStore } from '@/stores/ui.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 
 export function MobileNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const t = useTranslations('nav');
   const { sidebarMobileOpen, toggleMobileSidebar } = useUIStore();
   const { user, logout } = useAuthStore();
@@ -25,7 +24,7 @@ export function MobileNav() {
   const handleLogout = () => {
     logout();
     toggleMobileSidebar();
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (

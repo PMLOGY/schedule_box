@@ -60,13 +60,23 @@ const STATUS_BADGE_VARIANT: Record<
   partially_refunded: 'glass-amber',
 };
 
-const GATEWAY_LABELS: Record<string, string> = {
-  comgate: 'Comgate',
-  qrcomat: 'QR',
-  cash: 'Cash',
-  bank_transfer: 'Bank',
-  gift_card: 'Gift Card',
+// Gateway → i18n key mapping
+const GATEWAY_I18N_KEYS: Record<string, string> = {
+  comgate: 'comgate',
+  cash: 'cash',
+  bank_transfer: 'bankTransfer',
+  qrcomat: 'qr',
+  gift_card: 'giftCard',
 };
+
+function useGatewayLabel() {
+  const t = useTranslations('payments.methods');
+  return (gateway: string) => {
+    const key = GATEWAY_I18N_KEYS[gateway];
+    if (key && t.has(key)) return t(key);
+    return gateway;
+  };
+}
 
 // ============================================================================
 // MAIN PAGE COMPONENT
@@ -75,9 +85,11 @@ const GATEWAY_LABELS: Record<string, string> = {
 export default function PaymentsPage() {
   const t = useTranslations('payments');
   const tCommon = useTranslations('common');
+  const getGatewayLabel = useGatewayLabel();
 
   // Filters state
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [gatewayFilter, setGatewayFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
@@ -98,34 +110,28 @@ export default function PaymentsPage() {
   const queryParams = useMemo(() => {
     const params: Record<string, unknown> = { page, limit };
     if (statusFilter && statusFilter !== 'all') params.status = statusFilter;
+    if (gatewayFilter && gatewayFilter !== 'all') params.gateway = gatewayFilter;
     if (dateFrom) params.date_from = dateFrom;
     if (dateTo) params.date_to = dateTo;
     return params;
-  }, [page, limit, statusFilter, dateFrom, dateTo]);
+  }, [page, limit, statusFilter, gatewayFilter, dateFrom, dateTo]);
 
   const { data, isLoading } = usePaymentsQuery(queryParams);
   const { data: paymentDetail, isLoading: detailLoading } = usePaymentDetail(selectedPaymentId);
   const refundMutation = useRefundPayment();
 
   // ============================================================================
-  // KPI CALCULATIONS
+  // KPI — from API aggregates (company-wide, not affected by filters)
   // ============================================================================
 
-  // These KPIs are computed from the current page of data for display
-  // In a production app, dedicated aggregation endpoints would be used
-  const kpis = useMemo(() => {
-    if (!data?.data) {
-      return { total: 0, pending: 0, refunded: 0, completed: 0 };
-    }
-    const items = data.data;
-    return {
-      total: items.reduce((sum, p) => sum + (p.status === 'paid' ? parseFloat(p.amount) : 0), 0),
-      pending: items.filter((p) => p.status === 'pending').length,
-      refunded: items.filter((p) => p.status === 'refunded' || p.status === 'partially_refunded')
-        .length,
-      completed: items.filter((p) => p.status === 'paid').length,
-    };
-  }, [data]);
+  const agg = (data?.meta as Record<string, unknown>)?.aggregates as
+    | {
+        total_revenue: string;
+        paid_count: number;
+        pending_count: number;
+        refunded_count: number;
+      }
+    | undefined;
 
   // ============================================================================
   // HANDLERS
@@ -173,12 +179,13 @@ export default function PaymentsPage() {
 
   const clearFilters = () => {
     setStatusFilter('all');
+    setGatewayFilter('all');
     setDateFrom('');
     setDateTo('');
     setPage(1);
   };
 
-  const hasActiveFilters = statusFilter !== 'all' || dateFrom || dateTo;
+  const hasActiveFilters = statusFilter !== 'all' || gatewayFilter !== 'all' || dateFrom || dateTo;
 
   // ============================================================================
   // RENDER
@@ -193,19 +200,21 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="glass" className="p-4">
           <div className="text-sm text-muted-foreground">{t('kpi.totalRevenue')}</div>
-          <div className="text-2xl font-bold mt-1">{formatCurrency(kpis.total)}</div>
-        </Card>
-        <Card variant="glass" className="p-4">
-          <div className="text-sm text-muted-foreground">{t('kpi.pendingPayments')}</div>
-          <div className="text-2xl font-bold mt-1">{kpis.pending}</div>
+          <div className="text-2xl font-bold mt-1">
+            {formatCurrency(parseFloat(agg?.total_revenue ?? '0'))}
+          </div>
         </Card>
         <Card variant="glass" className="p-4">
           <div className="text-sm text-muted-foreground">{t('kpi.completedPayments')}</div>
-          <div className="text-2xl font-bold mt-1">{kpis.completed}</div>
+          <div className="text-2xl font-bold mt-1">{agg?.paid_count ?? 0}</div>
+        </Card>
+        <Card variant="glass" className="p-4">
+          <div className="text-sm text-muted-foreground">{t('kpi.pendingPayments')}</div>
+          <div className="text-2xl font-bold mt-1">{agg?.pending_count ?? 0}</div>
         </Card>
         <Card variant="glass" className="p-4">
           <div className="text-sm text-muted-foreground">{t('kpi.refundedPayments')}</div>
-          <div className="text-2xl font-bold mt-1">{kpis.refunded}</div>
+          <div className="text-2xl font-bold mt-1">{agg?.refunded_count ?? 0}</div>
         </Card>
       </div>
 
@@ -233,6 +242,27 @@ export default function PaymentsPage() {
                 <SelectItem value="partially_refunded">
                   {t('statuses.partiallyRefunded')}
                 </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Gateway/method filter */}
+          <div className="w-full sm:w-48">
+            <Select
+              value={gatewayFilter}
+              onValueChange={(val) => {
+                setGatewayFilter(val);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('filters.method')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('filters.allMethods')}</SelectItem>
+                <SelectItem value="comgate">Comgate</SelectItem>
+                <SelectItem value="cash">{t('methods.cash')}</SelectItem>
+                <SelectItem value="bank_transfer">{t('methods.bankTransfer')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -322,9 +352,7 @@ export default function PaymentsPage() {
                     {formatCurrency(payment.amount)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="glass-gray">
-                      {GATEWAY_LABELS[payment.gateway] || payment.gateway}
-                    </Badge>
+                    <Badge variant="glass-gray">{getGatewayLabel(payment.gateway)}</Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_BADGE_VARIANT[payment.status]}>
@@ -432,9 +460,7 @@ export default function PaymentsPage() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <div className="text-muted-foreground">{t('detail.gateway')}</div>
-                  <div className="font-medium">
-                    {GATEWAY_LABELS[paymentDetail.gateway] || paymentDetail.gateway}
-                  </div>
+                  <div className="font-medium">{getGatewayLabel(paymentDetail.gateway)}</div>
                 </div>
                 <div>
                   <div className="text-muted-foreground">{t('detail.createdAt')}</div>

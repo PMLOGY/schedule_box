@@ -18,7 +18,7 @@ import {
   reviews,
 } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
-import { paginatedResponse, successResponse } from '@/lib/utils/response';
+import { paginatedResponse } from '@/lib/utils/response';
 
 export const GET = createRouteHandler({
   requiresAuth: true,
@@ -33,7 +33,7 @@ export const GET = createRouteHandler({
       .limit(1);
 
     if (!dbUser) {
-      return successResponse({ data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } });
+      return paginatedResponse([], { total: 0, page: 1, limit: 20, total_pages: 0 });
     }
 
     // Find all customer records matching this email across companies
@@ -43,7 +43,7 @@ export const GET = createRouteHandler({
       .where(and(eq(customers.email, dbUser.email), isNull(customers.deletedAt)));
 
     if (customerRecords.length === 0) {
-      return successResponse({ data: [], meta: { total: 0, page: 1, limit: 20, totalPages: 0 } });
+      return paginatedResponse([], { total: 0, page: 1, limit: 20, total_pages: 0 });
     }
 
     const customerIds = customerRecords.map((c) => c.id);
@@ -142,7 +142,7 @@ export const GET = createRouteHandler({
       total: count,
       page,
       limit,
-      totalPages: Math.ceil(count / limit),
+      total_pages: Math.ceil(count / limit),
     });
   },
 });

@@ -120,7 +120,7 @@ export function useUpdateCustomer() {
 export function useCustomerDetail(uuid: string) {
   return useQuery({
     queryKey: ['customers', uuid],
-    queryFn: () => apiClient.get<{ data: CustomerDetail }>(`/customers/${uuid}`),
+    queryFn: () => apiClient.get<CustomerDetail>(`/customers/${uuid}`),
     enabled: !!uuid,
   });
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useAuthStore } from '@/stores/auth.store';
 
 export interface CompanySettings {
   uuid: string;
@@ -29,14 +30,17 @@ export interface WorkingHour {
 }
 
 export function useCompanySettingsQuery() {
+  const user = useAuthStore((s) => s.user);
+  // Skip for admin (no company) and employee (no settings.manage permission)
+  const canFetchSettings = !!user && user.role !== 'admin' && user.role !== 'employee';
+
   return useQuery({
     queryKey: ['settings', 'company'],
     queryFn: async () => {
-      // API returns { data: { data: company } } — apiClient unwraps outer { data }
-      const result = await apiClient.get<{ data: CompanySettings }>('/settings/company');
-      return result.data;
+      return apiClient.get<CompanySettings>('/settings/company');
     },
     staleTime: 120_000,
+    enabled: canFetchSettings,
   });
 }
 
