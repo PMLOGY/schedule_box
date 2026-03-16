@@ -1,6 +1,7 @@
 /**
- * RabbitMQ event infrastructure for ScheduleBox
+ * CloudEvent infrastructure for ScheduleBox
  * CloudEvents v1.0 implementation with domain event definitions
+ * RabbitMQ removed — no-op publisher for Vercel serverless deployment
  */
 
 // Core types
@@ -14,10 +15,6 @@ export {
   createEventPublisher,
   validateCloudEvent,
 } from './publisher';
-
-// Consumer helper
-export type { ConsumerConnection, ConsumeOptions } from './consumer';
-export { createConsumerConnection, consumeMessages, gracefulShutdown } from './consumer';
 
 // Booking domain events
 export type {
