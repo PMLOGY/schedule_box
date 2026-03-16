@@ -245,7 +245,13 @@ Plans:
   5. An admin can toggle a feature flag on/off from the admin UI — the flag state is enforced server-side within 60 seconds of the change (Redis TTL); toggling a flag per-company affects only that company
   6. An admin can suspend a company (with a reason) — suspended companies receive a 403 on login attempts but can still reach billing pages; unsuspending restores full access
   7. Admin can enable maintenance mode — all public and authenticated pages show a branded status page except for requests authenticated with the super-admin bypass cookie; disabling maintenance mode restores access immediately
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 47-01-PLAN.md — DB schemas + audit helper + Twilio client + booking email functions
+- [ ] 47-02-PLAN.md — Wire booking emails into lifecycle events + SMS reminder cron
+- [ ] 47-03-PLAN.md — Impersonation + company suspend + audit log UI
+- [ ] 47-04-PLAN.md — Feature flags + maintenance mode
+- [ ] 47-05-PLAN.md — Broadcast messaging + platform metrics dashboard
 
 ### Phase 48: Marketplace & UX
 **Goal**: Customers can discover businesses on a public marketplace with search and filtering, and business owners experience improved booking management through modals, real-time updates, and the video/webhooks management pages
@@ -335,7 +341,7 @@ Plans:
 | 44. Production Deployment | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 45. Infrastructure Migration | 3/3 | Complete   | 2026-03-16 | - |
 | 46. Security Hardening | 2/3 | In Progress|  | - |
-| 47. Notifications & Super-Admin | v3.0 | TBD | Not started | - |
+| 47. Notifications & Super-Admin | v3.0 | 0/5 | Planned | - |
 | 48. Marketplace & UX | v3.0 | TBD | Not started | - |
 | 49. Observability & Verticals | v3.0 | TBD | Not started | - |
 | 50. Testing & Hardening | v3.0 | TBD | Not started | - |
