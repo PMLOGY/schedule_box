@@ -96,7 +96,7 @@ export const GET = createRouteHandler({
         atRisk: churnResult?.atRisk ?? 0,
         active: churnResult?.active ?? 0,
       },
-      clvDistribution: clvResults.rows ?? clvResults,
+      clvDistribution: (clvResults as unknown as { rows?: unknown[] }).rows ?? clvResults,
     });
   },
 });

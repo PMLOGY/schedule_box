@@ -67,7 +67,7 @@ export const GET = createRouteHandler({
       WHERE company_id = ${companyId}
         AND status IN ('completed', 'confirmed', 'no_show', 'pending')
     `);
-    const totalCompanyRow = totalCompanyResult.rows[0];
+    const totalCompanyRow = totalCompanyResult[0];
 
     // Query 3: Today's total upcoming bookings
     const todayTotalResult = await db.execute<CountRow>(sql`
@@ -78,24 +78,26 @@ export const GET = createRouteHandler({
         AND start_time >= NOW()
         AND start_time < NOW() + INTERVAL '24 hours'
     `);
-    const todayTotalRow = todayTotalResult.rows[0];
+    const todayTotalRow = todayTotalResult[0];
 
     const totalCompanyBookings = parseInt(totalCompanyRow?.count ?? '0', 10);
     const totalTodayBookings = parseInt(todayTotalRow?.count ?? '0', 10);
     const aiActive = totalCompanyBookings >= AI_ACTIVATION_THRESHOLD;
 
     // Map high-risk bookings with computed riskLevel
-    const highRiskBookings = highRiskRows.rows.map((row) => {
-      const probability = parseFloat(String(row.no_show_probability));
-      return {
-        bookingId: row.booking_id,
-        customerName: row.customer_name,
-        serviceName: row.service_name,
-        startTime: row.start_time,
-        noShowProbability: probability,
-        riskLevel: (probability >= 0.5 ? 'high' : 'medium') as 'high' | 'medium',
-      };
-    });
+    const highRiskBookings = (highRiskRows as unknown as Array<Record<string, unknown>>).map(
+      (row) => {
+        const probability = parseFloat(String(row.no_show_probability));
+        return {
+          bookingId: row.booking_id,
+          customerName: row.customer_name,
+          serviceName: row.service_name,
+          startTime: row.start_time,
+          noShowProbability: probability,
+          riskLevel: (probability >= 0.5 ? 'high' : 'medium') as 'high' | 'medium',
+        };
+      },
+    );
 
     const highRiskCount = highRiskBookings.length;
 
