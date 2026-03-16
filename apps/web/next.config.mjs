@@ -41,6 +41,10 @@ const nextConfig = {
     '@opentelemetry/api',
     '@opentelemetry/instrumentation',
     'require-in-the-middle',
+    // isomorphic-dompurify uses jsdom which has native CSS file reads via fs.readFileSync
+    // Must be external to prevent webpack from bundling it with incorrect __dirname resolution
+    'isomorphic-dompurify',
+    'jsdom',
   ],
   async headers() {
     return [
@@ -65,4 +69,7 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   hideSourceMaps: true,
   disableLogger: true,
   silent: !process.env.SENTRY_AUTH_TOKEN,
+  autoInstrumentServerFunctions: false,
+  autoInstrumentMiddleware: false,
+  autoInstrumentAppDirectory: false,
 });

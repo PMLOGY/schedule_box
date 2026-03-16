@@ -56,6 +56,11 @@ export async function MarketingFooter() {
                   {t('termsLink')}
                 </Link>
               </li>
+              <li>
+                <Link href="/cookie-policy" className="hover:text-foreground">
+                  {t('cookiePolicyLink')}
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -1559,7 +1559,8 @@
       "pricingTitle": "Ceník — ScheduleBox",
       "pricingDescription": "Transparentní ceny bez překvapení. Vyberte si tarif, který vyhovuje vašemu podnikání.",
       "privacyTitle": "Zásady ochrany osobních údajů — ScheduleBox",
-      "termsTitle": "Obchodní podmínky — ScheduleBox"
+      "termsTitle": "Obchodní podmínky — ScheduleBox",
+      "cookiePolicyTitle": "Zásady cookies — ScheduleBox"
     },
     "nav": {
       "features": "Funkce",
@@ -1762,8 +1763,45 @@
       "contact": "Kontakt",
       "privacyLink": "Ochrana osobních údajů",
       "termsLink": "Obchodní podmínky",
+      "cookiePolicyLink": "Zásady cookies",
       "copyright": "© {year} ScheduleBox. Všechna práva vyhrazena.",
       "registryNote": "Zapsáno v obchodním rejstříku vedeném Městským soudem v Praze."
+    },
+    "cookiePolicy": {
+      "title": "Zásady používání cookies",
+      "lastUpdated": "Poslední aktualizace",
+      "whatAreCookies": {
+        "title": "Co jsou cookies",
+        "text": "Cookies jsou malé textové soubory ukládané do vašeho prohlížeče při návštěvě webových stránek. Umožňují nám rozpoznat vás při příštích návštěvách, zapamatovat si vaše preference a zajistit správné fungování služby."
+      },
+      "cookiesWeUse": {
+        "title": "Jaké cookies používáme",
+        "text": "Používáme výhradně technické cookies nezbytné pro fungování služby a cookies pro ukládání vašich preferencí. Analytické ani marketingové cookies aktuálně nepoužíváme."
+      },
+      "essential": {
+        "title": "Nezbytné cookies",
+        "text": "Tyto cookies jsou nutné pro správné fungování aplikace. Zahrnují session token pro ověření přihlášení (JWT uložený v httpOnly cookie), identifikátor relace a CSRF ochranu. Bez těchto cookies nelze službu používat."
+      },
+      "analytics": {
+        "title": "Analytické cookies",
+        "text": "V současné době nepoužíváme žádné analytické cookies třetích stran (jako Google Analytics nebo Hotjar). Výkonnostní data sbíráme pouze agregovaně na serverové straně bez cookies."
+      },
+      "preferences": {
+        "title": "Preferenční cookies",
+        "text": "Ukládáme vaši jazykovou preferenci (čeština, angličtina, slovenština) a preferenci barevného motivu. Tato data jsou uložena v localStorage prohlížeče nebo v cookie s platností 1 rok."
+      },
+      "thirdParty": {
+        "title": "Cookies třetích stran",
+        "text": "Při platbách přes Comgate může platební brána ukládat vlastní session cookies pro dokončení transakce. Pro sledování chyb používáme Sentry, které může ukládat anonymní identifikátor relace. Tato data jsou anonymizována a neslouží k marketingovým účelům."
+      },
+      "manage": {
+        "title": "Správa cookies",
+        "text": "Cookies můžete kdykoli smazat nebo zablokovat v nastavení vašeho prohlížeče. Upozorňujeme, že blokování nezbytných cookies může narušit nebo zcela znemožnit používání služby ScheduleBox. Podrobné instrukce naleznete v nápovědě vašeho prohlížeče."
+      },
+      "contact": {
+        "title": "Kontakt",
+        "text": "V případě dotazů ohledně používání cookies nás kontaktujte na privacy@schedulebox.cz."
+      }
     }
   },
   "billing": {

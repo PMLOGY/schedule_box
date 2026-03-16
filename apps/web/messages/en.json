@@ -1559,7 +1559,8 @@
       "pricingTitle": "Pricing — ScheduleBox",
       "pricingDescription": "Transparent pricing with no surprises. Choose the plan that fits your business.",
       "privacyTitle": "Privacy Policy — ScheduleBox",
-      "termsTitle": "Terms of Service — ScheduleBox"
+      "termsTitle": "Terms of Service — ScheduleBox",
+      "cookiePolicyTitle": "Cookie Policy — ScheduleBox"
     },
     "nav": {
       "features": "Features",
@@ -1762,8 +1763,45 @@
       "contact": "Contact",
       "privacyLink": "Privacy Policy",
       "termsLink": "Terms of Service",
+      "cookiePolicyLink": "Cookie Policy",
       "copyright": "© {year} ScheduleBox. All rights reserved.",
       "registryNote": "Registered in the Commercial Register maintained by the Municipal Court in Prague."
+    },
+    "cookiePolicy": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated",
+      "whatAreCookies": {
+        "title": "What Are Cookies",
+        "text": "Cookies are small text files stored in your browser when you visit websites. They allow us to recognize you on return visits, remember your preferences, and ensure the service functions correctly."
+      },
+      "cookiesWeUse": {
+        "title": "Cookies We Use",
+        "text": "We use only technical cookies necessary for the service to function and cookies to store your preferences. We do not currently use any analytics or marketing cookies."
+      },
+      "essential": {
+        "title": "Essential Cookies",
+        "text": "These cookies are required for the application to work correctly. They include the session token for login verification (JWT stored in an httpOnly cookie), session identifier, and CSRF protection. The service cannot be used without these cookies."
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "text": "We currently do not use any third-party analytics cookies (such as Google Analytics or Hotjar). Performance data is collected in aggregated form on the server side only, without cookies."
+      },
+      "preferences": {
+        "title": "Preference Cookies",
+        "text": "We store your language preference (Czech, English, Slovak) and color scheme preference. This data is saved in the browser's localStorage or in a cookie valid for 1 year."
+      },
+      "thirdParty": {
+        "title": "Third-Party Cookies",
+        "text": "When making payments via Comgate, the payment gateway may store its own session cookies to complete the transaction. For error tracking we use Sentry, which may store an anonymous session identifier. This data is anonymized and is not used for marketing purposes."
+      },
+      "manage": {
+        "title": "Managing Cookies",
+        "text": "You can delete or block cookies at any time in your browser settings. Please note that blocking essential cookies may impair or completely prevent the use of the ScheduleBox service. Detailed instructions can be found in your browser's help section."
+      },
+      "contact": {
+        "title": "Contact",
+        "text": "If you have any questions about our use of cookies, please contact us at privacy@schedulebox.cz."
+      }
     }
   },
   "billing": {
