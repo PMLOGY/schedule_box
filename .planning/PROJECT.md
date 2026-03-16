@@ -26,17 +26,22 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder + glass primitives (GlassPanel, GradientMesh, GlassShimmer)
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v2.0 Full Functionality & Production Readiness
+## Current Milestone: v3.0 Production Launch & 100% Documentation Coverage
 
-**Goal:** Make every feature work end-to-end across all 4 user views (Admin, Business Owner, Employee, End Customer), fix all broken flows, and prepare for production deployment.
+**Goal:** Close every gap from the GAP analysis to achieve 100% implementation of the v13.0 FINAL documentation, deploy to Vercel, and harden security/testing for production.
 
 **Target features:**
-- Full audit and fix of all pages across 4 views
-- Auth/session persistence fix (no random logouts)
-- Business owner can share public booking link with customers
-- End-to-end flow: owner setup → share link → customer books → employee sees booking → admin monitors
-- Every page functional — not just scaffolded
-- Production-ready Docker Compose deployment
+- P0: Remove RabbitMQ dependency (safe no-op publishEvent for Vercel)
+- P1: Security hardening (Sentry, DOMPurify XSS, PII AES-256-GCM encryption, HIBP password check)
+- P1: Test coverage to 80% (Vitest unit + Playwright E2E for critical flows)
+- P2: Super-Admin completion (impersonation, platform metrics, audit logs, suspend, broadcast, maintenance mode, feature flags)
+- P2: Real-time updates (polling/SSE for Vercel compatibility)
+- P2: Missing pages (cookie policy, webhooks settings UI, video meetings UI)
+- P2: Observability (OpenTelemetry instrumentation, Sentry SDK)
+- P2: Security (SSRF protection, CSRF tokens)
+- P3: Industry verticals (medical/automotive DB fields, per-industry UI labels, per-industry AI config)
+- P3: Testing infrastructure (Storybook, contract tests, integration tests, DB partitioning)
+- Deploy: Vercel + Upstash Redis + Neon PostgreSQL (no RabbitMQ, no Kubernetes)
 
 ## Current State
 
@@ -95,7 +100,7 @@ Freemium with 4 tiers:
 - ✓ POLSH-01..06 — KPI stagger animation, GlassShimmer skeletons, glass dropdowns/tooltips, dark mode QA, responsive QA — v1.4
 
 ### Active
-See `.planning/REQUIREMENTS.md` for v2.0 requirements.
+See `.planning/REQUIREMENTS.md` for v3.0 requirements (32 gaps from GAP analysis).
 
 ### Out of Scope
 - Mobile native app — web-first approach, PWA works well
@@ -135,4 +140,4 @@ See `.planning/REQUIREMENTS.md` for v2.0 requirements.
 
 ---
 
-_Last updated: 2026-03-13 after v2.0 milestone started_
+_Last updated: 2026-03-16 after v3.0 milestone started_
