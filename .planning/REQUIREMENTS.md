@@ -1,110 +1,135 @@
-# Requirements: ScheduleBox v2.0
+# Requirements: ScheduleBox v3.0
 
-**Defined:** 2026-03-13
+**Defined:** 2026-03-16
 **Core Value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
 
-## v2.0 Requirements
+## v3.0 Requirements
 
-Requirements for making the app fully functional across all 4 user views and production-ready.
+Requirements for production launch with 100% documentation coverage. Each maps to roadmap phases.
+Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
-### Authentication & Session
+### Infrastructure
 
-- [x] **AUTH-01**: User session persists across browser refresh without random logouts
-- [x] **AUTH-02**: Token refresh works silently — no mid-session expiration
-- [x] **AUTH-03**: Each role routes to correct view after login (admin→admin panel, owner→dashboard, employee→dashboard, customer→portal)
-- [x] **AUTH-04**: Owner can create employee accounts with credentials/invite
+- [ ] **INFRA-01**: publishEvent becomes safe no-op — app boots without RabbitMQ
+- [ ] **INFRA-02**: PostgreSQL migrated to Neon serverless (pooled + direct URLs)
+- [ ] **INFRA-03**: Redis migrated to Upstash (HTTP transport, drop-in for get/set/incr/expire)
+- [ ] **INFRA-04**: App deployed to Vercel with production env vars and DNS
+- [ ] **INFRA-05**: Next.js patched to >=14.2.25 (CVE-2025-29927 middleware bypass fix)
 
-### Business Owner
+### Security
 
-- [x] **OWNER-01**: Owner can see and copy their public booking URL from the dashboard
-- [x] **OWNER-02**: Service CRUD fully functional — create, edit, delete services with all fields persisting
-- [x] **OWNER-03**: Employee CRUD fully functional — create, edit, deactivate employees with service assignments
-- [x] **OWNER-04**: Incoming bookings visible with confirm, cancel, complete, no-show actions working
-- [x] **OWNER-05**: Calendar displays real bookings with correct times and employee assignments
-- [x] **OWNER-06**: All dashboard pages load real data — settings, payments, customers, reviews, loyalty, analytics
+- [ ] **SEC-01**: Sentry error tracking integrated with Next.js App Router (@sentry/nextjs)
+- [ ] **SEC-02**: DOMPurify sanitizes all user-generated content (reviews, messages, notes)
+- [ ] **SEC-03**: PII fields (email, phone) encrypted with AES-256-GCM at rest via expand-contract migration
+- [ ] **SEC-04**: HIBP API checks passwords on registration and password change
+- [ ] **SEC-05**: SSRF protection — URL whitelist + private IP blocking on webhook URLs
+- [ ] **SEC-06**: CSRF token middleware for state-changing POST/PUT/DELETE requests
+- [ ] **SEC-07**: Cookie Policy page accessible from footer on all public pages
 
-### Employee
+### Super-Admin
 
-- [x] **EMP-01**: Employee can set weekly working hours (per-day start/end times)
-- [x] **EMP-02**: Employee can request days off with reason
-- [x] **EMP-03**: Employee sees only their assigned bookings
-- [x] **EMP-04**: Employee can confirm, complete, or mark no-show on their bookings
+- [ ] **ADMIN-01**: Admin can impersonate any user with mandatory audit trail entry
+- [ ] **ADMIN-02**: Feature flags table + admin UI to toggle features per company
+- [ ] **ADMIN-03**: Admin can suspend/unsuspend companies with reason field
+- [ ] **ADMIN-04**: Admin can broadcast messages to all active companies
+- [ ] **ADMIN-05**: Maintenance mode toggle blocks public access with branded status page
+- [ ] **ADMIN-06**: Platform daily metrics dashboard (new companies, bookings, revenue, churn)
+- [ ] **ADMIN-07**: Platform audit log of all admin actions with timestamp, actor, and details
 
-### End Customer (Public Booking)
+### Notifications
 
-- [x] **CUST-01**: Public booking wizard works end-to-end — select service → pick slot → enter details → booking created
-- [x] **CUST-02**: Booking confirmation shows booking ID and status, trackable via URL
-- [x] **CUST-03**: Customer can leave a review after completed booking
-- [x] **CUST-04**: Loyalty points accumulate for returning customers and discounts apply
+- [ ] **NOTIF-01**: Booking confirmation email sends on booking creation via SMTP
+- [ ] **NOTIF-02**: Booking reminder SMS sends 24h before appointment via Twilio
+- [ ] **NOTIF-03**: Booking status change emails (confirmed, cancelled, completed) send correctly
+- [ ] **NOTIF-04**: Notification delivery status visible in owner notification list (sent/failed/pending)
 
-### Admin (Platform)
+### Marketplace
 
-- [x] **ADMIN-01**: Admin dashboard shows real platform-wide stats (total companies, users, bookings, revenue)
-- [x] **ADMIN-02**: Admin can view, activate, and deactivate company accounts
-- [x] **ADMIN-03**: Admin can view and manage all users across companies
+- [ ] **MKT-01**: Public marketplace page at /marketplace with full-text search across firms
+- [ ] **MKT-02**: Filter by category, subcategory, city, and geolocation radius
+- [ ] **MKT-03**: Firm detail page with description, photos, reviews, services list, and map
+- [ ] **MKT-04**: Direct booking from marketplace firm profile (links to existing booking wizard)
+- [ ] **MKT-05**: Premium listing placement for AI-Powered tier companies (featured flag)
+- [ ] **MKT-06**: Sort by average rating, distance, and featured status
 
-### Production Deployment
+### UX Improvements
 
-- [x] **DEPLOY-01**: Production Docker Compose with Next.js, PostgreSQL, Redis, and proper environment config
-- [x] **DEPLOY-02**: Production build succeeds with no errors
-- [x] **DEPLOY-03**: Environment variable configuration documented and validated on startup
+- [ ] **UX-01**: Booking detail opens in modal/drawer instead of full page navigation
+- [ ] **UX-02**: Booking status changes (confirm/cancel/complete/no-show) via modal actions
+- [ ] **UX-03**: Real-time dashboard updates via 30s TanStack Query polling (refetchInterval)
+- [ ] **UX-04**: Video meetings management UI page for owners
+- [ ] **UX-05**: Webhooks settings UI page for owners to manage API webhooks
 
-## Future Requirements
+### Bug Fixes
 
-### Customer Portal (Deferred)
+- [ ] **FIX-01**: AI-Powered plan shows unlimited bookings capacity (not 0)
 
-- **PORTAL-01**: Customer can create account to view booking history across businesses
-- **PORTAL-02**: Customer can manage profile and notification preferences
+### Observability
 
-### Advanced Admin (Deferred)
+- [ ] **OBS-01**: OpenTelemetry instrumentation on API routes with @vercel/otel + 10% sampling
+- [ ] **OBS-02**: Structured JSON logging compatible with Vercel log drain
 
-- **ADMN-01**: Admin can create companies directly
-- **ADMN-02**: Admin analytics deep-dive with charts
+### Testing
+
+- [ ] **TEST-01**: Vitest unit test coverage reaches 80% on critical business logic paths
+- [ ] **TEST-02**: Playwright E2E tests for booking flow, payments, auth, and admin
+- [ ] **TEST-03**: Testcontainers integration tests for DB operations (CI-only)
+- [ ] **TEST-04**: Storybook for core UI components (Button, Card, Dialog, Badge, DataTable)
+
+### Industry Verticals
+
+- [ ] **VERT-01**: Medical vertical — booking_metadata JSONB supports birth_number, insurance fields
+- [ ] **VERT-02**: Automotive vertical — booking_metadata JSONB supports SPZ/VIN fields
+- [ ] **VERT-03**: Per-industry UI labels dynamically rendered from industry config
+- [ ] **VERT-04**: Per-industry AI config (disable upselling for medical, adjust capacity for fitness)
+
+### Infrastructure Hardening
+
+- [ ] **HARD-01**: DB partitioning for bookings table by month (raw SQL migration)
+- [ ] **HARD-02**: DB partitioning for notifications and audit_logs tables
+
+## Future Requirements (v3.1+)
+
+### Mobile
+- **MOB-01**: White-label React Native mobile app for companies
+- **MOB-02**: App Store / Play Store CI/CD pipeline
+
+### Enterprise Security
+- **ESEC-01**: HashiCorp Vault for centralized secrets management
+- **ESEC-02**: ClamAV file scanning for uploaded content
+- **ESEC-03**: Pact contract tests between services
+
+### Architecture
+- **ARCH-01**: Microservices decomposition (if scale requires)
+- **ARCH-02**: API Gateway (Kong/Traefik) for service routing
+- **ARCH-03**: S3/R2 file storage for avatars and photos
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Customer accounts for booking | Public booking works without auth — simpler for users |
-| CI/CD pipeline setup | Deployment config only, CI/CD is a separate concern |
-| Kubernetes/Helm deployment | Docker Compose on VPS is the target |
-| New feature development | This milestone is about making existing features work |
-| Mobile native app | Web-first, PWA sufficient |
+| React Native mobile app | 200+ hours, separate milestone, web-first approach works |
+| HashiCorp Vault | .env is sufficient for Vercel deployment model |
+| Blue/Green deployment | Vercel handles this natively via preview deployments |
+| Pact contract tests | TypeScript schema validation sufficient at monolith scale |
+| Microservices migration | Monolith is correct architecture for <500 companies |
+| ClamAV file scanning | No file upload feature is active |
+| S3/R2 file storage | No file upload feature needs object storage yet |
 
 ## Traceability
 
+Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 39 | Complete |
-| AUTH-02 | Phase 39 | Complete |
-| AUTH-03 | Phase 39 | Complete |
-| AUTH-04 | Phase 39 | Complete |
-| OWNER-01 | Phase 40 | Complete |
-| OWNER-02 | Phase 40 | Complete |
-| OWNER-03 | Phase 40 | Complete |
-| OWNER-04 | Phase 40 | Complete |
-| OWNER-05 | Phase 40 | Complete |
-| OWNER-06 | Phase 40 | Complete |
-| EMP-01 | Phase 41 | Complete |
-| EMP-02 | Phase 41 | Complete |
-| EMP-03 | Phase 41 | Complete |
-| EMP-04 | Phase 41 | Complete |
-| CUST-01 | Phase 42 | Complete |
-| CUST-02 | Phase 42 | Complete |
-| CUST-03 | Phase 42 | Complete |
-| CUST-04 | Phase 42 | Complete |
-| ADMIN-01 | Phase 43 | Complete |
-| ADMIN-02 | Phase 43 | Complete |
-| ADMIN-03 | Phase 43 | Complete |
-| DEPLOY-01 | Phase 44 | Complete |
-| DEPLOY-02 | Phase 44 | Complete |
-| DEPLOY-03 | Phase 44 | Complete |
 
 **Coverage:**
-- v2.0 requirements: 24 total
-- Mapped to phases: 24
-- Unmapped: 0 ✓
+
+- v3.0 requirements: 46 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 46
 
 ---
-*Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 — Phase mapping complete (roadmap created)*
+
+_Requirements defined: 2026-03-16_
+_Last updated: 2026-03-16 after initial definition_
