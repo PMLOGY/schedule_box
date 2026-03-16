@@ -120,9 +120,9 @@ export async function getBookingCount(companyId: number): Promise<number> {
   // Try Redis first for the fast-path counter
   try {
     const key = bookingCounterKey(companyId, getCurrentPeriod());
-    const result = await redis.get(key);
+    const result = await redis.get<string>(key);
     if (result !== null) {
-      return parseInt(result, 10) || 0;
+      return parseInt(String(result), 10) || 0;
     }
     // Key doesn't exist in Redis — fall through to DB count
   } catch (error) {

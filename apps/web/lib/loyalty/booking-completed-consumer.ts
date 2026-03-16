@@ -1,22 +1,19 @@
 /**
- * Booking Completed Event Consumer for Loyalty Points
+ * Booking Completed Event Handler for Loyalty Points
  *
- * RabbitMQ consumer that listens for booking.completed events and automatically
- * awards loyalty points via the points engine. Fulfills LOYAL-03 (automatic points earning).
+ * RabbitMQ consumer removed for Vercel serverless deployment.
+ * handleBookingCompleted is called directly from the booking completion API route.
+ * Fulfills LOYAL-03 (automatic points earning).
  *
  * Features:
  * - Idempotent: awardPointsForBooking checks for existing transactions before awarding
- * - Graceful shutdown: SIGTERM closes channel and connection cleanly
- * - Standalone or embedded: Can run as a worker process or be started within Next.js server
  *
  * Exports:
- * - handleBookingCompleted: Event handler (exported for testing)
- * - startBookingCompletedConsumer: Starts the consumer loop
+ * - handleBookingCompleted: Event handler (exported for testing and direct invocation)
  */
 
 import type { CloudEvent } from '@schedulebox/events';
 import type { BookingCompletedPayload } from '@schedulebox/events';
-import { createConsumerConnection, consumeMessages, gracefulShutdown } from '@schedulebox/events';
 import { awardPointsForBooking } from './points-engine';
 
 // ============================================================================
@@ -34,9 +31,6 @@ import { awardPointsForBooking } from './points-engine';
  * - Calculating and awarding points
  * - Tier upgrade check
  *
- * If awardPointsForBooking succeeds (including the idempotent skip case),
- * the message is ACKed. If it throws, the consumer NACKs and requeues.
- *
  * @param event - CloudEvent with BookingCompletedPayload
  */
 export async function handleBookingCompleted(
@@ -45,55 +39,22 @@ export async function handleBookingCompleted(
   const { bookingUuid, companyId } = event.data;
 
   console.log(
-    `[Loyalty Consumer] Processing booking.completed event for booking ${bookingUuid} (company ${companyId})`,
+    `[Loyalty] Processing booking.completed event for booking ${bookingUuid} (company ${companyId})`,
   );
 
   try {
     await awardPointsForBooking(bookingUuid, companyId);
-    console.log(`[Loyalty Consumer] Awarded points for booking ${bookingUuid}`);
+    console.log(`[Loyalty] Awarded points for booking ${bookingUuid}`);
   } catch (error) {
-    console.error(`[Loyalty Consumer] Failed to award points for booking ${bookingUuid}:`, error);
-    // Re-throw so consumer NACKs and requeues the message
+    console.error(`[Loyalty] Failed to award points for booking ${bookingUuid}:`, error);
     throw error;
   }
 }
 
-// ============================================================================
-// CONSUMER STARTUP
-// ============================================================================
-
 /**
- * Start the booking.completed event consumer
- *
- * Creates a RabbitMQ connection, binds to the booking.completed routing key,
- * and starts consuming messages with the handleBookingCompleted handler.
- *
- * Sets up SIGTERM handler for graceful shutdown (close channel, then connection).
- *
- * Can be called from:
- * - A standalone worker process (e.g., services/loyalty-worker/index.ts)
- * - The Next.js server during development (e.g., in instrumentation.ts)
+ * No-op consumer startup — RabbitMQ removed for Vercel serverless deployment.
+ * Kept for backward compatibility with any imports.
  */
 export async function startBookingCompletedConsumer(): Promise<void> {
-  const { connection, channel } = await createConsumerConnection();
-
-  // Bind to booking.completed events on the loyalty queue
-  await consumeMessages(channel, {
-    queueName: 'loyalty.booking-completed',
-    routingKeys: ['booking.completed'],
-    prefetch: 10,
-    handler: handleBookingCompleted,
-  });
-
-  console.log('[Loyalty Worker] Listening for booking.completed events...');
-
-  // Graceful shutdown on SIGTERM
-  const shutdown = async () => {
-    console.log('[Loyalty Worker] Shutting down...');
-    await gracefulShutdown(connection, channel);
-    process.exit(0);
-  };
-
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
+  console.log('[Loyalty] Consumer disabled — using direct invocation on Vercel.');
 }

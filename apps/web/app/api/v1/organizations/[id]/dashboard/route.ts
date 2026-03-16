@@ -126,7 +126,18 @@ export const GET = createRouteHandler<undefined, OrgParams>({
     `);
 
     // 6. Compute org-level aggregates
-    const locationsArray = Array.from(locationMetrics);
+    // db.execute() with Neon HTTP driver returns NeonHttpQueryResult with .rows property
+    type LocationRow = {
+      company_uuid: string;
+      company_name: string;
+      address_city: string | null;
+      bookings_count: number;
+      revenue_total: string;
+    };
+    const rawMetrics = locationMetrics as unknown as { rows?: LocationRow[] } | LocationRow[];
+    const locationsArray: LocationRow[] = Array.isArray(rawMetrics)
+      ? rawMetrics
+      : ((rawMetrics as { rows?: LocationRow[] }).rows ?? []);
 
     let totalBookings = 0;
     let totalRevenue = 0;

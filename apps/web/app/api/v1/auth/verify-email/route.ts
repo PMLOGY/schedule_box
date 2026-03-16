@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
 
     // 2. Hash token and look up in Redis
     const tokenHash = createHash('sha256').update(input.token).digest('hex');
-    const userIdStr = await redis.get(`email_verify:${tokenHash}`);
+    const userIdRaw = await redis.get<string>(`email_verify:${tokenHash}`);
 
-    if (!userIdStr) {
+    if (!userIdRaw) {
       throw new BadRequestError('Invalid or expired verification token');
     }
 
-    const userId = parseInt(userIdStr, 10);
+    const userId = parseInt(String(userIdRaw), 10);
 
     // 3. Update user: emailVerified=true
     await db.update(users).set({ emailVerified: true }).where(eq(users.id, userId));

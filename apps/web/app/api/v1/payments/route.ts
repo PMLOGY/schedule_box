@@ -18,6 +18,7 @@ import {
   paymentListQuerySchema,
   type PaymentCreate,
   type PaymentListQuery,
+  type PaginationMeta,
 } from '@schedulebox/shared';
 import {
   createPaymentRecord,
@@ -146,7 +147,7 @@ export const GET = createRouteHandler({
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / limit);
 
-    return paginatedResponse(responseData, {
+    const meta: PaginationMeta & { aggregates: object } = {
       total: totalCount,
       page,
       limit,
@@ -157,7 +158,8 @@ export const GET = createRouteHandler({
         pending_count: aggregates.pending_count,
         refunded_count: aggregates.refunded_count,
       },
-    });
+    };
+    return paginatedResponse(responseData, meta as unknown as PaginationMeta);
   },
 });
 

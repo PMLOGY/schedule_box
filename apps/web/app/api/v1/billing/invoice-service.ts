@@ -94,8 +94,13 @@ export interface InvoiceRecord {
  * @returns Formatted invoice number string
  */
 export async function generateSubscriptionInvoiceNumber(tx: Database): Promise<string> {
-  const [result] = await tx.execute(sql`SELECT nextval('subscription_invoice_seq') as num`);
-  const seqNum = String(result.num).padStart(6, '0');
+  const executeResult = await tx.execute(sql`SELECT nextval('subscription_invoice_seq') as num`);
+  // Neon HTTP returns NeonHttpQueryResult with .rows; fallback for array-returning drivers
+  const rows: Array<Record<string, unknown>> = Array.isArray(executeResult)
+    ? (executeResult as Array<Record<string, unknown>>)
+    : ((executeResult as unknown as { rows: Array<Record<string, unknown>> }).rows ?? []);
+  const result = rows[0];
+  const seqNum = String(result?.num).padStart(6, '0');
   const year = new Date().getFullYear();
   return `SB-${year}-${seqNum}`;
 }

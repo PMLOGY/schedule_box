@@ -6,7 +6,12 @@
 
 import { eq, and, gte, isNull, sql } from 'drizzle-orm';
 import { db, reviews, bookings, customers, services, users } from '@schedulebox/database';
-import { ConflictError, ForbiddenError, NotFoundError } from '@schedulebox/shared';
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  type PaginationMeta,
+} from '@schedulebox/shared';
 import { reviewCreateSchema, reviewListQuerySchema } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
@@ -137,7 +142,7 @@ export const GET = createRouteHandler({
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / limit);
 
-    return paginatedResponse(responseData, {
+    const reviewMeta: PaginationMeta & { aggregates: object } = {
       total: totalCount,
       page,
       limit,
@@ -148,7 +153,8 @@ export const GET = createRouteHandler({
         this_month: agg.this_month,
         response_rate: responseRate,
       },
-    });
+    };
+    return paginatedResponse(responseData, reviewMeta as unknown as PaginationMeta);
   },
 });
 

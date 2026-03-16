@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       const tokenHash = createHash('sha256').update(resetToken).digest('hex');
 
       // Store in Redis with 1-hour TTL (3600 seconds)
-      await redis.setex(`password_reset:${tokenHash}`, 3600, user.id.toString());
+      await redis.set(`password_reset:${tokenHash}`, user.id.toString(), { ex: 3600 });
 
       try {
         await sendPasswordResetEmail(input.email, resetToken);

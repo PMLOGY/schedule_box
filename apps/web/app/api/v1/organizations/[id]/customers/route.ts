@@ -183,10 +183,29 @@ export const GET = createRouteHandler<undefined, OrgParams>({
       ) sub
     `);
 
-    const customersArray = Array.from(customersResult);
+    // db.execute() with Neon HTTP driver returns NeonHttpQueryResult with .rows property
+    type CustomerRow = {
+      uuid: string;
+      name: string;
+      email: string | null;
+      phone: string | null;
+      total_bookings: number;
+      total_spent: string;
+      last_visit_at: string | null;
+      locations_visited: number;
+    };
+    const rawResult = customersResult as unknown as { rows?: CustomerRow[] } | CustomerRow[];
+    const customersArray: CustomerRow[] = Array.isArray(rawResult)
+      ? rawResult
+      : ((rawResult as { rows?: CustomerRow[] }).rows ?? []);
 
-    const countArray = Array.from(countResult);
-    const total = countArray.length > 0 ? Number(countArray[0].total) : 0;
+    const rawCount = countResult as unknown as
+      | { rows?: Array<{ total: number }> }
+      | Array<{ total: number }>;
+    const countRows: Array<{ total: number }> = Array.isArray(rawCount)
+      ? rawCount
+      : ((rawCount as { rows?: Array<{ total: number }> }).rows ?? []);
+    const total = countRows.length > 0 ? Number(countRows[0].total) : 0;
     const totalPages = Math.ceil(total / limit);
 
     const responseData = customersArray.map((c) => ({

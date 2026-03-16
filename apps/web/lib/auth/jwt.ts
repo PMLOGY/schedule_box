@@ -244,7 +244,7 @@ export async function blacklistToken(token: string): Promise<void> {
 
     // Only blacklist if token hasn't expired yet
     if (ttl > 0) {
-      await redis.setex(`blacklist:${token}`, ttl, '1');
+      await redis.set(`blacklist:${token}`, '1', { ex: ttl });
     }
   } catch (error) {
     // Ignore errors during blacklisting (token might be malformed)

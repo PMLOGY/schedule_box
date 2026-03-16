@@ -25,6 +25,7 @@ import {
   subDays,
   addDays,
 } from 'date-fns';
+import type { Locale } from 'date-fns';
 import { cs } from 'date-fns/locale/cs';
 import { sk } from 'date-fns/locale/sk';
 import { enUS } from 'date-fns/locale/en-US';

@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
           await redis.expire(failKey, LOGIN_LOCKOUT_SECONDS);
         }
         if (failures >= LOGIN_LOCKOUT_THRESHOLD) {
-          await redis.setex(lockoutKey, LOGIN_LOCKOUT_SECONDS, '1');
+          await redis.set(lockoutKey, '1', { ex: LOGIN_LOCKOUT_SECONDS });
           await redis.del(failKey);
           throw new UnauthorizedError(
             'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       if (!input.mfa_code) {
         // MFA required but code not provided → return challenge
         const mfaToken = nanoid(32);
-        await redis.setex(`mfa:${mfaToken}`, 300, userRecord.id.toString()); // 5 min TTL
+        await redis.set(`mfa:${mfaToken}`, userRecord.id.toString(), { ex: 300 }); // 5 min TTL
 
         return successResponse({
           mfa_required: true,

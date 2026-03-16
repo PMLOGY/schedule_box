@@ -12,6 +12,7 @@ import {
   subMonths,
   startOfWeek,
   endOfWeek,
+  type Locale,
 } from 'date-fns';
 import { cs } from 'date-fns/locale/cs';
 import { sk } from 'date-fns/locale/sk';

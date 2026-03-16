@@ -122,7 +122,7 @@ async function registerCustomer(input: {
   // Generate email verification token
   const verifyToken = nanoid(64);
   const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
-  await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
+  await redis.set(`email_verify:${verifyHash}`, result.user.id.toString(), { ex: 86400 });
   sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
     console.error('[Register] Failed to send verification email:', err),
   );
@@ -223,7 +223,7 @@ async function registerOwner(input: {
   // Generate email verification token
   const verifyToken = nanoid(64);
   const verifyHash = createHash('sha256').update(verifyToken).digest('hex');
-  await redis.setex(`email_verify:${verifyHash}`, 86400, result.user.id.toString());
+  await redis.set(`email_verify:${verifyHash}`, result.user.id.toString(), { ex: 86400 });
   sendEmailVerificationEmail(result.user.email, verifyToken).catch((err) =>
     console.error('[Register] Failed to send verification email:', err),
   );

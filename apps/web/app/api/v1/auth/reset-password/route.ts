@@ -30,13 +30,13 @@ export async function POST(req: NextRequest) {
 
     // 2. Hash provided token and look up in Redis
     const tokenHash = createHash('sha256').update(input.token).digest('hex');
-    const userIdStr = await redis.get(`password_reset:${tokenHash}`);
+    const userIdRaw = await redis.get<string>(`password_reset:${tokenHash}`);
 
-    if (!userIdStr) {
+    if (!userIdRaw) {
       throw new BadRequestError('Invalid or expired reset token');
     }
 
-    const userId = parseInt(userIdStr, 10);
+    const userId = parseInt(String(userIdRaw), 10);
 
     // 3. Check password history
     const passwordIsNew = await checkPasswordHistory(userId, input.new_password);
