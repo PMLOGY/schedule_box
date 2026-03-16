@@ -13,10 +13,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <NavigationProgress />
       <GradientMesh preset="dashboard" />
       <div className="flex h-screen">
-        <aside aria-label="Dashboard sidebar">
+        <aside aria-label="Dashboard sidebar" className="flex-shrink-0">
           <Sidebar />
         </aside>
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden min-w-0">
           <Header />
           <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-6">
             <div className="mx-auto max-w-7xl">{children}</div>

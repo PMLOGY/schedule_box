@@ -30,7 +30,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col h-full border-r bg-background transition-all duration-300',
+        'hidden md:flex flex-col h-full flex-shrink-0 border-r bg-background transition-all duration-300',
         sidebarCollapsed ? 'w-16' : 'w-64',
       )}
     >
@@ -41,7 +41,7 @@ export function Sidebar() {
             S
           </div>
         ) : (
-          <div className="text-xl font-bold text-primary">ScheduleBox</div>
+          <div className="text-xl font-bold text-primary whitespace-nowrap">ScheduleBox</div>
         )}
       </div>
 
