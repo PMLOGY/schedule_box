@@ -1,521 +1,510 @@
 # Pitfalls Research
 
-**Domain:** Glassmorphism design overhaul for existing Next.js 14 / Tailwind / shadcn/ui SaaS application
-**Researched:** 2026-02-25
-**Confidence:** HIGH (backed by MDN, NNG, Chrome DevRel, Axess Lab, Josh Comeau deep-dive, and browser bug trackers)
+**Domain:** Adding 32 production gaps to existing Next.js 14 SaaS + migrating Railway → Vercel/Neon/Upstash
+**Researched:** 2026-03-16
+**Confidence:** HIGH (Vercel/Neon/Upstash official docs + CVE advisories), MEDIUM (encryption migration patterns, OTel sampling)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that will cause visual regressions, accessibility failures, or significant rewrites.
+Mistakes that cause data loss, security breaches, or full-feature rewrites.
 
 ---
 
-### Pitfall 1: Glass on a Solid Background Is Invisible
+### Pitfall 1: publishEvent no-op swallows errors silently — booking SAGA steps fail without a trace
 
 **What goes wrong:**
-The glassmorphism effect only works when there is something interesting behind the element to blur. If the background is a single flat color, `backdrop-filter: blur()` just blurs that solid color — producing a washed-out, slightly transparent panel that looks like a broken UI, not premium glass. ScheduleBox's current `globals.css` sets `--background: 0 0% 100%` (pure white) in light mode and `--background: 222.2 84% 4.9%` (near-black) in dark mode. Every glass card placed on these backgrounds will look identical to a low-opacity solid card — the effect is lost entirely.
+The existing SAGA choreography (booking created → payment charged → confirmation sent) relies on `publishEvent()` to chain steps. If the no-op replacement returns `void` or `Promise.resolve()` unconditionally on every call, a booking can complete the HTTP response successfully while the downstream payment charge or refund trigger never executes. The silence looks like success. The failure surfaces days later via customer complaints, not logs.
 
 **Why it happens:**
-Developers apply `backdrop-filter: blur(12px)` to components and expect the result to look like design mockups, which were made against gradient mesh or photo backgrounds in Figma. The `backdrop-filter` property blurs whatever is literally behind the element at the pixel level; if the background layer is monotone, there is nothing interesting to reveal.
+Developers treat "remove RabbitMQ" as "delete the connection + return early." They do not trace every call site to understand which events are fire-and-forget (analytics, notifications) versus which are required for the SAGA to proceed (payment confirmation, refund trigger, booking state machine transitions). The distinction is business-critical.
 
 **How to avoid:**
-Establish gradient mesh backgrounds before applying any glass effects. A minimum viable approach: add 2–3 large, softly blurred radial gradient "orbs" (positioned absolute, pointer-events-none) anchored to page-level layouts.
+Audit every `publishEvent()` call site before removing the broker. Classify each as:
+- **Fire-and-forget** (notification, analytics event): safe no-op. Add `console.warn('[RabbitMQ removed] skipped event: booking.notification.send')` so the removal stays traceable in Vercel logs.
+- **SAGA-required** (payment.charge, refund.trigger, booking.state.transition): must be replaced with a direct function call or inline async execution in the same request context. NOT a no-op.
 
-```css
-/* light mode ambient layer */
-background: radial-gradient(ellipse at 20% 50%, hsl(217 91% 60% / 0.12) 0%, transparent 60%),
-            radial-gradient(ellipse at 80% 20%, hsl(142 71% 45% / 0.10) 0%, transparent 55%);
-```
-
-Both light and dark modes need their own orb sets — in dark mode the orbs need more saturation (purple, blue, teal at 0.20–0.30 opacity) to register against the dark canvas.
+The fire-and-forget vs. SAGA-required classification must be documented as an inline comment at each call site before the RabbitMQ code is deleted.
 
 **Warning signs:**
-- Glass cards look the same as non-glass cards except slightly transparent
-- Mockups look great in Figma; implementation looks flat in browser
-- Adding `backdrop-filter` produces no visible change
+- Bookings created but payment never charged
+- Refunds confirmed in UI but balance not updated
+- No entries in the notification send log after booking confirmation
+- Booking status stuck in `pending` after the flow completes
 
-**Phase to address:** Phase 1 — Foundation / Background System. Must be done before any glass component work. Glass applied before background orbs exists will be invisible and invalidate all component-level testing.
+**Phase to address:** P0 — RabbitMQ removal (must be the first phase, blocks all deployment)
 
 ---
 
-### Pitfall 2: Dark Mode Glass Looks Muddy or Invisible
+### Pitfall 2: Neon pooled connection URL used for migrations — silent failures or lock errors
 
 **What goes wrong:**
-Dark mode exposes the weakest point of glassmorphism. With a very dark background (ScheduleBox uses near-black `222.2 84% 4.9%`), a glass card with `background: white/0.05` and `backdrop-filter: blur(12px)` blurs near-black content with near-black ambient light, producing a dark gray smear. The panel becomes invisible against the background at best, or picks up harsh glow artifacts from bright elements that scroll behind it at worst.
+Neon's PgBouncer runs in **transaction pooling mode** on the pooled connection string. Any SQL that uses session-level state — `SET LOCAL`, `LISTEN/NOTIFY`, advisory locks, prepared statements outside a transaction, or `SET statement_timeout` — silently errors or hangs. Drizzle Kit migrations use `SET search_path` and other session-scoped commands. Running `drizzle-kit migrate` against the pooled URL either corrupts migration state or produces a hard-to-diagnose timeout.
 
 **Why it happens:**
-Designers prototype dark mode glass against colorful gradient backgrounds in Figma. Developers copy the opacity values (5–10% white fill) without recreating those background conditions. The formula that works in light mode (less saturation, lighter orbs) fails completely in dark mode because there is not enough chromatic difference for blur to show.
+The pooled and direct Neon URLs look nearly identical — the only difference is `-pooler` in the hostname. Developers copy the "connection string" from the Neon dashboard without reading the footnote. CI/CD pipelines that run migrations share the same `DATABASE_URL` as the application.
 
 **How to avoid:**
-Dark mode glass needs a completely different recipe than light mode:
-- Use `background: rgba(255, 255, 255, 0.06)` to `rgba(255, 255, 255, 0.10)` — slightly higher opacity than light mode
-- Increase border prominence: `border: 1px solid rgba(255, 255, 255, 0.12)` — borders carry most of the "glass" perception in dark mode
-- Background orbs in dark mode must be noticeably more saturated and higher opacity (0.20–0.35) than in light mode
-- Avoid pure black (`#000000`) as the page background — use dark charcoal with a slight blue tint so orbs register
-- Add a subtle white gradient on the top edge of glass cards (`background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, transparent 100%)`) to simulate light hitting glass from above
+Use two environment variables from day one:
+- `DATABASE_URL` — pooled connection string (for all runtime Drizzle queries in the application)
+- `DATABASE_URL_UNPOOLED` — direct connection string (for `drizzle-kit migrate`, `drizzle-kit push`, seed scripts, and any SQL using session-scoped features)
 
-Test on the actual deployed dark background on a non-developer display, not Figma.
+In `drizzle.config.ts`, always reference `process.env.DATABASE_URL_UNPOOLED`. In `packages/database/src/index.ts`, use the neon-http or neon-serverless driver against `DATABASE_URL`. Neon's dashboard provides both strings — commit the env var names in `.env.example` so no one guesses.
 
 **Warning signs:**
-- Cards are visually indistinguishable from the background
-- You can only see a card by its border, not its glass surface
-- Scrolling content behind a glass panel looks identical blurred vs. unblurred
+- `drizzle-kit push` hangs indefinitely against Neon
+- `Error: prepared statement "s0" does not exist` in application logs
+- Advisory lock operations hanging in booking double-prevention logic
+- Migrations show as pending even after being run
 
-**Phase to address:** Phase 1 (background system) AND Phase 2 (glass design tokens). Dark mode glass requires a separate token set — same token values as light mode will fail.
+**Phase to address:** Infrastructure — Vercel/Neon migration (must be resolved before any other phase runs migrations)
 
 ---
 
-### Pitfall 3: WCAG Contrast Failures on Glass Surfaces
+### Pitfall 3: Vercel function timeout kills the availability engine on popular slots
 
 **What goes wrong:**
-Text on semi-transparent glass surfaces fails WCAG 2.2 contrast requirements (4.5:1 for body text, 3:1 for large text and UI elements). The failure is non-obvious and context-dependent: the glass panel sits over different background areas as the page scrolls, meaning text contrast varies continuously. A ratio that passes at one scroll position fails at another. Standard contrast checkers evaluate a fixed background color and cannot catch this.
+The `availability-engine.ts` runs 4-6 serial queries: working hours, employee assignments, existing bookings, resource locks, buffer rules, capacity limits. On popular businesses (50+ bookings/day, multiple employees), this serial pattern plus a Neon connection setup on a cold invocation can breach the 10s Hobby timeout or push the 60s Pro timeout under concurrent load. The customer sees "no availability" when slots exist.
 
 **Why it happens:**
-Translucent components overlay multiple colors. Text may have enough contrast over one background area and fail over another. Developers check contrast against the glass panel's own color and pass — but do not account for the shifting blurred content behind the panel.
+The availability engine was designed for Railway (persistent Node.js process, warm DB connection pool). On Vercel, Fluid Compute keeps a warm instance for >99% of requests, but the serial query pattern still accumulates latency. A single Neon query from Vercel US-East-1 to Neon takes 20-50ms; six serial queries add 120-300ms before business logic runs.
 
 **How to avoid:**
-Never rely solely on blur for text legibility. Use a semi-opaque color scrim beneath all text within glass panels:
-
-```css
-.glass-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: hsl(var(--background) / 0.25);
-  border-radius: inherit;
-  pointer-events: none;
-}
-```
-
-Additionally:
-- Prefer font-weight 500+ for all text on glass surfaces
-- Minimum body text size 16px on glass
-- Test contrast by placing the darkest and lightest possible background content behind the glass panel and measuring both extremes
-- Implement `prefers-reduced-transparency` fallback with a fully opaque surface (see Pitfall 12)
+1. Consolidate the 4-6 serial availability queries into a single SQL CTE that fetches all required data in one round-trip. This is the single highest-impact optimization.
+2. Add `export const maxDuration = 30` to the availability route file (requires Vercel Pro plan).
+3. Cache computed availability windows in Upstash Redis with a 60-second TTL — availability rarely changes mid-minute.
+4. Test availability response time in staging by simulating 10 concurrent requests with Vitest's concurrent test runner before shipping.
 
 **Warning signs:**
-- Thin font weights (300–400) on glass panels
-- Text directly on glass with no reinforcing scrim
-- Contrast ratio tools pass but users report difficulty reading
-- Mobile users (smaller screens, lower brightness) struggle with legibility
+- Booking wizard step 2 (slot picker) takes >5s to load
+- Vercel function duration logs showing >8s on the availability endpoint
+- Sentry timeout errors on `GET /api/v1/bookings/availability`
+- `504 Gateway Timeout` on the availability route during peak booking hours
 
-**Phase to address:** Phase 2 — Design tokens AND Phase 3 — Component glass variants. Make WCAG audit a checklist item in every component's QA.
+**Phase to address:** Infrastructure — Vercel migration (availability optimization is a required sub-task, not optional polish)
 
 ---
 
-### Pitfall 4: `backdrop-filter` Performance Degrades Low-End Devices
+### Pitfall 4: PII encryption migration corrupts existing data or blocks the database
 
 **What goes wrong:**
-`backdrop-filter: blur()` is GPU-intensive. Applying it to many simultaneous elements triggers composite layer creation for each, saturating GPU memory and causing janky scrolling, dropped frames, and rapid battery drain. Measured impact: approximately 15–25% higher GPU usage vs. solid surfaces; frame rates drop approximately 12fps on mid-range Android with multiple glass elements visible simultaneously. SMB owners in CZ/SK commonly use mid-range Android phones and older business laptops — the same devices most affected.
+Encrypting existing `phone`, `email`, and `notes` columns in production causes one or more of these failure modes:
+1. **Double-encryption**: Migration encrypts existing plaintext, but the old deployed application code re-encrypts already-encrypted values on next write, producing unreadable gibberish.
+2. **Table lock under load**: `UPDATE customers SET phone = encrypt(phone)` on a table with 50,000+ rows takes an `AccessExclusiveLock`. With the application still running, this blocks all reads and writes for minutes — visible downtime.
+3. **Search breakage**: Existing queries `WHERE phone = $1` or customer search by phone stop working because the column now holds AES-GCM ciphertext. The search returns zero results for every query. This breaks the front desk workflow immediately.
 
 **Why it happens:**
-Glass looks smooth on developer MacBook Pros. Testing is not done on lower-spec hardware. The effect is applied to cards, sidebars, navbars, modals, and tooltips simultaneously without measuring composite layer count.
+The migration and the code deploy are treated as independent steps rather than a coordinated cut-over. The developer writes a single `UPDATE` migration without thinking about: (a) the app still writing plaintext during the migration window, (b) lock duration on large tables, (c) search features that depend on plaintext comparison.
 
 **How to avoid:**
-- Limit `backdrop-filter` to a maximum of 3–4 simultaneous elements in any viewport
-- Keep blur values between 8–12px; above 20px costs exponentially more with diminishing visual return
-- Never animate `backdrop-filter` values directly — animate `opacity` of overlaid elements instead
-- Avoid `backdrop-filter` on full-width, full-height elements (sidebars spanning entire screen height are borderline)
-- Use `@media (prefers-reduced-motion: reduce)` to disable animated glass transitions
-- Test specifically on Chrome DevTools CPU throttle (4x slowdown) and on a real mid-range Android device
-- For data tables and analytics pages: `backdrop-filter` applies only to the page-level background; table rows and cells must remain opaque
+Use the expand-contract pattern — never encrypt in-place on a live table:
+
+1. **Expand**: Add `phone_encrypted bytea`, `email_encrypted bytea` nullable columns alongside the existing plaintext columns. Deploy app code that writes to both columns simultaneously (plaintext + encrypted).
+2. **Migrate**: A background script encrypts existing rows in batches of 500 with a 50ms sleep between batches (`pg_sleep(0.05)`). No lock contention. Run during off-peak hours (02:00-04:00 CET).
+3. **Verify**: Assert 100% of rows have non-null `phone_encrypted` before proceeding.
+4. **Contract**: Remove old plaintext columns. Deploy code that reads only from encrypted columns.
+
+For searchable fields (phone, email): store a deterministic HMAC-SHA256 tag alongside the encrypted value. Index the HMAC column. Queries become `WHERE phone_hmac = hmac($1, key)` for exact-match lookups. AES-GCM uses a random nonce per encryption — the same plaintext encrypts to different ciphertext each time — making it non-searchable without a HMAC companion.
 
 **Warning signs:**
-- Scroll jank (frame rate drops below 30fps)
-- Chrome DevTools Layers panel shows 10+ compositor layers
-- Chrome DevTools "Rendering > Paint flashing" lights up on scroll across glass surfaces
-- Battery drain complaints from mobile users
+- Phone search returning 0 results after migration
+- Base64-of-base64 values appearing in DB (double-encryption)
+- `pg_stat_activity` showing long-running `UPDATE customers` with `AccessExclusiveLock`
+- Customer search page broken immediately after migration deploy
 
-**Phase to address:** Phase 2 — Component implementation. Establish and enforce a glass performance budget. Analytics and calendar pages get explicit exclusion from cell-level glass.
+**Phase to address:** P1 — Security hardening (PII encryption sub-task). Must complete before any other phase writes new customer data to avoid split-state tables.
 
 ---
 
-### Pitfall 5: Safari Requires `-webkit-` Prefix and Rejects CSS Variables in `backdrop-filter`
+### Pitfall 5: Upstash ephemeral in-memory cache breaks rate limiting across serverless invocations
 
 **What goes wrong:**
-Safari still requires `-webkit-backdrop-filter` as of Safari 18.x. Without it, the entire blur effect is silently skipped on all Apple devices. A deeper Safari-specific bug: CSS custom properties (variables) do not work inside `-webkit-backdrop-filter`. A pattern like `backdrop-filter: blur(var(--glass-blur))` works in Chrome but silently fails in Safari's webkit-prefixed version — it renders with no blur.
+The `@upstash/ratelimit` SDK uses an in-memory `Map` for caching the sliding-window counter to reduce HTTP round-trips. In Vercel serverless (Node.js runtime), each function invocation gets a fresh process — the `Map` is empty every time. In some SDK configurations, the stale empty Map causes the SDK to report "not rate limited" when the Upstash counter has actually been exceeded, creating a bypass. In other configurations, it causes redundant HTTP calls with no cache benefit.
 
 **Why it happens:**
-Tailwind's `backdrop-blur-*` utilities add the `-webkit-` prefix automatically. But any custom CSS written directly (in `globals.css`, component CSS modules, or inline styles) skips it. Developers also reach for CSS variables to centralize blur values — a reasonable abstraction — without knowing it breaks Safari's webkit implementation. The MDN browser-compat-data issue #25914 documents this as unresolved behavior.
+The SDK documentation shows `ephemeralCache: new Map()` as a usage example. Developers copy it without noticing it is documented for Edge Runtime and long-running environments, not Node.js serverless where process memory does not persist between invocations.
 
 **How to avoid:**
-- Always use Tailwind's `backdrop-blur-*` utilities where possible; they handle prefixing
-- For custom CSS, always write both declarations:
-  ```css
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  ```
-- Never use CSS variables inside `-webkit-backdrop-filter` — hardcode pixel values or use Tailwind utilities
-- Add a test checkpoint: view on real Safari (not Chrome on Mac) before each phase is marked complete
+- For Node.js serverless API routes: omit `ephemeralCache` entirely. Accept the extra Upstash HTTP call per rate-limit check (~5-10ms from Vercel US regions to Upstash US-East-1 — acceptable overhead for rate limiting).
+- Move rate limiting to `middleware.ts` with `export const runtime = 'edge'`. Edge Runtime instances are long-lived within a region; the `Map` cache works correctly there. This is the architecturally correct placement for rate limiting — it runs before any API route, blocking malicious traffic before it consumes compute.
+- Use `sliding-window` algorithm (not `fixed-window`) to prevent burst attacks at window reset boundaries.
+- Use `@upstash/redis` HTTP client, not `ioredis` or the standard `redis` package — Upstash does not expose a TCP Redis port, only a REST API.
 
 **Warning signs:**
-- Glass renders perfectly in Chrome and Firefox but appears opaque or has no blur in Safari
-- Using `var(--glass-blur)` inside `backdrop-filter` in any CSS file
-- No `-webkit-backdrop-filter` alongside standard `backdrop-filter` in any custom CSS
+- Rate limit bypassed in load testing (window reset allows burst of requests)
+- Upstash dashboard showing 5-10x more requests than expected (no cache hit benefit)
+- `Error: LIMIT_EXCEEDED` on the first request to a fresh serverless function instance
+- `ioredis` or `redis` connection errors in Vercel function logs
 
-**Phase to address:** Phase 2 — Component implementation. Bake the `-webkit-` prefix into every glass base class from day one.
+**Phase to address:** Infrastructure — Vercel migration (Upstash setup sub-task)
 
 ---
 
-### Pitfall 6: `backdrop-filter` Creates Stacking Contexts That Break Existing z-index
+### Pitfall 6: Super-admin impersonation issues a real user JWT — unrevokable, untraceable token
 
 **What goes wrong:**
-Any element that has `backdrop-filter` applied automatically creates a new CSS stacking context. This silently breaks z-index layering for all descendants and creates surprising interactions with existing modals, dropdowns, tooltips, and popovers. For example: a glass sidebar with `backdrop-filter` traps all its children in its stacking context, preventing a dropdown menu inside the sidebar from layering above a modal that sits outside the sidebar's context — no matter how high the z-index value is set. ScheduleBox has complex overlay patterns (reservation modals, calendar popovers, booking drawers) that are at high risk.
+A naive impersonation implementation generates a real JWT for the target user and stores it in the admin's session cookie. If that token is forwarded (shared link, logs, copy-paste), the recipient has full access to the target user's account with no revocation mechanism. The JWT remains valid until its natural expiry (up to 7 days if using standard refresh token rotation). The audit trail shows the impersonated user acting — the admin's identity is invisible.
 
 **Why it happens:**
-Stacking context creation is a side-effect of `backdrop-filter` that is invisible in code review. The z-index breakage is non-deterministic by appearance — things look fine until a specific combination of overlapping elements is triggered — so it gets missed in initial review.
+Developers implement impersonation as "log in as user X" — generate their JWT, set cookie. This is the simplest path but creates an unrevokable, untraceable credential. The correct approach requires a separate, purpose-specific token type.
 
 **How to avoid:**
-- Audit all existing modal, dropdown, popover, and tooltip z-index values before introducing glass to layout wrappers
-- Prefer applying `backdrop-filter` to pseudo-elements (`::before`, `::after`) rather than the element itself — this avoids stacking context creation on the parent container
-- Use Radix UI's Portal (which shadcn/ui Dialog, Popover, DropdownMenu, etc. already use) to render overlays at the document body level, removing them from nested stacking contexts — verify all shadcn interactive components use Portals
-- For glass elements that must contain interactive children: use `isolation: isolate` on the glass element's parent to explicitly control stacking context boundaries
+Issue a short-lived (15-minute maximum) impersonation token distinct from regular session tokens:
+1. Separate JWT type with claim `token_type: 'impersonation'` — cannot be used as a regular session token
+2. Carries both `sub: targetUserId` AND `actingAs: adminUserId` in the payload
+3. No refresh — expires hard in 15 minutes
+4. Stored in a separate `impersonation_sessions` table with `revoked_at` column; checked server-side on every impersonated request
+5. Every action during impersonation writes to `audit_logs` with `performed_by_admin_id` populated (never null)
+6. Stored in a separate HttpOnly cookie (`imp_token`) — never merged with the admin's session cookie
+7. A persistent non-dismissible red banner ("IMPERSONATION ACTIVE — acting as [company name]") visible on all pages during the session
 
 **Warning signs:**
-- Dropdowns inside a glass sidebar clip behind the sidebar's edge
-- Modals appear behind glass panels despite high z-index values
-- Tooltips disappear randomly when hovering inside glass containers
-- `z-index: 9999` stops working in unexpected places
+- `audit_logs` records showing actions from user X while admin was logged in at the same time, but no `admin_id` in the log record
+- Impersonation token visible in browser dev tools network tab after session ends
+- No `impersonation_sessions` table in the schema
+- Admin's regular `Authorization` cookie contains the target user's `sub`
 
-**Phase to address:** Pre-implementation audit before Phase 1 touches any layout wrappers, AND Phase 2 component implementation. This must be caught before glass is applied to the app shell.
+**Phase to address:** P2 — Super-Admin completion
 
 ---
 
-### Pitfall 7: `backdrop-filter` Fails with `overflow: hidden` — Chrome and Firefox Behave Differently
+### Pitfall 7: SSE connections time out on Vercel Node.js runtime after 60 seconds
 
 **What goes wrong:**
-A glass card with rounded corners needs `overflow: hidden` to clip content to the border-radius. In Chrome, adding `overflow: hidden` to a parent of a `backdrop-filter` element causes the blur to clip before the filter is applied — the glass blur disappears in Chrome even though it works correctly in Firefox and Safari. Additionally, Firefox has a confirmed bug where `backdrop-filter` stops working on `position: sticky` elements when an ancestor has both `overflow` and `border-radius` set (Bugzilla #1803813).
+Vercel's Node.js runtime enforces a hard function timeout: 10s on Hobby plan, 60s on Pro plan. SSE connections for live booking updates and dashboard calendar refresh require connections lasting minutes to hours. The connection closes silently at the timeout boundary. The browser `EventSource` API auto-reconnects — this creates a thundering herd on the SSE endpoint where all connected clients reconnect simultaneously every 60 seconds in production, spiking DB load.
 
 **Why it happens:**
-Chrome and Firefox implement different order-of-operations for `overflow` clipping vs. filter application. This is a known cross-browser difference in the filter effects specification, not an easy fix. The workaround requires specific CSS incantations that are non-obvious.
+SSE works perfectly in local development (no timeout), so the Vercel timeout is not discovered until the first production deployment. The reconnect storm is not visible in development and appears suddenly at scale.
 
 **How to avoid:**
-- Use `mask-image` instead of `overflow: hidden` to clip glass panels to border-radius:
-  ```css
-  /* forces GPU compositing that respects clip correctly across browsers */
-  mask-image: radial-gradient(white, white);
-  ```
-- Or use `clip-path: inset(0 round var(--radius))` instead of `overflow: hidden`
-- Alternative: add `filter: blur(0px)` or `z-index: 1` to the `overflow: hidden` parent — forces the browser to re-evaluate compositing order and resolves the Chrome clipping issue
-- For sticky glass navbars: test the specific combination of `position: sticky` + ancestor `overflow` in Firefox before shipping
+Two approaches, in priority order:
+
+**Option A — SWR polling (recommended for this project):**
+Replace SSE with 15-second interval polling using `useSWR(url, fetcher, { refreshInterval: 15000 })`. At <500 companies with typical SMB booking volumes, 15-second stale data is acceptable. Booking confirmation page uses 3-second polling until status transitions to `confirmed`. This eliminates SSE complexity entirely and works correctly on all Vercel plans without any runtime configuration.
+
+**Option B — Edge Runtime SSE (for future real-time requirements):**
+Add `export const runtime = 'edge'` on the SSE route. Edge Runtime instances are long-lived and support streaming natively via Web Streams API. Replaces Node.js `res.write()` with `ReadableStream`. Constraint: Edge Runtime has no Node.js built-ins — no `fs`, no `require()`, no `process.env` dynamic access beyond `process.env.NEXT_PUBLIC_*`.
+
+For v3.0 scale, Option A is correct. Option B is premature for <500 companies.
 
 **Warning signs:**
-- Glass blur disappears in Chrome but works in Firefox/Safari (or vice versa)
-- Rounded glass cards show their border-radius correctly in one browser, not another
-- `overflow: hidden` is on the same element or direct parent of a `backdrop-filter` element
+- Browser console showing `EventSource` reconnecting every 60s
+- Vercel function logs showing `504 Function Timeout` on the SSE endpoint
+- Dashboard data showing a consistent 60-second stale window between updates
+- Spike in Neon connection counts every 60 seconds (reconnect storm signature)
 
-**Phase to address:** Phase 2 — Component implementation. Establish a standard rounded glass card base pattern that passes Chrome, Firefox, and Safari before it is used anywhere else.
+**Phase to address:** P2 — Real-time updates
 
 ---
 
-### Pitfall 8: Glass Applied to Data-Heavy Pages Destroys Readability
+### Pitfall 8: Next.js CVE-2025-29927 middleware bypass grants access to all admin routes if not patched
 
 **What goes wrong:**
-Glass effects on data tables, calendar cells, and chart containers actively degrade readability. Chart tooltip text over glass is nearly unreadable when the chart's own colored series are behind the glass layer. Calendar event chips on a glass calendar grid become visually indistinguishable from the grid itself. Data table rows with alternating row colors lose scan-ability when glass flattens the contrast difference between odd and even rows. ScheduleBox's analytics dashboard (revenue charts, booking tables) and the calendar view are the highest-risk pages.
+CVE-2025-29927 (disclosed 2025, patched in Next.js 14.2.25) allows any attacker to bypass Next.js middleware by sending `x-middleware-subrequest: middleware` in the HTTP request header. Since ScheduleBox's admin and super-admin route protection is implemented in `middleware.ts`, an unpatched deployment exposes every admin endpoint to unauthenticated access — including impersonation, suspend, broadcast, platform metrics, and user management.
 
 **Why it happens:**
-The design mockup shows glass on a clean hero background. Implementation copies the glass pattern to data-heavy components where the "content behind the glass" is the data itself — creating visual competition between the glass aesthetic and the data the user must read.
+Next.js used the `x-middleware-subrequest` header internally to prevent infinite middleware recursion. External requests with this header were trusted the same way, bypassing all middleware checks. The fix strips the header from external requests.
 
 **How to avoid:**
-- Apply glassmorphism only to page-level containers: the page background, sidebar, top nav, modal overlays, and dashboard stat cards
-- Data tables: always fully opaque with standard card backgrounds — no `backdrop-filter` on table wrappers
-- Charts: glass applies to the chart card wrapper only; the `<canvas>` or SVG rendering area must be opaque
-- Calendar: grid cells must be opaque; only the top-level calendar container or header bar can use glass
-- Rule of thumb: if the content inside the component is the primary data the user is reading, the component must be opaque
+Verify `next` version in `package.json` is `>=14.2.25` before any deployment. This is a one-line package bump. Add a CI check: `node -e "const v = require('./node_modules/next/package.json').version; if (v < '14.2.25') process.exit(1)"`.
+
+Additionally: do not rely solely on middleware for authorization. Apply server-side authorization checks in every API route handler as a second layer — middleware is a convenient first filter, not the only protection.
 
 **Warning signs:**
-- Text in data table cells is hard to read
-- Chart series colors bleed through adjacent panel backgrounds
-- Calendar events disappear into the glass grid background
-- Users cannot distinguish interactive rows from non-interactive background areas
+- `next` version in `package.json` is below `14.2.25`
+- Admin routes protected only by middleware with no server-side check in the route handler
+- No Next.js version pin in CI that fails below the patched version
 
-**Phase to address:** Phase 3 — Page-by-page application. Maintain an explicit exclusion list for glass: table rows, chart canvases, calendar cells, form inputs. Treat violations as bugs.
+**Phase to address:** P1 — Security hardening (first security sub-task before any deployment)
 
 ---
 
-### Pitfall 9: Over-Application of Glass Destroys Visual Hierarchy
+## Moderate Pitfalls
+
+---
+
+### Pitfall 9: OpenTelemetry SDK initialization adds 200-500ms to cold starts
 
 **What goes wrong:**
-When every surface is glass, nothing is glass. The visual hierarchy collapses: users cannot determine what is a primary action, what is a container, and what is background. Nielsen Norman Group research documents that glassmorphism's visual ambiguity makes interactive elements unclear and increases cognitive load. In SaaS dashboards, the contrast between primary CTAs (solid, high-confidence) and ambient containers (glass) is the main driver of correct visual hierarchy.
+The OTel SDK initialization (creating TracerProvider, registering exporters, configuring instrumentations) runs synchronously on module load in Next.js `instrumentation.ts`. On Vercel serverless, this adds 200-500ms to every cold start. With Fluid Compute reducing cold starts to <1% of invocations on Pro, this is usually invisible, but it makes p99 latency look abnormal and can push the availability engine over the timeout limit on complex routes.
+
+`BatchSpanProcessor` — the default in most OTel examples — keeps background timer intervals that prevent Vercel functions from freezing between invocations, which increases billing because functions stay warm longer than necessary.
 
 **Why it happens:**
-After implementing glass on a few components with impressive results, developers apply it everywhere. The technique becomes the style, not a tool for hierarchy. The result is a product that looks trendy but is harder to use.
+OTel examples and documentation target long-running Node.js servers, not serverless. Developers copy standard examples into `instrumentation.ts` without adapting for the serverless execution model.
 
 **How to avoid:**
-- Define a "glass budget" per page: maximum 3 simultaneous glass surfaces in any viewport at once
-- Primary action buttons (Book, Save, Submit, Confirm) must always be solid and high-contrast — never glass
-- Form inputs must always be opaque — glass inputs create ambiguity about whether fields are editable or decorative
-- Glass surfaces apply to: stat cards, app shell (nav/sidebar), modal overlays, decorative hero sections
-- Glass surfaces never apply to: primary CTAs, form fields, error/destructive states, loading states, data table rows
+1. Use `@vercel/otel` (Vercel's first-party OTel wrapper) instead of raw `@opentelemetry/sdk-node` — it defers initialization, skips non-applicable instrumentations, and is tested against Fluid Compute.
+2. Use `SimpleSpanProcessor` instead of `BatchSpanProcessor` — no background timers, function freezes correctly between invocations.
+3. Set production sampling to 10%: `new ParentBasedSampler(new TraceIdRatioBased(0.1))`. Full 100% sampling at 500 companies with typical booking flows generates ~50,000+ spans/day minimum. Vercel Drains charges $0.50/GB — at 500 companies this cost compounds quickly.
+4. Only instrument what will be queried: HTTP traces and DB spans. Skip file system, DNS, and process instrumentation.
+5. Guard with `if (process.env.NEXT_RUNTIME === 'edge') return` — OTel SDK does not support Edge Runtime.
 
 **Warning signs:**
-- Difficulty locating the primary CTA on any page within 3 seconds
-- Form inputs look like decorative panels rather than editable fields
-- Error states and success states are visually similar to normal glass cards
-- "Everything looks beautiful but I don't know where to click" feedback pattern
+- Cold start p99 increases by >300ms after adding OTel
+- `BatchSpanProcessor` in any OTel setup code
+- Vercel observability billing growing faster than user count
+- OTel instrumentation code running in Edge Runtime (will throw)
 
-**Phase to address:** Phase 2 — Establish glass usage rules and the component-type exclusion list before any implementation begins.
+**Phase to address:** P2 — Observability
 
 ---
 
-### Pitfall 10: Modifying shadcn/ui CSS Variables Globally Applies Glass Everywhere
+### Pitfall 10: Drizzle ORM introspect conflicts with manually-partitioned tables
 
 **What goes wrong:**
-shadcn/ui components (Card, Dialog, Sheet, Popover, etc.) use CSS variables (`--card`, `--popover`, `--background`) for their backgrounds. Overriding these variables globally to a semi-transparent RGBA value makes every component that uses `--card` become glass — including error dialogs, confirmation modals, data table containers, and toast notifications. Conversely, attempting to add `backdrop-filter` via Tailwind utility classes to every individual usage site creates a maintenance nightmare of 200+ scattered `backdrop-blur` classes with no ability to opt out.
+If `bookings` is partitioned by `created_at` range using raw SQL in a migration file (since Drizzle has no declarative partition API), `drizzle-kit introspect` pulls each partition as a separate table (`bookings_2025_q1`, `bookings_2025_q2`). Subsequent `drizzle-kit push` generates `ALTER TABLE` or `DROP TABLE` statements that conflict with partition constraints. The schema file permanently diverges from DB reality and all future migrations become unreliable.
 
 **Why it happens:**
-The natural instinct is "make all cards glass" by changing the `--card` CSS variable. This is logically appealing but architecturally incorrect: it applies glass globally without any opt-out mechanism.
+Drizzle's introspection does not understand the parent/child relationship of PostgreSQL table partitions. After manual DDL, running introspect is a destructive operation that corrupts the managed schema state.
 
 **How to avoid:**
-- Never make `--card`, `--popover`, or any global CSS variable semi-transparent
-- Create an additive glass modifier class applied explicitly per instance:
-  ```css
-  .glass {
-    background: hsl(var(--background) / 0.60) !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border) / 0.50);
-  }
-  ```
-- Apply `.glass` class to specific component instances, not via global CSS variable mutation
-- For shadcn Dialog and Sheet: wrap the inner content div with a glass variant, keeping the Portal and overlay system intact and unmodified
-- Verify via grep after each phase: `grep -r "backdrop-filter\|backdrop-blur" apps/web/components` — confirm glass is not spreading into unexpected components
+**Primary recommendation: do not partition tables in v3.0.** PostgreSQL handles 1-5 million rows efficiently with proper composite indexes on `(company_id, created_at)`. At <500 companies with SMB booking volumes (~50K-200K bookings/year total), partitioning provides no measurable benefit and significant maintenance cost. Defer to a future milestone when row counts justify it.
+
+If partitioning is implemented: create partitioned tables via standalone raw-SQL migration files that Drizzle Kit treats as opaque. Define the parent table normally in `schema.ts` (Drizzle queries work transparently on partitioned tables). Never run `drizzle-kit introspect` after adding manual DDL.
 
 **Warning signs:**
-- Modifying `--card` makes error dialogs semi-transparent
-- More than 50 unique `backdrop-blur-*` Tailwind class usages scattered across unrelated components
-- Glass appearing on toast notifications, form validation errors, or destructive confirmation dialogs
+- Drizzle introspect generating tables like `bookings_2025_q1`
+- Migration conflicts on `ALTER TABLE bookings` statements after adding partitions
+- `drizzle-kit push` attempting to drop and recreate the bookings table
 
-**Phase to address:** Phase 2 — Glass design system. Establish the `.glass` modifier class pattern before touching any individual components.
-
----
-
-### Pitfall 11: next-themes Hydration Mismatch with Theme-Conditional Glass Logic
-
-**What goes wrong:**
-Glass effects that differ between light and dark mode (different opacity, different orb colors, different blur intensity) can cause SSR hydration mismatches in Next.js when implemented with JavaScript theme branching. The server renders with the default theme (undefined/system), the client hydrates with the user's persisted theme preference from localStorage, and React logs hydration errors. This specifically affects components that use `useTheme()` to conditionally apply glass class names or glass intensities.
-
-**Why it happens:**
-next-themes (used by shadcn/ui's ThemeProvider) cannot access `localStorage` during SSR, so theme values are `undefined` on the server. Code that branches on `theme === 'dark'` to return different class strings will always produce server/client mismatches.
-
-**How to avoid:**
-- Never use `useTheme()` inside component render to conditionally apply glass class names
-- Drive all light/dark glass differences entirely through CSS variable tokens and Tailwind `dark:` variants — no JS branching:
-  ```tsx
-  // WRONG: causes hydration mismatch
-  const { theme } = useTheme();
-  <div className={theme === 'dark' ? 'glass-dark' : 'glass-light'}>
-
-  // CORRECT: pure CSS, SSR-safe
-  <div className="glass dark:glass-dark">
-  ```
-- Background gradient orbs (which differ significantly between light and dark) must be rendered using CSS `dark:` variants, not JS conditionals
-- If a component genuinely needs JS theme access for glass behavior, use `dynamic(() => import(...), { ssr: false })` to exclude it from SSR
-
-**Warning signs:**
-- "Hydration error: Text content does not match server-rendered HTML" in the Next.js console
-- Glass orb backgrounds flash or shift on page load (FOUC-style flicker)
-- Components using `useTheme()` inside render for glass class name selection
-
-**Phase to address:** Phase 1 — Foundation. Establish the pure-CSS dark mode glass pattern from day one to prevent this propagating across 65,000 LOC.
+**Phase to address:** P3 — DB infrastructure (strongly recommend deferring partitioning entirely)
 
 ---
 
-### Pitfall 12: Missing `prefers-reduced-transparency` Accessibility Fallback
+### Pitfall 11: Test coverage reaches 80% on metrics but critical booking paths remain at 20%
 
 **What goes wrong:**
-Users with vestibular disorders, migraines, or visual impairments may have enabled "Reduce Transparency" in their OS (macOS, iOS, Windows). Without a `@media (prefers-reduced-transparency: reduce)` rule, glassmorphism remains active for these users despite their explicit system preference — causing visual discomfort, legibility issues, or migraine triggers. The `prefers-reduced-motion` query (which must also disable animated glass effects) has wider support and is equally required.
+A global 80% line coverage gate is achieved by testing the easiest code — utility functions, formatters, type guards, simple validators. The availability engine, payment SAGA state machine, and booking state transitions — which are the actual production failure points — remain at 20-30% coverage because they require database fixtures and are time-consuming to mock correctly.
 
 **Why it happens:**
-`prefers-reduced-transparency` has limited browser support as of early 2026: Chrome 118+, Edge 118+; Firefox is behind a flag; Safari does not support it. Developers deprioritize it assuming low impact. The correct pattern — additive transparency enhancement — is also less intuitive than the common implementation approach.
+Coverage is measured as a single aggregate number. Developers write tests for whatever raises the number fastest to unblock CI. Hard-to-test business logic (DB-heavy, multi-step flows) is deferred or skipped.
 
 **How to avoid:**
-Apply the additive pattern: solid backgrounds first, glass as an enhancement only when the user has not opted out:
-
-```css
-/* Solid fallback — always present */
-.glass {
-  background: hsl(var(--card));
-}
-
-/* Glass enhancement — only when user allows transparency and browser supports it */
-@media (prefers-reduced-transparency: no-preference) {
-  @supports (backdrop-filter: blur(1px)) {
-    .glass {
-      background: hsl(var(--card) / 0.60);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
-    }
-  }
-}
-
-/* Disable animated glass transitions regardless of transparency preference */
-@media (prefers-reduced-motion: reduce) {
-  .glass {
-    transition: none;
+Set per-module coverage thresholds rather than a single global threshold. In `vitest.config.ts`:
+```ts
+coverage: {
+  thresholds: {
+    'lib/booking/availability-engine.ts': { branches: 90, lines: 90 },
+    'lib/payment/saga.ts': { branches: 85, lines: 85 },
+    'lib/auth/**': { lines: 80 },
+    'components/**': { lines: 60 },
+    'lib/utils/**': { lines: 70 },
   }
 }
 ```
 
-The `@supports` guard simultaneously handles older browsers (old Android WebViews) without polyfills.
-
-To test: enable "Reduce Transparency" in macOS System Settings > Accessibility > Display, then view in Chrome 118+.
+Use Neon's database branching feature for integration tests — it creates a fresh database branch per test run in under 1 second, enabling real DB tests without mocking. This eliminates the "mock everything" trap that produces passing tests that don't reflect real behavior.
 
 **Warning signs:**
-- No `@media (prefers-reduced-transparency)` anywhere in the codebase
-- No `@supports (backdrop-filter: blur(1px))` guard on glass effects
-- Animated glass transitions not covered by `prefers-reduced-motion`
-- The `.glass` class has no solid background fallback before the `backdrop-filter` rule
+- Global coverage at 80% but `availability-engine.ts` has red coverage lines
+- All green tests concentrated in `lib/utils/` and `components/`
+- Integration tests marked `.skip` or `.todo` in CI output
+- No tests that exercise the booking → payment state machine end-to-end
 
-**Phase to address:** Phase 2 — Glass design tokens. Bake the fallback pattern into the `.glass` base class definition from the start so every component inherits it.
+**Phase to address:** P1 — Test coverage (set per-module thresholds before writing tests, not after)
+
+---
+
+### Pitfall 12: Feature flags stored in DB cause N+1 query on every API request
+
+**What goes wrong:**
+A naive feature flag implementation queries the `feature_flags` table on every API request to check if a flag is enabled for the current company. At 500 companies making 10 requests/second each, this adds 5,000 extra DB queries/second — a 3-5x increase in Neon connection load that saturates the pool and degrades all other queries.
+
+**Why it happens:**
+Feature flags seem trivially simple — a DB table with `company_id`, `flag_name`, `enabled`. Developers add `SELECT * FROM feature_flags WHERE company_id = ?` to the auth middleware without considering the call frequency.
+
+**How to avoid:**
+For <500 companies, the correct implementation is:
+1. Cache flags in Upstash Redis as a hash per company with a 5-minute TTL: `HGETALL flags:company:${companyId}`.
+2. On flag change (admin UI toggle), invalidate that company's Redis key.
+3. Within a single request, check the flag once and pass the result as a function argument — never re-fetch within a request lifecycle.
+4. Keep the flag set to a maximum of 10 flags. More than 10 flags for an SMB SaaS is premature infrastructure investment.
+5. Do not evaluate flags client-side for subscription-tier gating — always server-side in API route handlers.
+
+**Warning signs:**
+- `feature_flags` table appearing in pg_stat_statements top-20 most-queried tables
+- Redis hit rate below 80% on flag keys
+- Performance regression after adding flag checks to middleware
+- Feature flag checks bypassed by calling the API directly without the flag header
+
+**Phase to address:** P2 — Super-Admin completion (feature flags sub-task)
+
+---
+
+### Pitfall 13: Industry verticals add per-vertical schema columns that bypass RLS
+
+**What goes wrong:**
+Adding `medical_notes`, `vehicle_vin`, or `appointment_type` as typed columns to `bookings` or `customers` tables — or a new `vertical_fields` table — requires updating Row Level Security policies. If new columns are added without reviewing the RLS `USING` clauses, data may be readable across tenant boundaries. Medical notes are PII under GDPR — a cross-tenant leak is a mandatory reporting incident under GDPR Article 33.
+
+**Why it happens:**
+RLS policies are tested thoroughly during initial feature development, but schema extensions are treated as "just adding a column" without re-running the RLS test suite.
+
+**How to avoid:**
+1. Store vertical-specific configuration in a `vertical_config jsonb NOT NULL DEFAULT '{}'` column on the `companies` table. Vertical fields inherit the existing `company_id`-based RLS without any new policy definitions.
+2. For per-booking vertical data, use `booking_metadata jsonb` (add once if not present) rather than typed per-vertical columns — avoids schema proliferation for <10 industry types and keeps RLS coverage trivial.
+3. Run the RLS test suite (`packages/database/tests/rls.test.ts`) after every schema change as a non-optional CI step.
+
+**Warning signs:**
+- New table added for vertical data without a `company_id` foreign key
+- RLS test suite not run after schema migration
+- Test user from company A can read records from company B after vertical schema change
+- `medical_notes` column on `bookings` without a corresponding RLS policy
+
+**Phase to address:** P3 — Industry verticals
 
 ---
 
 ## Technical Debt Patterns
 
-Shortcuts that seem reasonable but create long-term problems.
-
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|---|---|---|---|
-| Modifying `--card` CSS variable to semi-transparent | Fast global glass on all cards | Breaks all opt-out; error dialogs become glass | Never |
-| Using `useTheme()` for conditional glass class names | Feels explicit and intentional | SSR hydration mismatches, visible FOUC on load | Never in SSR components |
-| Blur values above 20px | Impressive in demos and screenshots | Exponential GPU cost; muddy appearance on dark mode | Never for production |
-| Skipping `-webkit-backdrop-filter` prefix in custom CSS | Cleaner-looking code | Silent failure on all Apple devices | Never |
-| Applying glass to all Card component instances globally | Consistent look across the app | Cannot opt out; breaks data tables and error states | Never |
-| Using `overflow: hidden` on glass card wrapper directly | Simple border-radius clip | Cross-browser blur failure in Chrome | Only when combined with `mask-image` workaround |
-| Skipping `prefers-reduced-transparency` fallback | Saves a few lines of CSS | Accessibility violation; potential harm to users | MVP only with explicit debt ticket and timeline |
-| Applying glass to calendar cells for visual richness | Looks impressive in demo | Jank on calendar render; 52+ compositor layers | Never |
+|----------|-------------------|----------------|-----------------|
+| Full no-op for all `publishEvent` calls | Fast RabbitMQ removal | Payment SAGA steps silently skip — bookings without charges | Never — must classify each call site first |
+| Single `DATABASE_URL` for both app runtime and migrations | Simpler env config | Migrations run against pooled connection — silent failures or hangs | Never — always use `DATABASE_URL_UNPOOLED` for migrations |
+| Global 80% coverage target with no per-module thresholds | Easy CI gate to pass | Critical paths undertested; coverage provided by utility function tests | Never for booking-critical modules — set per-module thresholds |
+| Raw OTel SDK with `BatchSpanProcessor` in `instrumentation.ts` | Standard OTel example code | 300-500ms cold start penalty; background timers prevent function freeze | Never on Vercel — use `@vercel/otel` with `SimpleSpanProcessor` |
+| AES-GCM random nonce for all encrypted fields including searchable PII | Simpler encryption code | Phone/email search broken — AES-GCM nonce is random, ciphertext is unsearchable | Never for fields requiring exact-match queries — add HMAC index |
+| Issuing a real user JWT for admin impersonation | Simple "log in as user" implementation | Unrevokable token, no audit trail, potential token leakage | Never — always use a separate short-lived impersonation token |
+| SSE with Node.js runtime on Vercel | Works in local development | 60s hard timeout, thundering herd reconnect storm in production | Never — use Edge Runtime SSE or SWR polling |
+| Querying `feature_flags` table on every API request | Simple, no caching layer | 5,000 extra DB queries/second at 500 companies | Never — cache in Upstash Redis with 5-minute TTL |
+| PostgreSQL table partitioning in Drizzle schema | Type-safe schema definition | Introspect breaks, migration conflicts, permanent schema drift | Never — use raw SQL migration for partition DDL, or defer entirely |
+| Encrypting PII in-place with a single `UPDATE` migration | Simple one-step migration | Table lock under load, double-encryption risk, search breakage | Never on a live database — always use expand-contract pattern |
 
 ---
 
 ## Integration Gotchas
 
-Common mistakes when connecting glass effects to the existing system.
-
 | Integration | Common Mistake | Correct Approach |
-|---|---|---|
-| shadcn/ui Card | Override `--card` variable globally to semi-transparent | Add `.glass` modifier class applied per-instance only |
-| shadcn/ui Dialog | Apply `backdrop-filter` to the Dialog wrapper element | Apply to `DialogContent` inner div; Portal handles stacking |
-| shadcn/ui Sheet | Glass on `SheetContent` breaks z-index in Safari | Use `::before` pseudo-element for blur layer |
-| Recharts / chart library | Glass on chart container clips or obscures tooltips | Glass on the card wrapper only; chart canvas stays opaque |
-| TanStack Table | Glass row backgrounds destroy alternating row contrast | Table is always opaque; glass only on the outer table card wrapper |
-| next-themes | `useTheme()` in render for conditional glass class names | Pure CSS `dark:` variants; no JS theme branching for styling |
-| Tailwind JIT | Custom blur values via arbitrary `backdrop-blur-[14px]` inconsistently | Extend `theme.backdropBlur` in tailwind.config.ts for consistency |
-| Framer Motion | Animating `backdrop-filter` value from one blur level to another | Animate `opacity` of an overlaid element; never animate `backdrop-filter` itself |
-| Loading skeletons | Apply glass shimmer to skeleton overlays | Keep loading skeletons as flat, opaque surfaces |
+|-------------|----------------|------------------|
+| Neon PostgreSQL | Using pooled URL (`-pooler` hostname) for `drizzle-kit migrate` | Use `DATABASE_URL_UNPOOLED` (direct connection) for all migration commands; pooled URL for runtime queries only |
+| Neon PostgreSQL | Assuming connection limits match Railway's persistent pool | Neon free tier: 10 direct connections max. Always use pooled URL in the app; direct only for migrations |
+| Neon PostgreSQL | Running `drizzle-kit introspect` after manual partition DDL | Never introspect after manual DDL — maintain `schema.ts` by hand for any table created with raw SQL |
+| Upstash Redis | Using `ioredis` or `redis` npm package | Upstash requires `@upstash/redis` HTTP REST client — TCP Redis libraries cannot connect to Upstash |
+| Upstash Redis | `ephemeralCache: new Map()` in Node.js serverless rate limiter | Omit `ephemeralCache` in Node.js serverless; the Map does not persist across invocations. Only use in Edge Middleware |
+| Vercel SSE | `export const runtime = 'nodejs'` (default) on SSE route | Use `export const runtime = 'edge'` for SSE, or replace SSE with SWR polling |
+| Vercel functions | No `maxDuration` export on slow availability/payment routes | Add `export const maxDuration = 30` on heavy routes (requires Vercel Pro plan) |
+| OpenTelemetry | `BatchSpanProcessor` on any Vercel serverless route | Use `SimpleSpanProcessor` — batch processor background timer prevents Vercel function freeze/thaw cycle |
+| Sentry + Next.js 14 | Deploying without `tunnelRoute` config | Without tunnel, Sentry is blocked by ad blockers on ~30% of CZ/SK browsers — add `tunnelRoute: "/monitoring"` to `sentry.client.config.ts` |
+| HIBP password check | Calling HIBP API synchronously blocking form submission | Use debounced async check after 300ms typing pause; show warning non-blocking; never block form submit on HIBP response |
+| Next.js middleware auth | Relying solely on middleware for admin route protection | Always add a second server-side authorization check in each API route handler — middleware is a filter, not the only gate |
 
 ---
 
 ## Performance Traps
 
-Patterns that work at small scale but fail under real usage.
-
 | Trap | Symptoms | Prevention | When It Breaks |
-|---|---|---|---|
-| Glass on more than 4 simultaneous viewport elements | Jank on scroll, 12+ fps drop | Glass budget: max 3–4 per viewport | Any device below MacBook Pro class GPU |
-| High blur values (20px+) | Exponential GPU cost, battery drain on mobile | Keep blur 8–12px for production | Mid-range Android phones immediately |
-| Animating `backdrop-filter` | Per-frame GPU re-composite on every animation frame | Animate `opacity` of overlay elements instead | Immediately on any device |
-| Glass on full-screen-height sidebar (entire page height) | Continuously recomposite entire sidebar during scroll | Solid sidebar body; glass only on sidebar header bar | Low-end laptops and mid-range Android |
-| Nested `backdrop-filter` elements (one inside another) | Double-blur visual artifact and 2x GPU cost | Never nest elements with backdrop-filter | Any browser, immediately |
-| Glass on all 52 calendar week cells | Critical scroll and render jank on calendar page | Calendar cells must be opaque; only header can be glass | Immediately on calendar render |
-| `will-change: backdrop-filter` | Unintended extra stacking context plus GPU reservation | Never use `will-change` with `backdrop-filter` | Any browser |
+|------|----------|------------|----------------|
+| 6 serial DB queries in availability engine | Slot picker >5s on popular businesses | Consolidate into single CTE query | Any business with >20 bookings/day on Vercel serverless |
+| OTel 100% trace sampling | Vercel observability bill growing unexpectedly | Set `tracesSampleRate: 0.1` (10%) in production from day one | At ~50 active companies |
+| Feature flag DB query per request | `feature_flags` in pg_stat_statements top queries | Upstash Redis cache per company, 5-min TTL | At ~50 concurrent users |
+| Neon connection spikes from concurrent serverless invocations | `too many connections` errors during peak hours | Use pooled connection URL always; Neon pooler handles up to 10,000 clients | Any traffic spike >50 concurrent requests |
+| PII decryption on every SELECT * | Customer list page slow (500ms+) | Decrypt only on display, not in the DB layer; cache decrypted values in request context | At >5,000 customer rows per company |
+| Unsampled Sentry performance traces from booking wizard | Sentry quota exhausted mid-month | Set `tracesSampleRate: 0.2` and `profilesSampleRate: 0.1` in `sentry.client.config.ts` | At ~100 daily active users |
+| SSE reconnect storm (all clients reconnect at 60s boundary) | Neon connection spike every 60s; booking list briefly stale | Replace SSE with SWR polling at 15s intervals | Immediately if using SSE on Node.js runtime in production |
+
+---
+
+## Security Mistakes
+
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Next.js version below 14.2.25 in production | CVE-2025-29927: any attacker bypasses all middleware auth with one request header — full admin access | Upgrade to `>=14.2.25` before any deployment; pin version in CI |
+| Real user JWT issued for impersonation | Token leakage grants full account access; 7-day validity; no audit trail | Separate 15-minute impersonation token with `token_type: 'impersonation'` claim; revocable via DB |
+| Plaintext PII appearing in logs during encryption migration | Log aggregators (Sentry, Vercel logs) capture customer phone/email in plaintext | Scrub all PII fields from log statements before the migration; use `[REDACTED]` placeholder |
+| Encryption key in `DATABASE_URL` or single shared env var without rotation plan | Key compromise decrypts all historical PII | Store in Vercel environment secrets; derive per-tenant key using HKDF(`masterKey`, `companyId`) |
+| Super-admin broadcast with no rate limit or confirmation gate | Admin typo sends SMS to all 50,000 customers at Twilio rates (~$2,500 mistake) | Require typing the target count to confirm broadcast; rate-limit broadcast API to 1 call per 10 minutes |
+| CSRF tokens absent on impersonation, suspend, and broadcast endpoints | CSRF attack forces admin to perform destructive actions | Apply CSRF validation to all state-changing super-admin endpoints even behind admin auth |
+| Feature flags enforced client-side only | Subscription tier bypass by direct API call with no flag header | Always enforce feature flags server-side in API route handlers; client check is UI convenience only |
 
 ---
 
 ## UX Pitfalls
 
-Common user experience mistakes in glassmorphism for a SaaS application.
-
 | Pitfall | User Impact | Better Approach |
-|---|---|---|
-| Glass form inputs | Users unsure if field is editable vs. decorative background | All form inputs always opaque with solid visible border |
-| Glass error/destructive states | Errors look decorative rather than urgent | Error states always use solid high-contrast red background, never glass |
-| Glass primary CTA buttons | Primary action is ambiguous, lower click-through | CTAs always solid, high-contrast, never glass |
-| Thin font weight (300) on glass | Text illegible especially on mobile and dim displays | Minimum font-weight 500 for all text on glass surfaces |
-| Glass chart tooltips | Tooltip text unreadable over colored chart series behind it | Chart tooltips always use solid opaque background |
-| Glass loading skeletons | Shimmer animation compounds visual noise; distracting | Loading skeletons stay flat and opaque |
-| Text without scrim layer on scrollable glass | Contrast varies by scroll position; random legibility failures | Always add semi-opaque scrim beneath text in any glass container |
-| Glass on mobile without performance budget | Scroll jank, battery drain, frustrated users | Reduce or disable glass on viewport width below 768px using media query |
+|---------|-------------|-----------------|
+| Booking wizard shows "no availability" during Neon cold start | Customer leaves and books with a competitor | Show loading skeleton for 3s before error; retry availability fetch once before showing failure state |
+| SSE disconnect shows stale data with no visual indicator | Owner acts on an outdated booking status | Show "last updated X ago" timestamp; indicator goes gray when connection/polling has not refreshed recently |
+| PII encryption migration causes blank customer search | Owner calls support; loses confidence in the platform | Full staging test with production data clone before live migration; have rollback SQL ready before the maintenance window |
+| Feature flag silently disables feature for a paying customer | Customer reports bug that cannot be reproduced in admin | Log flag evaluation decisions to `audit_logs`; provide admin UI showing active flags per company |
+| Super-admin impersonation session looks identical to normal login | Support agent makes changes thinking they are helping without realizing they are impersonating | Persistent red non-dismissible "IMPERSONATION ACTIVE — as [Company Name]" banner on all pages |
+| Industry vertical labels show wrong terminology | Medical business sees "Appointment Notes" when they expect "Clinical Notes"; feels unpolished | Load per-industry i18n override keys that replace global terms; test with at least one real user per vertical before launch |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-Things that appear complete but are missing critical pieces.
-
-- [ ] **Background system:** Glass cards may look great on developer monitor but appear flat on a standard laptop — verify on a mid-range Windows laptop display, not a calibrated monitor
-- [ ] **Dark mode:** Glass panels look fine in Figma but are invisible in the deployed dark mode — verify contrast of each glass card with the darkest and brightest orb position behind it
-- [ ] **Safari test:** Glass renders in Chrome but is missing entirely in Safari — explicitly test on Safari iOS or macOS before marking any phase complete
-- [ ] **Calendar page:** Glass accidentally applied to calendar cell internals — verify all calendar cells remain fully opaque in the browser rendering
-- [ ] **Data tables:** Alternating row color contrast is still visible and scannable through the glass wrapper — verify with real data in both themes
-- [ ] **z-index audit:** Existing reservation modal, booking drawer, and calendar popovers still layer correctly after adding glass to the app shell — explicitly test each overlay interaction
-- [ ] **WCAG contrast:** Text on each glass surface passes 4.5:1 ratio even when the most saturated background orb is positioned directly behind the text — test with aXe browser extension
-- [ ] **Performance:** Scroll performance on the analytics dashboard does not drop below 60fps on Chrome DevTools 4x CPU throttle
-- [ ] **prefers-reduced-transparency:** Enable "Reduce Transparency" in macOS Accessibility settings and verify glass degrades gracefully to an opaque surface in Chrome 118+
-- [ ] **Hydration:** Zero hydration mismatch errors in the Next.js console on cold page load in both light and dark mode
+- [ ] **RabbitMQ removal**: Every `publishEvent` call site has a classification comment (fire-and-forget vs. SAGA-required) — verify with `grep -rn 'publishEvent'` that every result has an adjacent comment
+- [ ] **Neon migration**: Two connection strings configured (`DATABASE_URL` pooled + `DATABASE_URL_UNPOOLED` direct) — verify `drizzle.config.ts` references `DATABASE_URL_UNPOOLED`
+- [ ] **Next.js version**: `package.json` shows `next >= 14.2.25` — verify with `npm list next` in CI
+- [ ] **PII encryption**: Expand-contract migration complete — old plaintext `phone` and `email` columns dropped (not merely nulled) — verify `\d customers` in psql shows no varchar phone column
+- [ ] **PII search**: HMAC index column exists for each encrypted searchable field — verify `customers.phone_hmac` index in schema and in Neon table inspector
+- [ ] **Upstash Redis**: `@upstash/redis` HTTP client used (not `ioredis`) — verify `grep -rn "ioredis\|require('redis')"` returns no results in the codebase
+- [ ] **SSE timeout**: Vercel timeout tested in staging — hold SSE or polling connection for 65s on a Vercel Pro deployment; verify behavior is correct (not tested only locally)
+- [ ] **Impersonation audit trail**: Run an action during impersonation session and confirm `audit_logs` record has non-null `performed_by_admin_id`
+- [ ] **OTel sampling**: `OTEL_TRACES_SAMPLER_ARG=0.1` set in Vercel production environment variables (not 1.0)
+- [ ] **Feature flags server-side**: Each feature flag check in a client component has a corresponding server-side enforcement in its API route — grep for flag names and verify each has both client and server checks
 
 ---
 
 ## Recovery Strategies
 
-When pitfalls occur despite prevention, how to recover.
-
 | Pitfall | Recovery Cost | Recovery Steps |
-|---|---|---|
-| Glass on solid background (effect invisible) | MEDIUM | Add background orb layer to layout — no component changes needed; re-test all glass |
-| Dark mode invisible or muddy glass | MEDIUM | Redesign dark-mode glass token values; increase orb saturation and card opacity; re-test |
-| WCAG contrast failures widespread | HIGH | Audit every glass surface; add text scrim layers to each; increase font weights; full QA cycle |
-| z-index breakage across existing overlays | HIGH | Refactor glass to pseudo-elements on affected containers; audit all modal and dropdown interactions |
-| `backdrop-filter` removed for performance | LOW | Replace with `background: hsl(var(--card) / 0.85)` flat glass fallback — preserves semi-transparent look |
-| Safari breakage from missing `-webkit-` | LOW | Global search-replace in CSS files; add prefix to Tailwind config — 1–2 hour fix |
-| Hydration mismatches from JS theme branching | MEDIUM | Refactor conditional class names to pure CSS `dark:` variants; no business logic changes needed |
-| Over-applied glass (visual hierarchy collapsed) | HIGH | Systematic removal audit: CTAs, forms, tables, error states — full design and QA review cycle |
+|---------|---------------|----------------|
+| publishEvent no-op skipped payment charges | HIGH | Identify affected bookings via `bookings` table (status `confirmed` with no payment record); manually trigger payment via admin panel; add compensating transaction entries to audit log; hotfix the no-op classification |
+| Neon pooled URL broke migrations | MEDIUM | Restore from Neon 7-day point-in-time restore to pre-migration state; re-run migrations using `DATABASE_URL_UNPOOLED`; validate with `drizzle-kit check` |
+| PII encryption corrupted data (double-encrypted) | HIGH | Restore from Railway pre-migration backup (last known clean snapshot); re-run expand-contract migration; if plaintext was exposed in logs: GDPR Article 33 requires DPA notification within 72 hours |
+| Availability timeout in production | LOW | Add `export const maxDuration = 30` immediately via env var or code change; merge CTE optimization; deploying a fix on Vercel takes <5 minutes |
+| OTel billing spike | LOW | Set `OTEL_TRACES_SAMPLER_ARG=0.01` immediately via Vercel env var — no redeployment needed; billing drops within minutes |
+| SSE thundering herd reconnect storm | MEDIUM | Switch to SWR polling as immediate fallback (`refreshInterval: 15000`) — implementable in <1 hour with no backend changes |
+| Impersonation token leaked | HIGH | Set `revoked_at = now()` on all active `impersonation_sessions` rows; rotate JWT signing secret (`JWT_SECRET` env var) — invalidates all existing tokens; audit every action taken during the leaked session period |
+| CVE-2025-29927 discovered post-deployment | HIGH | Upgrade `next` to `14.2.25+` immediately; redeploy; audit logs for `x-middleware-subrequest` header in Vercel request logs to detect exploitation attempts |
 
 ---
 
 ## Pitfall-to-Phase Mapping
 
 | Pitfall | Prevention Phase | Verification |
-|---|---|---|
-| Glass on solid background (invisible effect) | Phase 1: Background gradient system | Glass cards show visible blur and depth on both themes on a non-developer display |
-| Dark mode muddy or invisible glass | Phase 1 + Phase 2 tokens | Dark mode glass passes visual review on a standard Windows laptop monitor |
-| WCAG contrast failures | Phase 2 + per-component QA | Lighthouse accessibility audit scores remain at or above pre-overhaul baseline |
-| Performance degradation on low-end devices | Phase 2 performance budget | Chrome DevTools 4x throttle scroll test on analytics page maintains >= 60fps |
-| Safari `-webkit-` prefix missing | Phase 2 component base classes | Safari iOS and macOS test checkpoint before each phase is closed |
-| Stacking context z-index breakage | Pre-implementation audit + Phase 2 | All modal, drawer, and dropdown overlay interactions pass on every page |
-| `overflow: hidden` cross-browser blur failure | Phase 2 glass card base pattern | Same-output cross-browser screenshot comparison: Chrome, Firefox, Safari |
-| Data table and chart readability | Phase 3 page application | User can read all table data with correct color differentiation; chart series are distinct |
-| Over-application / hierarchy collapse | Phase 2 rules + Phase 3 audit | Primary CTA on each page is identified in under 3 seconds; no ambiguous interactive surfaces |
-| shadcn/ui global CSS variable contamination | Phase 2 architecture decision | Zero glass appearance on error dialogs, toast notifications, or form inputs |
-| next-themes hydration mismatch | Phase 1 foundation pattern | Zero hydration errors in Next.js console on cold load in both themes |
-| Missing reduced-transparency fallback | Phase 2 base `.glass` class definition | macOS "Reduce Transparency" + Chrome 118+ shows solid opaque card surfaces |
+|---------|-----------------|--------------|
+| publishEvent no-op breaks SAGA | P0: RabbitMQ removal | All call sites classified; booking + payment + notification E2E Playwright test passes end-to-end |
+| Neon pooled URL used for migrations | Infrastructure: Vercel/Neon migration | `drizzle.config.ts` uses `UNPOOLED` var; `drizzle-kit migrate` CI step passes on first run |
+| Availability engine timeout | Infrastructure: Vercel migration | Availability API p99 <2s under 10-concurrent-request load test in Vitest |
+| PII encryption data corruption | P1: Security hardening | Row count before/after migration matches; phone search returns correct results; no plaintext phone column in schema |
+| Upstash ephemeral cache breaks rate limiting | Infrastructure: Vercel migration | Load test: rate limiting holds across 100 concurrent requests from same IP; no bypass |
+| CVE-2025-29927 Next.js patch | P1: Security hardening | `npm list next` shows `>=14.2.25` in CI; middleware bypass test request returns 403 |
+| Impersonation token leakage | P2: Super-Admin | Playwright: impersonated action appears in `audit_logs` with non-null `admin_id`; token rejects after 15 min |
+| SSE timeout on Vercel | P2: Real-time updates | 65-second SSE hold test in Vercel Pro staging confirms no silent 60s disconnects; or SWR polling implemented |
+| OTel cold start overhead | P2: Observability | Cold start p99 <500ms after OTel addition; `OTEL_TRACES_SAMPLER_ARG=0.1` set in production |
+| Drizzle partition introspect conflict | P3: DB infrastructure | Partitioning deferred OR schema.ts matches DB without running introspect after manual DDL |
+| Industry vertical RLS leak | P3: Industry verticals | RLS test suite passes; company A cannot read company B vertical fields after schema change |
+| Coverage on wrong modules | P1: Test coverage | `availability-engine.ts` branch coverage >90% in coverage report; not just global 80% |
+| Feature flag N+1 query | P2: Super-Admin | `feature_flags` absent from pg_stat_statements top-20; Upstash Redis hit rate >95% on flag keys |
 
 ---
 
 ## Sources
 
-- [Glassmorphism Meets Accessibility — Axess Lab](https://axesslab.com/glassmorphism-meets-accessibility-can-frosted-glass-be-inclusive/)
-- [Glassmorphism: Definition and Best Practices — Nielsen Norman Group](https://www.nngroup.com/articles/glassmorphism/)
-- [Next-level frosted glass with backdrop-filter — Josh W. Comeau](https://www.joshwcomeau.com/css/backdrop-filter/)
-- [CSS prefers-reduced-transparency — Chrome for Developers](https://developer.chrome.com/blog/css-prefers-reduced-transparency)
-- [backdrop-filter — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter)
-- [prefers-reduced-transparency — MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-transparency)
-- [Safari 18 backdrop-filter + CSS variables bug — MDN browser-compat-data #25914](https://github.com/mdn/browser-compat-data/issues/25914)
-- [Glassmorphism Complete Implementation Guide 2025 — Developer Playground](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide)
-- [Dark Mode Glassmorphism Tips — Alpha Efficiency](https://alphaefficiency.com/dark-mode-glassmorphism)
-- [Glassmorphism Readability and Accessibility — New Target](https://www.newtarget.com/web-insights-blog/glassmorphism/)
-- [Dark Glassmorphism 2026 — Medium / MustBeWebCode](https://medium.com/@developer_89726/dark-glassmorphism-the-aesthetic-that-will-define-ui-in-2026-93aa4153088f)
-- [backdrop-filter and z-index stacking context — copyprogramming.com](https://copyprogramming.com/howto/backdrop-filter-and-z-index-dosent-works-together)
-- [Chromium and Nested Backdrop-Filters — Havn Blog](https://havn.blog/2024/03/14/chromium-and-nested.html)
-- [Backdrop-filter fails with overflow:hidden — copyprogramming.com](https://copyprogramming.com/howto/transitioning-backdrop-filter-blur-on-an-element-with-overflow-hidden-parent-is-not-working)
-- [Firefox bug #1803813 — backdrop-filter with sticky + overflow + border-radius](https://bugzilla.mozilla.org/show_bug.cgi?id=1803813)
-- [Fixing Hydration Mismatch in Next.js (next-themes) — Medium](https://medium.com/@pavan1419/fixing-hydration-mismatch-in-next-js-next-themes-issue-8017c43dfef9)
-- [Glassmorphism for Enterprise UI — Innoraft](https://www.innoraft.ai/blog/how-glassmorphism-drives-user-focus-complex-enterprise-ui)
-- [shadcn-glass-ui drop-in library — DEV Community](https://dev.to/yhooi2/introducing-shadcn-glass-ui-a-glassmorphism-component-library-for-react-4cpl)
+- Vercel Fluid Compute (cold starts): https://vercel.com/docs/fluid-compute
+- Vercel function timeout KB: https://vercel.com/kb/guide/what-can-i-do-about-vercel-serverless-functions-timing-out
+- Vercel scale-to-one blog (Fluid): https://vercel.com/blog/scale-to-one-how-fluid-solves-cold-starts
+- Neon connection pooling docs: https://neon.com/docs/connect/connection-pooling
+- Neon connection method selection: https://neon.com/docs/connect/choose-connection
+- Neon serverless driver: https://neon.com/docs/serverless/serverless-driver
+- Drizzle + Neon integration guide: https://neon.com/docs/guides/drizzle
+- Drizzle connect-neon docs: https://orm.drizzle.team/docs/connect-neon
+- Drizzle partition support discussion (GitHub #2093): https://github.com/drizzle-team/drizzle-orm/discussions/2093
+- Drizzle partition feature issue (GitHub #2854): https://github.com/drizzle-team/drizzle-orm/issues/2854
+- CVE-2025-29927 Vercel postmortem: https://vercel.com/blog/postmortem-on-next-js-middleware-bypass
+- CVE-2025-29927 NVD entry (patched versions): https://nvd.nist.gov/vuln/detail/CVE-2025-29927
+- Upstash ratelimit SDK: https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
+- Upstash ephemeral cache serverless issue (Vercel Next.js discussion #62178): https://github.com/vercel/next.js/discussions/62178
+- Vercel OTel instrumentation docs: https://vercel.com/docs/tracing/instrumentation
+- OTel on Vercel serverless (oneuptime guide, 2026-02): https://oneuptime.com/blog/post/2026-02-06-opentelemetry-vercel-serverless-functions/view
+- SSE time limits on Vercel (community): https://community.vercel.com/t/sse-time-limits/5954
+- SSE on Vercel Next.js discussion (#48427): https://github.com/vercel/next.js/discussions/48427
+- Vercel Drains trace billing ($0.50/GB): https://vercel.com/docs/drains/reference/traces
 
 ---
 
-_Pitfalls research for: glassmorphism design overhaul on existing Next.js 14 SaaS application (ScheduleBox)_
-_Researched: 2026-02-25_
+_Pitfalls research for: ScheduleBox v3.0 — 32 gaps closure + Railway → Vercel/Neon/Upstash migration_
+_Researched: 2026-03-16_

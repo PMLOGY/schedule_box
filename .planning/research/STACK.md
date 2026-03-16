@@ -1,480 +1,533 @@
-# Technology Stack — v1.4 Glassmorphism Design Overhaul
+# Stack Research — v3.0 Production Launch & Gap Closure
 
-**Project:** ScheduleBox v1.4
-**Focus:** Glassmorphism design system — frosted glass cards, gradient backgrounds, premium typography, glass transitions
-**Researched:** 2026-02-25
-**Confidence:** HIGH (verified against official Tailwind docs, Next.js docs, MDN, caniuse.com, Tailwind GitHub issues)
+**Domain:** SaaS Booking Platform — Vercel Deployment & Security Hardening
+**Researched:** 2026-03-16
+**Confidence:** HIGH (all package versions verified via npm registry; integration patterns verified via official docs and recent 2025/2026 sources)
 
-> **Scope:** This document covers ONLY what is new or changed for the v1.4 glassmorphism design overhaul.
-> The existing stack (Next.js 15, Tailwind CSS v3.4, shadcn/ui, next-themes, motion ^12.34.3,
-> tailwindcss-animate ^1.0.7, tailwind-merge ^3.4.0, class-variance-authority ^0.7.1) is in production
-> and already sufficient for glassmorphism. Do NOT re-introduce, re-evaluate, or add redundant packages.
+> **Scope:** This document covers ONLY what is NEW for the v3.0 milestone — closing 32 documented gaps
+> to reach 100% documentation coverage and deploy to Vercel. The existing stack (Next.js 15, React 19,
+> Drizzle ORM, ioredis, Tailwind CSS, shadcn/ui, Vitest, Playwright, etc.) is in production and is NOT
+> re-evaluated here.
 >
-> **Current versions confirmed:** tailwindcss ^3.4.0, tailwindcss-animate ^1.0.7, next-themes ^0.4.6,
-> motion ^12.34.3, tailwind-merge ^3.4.0, class-variance-authority ^0.7.1, autoprefixer ^10.4.0,
-> Inter via `next/font/google`.
+> **Migration summary:** ioredis → @upstash/redis (HTTP, Vercel-compatible), postgres.js → @neondatabase/serverless
+> (serverless Postgres), RabbitMQ → no-op stub (already planned in PROJECT.md), WebSocket → SSE/polling.
 
 ---
 
-## Executive Summary
+## Core Technology Changes (Migration)
 
-The glassmorphism overhaul requires **zero new npm packages**. Every capability needed is either
-already installed or is a native Tailwind CSS utility. The work is entirely in CSS tokens,
-component refactoring, and configuration changes.
+### Redis: ioredis → @upstash/redis
 
-The four design capabilities and their sources:
+| Aspect | Current (ioredis) | Target (@upstash/redis) |
+|--------|-------------------|------------------------|
+| Connection model | TCP persistent socket | HTTP REST (stateless) |
+| Vercel compatible | No — persistent connections crash serverless | Yes — native serverless |
+| Cold start | Warm connection required | Zero — one HTTP call per operation |
+| Local dev | Requires local Redis 7 daemon | Requires UPSTASH_REDIS_REST_URL + TOKEN |
+| API surface | Full Redis 7 API | Full Redis API over HTTP |
 
-1. **Frosted glass (backdrop-blur)** — Tailwind's `backdrop-blur-*` utilities (built-in since v2.1,
-   webkit-prefixed automatically since v3.4.5). No plugin needed.
+**Why @upstash/redis:** Vercel serverless functions are ephemeral. TCP-based Redis (ioredis) opens a new socket per invocation and either times out or hits connection limits. Upstash serves Redis over HTTP (REST) — each call is a single HTTPS request. No connection pooling needed. Vercel's official integration marketplace lists Upstash as the recommended Redis provider.
 
-2. **Gradient backgrounds** — Tailwind's `bg-gradient-to-*`, `from-*`, `via-*`, `to-*` utilities
-   (built-in). Add custom glass CSS variables to `globals.css`.
+**Migration scope in codebase:**
+- `apps/web/lib/redis/client.ts` — replace `Redis` (ioredis) with `Redis` (@upstash/redis)
+- 9 files import from the redis client: auth routes (forgot-password, login, register, reset-password, verify-email), `lib/auth/jwt.ts`, `lib/middleware/rate-limit.ts`, `lib/usage/usage-service.ts`
+- API is broadly compatible: `redis.set()`, `redis.get()`, `redis.del()`, `redis.setex()` all have identical signatures
 
-3. **Glass animation transitions** — `motion` library (already installed at ^12.34.3). Supports
-   `whileHover`, `initial`/`animate` with spring transitions. No new animation library needed.
+### PostgreSQL: postgres.js → @neondatabase/serverless
 
-4. **Typography upgrade** — Switch from Inter to **Plus Jakarta Sans** via `next/font/google`
-   (zero bundle cost — self-hosted via Next.js, no new npm package). Plus Jakarta Sans is a
-   variable font (weights 200–800), already on Google Fonts, loaded identically to the current
-   Inter setup.
+| Aspect | Current (postgres.js) | Target (@neondatabase/serverless) |
+|--------|----------------------|----------------------------------|
+| Connection model | TCP connection pool (max: 10) | HTTP or WebSocket (neon-serverless) |
+| Vercel compatible | No — TCP pool exhausted by serverless functions | Yes — HTTP-native serverless |
+| Drizzle driver | drizzle-orm/postgres-js | drizzle-orm/neon-http or neon-serverless |
+| Transactions | Full ACID | neon-http: single non-interactive only; neon-serverless (Pool): full session support |
 
-**Net new packages:** 0 npm packages. 0 Tailwind plugins. 0 CSS-in-JS.
+**Why @neondatabase/serverless:** Neon is the official Vercel Postgres partner. Its `neon-http` driver sends queries over HTTPS — zero TCP handshake overhead in serverless. For code paths requiring interactive transactions (SAGA payment flow), use `@neondatabase/serverless` with the Pool (WebSocket) variant instead of neon-http. Neon also provides branch-per-PR preview databases, git-like workflow.
 
----
+**Migration scope in codebase:**
+- `packages/database/src/db.ts` — replace `postgres.js` + `drizzle-orm/postgres-js` with `neon()` + `drizzle-orm/neon-http`
+- For transaction-heavy paths (payment SAGA, booking transitions): use `Pool` from `@neondatabase/serverless` + `drizzle-orm/neon-serverless`
+- Use **pooled** connection string from Neon dashboard (hostname contains `-pooler`) for all serverless function contexts
 
-## What Changes vs. What Stays
+### RabbitMQ: Remove Dependency
 
-### Changes (config + code only)
-
-| Area | Current State | v1.4 Change |
-|------|--------------|-------------|
-| Font | Inter via `next/font/google` | Plus Jakarta Sans via `next/font/google` (same API) |
-| CSS tokens | Standard shadcn HSL vars | Add glass-specific CSS custom properties |
-| Tailwind config | Standard color/shadow extends | Add `backdropBlur` extend + custom `boxShadow` for glow |
-| `globals.css` | Standard shadcn tokens | Add `@layer utilities` glass utility classes |
-| shadcn Card | Solid background | Add `glass` CVA variant using existing CVA + tailwind-merge |
-| Brand colors | `--primary: 217 91% 60%` (blue-500) | Update to `--primary: 220 100% 50%` (#0057FF target) |
-
-### Stays Unchanged
-
-| Technology | Reason |
-|-----------|--------|
-| tailwindcss ^3.4.0 | v3.4.5+ already auto-generates `-webkit-backdrop-filter` (confirmed PR #13997 merged July 2024) |
-| autoprefixer ^10.4.0 | Already in postcss.config.mjs, already handles remaining vendor prefixes |
-| motion ^12.34.3 | Handles all glass hover/enter animations via `whileHover`, `initial`/`animate` |
-| tailwindcss-animate ^1.0.7 | Already handles accordion; add glass shimmer keyframes here |
-| class-variance-authority ^0.7.1 | Used to create `glass` variants on shadcn components |
-| tailwind-merge ^3.4.0 | `cn()` already handles class conflict resolution for glass utilities |
-| next-themes ^0.4.6 | Already installed; glass tokens must be defined in both `:root` and `.dark` |
+**No new package needed.** Replace `publishEvent()` calls with a safe no-op stub. PROJECT.md already specifies this.
+- 20 files call `publishEvent()` — replace stub in `packages/events/src/publisher.ts` with `async function publishEvent() {}`
+- `amqplib` removed from dependency tree after stub
+- No Vercel-incompatible persistent AMQP connection
 
 ---
 
-## Core Technologies — No Changes
+## New Packages: Security Hardening
 
-These are confirmed sufficient for glassmorphism. Document them for completeness.
+### @sentry/nextjs — Error Tracking
 
-### Tailwind CSS v3.4 — Backdrop-Blur Native Support
+| Property | Value |
+|----------|-------|
+| Version | 10.43.0 |
+| Install location | `apps/web` (main app) |
+| Runtime | Client + Server + Edge (3 separate config files) |
 
-| Class | CSS Generated | Use Case |
-|-------|--------------|----------|
-| `backdrop-blur-sm` | `blur(8px)` + `-webkit-blur(8px)` | Subtle glass nav elements |
-| `backdrop-blur-md` | `blur(12px)` + `-webkit-blur(12px)` | Standard glass cards |
-| `backdrop-blur-lg` | `blur(16px)` + `-webkit-blur(16px)` | Featured/hero glass panels |
-| `backdrop-blur-xl` | `blur(24px)` + `-webkit-blur(24px)` | Modal overlays |
-| `backdrop-blur-[20px]` | Arbitrary value | Fine-tuned brand-specific blur |
+**Why:** Sentry is the industry standard for Next.js error tracking. `@sentry/nextjs` 10.x auto-instruments App Router Server Components, Route Handlers, and Server Actions via the `instrumentation.ts` hook. The SDK wizard generates `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, and `app/global-error.tsx`.
 
-**Webkit prefix status (HIGH confidence):** PR #13997 merged into Tailwind v3.4.5 on July 13, 2024.
-Tailwind now always emits `-webkit-backdrop-filter` alongside `backdrop-filter` for all `backdrop-blur-*`
-utilities. The project's existing `autoprefixer ^10.4.0` in `postcss.config.mjs` provides additional
-coverage. No manual prefix workaround needed.
-
-**Browser support (HIGH confidence, caniuse.com verified):** 95.76% global coverage. Chrome 76+,
-Edge 17+, Safari 9+, Firefox 103+, Opera 64+. Internet Explorer is unsupported and irrelevant for
-a B2B SaaS in the CZ/SK market.
-
-### motion ^12.34.3 — Glass Animations
-
-The already-installed `motion` library (formerly Framer Motion) handles all glassmorphism animation
-patterns with no additions:
-
-- `whileHover` with `scale`, `y`, `boxShadow` — card lift-on-hover
-- `initial`/`animate` with `opacity`, `y` — card entrance fade-in
-- `transition={{ type: "spring", stiffness: 300, damping: 30 }}` — spring feel for glass cards
-- `layoutId` — shared element transitions between glass components
-
-**CSS property animation note:** `backdropFilter` can be animated via `motion` `style` prop, but
-animating blur values is GPU-expensive. The recommended pattern is to use CSS classes for the
-static blur state and animate only `opacity`, `y`, `scale` via motion.
-
----
-
-## New Configuration — globals.css Additions
-
-These are CSS token additions to `apps/web/app/globals.css`. No new packages.
-
-### Glass Design Tokens
-
-```css
-@layer base {
-  :root {
-    /* === BRAND UPDATE: #0057FF target === */
-    --primary: 220 100% 50%;          /* #0057FF — Behance blue */
-    --primary-foreground: 0 0% 100%;
-
-    /* === GLASS SYSTEM TOKENS === */
-    /* Background blur levels */
-    --glass-blur-sm: 8px;
-    --glass-blur-md: 16px;
-    --glass-blur-lg: 24px;
-
-    /* Glass surface opacity (light mode) */
-    --glass-bg-light: rgba(255, 255, 255, 0.7);
-    --glass-bg-subtle: rgba(255, 255, 255, 0.5);
-    --glass-bg-strong: rgba(255, 255, 255, 0.85);
-
-    /* Glass border */
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-border-strong: rgba(255, 255, 255, 0.5);
-
-    /* Glass glow shadow (blue-tinted for premium feel) */
-    --glass-shadow: 0 8px 32px rgba(0, 87, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.3);
-    --glass-shadow-hover: 0 16px 48px rgba(0, 87, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.4);
-
-    /* Gradient backgrounds for glass to sit on top of */
-    --gradient-hero: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 50%, #f5f0ff 100%);
-    --gradient-card-bg: linear-gradient(135deg, rgba(0, 87, 255, 0.03) 0%, rgba(100, 60, 255, 0.02) 100%);
+**Next.js App Router integration pattern:**
+```typescript
+// instrumentation.ts (project root, not inside /app)
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('./sentry.server.config');
   }
-
-  .dark {
-    /* === BRAND UPDATE: same primary, adjusted for dark === */
-    --primary: 220 100% 60%;          /* Slightly lighter in dark mode for contrast */
-    --primary-foreground: 0 0% 100%;
-
-    /* === GLASS SYSTEM TOKENS — DARK === */
-    --glass-bg-light: rgba(20, 30, 60, 0.6);
-    --glass-bg-subtle: rgba(15, 25, 50, 0.4);
-    --glass-bg-strong: rgba(25, 35, 70, 0.8);
-
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-border-strong: rgba(255, 255, 255, 0.15);
-
-    --glass-shadow: 0 8px 32px rgba(0, 87, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    --glass-shadow-hover: 0 16px 48px rgba(0, 87, 255, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.10);
-
-    --gradient-hero: linear-gradient(135deg, #0a0f1e 0%, #0d1530 50%, #12102a 100%);
-    --gradient-card-bg: linear-gradient(135deg, rgba(0, 87, 255, 0.06) 0%, rgba(100, 60, 255, 0.04) 100%);
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('./sentry.edge.config');
   }
 }
 ```
 
-### Glass Utility Classes (globals.css @layer utilities)
-
-```css
-@layer utilities {
-  /* Core glass surface — standard card usage */
-  .glass {
-    background: var(--glass-bg-light);
-    backdrop-filter: blur(var(--glass-blur-md));
-    -webkit-backdrop-filter: blur(var(--glass-blur-md));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-  }
-
-  /* Strong glass — hero panels, modals */
-  .glass-strong {
-    background: var(--glass-bg-strong);
-    backdrop-filter: blur(var(--glass-blur-lg));
-    -webkit-backdrop-filter: blur(var(--glass-blur-lg));
-    border: 1px solid var(--glass-border-strong);
-    box-shadow: var(--glass-shadow);
-  }
-
-  /* Subtle glass — sidebar, secondary elements */
-  .glass-subtle {
-    background: var(--glass-bg-subtle);
-    backdrop-filter: blur(var(--glass-blur-sm));
-    -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-    border: 1px solid var(--glass-border);
-  }
-
-  /* Hover state */
-  .glass-hover {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-  }
-
-  .glass-hover:hover {
-    box-shadow: var(--glass-shadow-hover);
-    transform: translateY(-2px);
-  }
-
-  /* Gradient background layers for glass to sit on */
-  .gradient-hero {
-    background: var(--gradient-hero);
-  }
-}
-```
-
-**Why `@layer utilities` over a Tailwind plugin:** The `@layer utilities` approach works in Tailwind
-v3's existing `@tailwind utilities` pipeline. These classes are purged when unused (tree-shaken by
-Tailwind's JIT engine). A Tailwind plugin would require modifying `tailwind.config.ts` and adds
-indirection with no benefit at this scale. The `@layer` approach is the official Tailwind v3 pattern
-for project-specific utilities.
-
----
-
-## Tailwind Config Additions — tailwind.config.ts
-
+**next.config.ts wrapping:**
 ```typescript
-// ADD to theme.extend in apps/web/tailwind.config.ts
-
-extend: {
-  // ... existing extends unchanged ...
-
-  backdropBlur: {
-    'glass': '16px',    // standard glass card
-    'glass-lg': '24px', // strong glass
-    'glass-sm': '8px',  // subtle glass
-  },
-
-  boxShadow: {
-    // ... existing shadows unchanged ...
-    'glass': 'var(--glass-shadow)',
-    'glass-hover': 'var(--glass-shadow-hover)',
-    'glow-blue': '0 0 24px rgba(0, 87, 255, 0.25)',
-    'glow-blue-lg': '0 0 48px rgba(0, 87, 255, 0.35)',
-  },
-
-  backgroundImage: {
-    'gradient-hero': 'var(--gradient-hero)',
-    'gradient-glass': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-    'gradient-blue': 'linear-gradient(135deg, #0057FF 0%, #3B82F6 100%)',
-    'gradient-premium': 'linear-gradient(135deg, #0057FF 0%, #7C3AED 100%)',
-  },
-
-  fontFamily: {
-    // Replace Inter with Plus Jakarta Sans
-    sans: ['Plus Jakarta Sans', 'var(--font-plus-jakarta-sans)', 'sans-serif'],
-  },
-
-  keyframes: {
-    // ... existing keyframes unchanged ...
-    shimmer: {
-      '0%': { backgroundPosition: '-200% center' },
-      '100%': { backgroundPosition: '200% center' },
-    },
-    'glass-in': {
-      '0%': { opacity: '0', backdropFilter: 'blur(0px)', transform: 'translateY(8px)' },
-      '100%': { opacity: '1', backdropFilter: 'blur(16px)', transform: 'translateY(0)' },
-    },
-  },
-
-  animation: {
-    // ... existing animations unchanged ...
-    shimmer: 'shimmer 2s linear infinite',
-    'glass-in': 'glass-in 0.3s ease-out',
-  },
-},
-```
-
----
-
-## Typography Change — Inter to Plus Jakarta Sans
-
-**Why change from Inter:** Inter is ubiquitous in SaaS products (2020–2024 era). Plus Jakarta Sans
-has the same geometric legibility but with more personality — stronger character with subtle curves
-that differentiate premium products in 2025. Variable font (200–800) so no weight-specific loading.
-
-**Why NOT Geist:** Geist is the Vercel house font (Next.js default). Using it signals "bootstrapped
-Next.js template" rather than a custom product. Plus Jakarta Sans has less association with generic
-tooling.
-
-**Why NOT Space Grotesk / Satoshi / Manrope:** These are popular but require either self-hosting or
-Fontsource. Plus Jakarta Sans is on Google Fonts, loaded via `next/font/google` (auto self-hosted
-by Next.js), identical API to the current Inter setup.
-
-### Implementation — layout.tsx
-
-```typescript
-// apps/web/app/layout.tsx — REPLACE Inter with Plus Jakarta Sans
-
-import { Plus_Jakarta_Sans } from 'next/font/google';  // note: underscore in import name
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin', 'latin-ext'],
-  display: 'swap',
-  variable: '--font-plus-jakarta-sans',
-  preload: true,
-  // Variable font — no 'weight' needed; covers 200–800 automatically
+// next.config.ts
+const { withSentryConfig } = require('@sentry/nextjs');
+module.exports = withSentryConfig(nextConfig, {
+  org: 'schedulebox',
+  project: 'schedulebox-web',
+  silent: true,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
 });
-
-// In RootLayout:
-<body className={`${plusJakartaSans.variable} font-sans`}>
 ```
 
-**No other changes needed.** The `font-sans` Tailwind class already maps to the CSS variable
-via `tailwind.config.ts` `fontFamily.sans` (update as shown in Tailwind Config section above).
-The `font-inter` variable currently in `globals.css` can be removed.
+**Vercel compatibility:** HIGH — Sentry explicitly supports Vercel. Source maps uploaded at build time. No persistent connection.
 
----
+### isomorphic-dompurify — XSS Sanitization
 
-## shadcn Component Glass Variants — CVA Pattern
+| Property | Value |
+|----------|-------|
+| Version | 3.3.0 |
+| Install location | `apps/web` |
+| Runtime | Server Components (SSR) + Client Components |
 
-No new libraries. Use the existing `class-variance-authority` (already installed) to add a `glass`
-variant to shadcn components. `tailwind-merge` (via the existing `cn()` utility) handles class
-conflict resolution.
+**Why isomorphic-dompurify, not dompurify:** DOMPurify requires a browser DOM (window.document). Next.js Server Components run in Node.js — no DOM. `isomorphic-dompurify` wraps DOMPurify with jsdom for server-side use, providing the same API on both runtimes.
 
-### Pattern: GlassCard
+**Critical jsdom version pin required:** isomorphic-dompurify v3+ pulls jsdom@28 which has an ESM-only dependency (`parse5`) that breaks CommonJS `require()` in Next.js on Vercel. Pin jsdom to 25.0.1 via pnpm overrides:
 
-```typescript
-// apps/web/components/ui/glass-card.tsx
-
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
-
-const glassCardVariants = cva(
-  // Base: rounded corners, overflow hidden for blur containment
-  'rounded-2xl overflow-hidden',
-  {
-    variants: {
-      variant: {
-        default: 'bg-card border border-border shadow',
-        glass: 'glass',           // uses @layer utilities .glass class
-        'glass-strong': 'glass-strong',
-        'glass-subtle': 'glass-subtle',
-      },
-      hover: {
-        true: 'glass-hover cursor-pointer',
-        false: '',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      hover: false,
-    },
+```json
+// root package.json
+{
+  "pnpm": {
+    "overrides": {
+      "jsdom": "25.0.1"
+    }
   }
-);
-
-interface GlassCardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof glassCardVariants> {}
-
-export function GlassCard({ className, variant, hover, ...props }: GlassCardProps) {
-  return (
-    <div
-      className={cn(glassCardVariants({ variant, hover }), className)}
-      {...props}
-    />
-  );
 }
 ```
 
-**Why this over glasscn-ui / shadcn-glass-ui:** Both third-party libraries exclude components
-that ScheduleBox already uses (Calendar, Charts, Form, Sonner). They add bundle weight and version
-lock-in for what is a 30-line CVA wrapper. The project already has `class-variance-authority` and
-the `cn()` pattern — use what's there.
+**Usage pattern:**
+```typescript
+import DOMPurify from 'isomorphic-dompurify';
+const clean = DOMPurify.sanitize(userHtmlInput, { ALLOWED_TAGS: ['b', 'i', 'em'] });
+```
+
+**Where to apply:** Review descriptions, customer notes in booking forms, any field rendered with `dangerouslySetInnerHTML`.
+
+### AES-256-GCM PII Encryption — Node.js built-in crypto
+
+**No new package.** Node.js 20 LTS `crypto` module provides AES-256-GCM natively and outperforms every third-party library by ~40x for 1MB operations (crypto: ~3,196 ops/sec vs @noble/ciphers: ~74 ops/sec per benchmark).
+
+**Why NOT @noble/ciphers:** Pure JS implementation, ~40x slower than native crypto for block ciphers. Noble is excellent for environments without native crypto (browsers, edge), but Node.js 20 already has it via OpenSSL.
+
+**Why NOT node-forge:** Unmaintained, no TypeScript types, slower than native.
+
+**Implementation pattern for PII field encryption:**
+```typescript
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+
+const ALGORITHM = 'aes-256-gcm';
+const KEY = Buffer.from(process.env.PII_ENCRYPTION_KEY!, 'hex'); // 32 bytes = 64 hex chars
+
+export function encryptPII(plaintext: string): string {
+  const iv = randomBytes(12); // 96-bit IV for GCM
+  const cipher = createCipheriv(ALGORITHM, KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag(); // 16-byte authentication tag
+  return Buffer.concat([iv, tag, encrypted]).toString('base64');
+}
+
+export function decryptPII(ciphertext: string): string {
+  const buf = Buffer.from(ciphertext, 'base64');
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const encrypted = buf.subarray(28);
+  const decipher = createDecipheriv(ALGORITHM, KEY, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
+}
+```
+
+### hibp — HIBP Password Breach Check
+
+| Property | Value |
+|----------|-------|
+| Version | 15.2.1 |
+| Install location | `apps/web` |
+| Runtime | Server-side only (API route) |
+
+**Why hibp:** Official unofficial TypeScript SDK for Have I Been Pwned API v3. Uses k-Anonymity model — sends only first 5 chars of SHA-1 hash of password, never the full password or hash. No API key required for Pwned Passwords endpoint. The library handles the range query and response parsing.
+
+**Usage in registration/password change route:**
+```typescript
+import { pwnedPassword } from 'hibp';
+
+const breachCount = await pwnedPassword(plaintextPassword);
+if (breachCount > 0) {
+  return NextResponse.json({ error: 'Password found in data breach' }, { status: 400 });
+}
+```
+
+**Vercel compatibility:** HIGH — single HTTPS call to api.pwnedpasswords.com, stateless.
 
 ---
 
-## What NOT to Add
+## New Packages: Observability
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| **tailwind-glassmorphism** (npm pkg) | Last meaningful update >2 years ago; wraps utilities Tailwind v3 provides natively. Adds a dependency for zero capability gain. | Tailwind's built-in `backdrop-blur-*` + `@layer utilities` |
-| **glasscn-ui** | Excludes Calendar, Sonner, Charts — components ScheduleBox already uses. Would create two component systems in the same project. | CVA `glass` variant on existing shadcn components |
-| **@yhooi2/shadcn-glass-ui** | Small package (low maintenance signal), same exclusion problem as glasscn-ui. | CVA pattern above |
-| **@casoon/tailwindcss-glass** | Tailwind v4-targeted plugin; ScheduleBox uses Tailwind v3. Version mismatch. | `@layer utilities` in globals.css |
-| **CSS-in-JS (styled-components, vanilla-extract)** | Project uses Tailwind CSS exclusively. Mixing paradigms creates class conflicts and slower builds. | Tailwind utilities + CSS custom properties |
-| **Fontsource (@fontsource/plus-jakarta-sans)** | Next.js `next/font/google` already self-hosts Google Fonts with better caching, no extra npm package, and automatic layout shift prevention. | `next/font/google` — already used for Inter |
-| **Geist** | Vercel's house font signals "Next.js template" to developers. Reduces perceived distinctiveness of ScheduleBox brand. | Plus Jakarta Sans |
-| **Additional animation library (GSAP, anime.js)** | `motion ^12.34.3` is already installed and covers all required glass animation patterns (spring, layout, gesture). | `motion` (already installed) |
-| **Framer (design tool) components** | Framer-exported components are not production-grade React — they are Framer-runtime dependent. | Custom CVA components + motion |
-| **PostCSS backdrop-filter plugin** | Tailwind v3.4.5+ generates `-webkit-backdrop-filter` automatically (PR #13997 confirmed merged). Autoprefixer is already in postcss.config.mjs. | Current setup — no changes needed |
+### @vercel/otel — OpenTelemetry Instrumentation
+
+| Property | Value |
+|----------|-------|
+| Version | 2.1.1 |
+| Install location | `apps/web` |
+| Config file | `instrumentation.ts` (project root) |
+
+**Why @vercel/otel over raw @opentelemetry/sdk-node:** `@vercel/otel` is Edge-compatible (NodeSDK is NOT edge-compatible). It automatically configures trace exporters, batch processors, and instrumentations for Next.js — zero manual setup for common cases. Works both on Vercel and self-hosted Node.js.
+
+**Next.js 15 instrumentation — no experimental flag needed (changed from 14):**
+```typescript
+// instrumentation.ts (project root, NOT inside /app)
+import { registerOTel } from '@vercel/otel';
+
+export function register() {
+  registerOTel({ serviceName: 'schedulebox-web' });
+}
+```
+
+**Important:** `@opentelemetry/sdk-node` must NOT be used directly in edge runtime paths. If edge runtime is used for any route, @vercel/otel is required.
+
+**Vercel compatibility:** HIGH — purpose-built for Vercel, exports traces to Vercel's built-in trace UI or external OTLP endpoint via `OTEL_EXPORTER_OTLP_ENDPOINT` env var.
+
+---
+
+## New Packages: Real-Time (WebSocket Replacement)
+
+### SSE via Native ReadableStream — No New Package
+
+**Vercel does NOT support persistent WebSocket connections** in serverless functions. SSE (Server-Sent Events) using the Web Streams API built into Next.js 15 Route Handlers is the correct replacement.
+
+**Implementation pattern for booking status updates:**
+```typescript
+// app/api/v1/bookings/stream/route.ts
+export const dynamic = 'force-dynamic'; // Critical — prevents Vercel response caching
+export const maxDuration = 25; // Vercel Pro limit for streaming (seconds)
+
+export async function GET(request: Request) {
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      // Send initial event immediately
+      controller.enqueue(encoder.encode('data: {"type":"connected"}\n\n'));
+
+      // Poll database every 3 seconds and push changes
+      const interval = setInterval(async () => {
+        try {
+          const updates = await getRecentBookingUpdates();
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(updates)}\n\n`));
+        } catch {
+          clearInterval(interval);
+          controller.close();
+        }
+      }, 3000);
+
+      // Clean up on disconnect
+      request.signal.addEventListener('abort', () => {
+        clearInterval(interval);
+        controller.close();
+      });
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+    },
+  });
+}
+```
+
+**Vercel SSE timeout limits:**
+- Hobby plan: 10 seconds (insufficient for persistent streams)
+- Pro plan: 60 seconds by default, 300 seconds with Fluid Compute
+- **Recommendation for ScheduleBox:** Use **polling** (30-second interval via TanStack Query `refetchInterval`) for booking dashboard updates. Simpler, no timeout concerns, works on all Vercel plans. SSE only for user-initiated flows where latency matters (live availability checking).
+
+**For multi-instance Vercel deployments (booking slot availability):** SSE requires shared state — use Upstash Redis Pub/Sub to bridge instances. Without this, Instance A's SSE connection won't receive events published on Instance B.
+
+**Alternative — polling pattern (simpler, recommended for this use case):**
+```typescript
+// hooks/use-bookings-query.ts — already exists, add refetchInterval
+useQuery({
+  queryKey: ['bookings'],
+  queryFn: fetchBookings,
+  refetchInterval: 30_000, // 30-second polling — sufficient for booking updates
+  refetchIntervalInBackground: false,
+});
+```
+
+---
+
+## New Packages: Testing Infrastructure
+
+### @storybook/nextjs — Component Documentation
+
+| Property | Value |
+|----------|-------|
+| Version | 10.2.19 |
+| Install location | `apps/web` (dev dependency) |
+| Config directory | `apps/web/.storybook/` |
+
+**Why @storybook/nextjs:** Purpose-built Storybook framework for Next.js — handles App Router, next/image, next/font, next/navigation mocks automatically. No manual webpack config. SWC compilation enabled via `useSWC: true`.
+
+**App Router setup:**
+```typescript
+// .storybook/main.ts
+import type { StorybookConfig } from '@storybook/nextjs';
+
+const config: StorybookConfig = {
+  framework: {
+    name: '@storybook/nextjs',
+    options: { appDirectory: true }, // Required for App Router
+  },
+  stories: ['../components/**/*.stories.tsx'],
+  addons: ['@storybook/addon-essentials'],
+};
+```
+
+**shadcn/ui compatibility:** shadcn components work in Storybook without any special config — they use standard Tailwind classes. Tailwind CSS is auto-configured by @storybook/nextjs when it detects `tailwind.config.ts`.
+
+**Vercel compatibility:** N/A — dev tool only, not deployed.
+
+### @pact-foundation/pact — Contract Testing
+
+| Property | Value |
+|----------|-------|
+| Version | 16.3.0 |
+| Install location | `apps/web` (dev dependency) or dedicated test package |
+| Test runner | Vitest (via pact-js adapter) |
+
+**Why Pact:** Consumer-driven contract testing for the boundary between Next.js API routes and the Python AI service (`services/ai-service`). When the AI service's response schema changes, the Pact consumer test catches it before deployment — preventing silent runtime failures.
+
+**Where to apply:** The Next.js app (consumer) calls `AI_SERVICE_URL` for predictions. The Pact consumer test generates a contract file; the Python AI service (provider) runs verification against it.
+
+**Important version note:** Pact v16.x uses Rust-backed FFI bindings. Requires pact_ffi native library — auto-downloaded on `npm install`. This adds ~80MB to the dev dependency footprint. Acceptable for dev/CI, do not include in production builds.
+
+**Basic consumer test pattern:**
+```typescript
+// tests/pact/ai-service.pact.test.ts
+import { PactV4, MatchersV3 } from '@pact-foundation/pact';
+
+const provider = new PactV4({ consumer: 'schedulebox-web', provider: 'schedulebox-ai' });
+
+it('predicts no-show risk', async () => {
+  await provider.addInteraction()
+    .given('booking exists')
+    .uponReceiving('no-show prediction request')
+    .withRequest({ method: 'POST', path: '/predict/no-show' })
+    .willRespondWith({ status: 200, body: { risk: MatchersV3.decimal(0.3) } })
+    .executeTest(async (mockServer) => {
+      const result = await predictNoShow(mockServer.url, bookingData);
+      expect(result.risk).toBeDefined();
+    });
+});
+```
+
+### testcontainers + @testcontainers/postgresql — Integration Testing
+
+| Property | Value |
+|----------|-------|
+| testcontainers version | 11.12.0 |
+| @testcontainers/postgresql version | 11.12.0 |
+| Install location | Root-level or `apps/web` dev dependency |
+| Test runner | Vitest with `globalSetup` |
+
+**Why Testcontainers:** Starts a real PostgreSQL 16 Docker container for integration tests. Tests run against the same Postgres version as production. No mocking of DB layer — catches schema migration bugs and query correctness.
+
+**Requirement:** Docker must be running when integration tests execute. This is CI-compatible (GitHub Actions with `services:` Docker-in-Docker). Note: user's local env does not have Docker, so integration tests will be CI-only.
+
+**Vitest globalSetup pattern:**
+```typescript
+// vitest.integration.global-setup.ts
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
+
+let container: Awaited<ReturnType<typeof new PostgreSqlContainer().start>>;
+
+export async function setup() {
+  container = await new PostgreSqlContainer('postgres:16-alpine')
+    .withDatabase('schedulebox_test')
+    .start();
+  process.env.DATABASE_URL = container.getConnectionUri();
+}
+
+export async function teardown() {
+  await container.stop();
+}
+```
+
+**Vitest config for integration tests (separate from unit tests to avoid Docker dependency in dev):**
+```typescript
+// vitest.integration.config.ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    name: 'integration',
+    globalSetup: './vitest.integration.global-setup.ts',
+    include: ['**/*.integration.test.ts'],
+    pool: 'forks', // Required for Testcontainers — threads don't support Docker
+    testTimeout: 60_000,
+  },
+});
+```
+
+---
+
+## Supporting Libraries (No New Packages)
+
+| Capability | Approach | Rationale |
+|-----------|----------|-----------|
+| CSRF protection | `crypto.randomUUID()` + cookie/header double-submit | Built into Node.js 20, no package needed |
+| SSRF protection | URL allowlist in API route middleware | Logic only, no package |
+| DB partitioning (P3) | PostgreSQL 16 native partitioning via Drizzle SQL | Already available in DB layer |
+
+---
+
+## Installation Summary
+
+```bash
+# Runtime dependencies (apps/web)
+pnpm --filter @schedulebox/web add \
+  @sentry/nextjs@10.43.0 \
+  isomorphic-dompurify@3.3.0 \
+  @upstash/redis@1.37.0 \
+  @neondatabase/serverless@1.0.2 \
+  @vercel/otel@2.1.1 \
+  hibp@15.2.1
+
+# Dev dependencies (apps/web)
+pnpm --filter @schedulebox/web add -D \
+  @storybook/nextjs@10.2.19 \
+  @storybook/addon-essentials \
+  @pact-foundation/pact@16.3.0 \
+  testcontainers@11.12.0 \
+  @testcontainers/postgresql@11.12.0
+
+# Remove from apps/web after migration complete
+pnpm --filter @schedulebox/web remove ioredis
+
+# Remove from packages/database after migration
+pnpm --filter @schedulebox/database add @neondatabase/serverless@1.0.2
+pnpm --filter @schedulebox/database remove postgres
+
+# Root package.json — add jsdom pin for isomorphic-dompurify
+# "pnpm": { "overrides": { "jsdom": "25.0.1" } }
+```
 
 ---
 
 ## Alternatives Considered
 
-| Recommended | Alternative | Why Not Alternative |
-|-------------|-------------|-------------------|
-| Plus Jakarta Sans via `next/font/google` | Geist | Vercel's default — makes product look like a bootstrapped Next.js project |
-| Plus Jakarta Sans via `next/font/google` | Satoshi / Manrope | Requires self-hosting or Fontsource npm package; `next/font/google` is zero-overhead |
-| `@layer utilities` custom classes in globals.css | `tailwind-glassmorphism` npm plugin | Plugin is unmaintained; Tailwind v3 native utilities are more capable and already installed |
-| CVA `glass` variant on existing shadcn components | glasscn-ui or shadcn-glass-ui | Both exclude components already in use; CVA pattern reuses existing tooling |
-| Tailwind `bg-white/70 backdrop-blur-lg` utility classes | CSS-in-JS for glass | Project is Tailwind-native; mixing paradigms adds build complexity |
-| CSS custom properties (`--glass-blur-md: 16px`) | Hardcoded Tailwind arbitrary values everywhere | CSS variables allow theme-aware glass that respects dark mode; arbitrary values duplicate values |
+| Recommended | Alternative | Why Not |
+|-------------|-------------|---------|
+| @upstash/redis | Vercel KV | Vercel KV is built on Upstash — same underlying service, higher cost tier, less flexible pricing |
+| @upstash/redis | Redis Cloud Serverless | Less Vercel marketplace integration, no built-in connection proxy |
+| @neondatabase/serverless | Vercel Postgres | Vercel Postgres is built on Neon — same underlying service, Neon direct gives more control and better pricing |
+| @neondatabase/serverless | Supabase | Different DB provider, would require full migration; Neon has native Drizzle docs |
+| @vercel/otel | @opentelemetry/sdk-node | NodeSDK is NOT Edge-compatible; @vercel/otel handles both runtimes |
+| isomorphic-dompurify | sanitize-html | heavier, opinionated allowlist; DOMPurify is the XSS-focused standard |
+| isomorphic-dompurify | xss | Less maintained, narrower escaping only; DOMPurify handles full HTML sanitization |
+| hibp (npm package) | Manual k-anonymity implementation | hibp handles hash computation, k-anonymity range query, and response parsing — ~15 lines vs ~150 lines |
+| Node.js crypto | @noble/ciphers | Pure JS, 40x slower for block ciphers in Node.js; native crypto uses OpenSSL hardware acceleration |
+| testcontainers | vitest-environment-drizzle | Testcontainers starts real Docker containers — catches Docker-level pg differences; drizzle env uses in-memory or SQLite |
+| SSE / polling | Socket.io | Requires persistent server — incompatible with Vercel serverless. Would need separate WebSocket server on Railway |
+| SSE / polling | Pusher / Ably | Third-party real-time service, additional cost, extra dependency for what is mostly a low-frequency update need |
+
+---
+
+## What NOT to Use (Vercel Incompatible)
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| ioredis / node-redis | TCP persistent connections — timeout or exhaust connections in serverless | @upstash/redis (HTTP) |
+| postgres.js with `max > 1` | TCP connection pool — unmanaged connections in serverless invocations | @neondatabase/serverless with pooled string |
+| amqplib / RabbitMQ | Persistent AMQP connection — not available in serverless | No-op publishEvent() stub |
+| ws / socket.io | WebSocket persistent connection — Vercel serverless terminates connections | SSE (ReadableStream) or 30s polling |
+| @opentelemetry/sdk-node direct | Not edge-compatible, breaks Vercel Edge runtime routes | @vercel/otel |
+| BullMQ (self-hosted) | Requires persistent Redis connection and worker process | Vercel Cron Jobs + Upstash Redis |
 
 ---
 
 ## Version Compatibility Matrix
 
-| Package | Current Version | v1.4 Requirement | Notes |
-|---------|----------------|-----------------|-------|
-| tailwindcss | ^3.4.0 | ^3.4.5+ (already satisfied) | v3.4.5 required for auto `-webkit-backdrop-filter` |
-| autoprefixer | ^10.4.0 | ^10.4.0 (no change) | Already in postcss pipeline; handles remaining prefix needs |
-| class-variance-authority | ^0.7.1 | ^0.7.1 (no change) | Used for glass CVA variants |
-| tailwind-merge | ^3.4.0 | ^3.4.0 (no change) | `cn()` handles glass class conflict resolution |
-| motion | ^12.34.3 | ^12.34.3 (no change) | Spring animations for glass card hover/entrance |
-| tailwindcss-animate | ^1.0.7 | ^1.0.7 (no change) | Add shimmer + glass-in keyframes |
-| next-themes | ^0.4.6 | ^0.4.6 (no change) | Glass tokens defined in both `:root` and `.dark` |
-| next | ^15.5.10 | ^15.5.10 (no change) | `next/font/google` handles Plus Jakarta Sans self-hosting |
+| Package | Requires | Compatible With | Notes |
+|---------|----------|-----------------|-------|
+| @sentry/nextjs@10.43.0 | Next.js ≥13 | Next.js 15, React 19 | Works with App Router instrumentation.ts |
+| @upstash/redis@1.37.0 | Node.js ≥18 | All Vercel runtimes | REST-based, no socket dependency |
+| @neondatabase/serverless@1.0.2 | Node.js ≥18 | drizzle-orm ≥0.36.4 | Use neon-http for most routes; neon-serverless (Pool) for transactions |
+| isomorphic-dompurify@3.3.0 | jsdom pinned to 25.0.1 | Next.js 15, SSR | jsdom@28 ESM issue — pin override required |
+| @vercel/otel@2.1.1 | Next.js ≥13.4 | Edge + Node.js runtime | instrumentation.ts in project root |
+| hibp@15.2.1 | Node.js ≥18 | TypeScript 5.x | Server-side only — k-anonymity API calls |
+| @storybook/nextjs@10.2.19 | Next.js ≥14 | App Router (`appDirectory: true`) | Dev only, not in production build |
+| @pact-foundation/pact@16.3.0 | Node.js ≥18 | Vitest via adapter | Rust FFI — 80MB native binary, dev/CI only |
+| testcontainers@11.12.0 | Docker daemon running | Vitest `pool: 'forks'` | CI only — local dev lacks Docker |
 
 ---
 
-## Installation
+## Environment Variables Required (New)
 
-```bash
-# NO new npm packages.
-
-# 1. Font is auto-loaded by Next.js — no install step.
-#    Update apps/web/app/layout.tsx to import Plus_Jakarta_Sans from 'next/font/google'
-
-# 2. Update apps/web/tailwind.config.ts with backdropBlur, boxShadow, backgroundImage, fontFamily extends
-
-# 3. Update apps/web/app/globals.css with glass CSS tokens and @layer utilities
-
-# 4. Create apps/web/components/ui/glass-card.tsx using CVA pattern
-
-# 5. Verify tailwindcss version is >=3.4.5:
-pnpm --filter @schedulebox/web list tailwindcss
-# Expected: tailwindcss 3.4.x where x >= 5
-```
-
----
-
-## Performance Notes
-
-- **Limit `backdrop-blur` to < 10 elements per viewport.** The GPU cost of `backdrop-filter` scales
-  linearly with the number of elements and the blur radius. Use `glass-subtle` (blur 8px) for
-  repeated list items; reserve `glass-strong` (blur 24px) for singular hero elements.
-
-- **Provide visible background behind glass cards.** `backdrop-filter` is invisible without content
-  or color behind the element. The dashboard needs gradient background layers (use `.gradient-hero`
-  on the page container, or gradient mesh SVGs) for the glass effect to visually activate.
-
-- **Avoid animating `backdropFilter` directly with motion.** Animating blur radius forces GPU
-  re-render every frame. Animate `opacity`, `y`, `scale` instead — the blur stays static.
-
-- **`will-change: transform` on frequently-animated glass elements** helps browsers promote them to
-  a compositor layer. Add via Tailwind's `will-change-transform` class on motion-wrapped glass cards.
+| Variable | Purpose | Provider |
+|----------|---------|----------|
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis endpoint | Upstash dashboard → Vercel integration |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis auth token | Upstash dashboard → Vercel integration |
+| `DATABASE_URL` | Neon pooled connection string | Neon dashboard (use `-pooler` hostname) |
+| `SENTRY_DSN` | Sentry project DSN | Sentry project settings |
+| `SENTRY_ORG` | Sentry organization slug | Sentry organization settings |
+| `SENTRY_PROJECT` | Sentry project slug | Sentry project settings |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN for client-side | Same as SENTRY_DSN |
+| `PII_ENCRYPTION_KEY` | AES-256-GCM key (32 bytes = 64 hex chars) | Generate: `openssl rand -hex 32` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Optional OTLP trace export endpoint | Vercel built-in or external (e.g., Uptrace) |
 
 ---
 
 ## Sources
 
-- Tailwind CSS `backdrop-filter-blur` docs — https://tailwindcss.com/docs/backdrop-filter-blur (HIGH confidence — official docs)
-- Tailwind CSS `backdrop-blur` v3 docs — https://v3.tailwindcss.com/docs/backdrop-blur (HIGH confidence — official docs)
-- PR #13997: Always generate `-webkit-backdrop-filter` — https://github.com/tailwindlabs/tailwindcss/pull/13997 (HIGH confidence — merged July 13 2024, confirmed in Tailwind v3.4.5+)
-- Issue #13844: `backdrop-blur-` does not work on webkit — https://github.com/tailwindlabs/tailwindcss/issues/13844 (HIGH confidence — confirmed resolved by PR #13997)
-- caniuse.com backdrop-filter — https://caniuse.com/css-backdrop-filter (HIGH confidence — 95.76% global support, Firefox 103+, Safari 9+)
-- Next.js Font Optimization docs — https://nextjs.org/docs/app/getting-started/fonts (HIGH confidence — official docs, verified `Plus_Jakarta_Sans` import name from `next/font/google`)
-- Plus Jakarta Sans Google Fonts — https://fonts.google.com/specimen/Plus+Jakarta+Sans (HIGH confidence — variable font 200–800, available via `next/font/google`)
-- glasscn-ui GitHub — https://github.com/itsjavi/glasscn-ui (MEDIUM confidence — confirms it excludes Calendar, Charts, Form, Sonner)
-- Epic Web Dev: Glassmorphism with Tailwind — https://www.epicweb.dev/tips/creating-glassmorphism-effects-with-tailwind-css (MEDIUM confidence — confirms class patterns, `isolate` + `bg-white/20` + `backdrop-blur-lg` + `ring-1`)
-- FlyonUI Glassmorphism guide — https://flyonui.com/blog/glassmorphism-with-tailwind-css/ (MEDIUM confidence — confirms Tailwind class combinations, dark mode notes)
-- Motion library docs — https://motion.dev/docs/react-animation (MEDIUM confidence — confirms spring transitions, `whileHover`)
-- MDN backdrop-filter — https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter (HIGH confidence — confirms `-webkit-backdrop-filter` still needed for Safari compat)
+- [Sentry Next.js Setup Docs](https://docs.sentry.io/platforms/javascript/guides/nextjs/) — @sentry/nextjs 10.43.0 App Router integration patterns — HIGH confidence
+- [@sentry/nextjs npm](https://www.npmjs.com/package/@sentry/nextjs) — version 10.43.0 confirmed — HIGH confidence
+- [Upstash Redis + Next.js](https://upstash.com/docs/redis/tutorials/nextjs_with_redis) — @upstash/redis 1.37.0 integration — HIGH confidence
+- [Vercel + Upstash template](https://vercel.com/templates/next.js/get-started-with-upstash-redis-and-next-js) — official Vercel recommendation — HIGH confidence
+- [Neon + Drizzle Docs](https://neon.com/docs/guides/drizzle) — @neondatabase/serverless 1.0.2, neon-http pattern — HIGH confidence
+- [Drizzle + Neon Serverless](https://orm.drizzle.team/docs/connect-neon) — drizzle-orm/neon-http driver — HIGH confidence
+- [Next.js OpenTelemetry Guide](https://nextjs.org/docs/app/guides/open-telemetry) — @vercel/otel 2.1.1, instrumentation.ts — HIGH confidence
+- [isomorphic-dompurify GitHub](https://github.com/kkomelin/isomorphic-dompurify) — v3.3.0, jsdom@25 pin workaround — HIGH confidence
+- [isomorphic-dompurify npm](https://www.npmjs.com/package/isomorphic-dompurify) — version 3.3.0 confirmed — HIGH confidence
+- [hibp npm](https://www.npmjs.com/package/hibp) — 15.2.1, k-anonymity API — HIGH confidence
+- [HIBP API v3 Docs](https://haveibeenpwned.com/api/v3) — no API key for Pwned Passwords endpoint — HIGH confidence
+- [Node.js Crypto Docs](https://nodejs.org/api/crypto.html) — AES-256-GCM built-in — HIGH confidence
+- [Storybook Next.js Docs](https://storybook.js.org/docs/get-started/frameworks/nextjs) — @storybook/nextjs 10.2.19, App Router setup — HIGH confidence
+- [Pact JS npm](https://www.npmjs.com/package/@pact-foundation/pact) — 16.3.0, PactV4 API — HIGH confidence
+- [Testcontainers Node.js Docs](https://node.testcontainers.org/) — testcontainers 11.12.0, Vitest forks pool — HIGH confidence
+- [SSE + Vercel Community](https://community.vercel.com/t/sse-time-limits/5954) — Vercel timeout limits per plan — MEDIUM confidence
+- [Fixing SSE Next.js Vercel](https://medium.com/@oyetoketoby80/fixing-slow-sse-server-sent-events-streaming-in-next-js-and-vercel-99f42fbdb996) — force-dynamic, ReadableStream pattern — MEDIUM confidence
 
 ---
 
-_Stack research for: ScheduleBox v1.4 Glassmorphism Design Overhaul_
-_Researched: 2026-02-25_
+_Stack research for: ScheduleBox v3.0 — Production Launch & 32 Gap Closure_
+_Researched: 2026-03-16_

@@ -1,810 +1,599 @@
-# Architecture Patterns: Glassmorphism Design System Integration
+# Architecture Research: v3.0 Integration Architecture
 
-**Domain:** Glassmorphism design overhaul for existing Next.js 14 + Tailwind + shadcn/ui SaaS app
-**Researched:** 2026-02-25
-**Confidence:** HIGH (codebase-verified for all integration points; MEDIUM for performance benchmarks which are hardware-dependent)
-
----
-
-## The Integration Problem
-
-ScheduleBox has ~65,000 LOC already structured around:
-- `globals.css` with HSL CSS variables for every shadcn/ui token
-- `tailwind.config.ts` mapping those CSS vars to Tailwind color names
-- 21 shadcn/ui components in `apps/web/components/ui/` (copy-paste style — owned, not npm)
-- `ThemeProvider` via `next-themes` using `attribute="class"` (adds `.dark` to `<html>`)
-- Three distinct layout groups: `(marketing)`, `(auth)`, `(dashboard)`
-
-The glassmorphism system must layer on top of this without breaking existing CSS variables, without requiring component replacement, and without creating hydration mismatches.
+**Domain:** Next.js 14 SaaS monolith — infrastructure migration, security hardening, feature gap closure
+**Researched:** 2026-03-16
+**Confidence:** HIGH for migration patterns (official Neon/Upstash/Vercel docs); MEDIUM for DB partitioning
+(Drizzle native support not yet shipped); HIGH for SSE/OTel (official Next.js docs)
 
 ---
 
-## System Overview
+## System Overview (Current → Target)
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  DESIGN SYSTEM FOUNDATION (globals.css + tailwind.config.ts)        │
-├───────────────────────┬─────────────────────────────────────────────┤
-│  Existing tokens      │  New glass tokens (added alongside)         │
-│  --primary            │  --glass-bg-light                           │
-│  --background         │  --glass-bg-dark                            │
-│  --card               │  --glass-border-light                       │
-│  --border             │  --glass-border-dark                        │
-│  --shadow-*           │  --glass-blur-sm/md/lg                      │
-│  (unchanged)          │  --glass-shadow                             │
-└───────────────────────┴─────────────────────────────────────────────┘
-           │                           │
-           ▼                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  TAILWIND EXTENSION (tailwind.config.ts)                            │
-│  theme.extend: {                                                     │
-│    backdropBlur: { glass: 'var(--glass-blur-md)' }                  │
-│    backgroundColor: { glass: 'var(--glass-bg)' }                    │
-│  }                                                                   │
-│  plugins: [ glassPlugin ]  ← NEW: adds .glass-* utility classes     │
-└─────────────────────────────────────────────────────────────────────┘
-           │
-           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  COMPONENT LAYER                                                     │
-├──────────────────────────┬──────────────────────────────────────────┤
-│  MODIFIED (add variant)  │  NEW glass-specific components            │
-│  Card → +glass variant   │  GlassPanel (pure surface)                │
-│  Button → +glass variant │  GlassNavbar (marketing header)           │
-│  Dialog → glass bg       │  GlassModal (auth/dashboard dialogs)      │
-│  Sheet → glass sidebar   │  GradientMesh (background layer)          │
-│                          │  GlassSkeleton (loading states)           │
-└──────────────────────────┴──────────────────────────────────────────┘
-           │
-           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  PAGE LAYOUT LAYER                                                   │
-├─────────────────┬──────────────────┬──────────────────┬─────────────┤
-│  (marketing)    │  (auth)          │  (dashboard)     │  [company]  │
-│  Gradient mesh  │  Frosted card    │  Solid sidebar + │  Public     │
-│  Glass navbar   │  on gradient     │  glass header    │  booking    │
-│  Glass cards    │  background      │  glass KPI cards │  widget     │
-└─────────────────┴──────────────────┴──────────────────┴─────────────┘
+CURRENT (Railway / Docker)
+┌─────────────────────────────────────────────────────────────────┐
+│ Client Layer                                                     │
+│  Next.js 14 App (apps/web) — UI + 179 API routes               │
+├─────────────────────────────────────────────────────────────────┤
+│ Infrastructure Layer                                             │
+│  PostgreSQL 16  │  Redis 7  │  RabbitMQ 3.13                   │
+├─────────────────────────────────────────────────────────────────┤
+│ Sidecar Services                                                 │
+│  Python FastAPI AI  │  Node.js Notification Worker              │
+└─────────────────────────────────────────────────────────────────┘
+
+TARGET (Vercel + Managed Services)
+┌─────────────────────────────────────────────────────────────────┐
+│ Client Layer                                                     │
+│  Next.js 14 App (apps/web) — UI + 179 API routes               │
+│  Vercel Serverless Functions (60s timeout on Pro)               │
+├─────────────────────────────────────────────────────────────────┤
+│ Managed Services Layer                                           │
+│  Neon PostgreSQL (serverless + pooling)                         │
+│  Upstash Redis (HTTP-based, serverless-native)                  │
+│  [RabbitMQ REMOVED — safe no-op publishEvent]                   │
+├─────────────────────────────────────────────────────────────────┤
+│ Cross-Cutting (new in v3.0)                                      │
+│  @vercel/otel → OpenTelemetry traces                            │
+│  @sentry/nextjs → error capture                                 │
+│  AES-256-GCM PII encryption layer (Node.js crypto)             │
+│  SSE streaming routes for real-time updates                     │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Token Architecture: Three Layers
+## Component Responsibilities: New vs Modified
 
-### Layer 1 — Primitive Glass Tokens (in `globals.css`)
-
-Define raw values. These never appear in components directly.
-
-```css
-/* globals.css — add to :root block */
-:root {
-  /* Glass blur intensities */
-  --glass-blur-sm:  blur(8px);
-  --glass-blur-md:  blur(12px);
-  --glass-blur-lg:  blur(20px);
-  --glass-blur-xl:  blur(32px);
-
-  /* Glass backgrounds — light mode */
-  --glass-bg-light:        rgba(255, 255, 255, 0.55);
-  --glass-bg-light-subtle: rgba(255, 255, 255, 0.30);
-  --glass-bg-light-heavy:  rgba(255, 255, 255, 0.75);
-
-  /* Glass borders — light mode */
-  --glass-border-light:    rgba(255, 255, 255, 0.35);
-  --glass-border-light-sm: rgba(255, 255, 255, 0.20);
-
-  /* Glass shadows — light mode */
-  --glass-shadow-light: 0 8px 32px rgba(31, 38, 135, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-
-  /* Gradient mesh colors — light mode */
-  --mesh-primary:   hsl(var(--primary) / 0.12);
-  --mesh-secondary: hsl(var(--secondary) / 0.08);
-  --mesh-accent:    hsl(270 91% 60% / 0.06);
-}
-
-.dark {
-  /* Glass backgrounds — dark mode */
-  --glass-bg-light:        rgba(17, 25, 40, 0.65);
-  --glass-bg-light-subtle: rgba(17, 25, 40, 0.45);
-  --glass-bg-light-heavy:  rgba(17, 25, 40, 0.80);
-
-  /* Glass borders — dark mode */
-  --glass-border-light:    rgba(255, 255, 255, 0.12);
-  --glass-border-light-sm: rgba(255, 255, 255, 0.07);
-
-  /* Glass shadows — dark mode */
-  --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.40),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-  /* Gradient mesh colors — dark mode */
-  --mesh-primary:   hsl(var(--primary) / 0.20);
-  --mesh-secondary: hsl(var(--secondary) / 0.12);
-  --mesh-accent:    hsl(270 91% 60% / 0.10);
-}
-```
-
-**Why `rgba()` not `hsl() / opacity`:** rgba is required for glassmorphism backgrounds because the glass panel must blend with the backdrop behind it, not just its own background. HSL opacity works for solid colors but not when the background is a separate blurred composite.
-
-**Why `.dark` class not `prefers-color-scheme`:** The existing `ThemeProvider` uses `attribute="class"` — it adds `.dark` to `<html>`. CSS `prefers-color-scheme` would conflict with the user's manual toggle preference. Match the existing system.
-
-### Layer 2 — Semantic Glass Tokens (in `globals.css`)
-
-Map primitives to semantic context. These are what components use.
-
-```css
-:root {
-  /* Semantic aliases — components reference these */
-  --glass-bg:         var(--glass-bg-light);
-  --glass-bg-subtle:  var(--glass-bg-light-subtle);
-  --glass-bg-heavy:   var(--glass-bg-light-heavy);
-  --glass-border:     var(--glass-border-light);
-  --glass-shadow:     var(--glass-shadow-light);
-  --glass-blur:       var(--glass-blur-md);
-}
-
-.dark {
-  --glass-bg:         var(--glass-bg-dark);   /* dark mode redefines same names */
-  --glass-bg-subtle:  var(--glass-bg-dark-subtle);
-  --glass-bg-heavy:   var(--glass-bg-dark-heavy);
-  --glass-border:     var(--glass-border-dark);
-  --glass-shadow:     var(--glass-shadow-dark);
-  --glass-blur:       var(--glass-blur-md);   /* same blur, different bg */
-}
-```
-
-This is the same pattern shadcn/ui already uses for `--card`, `--border`, etc. The `.dark` selector just redefines the same variable names. Components use `var(--glass-bg)` and automatically adapt.
-
-### Layer 3 — Tailwind Utilities (in `tailwind.config.ts`)
-
-Expose tokens as Tailwind classes.
-
-```typescript
-// tailwind.config.ts — extend the existing config
-theme: {
-  extend: {
-    // Existing entries stay untouched
-    backdropBlur: {
-      'glass-sm': 'var(--glass-blur-sm)',
-      'glass':    'var(--glass-blur-md)',
-      'glass-lg': 'var(--glass-blur-lg)',
-      'glass-xl': 'var(--glass-blur-xl)',
-    },
-    backgroundColor: {
-      'glass':        'var(--glass-bg)',
-      'glass-subtle': 'var(--glass-bg-subtle)',
-      'glass-heavy':  'var(--glass-bg-heavy)',
-    },
-    boxShadow: {
-      'glass': 'var(--glass-shadow)',
-    },
-    borderColor: {
-      'glass': 'var(--glass-border)',
-    },
-  }
-},
-plugins: [
-  tailwindcssAnimate,  // existing
-  glassPlugin,         // NEW — defined below
-],
-```
-
-**Glass Plugin** (`apps/web/lib/tailwind/glass-plugin.ts`):
-
-```typescript
-import plugin from 'tailwindcss/plugin';
-
-export const glassPlugin = plugin(function ({ addUtilities, addComponents }) {
-  // Utility classes for glass surfaces
-  addUtilities({
-    '.glass-surface': {
-      'background': 'var(--glass-bg)',
-      'backdrop-filter': 'var(--glass-blur)',
-      '-webkit-backdrop-filter': 'var(--glass-blur)',
-      'border': '1px solid var(--glass-border)',
-      'box-shadow': 'var(--glass-shadow)',
-    },
-    '.glass-surface-subtle': {
-      'background': 'var(--glass-bg-subtle)',
-      'backdrop-filter': 'var(--glass-blur-sm)',
-      '-webkit-backdrop-filter': 'var(--glass-blur-sm)',
-      'border': '1px solid var(--glass-border)',
-    },
-    '.glass-surface-heavy': {
-      'background': 'var(--glass-bg-heavy)',
-      'backdrop-filter': 'var(--glass-blur-lg)',
-      '-webkit-backdrop-filter': 'var(--glass-blur-lg)',
-      'border': '1px solid var(--glass-border)',
-      'box-shadow': 'var(--glass-shadow)',
-    },
-  });
-
-  // Gradient mesh background component
-  addComponents({
-    '.gradient-mesh': {
-      'background-image': `
-        radial-gradient(ellipse at 20% 50%, var(--mesh-primary) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, var(--mesh-secondary) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 80%, var(--mesh-accent) 0%, transparent 55%)
-      `,
-    },
-  });
-});
-```
+| Component | Status | Responsibility | Integration Point |
+|-----------|--------|----------------|-------------------|
+| `packages/events/src/publisher.ts` | **MODIFIED** | `publishEvent` becomes safe no-op — logs event type, returns immediately, never touches amqplib | Called from 16 files in apps/web |
+| `packages/database/src/db.ts` | **MODIFIED** | Replace `pg` Pool with `@neondatabase/serverless` neon() HTTP driver | Every Drizzle query in API routes |
+| `apps/web/lib/redis.ts` | **MODIFIED** | Replace ioredis client with `@upstash/redis` REST client | JWT blacklist, rate limit, cache hits |
+| `apps/web/instrumentation.ts` | **NEW** | `@vercel/otel` registerOTel — instruments all App Router requests | Next.js 14 must set `experimental.instrumentationHook: true` in next.config |
+| `apps/web/app/api/v1/stream/route.ts` | **NEW** | SSE endpoint using ReadableStream + `text/event-stream` content type | Dashboard real-time: booking status changes |
+| `apps/web/lib/encryption.ts` | **NEW** | AES-256-GCM encrypt/decrypt using Node.js `crypto` module | Wraps DB read/write for PII columns |
+| `apps/web/middleware.ts` | **MODIFIED** | Add maintenance mode check (Redis flag), CSRF token validation, SSRF block list | All inbound requests |
+| `apps/web/app/api/v1/admin/impersonate/route.ts` | **NEW** | Super-admin issues impersonation JWT with `impersonatedBy` claim | Admin panel only |
+| `apps/web/app/api/v1/admin/feature-flags/route.ts` | **NEW** | CRUD for feature flags stored in PostgreSQL (not Redis — persistence required) | Feature flag middleware |
+| `apps/web/app/[locale]/(dashboard)/admin/` | **MODIFIED** | Add broadcast, maintenance-mode toggle, audit-log viewer, suspend company | Existing admin layout |
+| PII migration script | **NEW** | One-shot Drizzle migration + Node script: read existing plaintext → encrypt → write back | Must run before app goes live on Vercel |
+| DB partition migrations | **NEW** | Raw SQL in Drizzle migration file — `analytics_events`, `audit_logs` partitioned by month | Not expressible in Drizzle schema DSL |
 
 ---
 
-## Component Integration Map
-
-### Modified Components (add `glass` variant to existing CVA)
-
-These components already exist in `apps/web/components/ui/`. Add the `glass` variant to their existing CVA configuration. Do NOT replace the default variant.
-
-#### Card — add glass variant
-
-```typescript
-// apps/web/components/ui/card.tsx
-// BEFORE: no CVA, static classNames
-// AFTER: introduce cardVariants with CVA
-
-import { cva, type VariantProps } from 'class-variance-authority';
-
-const cardVariants = cva(
-  'rounded-lg transition-shadow',
-  {
-    variants: {
-      variant: {
-        default: 'border border-border bg-card text-card-foreground shadow-sm',
-        glass: [
-          'glass-surface',                          // from glass plugin
-          'text-card-foreground',
-          'supports-[backdrop-filter]:bg-glass',    // progressive enhancement
-          'not-supports-[backdrop-filter]:bg-card', // fallback: opaque card
-        ].join(' '),
-        'glass-subtle': 'glass-surface-subtle text-card-foreground',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
-
-// Card now accepts optional variant prop, default is 'default'
-// All existing <Card /> usage unchanged — backward compatible
-export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
-
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(cardVariants({ variant }), className)}
-      {...props}
-    />
-  ),
-);
-```
-
-**Key:** `defaultVariants: { variant: 'default' }` — every existing `<Card />` in the codebase continues working with zero prop changes.
-
-#### Button — add glass variant
-
-```typescript
-// apps/web/components/ui/button.tsx — extend existing buttonVariants
-// ADD to existing variants.variant object:
-glass: [
-  'glass-surface-subtle',
-  'text-foreground',
-  'hover:glass-surface',
-  'border border-glass',
-].join(' '),
-```
-
-#### Dialog — glass background overlay
-
-```typescript
-// apps/web/components/ui/dialog.tsx
-// The DialogOverlay gets a glass tint instead of pure black:
-// CHANGE: 'bg-black/80' → 'bg-black/40 backdrop-blur-glass-sm'
-// The DialogContent gets glass-surface treatment
-```
-
-### New Components (glass-specific, no existing equivalent)
-
-These do not replace anything. They are new additions to `apps/web/components/ui/`.
-
-| Component | File | Purpose | Used In |
-|-----------|------|---------|---------|
-| `GlassPanel` | `components/ui/glass-panel.tsx` | Pure glass surface wrapper, no semantics | Dashboard KPI cards, marketing sections |
-| `GradientMesh` | `components/ui/gradient-mesh.tsx` | Animated gradient background layer | Page backgrounds, hero section |
-| `GlassSkeleton` | `components/ui/glass-skeleton.tsx` | Loading skeleton matching glass card shape | Replaces existing Skeleton inside glass contexts |
-
----
-
-## Page-Section Glass Strategy
-
-Different page sections require different glass intensities. This prevents the "everything is blurred" anti-pattern.
-
-### Marketing Layout `(marketing)/layout.tsx`
-
-```
-Background layer:   gradient-mesh (fixed, behind everything)
-Navbar:             glass-surface + sticky + z-50
-Hero section:       NO glass on text — glass only on the demo widget card
-Feature cards:      glass-surface-subtle on hover (CSS hover transition)
-Pricing cards:      glass-surface for featured tier, glass-surface-subtle for others
-Social proof:       glass-surface-subtle on testimonial cards
-Footer:             solid bg-background (no glass — reduces visual noise at bottom)
-```
-
-**Isolation pattern:** The `(marketing)/layout.tsx` wraps the entire page in a positioned container that contains the gradient mesh background. This creates a stacking context so `backdrop-filter` on navbar and cards blurs the gradient mesh correctly.
-
-```tsx
-// apps/web/app/[locale]/(marketing)/layout.tsx — MODIFIED
-export default async function MarketingLayout({ children }) {
-  return (
-    // Outermost: relative + min-h-screen creates the stacking context
-    <div className="relative min-h-screen flex flex-col overflow-x-hidden">
-      {/* Gradient mesh as fixed layer behind content */}
-      <div className="fixed inset-0 gradient-mesh -z-10" aria-hidden="true" />
-      <MarketingNavbar />  {/* uses glass-surface internally */}
-      <main className="flex-1">{children}</main>
-      <MarketingFooter />  {/* uses solid bg-background */}
-      <CookieConsentBanner />
-    </div>
-  );
-}
-```
-
-### Auth Layout `(auth)/layout.tsx`
-
-```
-Background:         gradient-mesh (full page)
-Auth card:          glass-surface-heavy (most opaque — form readability)
-Logo/brand area:    no glass — plain text on gradient
-```
-
-```tsx
-// apps/web/app/[locale]/(auth)/layout.tsx — MODIFIED
-export default function AuthLayout({ children }) {
-  return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="fixed inset-0 gradient-mesh -z-10" aria-hidden="true" />
-      <div className="absolute top-4 right-4 flex items-center gap-2">
-        <LocaleSwitcher />
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-md px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary">ScheduleBox</h1>
-          <p className="text-muted-foreground mt-2">...</p>
-        </div>
-        {/* Card gets glass variant — heavy opacity for form legibility */}
-        <Card variant="glass" className="glass-surface-heavy shadow-glass">
-          <CardContent className="pt-6">{children}</CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
-```
-
-### Dashboard Layout `(dashboard)/layout.tsx`
-
-Dashboard glass is more restrained than marketing. Users spend hours here — aggressive glass causes eye fatigue. Use glass selectively on interactive surfaces, not as a base layer.
-
-```
-Sidebar:            SOLID bg-background (NOT glass) — text density + readability
-Header:             glass-surface-subtle + sticky + z-10
-KPI stat cards:     glass-surface (the primary glass moment in dashboard)
-Revenue chart card: glass-surface-subtle
-Modal/dialog:       glass overlay + glass-surface-heavy for content
-Page background:    subtle gradient-mesh at low opacity (--mesh-primary at 0.06 opacity)
-```
-
-```tsx
-// apps/web/app/[locale]/(dashboard)/layout.tsx — MODIFIED
-export default function DashboardLayout({ children }) {
-  return (
-    <AuthGuard>
-      <SkipLink />
-      <NavigationProgress />
-      {/* Subtle mesh background — very low opacity, just adds depth */}
-      <div className="fixed inset-0 gradient-mesh opacity-40 -z-10" aria-hidden="true" />
-      <div className="flex h-screen">
-        <aside aria-label="Dashboard sidebar">
-          {/* Sidebar stays SOLID — readability over aesthetics */}
-          <Sidebar />
-        </aside>
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Header gets glass treatment */}
-          <Header />
-          <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-6">
-            <div className="mx-auto max-w-7xl">{children}</div>
-          </main>
-        </div>
-      </div>
-      <DashboardTour />
-    </AuthGuard>
-  );
-}
-```
-
-**Why the sidebar stays solid:** The sidebar contains navigation text at small sizes with icon labels. Blur behind text of this density causes readability problems, especially in dark mode. Reserve glass for surfaces with large content areas or decorative use.
-
----
-
-## Existing Component Modification Guide
-
-### StatCard (dashboard KPI cards)
-
-The `StatCard` in `apps/web/components/dashboard/stat-card.tsx` is the single highest-impact glass target. It renders in a 4-column grid on every dashboard load.
-
-```typescript
-// BEFORE:
-<Card className={`shadow-sm hover:shadow transition-shadow ${className ?? ''}`}>
-
-// AFTER:
-<Card
-  variant="glass"
-  className={cn('hover:shadow-glass transition-shadow', className)}
->
-```
-
-One line change. Zero prop API changes to callers.
-
-### MarketingNavbar
-
-The existing navbar already has a partial glass implementation:
-
-```tsx
-// CURRENT (already glass-ish):
-className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-
-// REPLACE WITH (proper glass token):
-className="sticky top-0 z-50 glass-surface supports-[backdrop-filter]:glass-surface not-supports-[backdrop-filter]:bg-background/95"
-```
-
-The `supports-[backdrop-filter]` modifier is native Tailwind CSS — no plugin needed. This is the progressive enhancement pattern.
-
-### Header (dashboard)
-
-```tsx
-// CURRENT:
-className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background px-6"
-
-// MODIFIED:
-className="sticky top-0 z-10 flex h-16 items-center justify-between glass-surface-subtle px-6"
-```
-
----
-
-## Hydration Safety
-
-### The Problem
-
-`next-themes` ThemeProvider with `attribute="class"` applies `.dark` on the client after mount. During SSR, the server doesn't know the user's theme preference. If glass CSS variables reference `.dark` values in server-rendered HTML, there's a brief flash on first paint.
-
-### The Solution (already used in this codebase)
-
-The existing `ThemeToggle` component already uses the correct pattern:
-
-```typescript
-// apps/web/components/ui/theme-toggle.tsx — EXISTING correct pattern
-const [mounted, setMounted] = useState(false);
-useEffect(() => { setMounted(true); }, []);
-if (!mounted) return <Button disabled suppressHydrationWarning>...</Button>;
-```
-
-**For glass components:** Glass effects are purely CSS-driven (CSS variables + `backdrop-filter`). They have NO JavaScript logic. There is no hydration mismatch risk from glass CSS itself — the browser applies the correct `.dark` class CSS variables immediately on paint without any JS involvement after `next-themes` writes the class.
-
-**SSR note:** `backdrop-filter` is a CSS property applied via Tailwind classes in server-rendered HTML. The browser reads the HTML → sees `class="glass-surface"` → looks up the CSS rule → applies `backdrop-filter`. There is no JS involved in rendering the blur effect itself. No hydration mismatch is possible from the CSS approach.
-
-### The Only Risk: Theme Flash on First Load
-
-`disableTransitionOnChange` is already set in the existing `ThemeProvider`:
-
-```tsx
-// apps/web/app/providers.tsx — EXISTING
-<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-```
-
-This prevents the transition animation from running on theme initialization, which is the main source of flash. No changes needed here.
-
----
-
-## Performance Architecture
-
-### Compositing Layer Budget
-
-Each element with `backdrop-filter` creates a new GPU compositing layer. Excessive stacking causes frame drops, especially on mobile.
-
-**Rule: Maximum 3-4 simultaneous backdrop-filter elements in any viewport.**
-
-| Context | Allowed Glass Elements | Rationale |
-|---------|----------------------|-----------|
-| Marketing landing | 1 navbar + up to 4 feature cards | Cards only glass on visible viewport, not all at once |
-| Auth page | 1 card | Single form element |
-| Dashboard | 1 header + up to 4 KPI cards | KPI cards are the primary glass moment |
-| Modal/dialog open | 1 overlay + 1 dialog | Dialog replaces page content visually |
-
-### Blur Value Guidelines
-
-Higher blur values are exponentially more expensive on GPU:
-
-| Blur Value | Use Case | GPU Cost |
-|------------|----------|----------|
-| `blur(8px)` — `glass-blur-sm` | Subtle surfaces, sidebar overlays | Low |
-| `blur(12px)` — `glass-blur-md` | Standard cards, headers | Medium |
-| `blur(20px)` — `glass-blur-lg` | Auth cards, modals | High |
-| `blur(32px)` — `glass-blur-xl` | Hero centerpiece only | Very High |
-
-The default `--glass-blur-md: blur(12px)` is the safe production value. Do not use `glass-blur-xl` on elements that render multiple times per page.
-
-### will-change Strategy
-
-Do NOT apply `will-change: filter` to glass elements statically. Apply only during animation:
-
-```css
-/* Only add will-change during hover transitions, remove after */
-.glass-panel {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.glass-panel:hover {
-  will-change: transform;  /* NOT will-change: filter */
-}
-```
-
-`will-change: filter` forces a new compositing layer even when the element is not animating, causing unnecessary memory consumption.
-
-### Loading Skeleton Compatibility
-
-The existing `PageSkeleton` component uses `<Skeleton className="h-[120px] rounded-xl" />`. When dashboard cards become glass, the loading skeleton should match the glass shape without applying `backdrop-filter`:
-
-```typescript
-// apps/web/components/shared/page-skeleton.tsx
-// Skeleton components do NOT use glass-surface
-// They are replaced with opaque shimmer skeletons that LOOK like glass cards
-// (same border-radius, similar border, shimmer animation)
-
-// The distinction: glass is a live effect; skeletons are placeholder shapes
-// Using backdrop-filter on skeletons is wasted GPU during data loading
-```
-
-### Prefers-Reduced-Transparency / Reduced-Motion
-
-```css
-/* Add to globals.css after the existing @layer base block */
-@media (prefers-reduced-transparency: reduce) {
-  :root {
-    --glass-bg:         hsl(var(--card));
-    --glass-bg-subtle:  hsl(var(--card));
-    --glass-bg-heavy:   hsl(var(--card));
-    --glass-blur:       blur(0px);
-  }
-  .glass-surface,
-  .glass-surface-subtle,
-  .glass-surface-heavy {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
-```
-
-`prefers-reduced-transparency` is the correct media query (not `prefers-reduced-motion`) for users who disable translucency in their OS accessibility settings. This provides a proper opaque fallback that uses the existing `--card` token.
-
----
-
-## Progressive Enhancement Strategy
-
-`@supports (backdrop-filter: blur(1px))` is the standard CSS feature query. Tailwind exposes this as the `supports-[backdrop-filter]` modifier.
-
-**Pattern for every glass component:**
-
-```tsx
-// In JSX className:
-className={cn(
-  // Base styles (always apply — border, radius, shadow)
-  'rounded-lg border border-border shadow-sm',
-  // Fallback background when backdrop-filter NOT supported
-  'bg-card/95',
-  // Glass upgrade when backdrop-filter IS supported
-  'supports-[backdrop-filter]:bg-glass supports-[backdrop-filter]:backdrop-blur-glass supports-[backdrop-filter]:border-glass',
-)}
-```
-
-This means:
-- Firefox (historically poor `backdrop-filter` support): gets opaque card with `bg-card/95`
-- Chrome/Safari/Edge: gets full glass effect
-- Users with OS reduced transparency: gets opaque card via CSS media query override
-
-**Browser support for `backdrop-filter` as of 2025-2026:** All major browsers support it — Chrome 76+, Firefox 103+ (with `layout.css.backdrop-filter.enabled` flag, enabled by default from Firefox 103), Safari 9+ (with `-webkit-` prefix). The `-webkit-` prefix must be included alongside the standard property.
-
----
-
-## Recommended File Structure (Changes Only)
+## Recommended Project Structure (delta from current)
 
 ```
 apps/web/
+├── instrumentation.ts          # NEW — @vercel/otel init (root level, not in app/)
+├── middleware.ts                # MODIFIED — add maintenance mode + CSRF
 ├── app/
-│   └── globals.css                    MODIFIED — add glass tokens to :root and .dark
-├── tailwind.config.ts                 MODIFIED — add backdropBlur, backgroundColor, boxShadow, borderColor extensions + glassPlugin
+│   └── api/v1/
+│       ├── stream/
+│       │   └── route.ts        # NEW — SSE endpoint for real-time booking updates
+│       └── admin/
+│           ├── impersonate/
+│           │   └── route.ts    # NEW — super-admin impersonation JWT
+│           ├── feature-flags/
+│           │   └── route.ts    # NEW — feature flag CRUD
+│           ├── broadcast/
+│           │   └── route.ts    # NEW — broadcast message to all tenants
+│           └── maintenance/
+│               └── route.ts    # NEW — toggle maintenance mode flag
 ├── lib/
-│   └── tailwind/
-│       └── glass-plugin.ts            NEW — Tailwind plugin for .glass-surface utilities
-├── components/
-│   ├── ui/
-│   │   ├── card.tsx                   MODIFIED — add glass variant via CVA
-│   │   ├── button.tsx                 MODIFIED — add glass variant to existing buttonVariants
-│   │   ├── dialog.tsx                 MODIFIED — glass overlay + content background
-│   │   ├── glass-panel.tsx            NEW — generic glass surface component
-│   │   └── gradient-mesh.tsx          NEW — animated gradient mesh background
-│   ├── layout/
-│   │   ├── sidebar.tsx                UNCHANGED — stays solid for readability
-│   │   └── header.tsx                 MODIFIED — replace bg-background with glass-surface-subtle
-│   ├── dashboard/
-│   │   └── stat-card.tsx              MODIFIED — Card variant="glass"
-│   └── shared/
-│       └── page-skeleton.tsx          UNCHANGED — skeletons stay opaque (correct)
-└── app/[locale]/
-    ├── (marketing)/
-    │   ├── layout.tsx                 MODIFIED — add gradient-mesh background, fix stacking context
-    │   └── _components/
-    │       └── marketing-navbar.tsx   MODIFIED — replace ad-hoc glass with glass-surface token
-    ├── (auth)/
-    │   └── layout.tsx                 MODIFIED — add gradient-mesh, switch Card to glass variant
-    └── (dashboard)/
-        └── layout.tsx                 MODIFIED — add subtle gradient-mesh at low opacity
+│   ├── encryption.ts           # NEW — AES-256-GCM PII column helpers
+│   ├── redis.ts                # MODIFIED — swap ioredis → @upstash/redis
+│   └── feature-flags.ts        # NEW — read feature flags with Redis cache layer
+└── scripts/
+    └── encrypt-pii-migration.ts # NEW — one-shot encrypt existing plaintext PII
+
+packages/
+├── events/
+│   └── src/
+│       └── publisher.ts        # MODIFIED — no-op publishEvent
+└── database/
+    └── src/
+        ├── db.ts               # MODIFIED — Neon serverless driver
+        └── schema/
+            └── admin.ts        # NEW — feature_flags, broadcast_messages tables
 ```
 
 ---
 
-## Build Order (Dependency-Sequenced)
+## Architectural Patterns for v3.0
 
-The design system foundation MUST be complete before any page-level work begins. Components depend on tokens; pages depend on components.
+### Pattern 1: Safe No-Op publishEvent
 
-```
-Phase 1: Token Foundation (no visible output yet — unblocks everything)
-  ├── globals.css: add --glass-* primitives and semantic tokens to :root and .dark
-  ├── tailwind.config.ts: add theme extensions for backdropBlur, backgroundColor, etc.
-  └── lib/tailwind/glass-plugin.ts: create plugin with .glass-surface utilities
-  Blocks: All other phases
-  Risk: LOW — pure CSS/config, no component changes
+**What:** Replace `publishEvent` in `packages/events/src/publisher.ts` with a function that logs the event type and returns `Promise<void>` without connecting to RabbitMQ. All 16 call sites remain unchanged — the function signature is preserved.
 
-Phase 2: New Primitive Components (no page changes yet)
-  ├── components/ui/glass-panel.tsx: GlassPanel wrapper
-  └── components/ui/gradient-mesh.tsx: GradientMesh background
-  Blocks: Layout modifications
-  Risk: LOW — new files only, nothing existing modified
+**Why this approach:** All 38 `publishEvent` calls are fire-and-forget (callers do not use the return value for flow control). The booking, payment, loyalty, and review flows continue to work because the downstream consumers (notification sending, loyalty points, analytics) were already refactored to synchronous DB writes in v2.0 for the Railway deployment. RabbitMQ was used for eventual consistency cross-service communication that no longer applies in the Next.js monolith where all logic is colocated.
 
-Phase 3: Existing Component Variants (backward-compatible modifications)
-  ├── components/ui/card.tsx: add CVA + glass variant (default unchanged)
-  ├── components/ui/button.tsx: add glass variant to buttonVariants
-  └── components/ui/dialog.tsx: glass overlay and content styling
-  Blocks: Page-level usage of glass components
-  Risk: LOW-MEDIUM — CVA introduction changes Card props interface; verify TypeScript
+**When to use:** Every call site — no conditional logic needed.
 
-Phase 4: Dashboard Page Sections (highest user time-on-page, most impact)
-  ├── components/dashboard/stat-card.tsx: Card variant="glass"
-  ├── components/layout/header.tsx: glass-surface-subtle
-  └── app/[locale]/(dashboard)/layout.tsx: subtle gradient-mesh + stacking context
-  Blocks: Nothing (final consumer)
-  Risk: MEDIUM — stacking context changes can affect z-index of dropdowns/tooltips
+**Example:**
 
-Phase 5: Marketing Pages
-  ├── app/[locale]/(marketing)/layout.tsx: gradient-mesh + stacking context
-  └── app/[locale]/(marketing)/_components/marketing-navbar.tsx: glass tokens
-  Blocks: Nothing
-  Risk: MEDIUM — z-index stacking context must be verified against MobileNav
-
-Phase 6: Auth Pages
-  └── app/[locale]/(auth)/layout.tsx: gradient-mesh + heavy glass card
-  Blocks: Nothing
-  Risk: LOW — simplest page structure, single card component
+```typescript
+// packages/events/src/publisher.ts — v3.0 replacement
+export async function publishEvent<T>(event: CloudEvent<T>): Promise<void> {
+  // RabbitMQ removed for Vercel deployment.
+  // Event is logged for observability but not dispatched.
+  // All downstream actions (notifications, loyalty, analytics) are
+  // handled synchronously within the API route that creates the event.
+  console.log('[events] no-op publish:', event.type, event.subject ?? '');
+  return Promise.resolve();
+}
 ```
 
-**Why this order:**
-- Tokens before components: components cannot use `var(--glass-bg)` until the variable is defined
-- New components before modifications: verifies the glass system works before touching existing code
-- Dashboard before marketing: dashboard has higher complexity (z-index, dropdowns, mobile nav) and more active users
-- Auth last: simplest structure, lowest risk, easiest to verify
+**Trade-offs:** Loses eventual consistency and retryable delivery. Acceptable because: (a) this codebase runs as a single monolith where cross-service async is unnecessary, (b) the notification worker still sends email/SMS directly via SMTP/Twilio without needing RabbitMQ, and (c) analytics writes are already direct DB inserts.
 
 ---
 
-## Stacking Context Pitfalls
+### Pattern 2: Neon Serverless Driver — Connection Pooling
 
-### Dashboard z-index Conflicts
+**What:** Replace `pg` Pool with `@neondatabase/serverless` neon() for HTTP transport. Use the WebSocket-based `neonConfig` only for interactive transactions (advisory locks, `SELECT FOR UPDATE`).
 
-The existing dashboard layout creates stacking contexts at:
-- Sidebar: `z-*` from sticky positioning
-- Header: `z-10` (explicit)
-- Modals/Dialogs: Radix UI portals at `z-50`
+**Why this matters:** Vercel serverless functions cannot reuse TCP connections between invocations. The standard `pg` Pool will open a new connection on every cold start, exhausting Neon's connection limit at scale. Neon's HTTP driver routes each query over HTTP, eliminating connection state.
 
-Adding `gradient-mesh` as a fixed background with `-z-10` is safe — negative z-index sits below the document flow.
+**When to use:** All Drizzle queries except those that require `SELECT FOR UPDATE` (double-booking prevention — these need WebSocket transport).
 
-**Verified conflict risk:** The `MobileNav` component in `apps/web/components/layout/` renders a slide-over panel. If the marketing layout's gradient mesh creates a new stacking context via `transform` or `filter`, it can clip the mobile nav. Solution: use `fixed inset-0` with `-z-10` on the mesh, NOT `transform` or `filter` on the mesh container itself. The CSS `gradient-mesh` utility uses only `background-image`, which does NOT create a stacking context.
+**Example:**
 
-### Backdrop-Filter Clip Boundary
+```typescript
+// packages/database/src/db.ts
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 
-`backdrop-filter` blurs everything behind an element up to its nearest ancestor that is a "backdrop root" (i.e., has `isolation: isolate` or creates a new stacking context). If the gradient mesh background is behind a parent with `isolation: isolate`, backdrop-filter on child glass cards may blur incorrectly against a white background instead of the gradient.
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql, { schema });
 
-**Prevention:** Do NOT add `isolation: isolate` or `transform` to the page wrapper that contains both the gradient mesh and the glass cards. The mesh `div` uses `fixed inset-0 -z-10` — it is positioned outside the layout flow, so it is naturally the backdrop for all glass elements in the document without requiring explicit isolation.
+// For transactions requiring SELECT FOR UPDATE:
+import { Pool } from '@neondatabase/serverless';
+import { drizzle as drizzleWs } from 'drizzle-orm/neon-serverless';
+const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+export const dbTx = drizzleWs({ client: pool, schema });
+```
 
----
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Replacing `bg-card` Globally
-
-**What people do:** Change `--card` CSS variable to `rgba(255,255,255,0.55)` to make all cards glass.
-**Why it's wrong:** `--card` is used by shadcn/ui in dropdowns, popovers, command palettes, and select menus. A transparent `--card` makes interactive overlays like `<Select>` render with a blurred translucent background that is unreadable. Popover content becomes illegible.
-**Do this instead:** Keep `--card` as the opaque solid color. Add separate `--glass-bg` tokens and use them explicitly via the `variant="glass"` prop on individual Card components.
-
-### Anti-Pattern 2: Applying Glass to Text-Dense Surfaces
-
-**What people do:** Glass sidebar navigation, glass data tables, glass form inputs.
-**Why it's wrong:** Text at small sizes (12-14px) against a blurred background fails WCAG contrast requirements. Data tables with glass panels behind them become difficult to scan. Form inputs need clear affordances — a translucent input field creates uncertainty about editability.
-**Do this instead:** Reserve glass for cards with large text, icon-forward KPI cards, hero sections, and structural containers. Inputs, tables, and navigation items stay on solid backgrounds.
-
-### Anti-Pattern 3: Glass with No Background Behind It
-
-**What people do:** Add `backdrop-blur-lg` to a card that sits on `bg-background` (plain white or plain dark).
-**Why it's wrong:** Blurring a solid color produces the same solid color. If there is nothing visually interesting behind the glass, the effect is invisible. The glass surface appears as an ordinary opaque card with slightly reduced performance.
-**Do this instead:** Glass only works when there is a gradient, image, or visually distinct layer behind it. The `gradient-mesh` background is the required companion to glass UI in this design system. Always ensure glass elements are positioned over the mesh layer.
-
-### Anti-Pattern 4: will-change: filter on Static Glass Elements
-
-**What people do:** Add `will-change: filter` or `will-change: backdrop-filter` to glass cards to "pre-optimize" them.
-**Why it's wrong:** `will-change` allocates a GPU compositing layer immediately and holds it for the element's lifetime. With 4 KPI cards all having `will-change: filter`, that's 4 permanent GPU layers for elements that never animate their filter.
-**Do this instead:** No `will-change` on static glass. Add `will-change: transform` only during hover state transitions (scale, translate), not filter. The browser optimizes `backdrop-filter` automatically during compositing.
-
-### Anti-Pattern 5: Nested Glass Elements
-
-**What people do:** A glass card inside a glass panel inside a glass section.
-**Why it's wrong:** Each level of `backdrop-filter` compounds. The innermost element blurs what is behind it — which is the parent glass panel — which is itself a blurred, semi-transparent surface. The result is muddy, grey, and loses the visual clarity that makes glass beautiful.
-**Do this instead:** Maximum one level of glass nesting per section. If nesting is required (e.g., a modal inside a glass-backgrounded page), use `glass-surface-heavy` on the inner element to make it fully opaque, not glass-on-glass.
+**Trade-offs:** HTTP transport is 10-30ms slower per round-trip vs TCP. Acceptable at SMB scale (hundreds of bookings/day). Eliminates connection exhaustion on cold start.
 
 ---
 
-## Confidence Assessment
+### Pattern 3: Upstash Redis — HTTP Client
 
-| Area | Confidence | Basis |
-|------|------------|-------|
-| Token architecture | HIGH | Based on existing working shadcn/ui CSS variable pattern in codebase; same mechanism |
-| Tailwind plugin API | HIGH | Official Tailwind v3 docs verified via WebFetch |
-| CVA variant addition | HIGH | Verified against existing `buttonVariants` pattern in codebase |
-| ThemeProvider hydration | HIGH | `ThemeToggle` in codebase already uses correct mounted-check pattern |
-| Stacking context analysis | HIGH | Verified layout structure from actual component reads |
-| backdrop-filter browser support | MEDIUM | Cited sources; caniuse not directly accessible but widely documented as 95%+ global support |
-| Performance benchmarks | MEDIUM | GPU cost claims are qualitative consensus across multiple sources; actual values are hardware-dependent |
-| `prefers-reduced-transparency` support | MEDIUM | Safari/Chrome supported; Firefox support may vary; always test |
+**What:** Replace `ioredis` with `@upstash/redis`, which communicates over REST/HTTP. The API surface is a subset of ioredis but covers all usage patterns in this codebase: `get`, `set`, `del`, `setex`, `incr`, `expire`, `sadd`, `smembers`.
+
+**Why this matters:** ioredis uses persistent TCP sockets. Vercel serverless functions are stateless — a new socket opened per invocation is not released until the function cold-starts. Upstash uses HTTP, which is connection-less and compatible with serverless.
+
+**Usage patterns in this codebase:**
+- JWT blacklist: `set(tokenId, '1', { ex: 900 })` → direct replacement
+- Rate limiting: `incr(key)` + `expire(key, 60)` → direct replacement
+- Availability cache: `setex(key, 300, JSON.stringify(slots))` → use `set(key, data, { ex: 300 })`
+- Booking counters (usage limits): `incr` + `get` → direct replacement
+
+**Example:**
+
+```typescript
+// apps/web/lib/redis.ts
+import { Redis } from '@upstash/redis';
+
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+```
+
+**NOT a 100% drop-in:** Upstash Redis does not support pub/sub (`subscribe`/`publish`), Lua scripts, or MULTI/EXEC transactions. This codebase does not use any of these — confirmed by grepping call sites in `apps/web`.
+
+---
+
+### Pattern 4: SSE for Real-Time Updates on Vercel
+
+**What:** Use `ReadableStream` in an App Router API route to push booking status change events to the dashboard. The client polls or maintains an EventSource connection.
+
+**Why SSE instead of WebSocket:** Vercel serverless does not support persistent bidirectional connections. SSE uses standard HTTP streaming and works within the 60s function timeout (Pro tier). For updates that occur less frequently than 60s, client reconnects automatically via `EventSource`.
+
+**Required headers:**
+```
+Content-Type: text/event-stream; charset=utf-8
+Cache-Control: no-cache, no-transform
+Connection: keep-alive
+X-Accel-Buffering: no    ← prevents nginx/Vercel edge buffering
+```
+
+**Required route config:**
+```typescript
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+```
+
+**When to use:** Booking status updates on the owner dashboard. Not needed for data-dense pages (tables use TanStack Query polling with `refetchInterval: 30_000`).
+
+**Trade-offs:** SSE is one-directional. For the dashboard use case (server pushes booking changes to owner), this is sufficient. The 60s timeout means long-lived SSE connections require client reconnect logic — `EventSource` handles this automatically.
+
+---
+
+### Pattern 5: PII Column Encryption
+
+**What:** Wrap specific customer columns (`phone`, `email`, `full_name` for customers without accounts) with AES-256-GCM encrypt-on-write / decrypt-on-read at the application layer.
+
+**Why application-layer, not DB-layer:** Drizzle ORM has no native column encryption as of March 2026 (open GitHub issue #2098, not yet implemented). PostgreSQL pgcrypto extension adds complexity on Neon. Node.js `crypto.createCipheriv('aes-256-gcm')` is synchronous, zero-dependency, and compatible with Vercel serverless.
+
+**Affected columns (scope for v3.0):**
+- `customers.phone`
+- `customers.email` — store encrypted plaintext; a separate `email_hash` column (SHA-256, indexed) enables lookup by email without decrypting
+- No change to `users.email` — used for auth, must remain plaintext for JWT/login flows
+
+**Migration strategy for existing plaintext data:**
+1. Add `_encrypted` suffix columns as nullable in a Drizzle migration
+2. Run `scripts/encrypt-pii-migration.ts`: read all rows, encrypt values, write to `_encrypted` columns
+3. Second migration: drop original columns, rename `_encrypted` → original names
+4. This is a 3-step migration to avoid zero-downtime data loss
+
+**Key management:** `PII_ENCRYPTION_KEY` env var (32-byte hex, set in Vercel env). Rotate by re-running migration script with new key.
+
+**Example:**
+
+```typescript
+// apps/web/lib/encryption.ts
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
+
+const ALGO = 'aes-256-gcm';
+const KEY = Buffer.from(process.env.PII_ENCRYPTION_KEY!, 'hex'); // 32 bytes
+
+export function encryptPII(plaintext: string): string {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv(ALGO, KEY, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  // Format: iv(12):tag(16):ciphertext — base64 encoded
+  return Buffer.concat([iv, tag, encrypted]).toString('base64');
+}
+
+export function decryptPII(encoded: string): string {
+  const buf = Buffer.from(encoded, 'base64');
+  const iv = buf.subarray(0, 12);
+  const tag = buf.subarray(12, 28);
+  const ciphertext = buf.subarray(28);
+  const decipher = createDecipheriv(ALGO, KEY, iv);
+  decipher.setAuthTag(tag);
+  return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+}
+```
+
+---
+
+### Pattern 6: Super-Admin Impersonation JWT
+
+**What:** Platform admin issues a short-lived JWT (15 min, non-renewable) with an additional `impersonatedBy` claim containing the admin's user_id. The impersonated user's regular claims populate the rest of the token.
+
+**Storage:** The impersonation session is NOT stored in the Redis blacklist — it expires naturally. An audit log record is written to `audit_logs` on impersonation start and end.
+
+**Middleware detection:**
+
+```typescript
+// apps/web/middleware.ts — impersonation banner injection
+if (decoded.impersonatedBy) {
+  request.headers.set('x-impersonation', 'true');
+  request.headers.set('x-impersonated-by', decoded.impersonatedBy);
+}
+```
+
+**Security constraints:**
+- Only `role === 'platform_admin'` can call `POST /api/v1/admin/impersonate`
+- Impersonation tokens cannot be refreshed (no refresh token issued)
+- Impersonation cannot be nested (cannot impersonate while impersonating)
+- Token duration: 15 min hard limit, embedded in JWT `exp` claim
+
+---
+
+### Pattern 7: Feature Flags Storage
+
+**What:** Feature flags are stored in a `feature_flags` PostgreSQL table (not Redis) because they require persistence across deployments and support company-scoped overrides.
+
+**Read path:** On every request, feature flags are read from Upstash Redis cache (TTL: 60s) with PostgreSQL as fallback. This avoids a DB query on every API route invocation.
+
+**Schema:**
+```sql
+CREATE TABLE feature_flags (
+  id SERIAL PRIMARY KEY,
+  flag_key VARCHAR(100) NOT NULL UNIQUE,
+  enabled BOOLEAN NOT NULL DEFAULT false,
+  company_id INTEGER REFERENCES companies(id),  -- NULL = global
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Trade-offs:** Company-scoped overrides allow gradual rollout to specific tenants. Global flags apply to all companies when company_id is NULL. Redis cache prevents DB reads on hot paths.
+
+---
+
+### Pattern 8: OpenTelemetry Instrumentation
+
+**What:** Use `@vercel/otel` package which provides an Edge-compatible SDK, exporting traces over HTTP to any OTLP-compatible collector (or Vercel's native telemetry dashboard).
+
+**Setup:** Single `instrumentation.ts` file in the project root (not inside `app/`). For Next.js 14, requires `experimental.instrumentationHook: true` in `next.config.ts`.
+
+```typescript
+// instrumentation.ts (root level)
+import { registerOTel } from '@vercel/otel';
+
+export function register() {
+  registerOTel({ serviceName: 'schedulebox-web' });
+}
+```
+
+**What gets traced automatically:** All App Router `GET`/`POST` handler invocations, fetch calls made within handlers, middleware execution time.
+
+**Manual spans for critical paths:** Booking creation, payment processing, PII encryption/decryption operations.
+
+---
+
+### Pattern 9: DB Partitioning via Raw SQL Migrations
+
+**What:** Partition `analytics_events` and `audit_logs` by month (RANGE partitioning on `created_at`). Drizzle ORM does not support partition declaration in its schema DSL as of March 2026 — raw SQL in migration files is required.
+
+**Migration approach:**
+1. Drizzle migration: rename existing table to `_old` suffix
+2. Raw SQL block in migration: `CREATE TABLE analytics_events (LIKE analytics_events_old) PARTITION BY RANGE (created_at)`
+3. Raw SQL: create initial partitions for past 6 months + next 3 months
+4. Raw SQL: `INSERT INTO analytics_events SELECT * FROM analytics_events_old`
+5. Drizzle migration: drop `_old` table
+
+**Partition naming convention:** `analytics_events_y2026m03` (year + month)
+
+**Automation:** Monthly cron (Vercel Cron Jobs, free tier) creates the next month's partition 7 days in advance.
+
+**Drizzle query compatibility:** Drizzle queries against the parent table `analytics_events` — PostgreSQL routes to the correct partition transparently. No Drizzle schema changes needed for querying.
+
+---
+
+## Data Flow Changes for v3.0
+
+### Booking Creation Flow (Current → v3.0)
+
+```
+CURRENT:
+POST /api/v1/bookings
+  → Zod validate
+  → SELECT FOR UPDATE (pg Pool)
+  → INSERT booking
+  → publishEvent(booking.created) → RabbitMQ → notification-worker → email
+
+v3.0:
+POST /api/v1/bookings
+  → Zod validate
+  → SELECT FOR UPDATE (Neon WebSocket driver for tx isolation)
+  → INSERT booking
+  → publishEvent(booking.created) → no-op log
+  → sendNotificationDirectly(booking) → SMTP/Twilio inline
+  → INSERT analytics_event inline
+  → INSERT loyalty_transaction inline (if customer has card)
+```
+
+The notification, analytics, and loyalty writes were already inline in v2.0 based on the Railway deployment. The no-op publishEvent change formalizes this.
+
+### PII Read/Write Flow (New in v3.0)
+
+```
+WRITE (customer create/update):
+  Client → API route → Zod validate → encryptPII(phone, email) → Drizzle INSERT
+
+READ (customer list/detail):
+  Drizzle SELECT → decryptPII(phone, email) → return to client
+
+SEARCH BY EMAIL:
+  Hash email client-side (or in API) → query customers WHERE email_hash = $1
+  → return row → decryptPII(email) for display
+```
+
+### Real-Time Booking Updates Flow (New in v3.0)
+
+```
+Booking status change (confirm/cancel/complete):
+  POST /api/v1/bookings/[id]/status → DB update → write event to pending_sse_events table
+
+Dashboard SSE connection:
+  GET /api/v1/stream?company_id=X → ReadableStream
+    → poll pending_sse_events WHERE company_id=X AND delivered=false every 5s
+    → emit SSE data: event type + booking id
+    → mark delivered=true
+    → client EventSource receives → TanStack Query invalidate
+```
+
+Alternatively (simpler): dashboard uses `refetchInterval: 15000` on TanStack Query for booking lists. SSE is only needed if sub-5-second latency is a hard requirement.
+
+---
+
+## Integration Points: New Components
+
+| New Component | Touches | Method | Notes |
+|---------------|---------|--------|-------|
+| `instrumentation.ts` | All API routes | Auto-instrumented by @vercel/otel | No manual changes to route files |
+| `lib/encryption.ts` | `customers` API routes (GET, POST, PUT) | Explicit wrap at DB boundary | Must decrypt before returning to client |
+| `lib/redis.ts` (Upstash) | JWT blacklist, rate limit, availability cache | Drop-in for get/set/del/setex | No pub/sub — confirmed not used |
+| `packages/events/publisher.ts` (no-op) | 16 files across booking/payments/loyalty/reviews | No changes at call sites | Preserves function signature |
+| `api/v1/admin/impersonate` | Admin panel → middleware → all routes | New JWT claim `impersonatedBy` | Middleware must check this claim |
+| `api/v1/admin/feature-flags` | Admin panel, feature-flag middleware | PostgreSQL + Redis cache | Cache TTL 60s prevents hot-path DB reads |
+| `api/v1/stream` | Dashboard client (EventSource) | ReadableStream SSE | Requires `runtime = 'nodejs'`, `dynamic = 'force-dynamic'` |
+| DB partitioning migrations | `analytics_events`, `audit_logs` | Raw SQL in Drizzle migration file | Transparent to Drizzle queries post-migration |
+
+---
+
+## Integration Points: Modified Components
+
+| Modified Component | What Changes | Backward Compatible? |
+|--------------------|-------------|---------------------|
+| `packages/events/src/publisher.ts` | No RabbitMQ connection, returns immediately | YES — same function signature |
+| `packages/database/src/db.ts` | neon() driver instead of pg Pool | YES — Drizzle query API unchanged |
+| `apps/web/lib/redis.ts` | @upstash/redis instead of ioredis | YES — same get/set/del/setex patterns |
+| `apps/web/middleware.ts` | Maintenance mode check + CSRF header | Additive — no existing behavior removed |
+| `next.config.ts` | `experimental.instrumentationHook: true` | YES — additive config flag |
+| `customers` API routes | PII encrypt/decrypt at DB boundary | YES for output shape; migration required for stored data |
+
+---
+
+## Build Order (Dependency-Respecting)
+
+The 32 gaps fall into the following dependency layers. Phases must respect this order:
+
+### Layer 0 — Infrastructure (no dependencies)
+Must happen first. Blocks everything else.
+
+1. **RabbitMQ removal** — change `packages/events/src/publisher.ts` to no-op. This unblocks local development without RabbitMQ and is required before Vercel deployment.
+2. **Neon driver swap** — change `packages/database/src/db.ts`. Required before any DB queries work on Vercel.
+3. **Upstash Redis swap** — change `apps/web/lib/redis.ts`. Required before auth (JWT blacklist), rate limiting, and caching work on Vercel.
+4. **Environment variable update** — `.env.example` updated with `DATABASE_URL` (Neon), `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `PII_ENCRYPTION_KEY`, `NEXT_PUBLIC_SENTRY_DSN`.
+
+### Layer 1 — Security Foundation (depends on Layer 0)
+Builds on stable infra. Can run in parallel across security work items.
+
+5. **PII encryption lib** — `lib/encryption.ts` (pure Node.js crypto, no deps)
+6. **PII migration script** — encrypt existing customer data before going live
+7. **CSRF middleware** — add to `middleware.ts` (reads existing cookie)
+8. **SSRF protection** — `lib/ssrf-guard.ts` + apply to webhook URL validation
+9. **HIBP password check** — new function called from auth registration route
+10. **DOMPurify XSS** — add `isomorphic-dompurify` where HTML is rendered (notification templates)
+
+### Layer 2 — Observability (depends on Layer 0)
+Can run in parallel with Layer 1.
+
+11. **OpenTelemetry** — `instrumentation.ts` + `next.config.ts` flag
+12. **Sentry SDK** — `@sentry/nextjs` init in instrumentation file or `_app.tsx` equivalent
+
+### Layer 3 — Super-Admin Features (depends on Layer 0 + Layer 1 security)
+Needs stable auth and DB connectivity.
+
+13. **Impersonation API** — `api/v1/admin/impersonate` + middleware claim
+14. **Feature flags** — `admin.ts` schema + `api/v1/admin/feature-flags` + cache layer
+15. **Maintenance mode** — Redis flag + middleware check
+16. **Broadcast messages** — `api/v1/admin/broadcast` + schema
+17. **Audit log viewer** — frontend component reading existing `audit_logs` table
+18. **Company suspend** — extend existing company deactivation with suspension state
+
+### Layer 4 — Real-Time & Missing Pages (depends on Layer 0)
+Mostly independent of security features.
+
+19. **SSE endpoint** — `api/v1/stream` route
+20. **Dashboard EventSource client** — component subscribes to SSE
+21. **Cookie policy page** — `/[locale]/cookie-policy` (frontend only)
+22. **Webhooks settings UI** — `/[locale]/(dashboard)/settings/webhooks` (frontend only)
+23. **Video meetings UI** — `/[locale]/(dashboard)/bookings/[id]/video` (frontend only)
+
+### Layer 5 — Industry Verticals (depends on Layer 0 + DB schema)
+Needs stable DB connection.
+
+24. **Medical/automotive schema fields** — Drizzle migration adding nullable columns
+25. **Per-industry UI labels** — i18n key additions (cs.json/sk.json/en.json)
+26. **Per-industry AI config** — extend AI service config JSON
+
+### Layer 6 — Testing & DB Optimization (depends on Layers 0-5)
+Tests validate the above; partitioning is low-risk but complex.
+
+27. **Vitest unit test coverage to 80%** — covers encryption, feature flags, impersonation
+28. **Playwright E2E for critical flows** — booking, payment, admin impersonation
+29. **Storybook component catalog** — independent of runtime
+30. **Contract tests** — validate API response shapes
+31. **DB partitioning migration** — raw SQL migration for analytics_events + audit_logs
+32. **Integration tests** — Neon + Upstash compatibility verification
+
+---
+
+## Scaling Considerations
+
+| Scale | Architecture Approach |
+|-------|-----------------------|
+| Current (100-1K users) | Vercel Hobby tier — 10s function timeout sufficient for most routes; move booking/payment to Pro for 60s timeout |
+| 1K-10K users | Vercel Pro tier — 60s timeout; Neon connection pooling handles concurrent queries; Upstash free tier handles rate limiting |
+| 10K+ users | Consider Vercel Fluid Compute (up to 800s, warm instances); Neon read replicas for analytics queries; separate analytics writes to dedicated partition |
+
+**First bottleneck at SMB scale:** Availability engine queries (multiple JOINs for slot calculation). Mitigate with Redis cache for slot windows (already implemented in v1.0).
+
+**Second bottleneck:** Analytics writes during peak booking hours. Mitigate with DB partitioning (Layer 6) which reduces index scan scope on `analytics_events`.
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Conditional publishEvent
+
+**What people do:** Wrap every `publishEvent` call with `if (process.env.RABBITMQ_URL)` to make it optional.
+
+**Why it's wrong:** Creates two code paths, complicates testing, and the condition will never be true on Vercel — making it permanent dead code.
+
+**Do this instead:** Replace the `publishEvent` function body itself with a no-op. Call sites remain unchanged. The function contract (signature, return type) is preserved.
+
+---
+
+### Anti-Pattern 2: pg Pool for Vercel Serverless
+
+**What people do:** Keep the existing `pg.Pool` and assume connection reuse works.
+
+**Why it's wrong:** Vercel serverless functions are stateless. Each cold start opens a new TCP connection to Neon. Neon's default connection limit is 100; a traffic spike creates 100 simultaneous connections and every subsequent invocation fails with `too many connections`.
+
+**Do this instead:** Use `@neondatabase/serverless` neon() for HTTP transport. Reserve WebSocket/Pool only for routes requiring `SELECT FOR UPDATE`.
+
+---
+
+### Anti-Pattern 3: Storing Impersonation State in Redis
+
+**What people do:** Create a Redis session for impersonation to track active impersonations.
+
+**Why it's wrong:** Redis session adds complexity, requires cleanup logic, and the TTL expiry approach on the JWT itself is simpler and more auditable.
+
+**Do this instead:** Short-lived JWT (15 min) with `impersonatedBy` claim. No server-side state needed. Write audit log on issue; JWT expiry handles cleanup automatically.
+
+---
+
+### Anti-Pattern 4: Encrypting Email Used for Auth
+
+**What people do:** Encrypt `users.email` as part of PII hardening.
+
+**Why it's wrong:** `users.email` is used as the login identifier — the auth system must query `WHERE email = $1`. Encrypting it would require decrypting every row to find a match (full table scan) or maintaining a separate hash index.
+
+**Do this instead:** Encrypt only `customers.phone`, `customers.email` (customer records separate from user accounts). For `customers.email` lookups by value, maintain a `customers.email_hash` column (SHA-256, indexed, non-reversible) for equality queries.
+
+---
+
+### Anti-Pattern 5: Drizzle Schema DSL for Partitioned Tables
+
+**What people do:** Try to declare `PARTITION BY RANGE` in Drizzle schema TypeScript.
+
+**Why it's wrong:** Drizzle ORM does not support partition declarations in schema DSL as of March 2026 (GitHub issue #2854 open, not merged). Using `drizzle-kit push` or `drizzle-kit generate` on a partitioned table will generate incorrect DDL.
+
+**Do this instead:** Declare the parent table in Drizzle schema as a normal table (for type inference). Create the actual partitioned table and its child partitions via raw SQL in a migration file using Drizzle's `sql` template tag or a separate `.sql` file included in the migration sequence.
+
+---
+
+## External Service Integration Points
+
+| Service | Integration Pattern | Vercel Constraint | Notes |
+|---------|--------------------|--------------------|-------|
+| Neon PostgreSQL | `@neondatabase/serverless` HTTP driver | No persistent TCP | Use WebSocket driver for SELECT FOR UPDATE only |
+| Upstash Redis | REST HTTP via `@upstash/redis` | No persistent connections | Does not support pub/sub or Lua scripts |
+| Comgate Payments | HTTP webhook POST to `/api/v1/webhooks/comgate` | 60s function timeout sufficient | Webhook must respond within 30s — well within limit |
+| Twilio SMS | HTTP API call within API route | No background workers | Called synchronously inside booking confirmation route |
+| SMTP Email | Nodemailer SMTP call within API route | 60s timeout, watch for cold start | Consider Resend or SendGrid HTTP API to avoid SMTP auth latency |
+| OpenAI API | HTTP call to AI service | 60s timeout may be tight for complex prompts | Add `maxDuration: 60` to AI prediction routes; use streaming where possible |
+| @vercel/otel | OTLP HTTP export | Native Vercel integration | Zero configuration if using Vercel Observability dashboard |
+| Sentry | `@sentry/nextjs` SDK | Native Vercel integration | Wrap API routes with Sentry.wrapApiHandlerWithSentry |
 
 ---
 
 ## Sources
 
-- Codebase: `apps/web/app/globals.css` — existing CSS variable structure verified — HIGH confidence
-- Codebase: `apps/web/tailwind.config.ts` — existing theme extensions verified — HIGH confidence
-- Codebase: `apps/web/components/ui/button.tsx` — existing CVA `buttonVariants` pattern verified — HIGH confidence
-- Codebase: `apps/web/components/ui/card.tsx` — existing non-CVA Card verified; CVA addition required — HIGH confidence
-- Codebase: `apps/web/app/providers.tsx` — ThemeProvider `attribute="class"` confirmed — HIGH confidence
-- Codebase: `apps/web/app/[locale]/(marketing)/layout.tsx` — stacking context baseline verified — HIGH confidence
-- Codebase: `apps/web/app/[locale]/(dashboard)/layout.tsx` — existing layout structure verified — HIGH confidence
-- Codebase: `apps/web/components/layout/header.tsx` — existing `bg-background` class verified — HIGH confidence
-- Codebase: `apps/web/components/ui/theme-toggle.tsx` — `mounted` hydration pattern verified — HIGH confidence
-- [Tailwind CSS Plugins docs (v3)](https://v3.tailwindcss.com/docs/plugins) — `addUtilities`, `addComponents` API — HIGH confidence
-- [Vercel Academy: Extending shadcn/ui](https://vercel.com/academy/shadcn-ui/extending-shadcn-ui-with-custom-components) — CVA variant addition pattern — HIGH confidence
-- [glasscn-ui GitHub](https://github.com/itsjavi/glasscn-ui) — reference implementation for shadcn/ui glass variants — MEDIUM confidence
-- [shadcn-glass-ui DEV.to](https://dev.to/yhooi2/introducing-shadcn-glass-ui-a-glassmorphism-component-library-for-react-4cpl) — 3-layer token architecture reference — MEDIUM confidence
-- [LogRocket: Glassmorphism CSS](https://blog.logrocket.com/implement-glassmorphism-css/) — stacking context and dark mode guidance — MEDIUM confidence
-- [Epic Web Dev: Tailwind CSS Glassmorphism](https://www.epicweb.dev/tips/creating-glassmorphism-effects-with-tailwind-css) — `bg-white/10 backdrop-blur-lg` pattern — HIGH confidence
-- [Axess Lab: Glassmorphism Accessibility](https://axesslab.com/glassmorphism-meets-accessibility-can-frosted-glass-be-inclusive/) — `prefers-reduced-transparency` and contrast requirements — HIGH confidence
-- [Half Accessible: Glassmorphism Implementation Guide](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide) — blur value performance guidelines (8-15px threshold) — MEDIUM confidence
-- [shadcn/ui issue #327](https://github.com/shadcn-ui/ui/issues/327) — backdrop-filter performance concerns with shadcn/ui — MEDIUM confidence
+- [Neon Serverless Driver Docs](https://neon.com/docs/serverless/serverless-driver) — HIGH confidence (official)
+- [Drizzle + Neon Integration](https://orm.drizzle.team/docs/connect-neon) — HIGH confidence (official)
+- [Upstash Redis for Vercel](https://vercel.com/marketplace/upstash) — HIGH confidence (official)
+- [Vercel Functions Limits](https://vercel.com/docs/functions/limitations) — HIGH confidence (official)
+- [Next.js OpenTelemetry Guide](https://nextjs.org/docs/app/guides/open-telemetry) — HIGH confidence (official)
+- [Next.js Instrumentation Guide](https://nextjs.org/docs/pages/guides/instrumentation) — HIGH confidence (official)
+- [Drizzle PostgreSQL Partition Feature Request](https://github.com/drizzle-team/drizzle-orm/issues/2854) — HIGH confidence (confirms no native support)
+- [Drizzle Column Encryption Feature Request](https://github.com/drizzle-team/drizzle-orm/issues/2098) — HIGH confidence (confirms no native support)
+- [SSE Streaming in Next.js/Vercel](https://medium.com/@oyetoketoby80/fixing-slow-sse-server-sent-events-streaming-in-next-js-and-vercel-99f42fbdb996) — MEDIUM confidence (community)
+- [RabbitMQ on Vercel Discussion](https://github.com/vercel/next.js/discussions/69776) — HIGH confidence (confirms RabbitMQ not viable on Vercel)
 
 ---
 
-_Architecture research for: Glassmorphism design system integration with Next.js 14 + Tailwind + shadcn/ui_
-_Researched: 2026-02-25_
+_Architecture research for: ScheduleBox v3.0 Production Launch & 100% Documentation Coverage_
+_Researched: 2026-03-16_
