@@ -86,6 +86,9 @@
       "confirmPassword": "Potvrdit heslo",
       "submit": "Obnovit heslo",
       "success": "Heslo bylo úspěšně obnoveno"
+    },
+    "errors": {
+      "breachedPassword": "Toto heslo se vyskytlo ve známých únicích dat. Prosím, zvolte jiné heslo."
     }
   },
   "nav": {

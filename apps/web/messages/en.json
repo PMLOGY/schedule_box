@@ -86,6 +86,9 @@
       "confirmPassword": "Confirm password",
       "submit": "Reset password",
       "success": "Password successfully reset"
+    },
+    "errors": {
+      "breachedPassword": "This password has appeared in known data breaches. Please choose a different password."
     }
   },
   "nav": {

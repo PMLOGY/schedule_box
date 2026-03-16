@@ -8,6 +8,7 @@ export const config = {
   // - API routes (/api/*)
   // - Next.js internals (_next/*)
   // - Embed routes (/embed/*)
+  // - Sentry tunnel route (/monitoring)
   // - Static files (*.*)
-  matcher: ['/((?!api|_next|embed|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|embed|monitoring|.*\\..*).*)'],
 };
