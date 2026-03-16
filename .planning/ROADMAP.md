@@ -216,14 +216,14 @@ Plans:
 - [ ] 45-03-PLAN.md — Vercel config + readiness route + env cleanup + service removal (INFRA-04)
 
 ### Phase 46: Security Hardening
-**Goal**: The application meets GDPR compliance and production security requirements — PII is encrypted at rest, user-generated content is sanitized, passwords are checked against breach databases, and all state-changing requests are CSRF-protected
+**Goal**: The application meets GDPR compliance and production security requirements — PII is encrypted at rest, user-generated content is sanitized, passwords are checked against breach databases, and CSRF protection is verified
 **Depends on**: Phase 45 (Neon + Upstash must be live before running the PII migration)
 **Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07
 **Success Criteria** (what must be TRUE):
   1. Customer email and phone values in the database are AES-256-GCM encrypted ciphertext — plaintext PII is not visible in a raw `SELECT` query; customer search still returns correct results via HMAC index
   2. Submitting a review, company description, or message template containing `<script>alert(1)</script>` does not execute JavaScript when rendered — sanitized output is stored and displayed safely
   3. Registering or changing a password that appears in the HIBP breach database returns a clear error message before the password is accepted
-  4. Submitting a POST/PUT/DELETE request without a valid CSRF token returns 403 — webhook delivery endpoints are explicitly excluded from CSRF validation
+  4. All state-changing API routes use Bearer JWT in Authorization header (CSRF-safe per OWASP) — no additional CSRF token is needed; webhook delivery endpoints are documented as explicitly excluded from auth requirements
   5. Registering a webhook URL pointing to `169.254.0.0/16` or `10.0.0.0/8` (private IP ranges) is rejected with a clear error
   6. Runtime errors in production are captured in Sentry with a stack trace — the Sentry DSN routes through `/monitoring` to bypass CZ/SK ad-blockers
   7. A `/[locale]/cookie-policy` page exists, is linked from every public page footer, and renders the Czech/English cookie policy text
