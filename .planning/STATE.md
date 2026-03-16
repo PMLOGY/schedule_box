@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: "Completed 46-security-hardening 46-03-PLAN.md (checkpoint: awaiting human-verify Task 3)"
-last_updated: "2026-03-16T18:50:13.072Z"
+stopped_at: Completed 46-security-hardening 46-01-PLAN.md
+last_updated: "2026-03-16T18:52:14.519Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 7
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
   percent: 97
 ---
 
@@ -79,6 +79,9 @@ v3.0 decisions:
 - [Phase 45-infrastructure-migration]: notification-worker deleted — RabbitMQ consumer with no queue after publishEvent became no-op; Phase 47 handles notifications
 - [Phase 46-security-hardening]: Expand-contract migration: plaintext email/phone columns retained; contract phase drops them after back-fill verified
 - [Phase 46-security-hardening]: PII encryption: AES-256-GCM with key derivation from single ENCRYPTION_KEY env var; HMAC-SHA256 for searchable index without plaintext exposure
+- [Phase 46-security-hardening]: isomorphic-dompurify for XSS sanitization: server-safe DOMPurify wrapper, OWASP-recommended over regex-stripping
+- [Phase 46-security-hardening]: HIBP fail-open policy: network errors from HIBP silently return false — third-party failure must not block registration
+- [Phase 46-security-hardening]: SSRF validated at creation time via hostname regex; DNS rebinding attack deferred to Phase 49/50 hardening
 
 ## Blockers
 
@@ -102,9 +105,10 @@ v3.0 decisions:
 | Phase 45-infrastructure-migration P01 | 45 | 2 tasks | 13 files |
 | Phase 45-infrastructure-migration P03 | 15 | 1 tasks | 45 files |
 | Phase 46-security-hardening P03 | 25 | 2 tasks | 8 files |
+| Phase 46-security-hardening P01 | 14min | 2 tasks | 17 files |
 
 ## Session Continuity
 
-Last session: 2026-03-16T18:50:13.066Z
-Stopped at: Completed 46-security-hardening 46-03-PLAN.md (checkpoint: awaiting human-verify Task 3)
+Last session: 2026-03-16T18:52:14.516Z
+Stopped at: Completed 46-security-hardening 46-01-PLAN.md
 Resume file: None
