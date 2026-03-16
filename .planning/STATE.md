@@ -5,9 +5,9 @@ milestone_name: Production Launch & 100% Documentation Coverage
 status: active
 stopped_at: null
 last_updated: "2026-03-16T00:00:00.000Z"
-last_activity: 2026-03-16 — Milestone v3.0 started, defining requirements
+last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases (45-50), 47 requirements mapped
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-16)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Milestone v3.0 — Production Launch & 100% Documentation Coverage
+**Current focus:** Milestone v3.0 — Phase 45: Infrastructure Migration
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-16 — Milestone v3.0 started
+Phase: 45 of 50 (Infrastructure Migration)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -50,13 +50,17 @@ v3.0 decisions:
 - Upstash Redis (not self-hosted) — Vercel-native, free tier
 - Neon PostgreSQL (not self-hosted) — serverless, Vercel integration
 - RabbitMQ removed — not supported on Vercel, publishEvent becomes safe no-op
-- SSE/polling for real-time (not WebSocket) — Vercel serverless doesn't support persistent connections
-- GAP analysis (GAP-ANALYZA.md) drives all v3.0 requirements — 32 gaps identified
+- 30s TanStack Query polling (not SSE/WebSocket) — Vercel serverless 60s timeout; SSE causes thundering herd reconnect
+- DB partitioning deferred to Phase 50 — composite index sufficient at <500 companies; Drizzle introspect conflict risk
+- GAP analysis (GAP-ANALYZA.md) drives all v3.0 requirements — 47 requirements across 11 categories
 
 ## Blockers
 
-- Real testimonials needed for landing page social proof — placeholder content in place
+- **[ACTIVE]** Phase 45 must land before all other v3.0 phases — codebase does not compile for Vercel without Neon/Upstash migration
+- **[ACTIVE]** PII encryption (SEC-03) requires maintenance window — expand-contract migration, 500-row batches, have rollback SQL ready before running
+- **[ACTIVE]** Verify Vercel plan tier (Pro vs Hobby) before Phase 45 — `maxDuration: 30` requires Pro; availability engine CTE consolidation critical on Hobby
 - **[DEFERRED]** Comgate recurring activation — code complete (Phase 28), live recurring requires contacting Comgate support for merchant 498621
+- Real testimonials needed for landing page social proof — placeholder content in place
 
 ## Performance Metrics
 
@@ -72,5 +76,5 @@ v3.0 decisions:
 ## Session Continuity
 
 Last session: 2026-03-16
-Stopped at: Milestone v3.0 initialization
+Stopped at: v3.0 roadmap created — ready to plan Phase 45
 Resume file: None

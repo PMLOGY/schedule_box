@@ -7,7 +7,8 @@
 - ✅ **v1.2 Product Readiness** — Phases 23-27 (shipped 2026-02-24)
 - ✅ **v1.3 Revenue & Growth** — Phases 28-32 (shipped 2026-02-25)
 - ✅ **v1.4 Design Overhaul** — Phases 33-38 (shipped 2026-03-12)
-- 🚧 **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (in progress)
+- ✅ **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (shipped 2026-03-16)
+- 🚧 **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (in progress)
 
 ## Phases
 
@@ -91,16 +92,30 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### v2.0 Full Functionality & Production Readiness (In Progress)
+<details>
+<summary>✅ v2.0 Full Functionality & Production Readiness (Phases 39-44) — SHIPPED 2026-03-16</summary>
 
 **Milestone Goal:** Every feature works end-to-end across all 4 user views (Admin, Business Owner, Employee, End Customer). Auth is stable, the complete booking chain is functional, and the app is deployable to production via Docker Compose.
 
-- [x] **Phase 39: Auth & Session** - Session persistence, silent token refresh, role-based routing, employee invite (completed 2026-03-13)
-- [x] **Phase 40: Business Owner Flow** - Public booking URL, service/employee CRUD, booking management, dashboard with real data (completed 2026-03-13)
-- [x] **Phase 41: Employee Flow** - Working hours, time-off requests, personal booking view and status actions (completed 2026-03-13)
-- [x] **Phase 42: End Customer Booking** - End-to-end public booking wizard, confirmation tracking, reviews, loyalty points (completed 2026-03-13)
-- [x] **Phase 43: Admin Platform** - Platform-wide stats dashboard, company management, user management (completed 2026-03-13)
-- [x] **Phase 44: Production Deployment** - Docker Compose, production build, environment variable validation (completed 2026-03-13)
+- [x] Phase 39: Auth & Session (2/2 plans) — completed 2026-03-13
+- [x] Phase 40: Business Owner Flow (2/2 plans) — completed 2026-03-13
+- [x] Phase 41: Employee Flow (2/2 plans) — completed 2026-03-13
+- [x] Phase 42: End Customer Booking (2/2 plans) — completed 2026-03-13
+- [x] Phase 43: Admin Platform (1/1 plan) — completed 2026-03-13
+- [x] Phase 44: Production Deployment (2/2 plans) — completed 2026-03-13
+
+</details>
+
+### v3.0 Production Launch & 100% Documentation Coverage (In Progress)
+
+**Milestone Goal:** Close every gap from the GAP analysis to achieve 100% implementation of the v13.0 FINAL documentation spec. Deploy to Vercel (Neon + Upstash), harden security and compliance, complete super-admin tooling, marketplace, UX gaps, observability, industry verticals, and test coverage.
+
+- [ ] **Phase 45: Infrastructure Migration** - Migrate from Railway/RabbitMQ to Vercel/Neon/Upstash; patch CVE-2025-29927; fix AI-Powered plan capacity display
+- [ ] **Phase 46: Security Hardening** - PII encryption at rest, XSS sanitization, HIBP breach check, CSRF, SSRF, Sentry, cookie policy page
+- [ ] **Phase 47: Notifications & Super-Admin** - Verify notification delivery pipeline; build complete super-admin tooling (impersonation, feature flags, suspend, broadcast, maintenance, metrics, audit log)
+- [ ] **Phase 48: Marketplace & UX** - Public marketplace with search/filter/map; booking detail modal; real-time polling; video meetings UI; webhooks settings UI
+- [ ] **Phase 49: Observability & Verticals** - OpenTelemetry + structured logging; medical and automotive industry vertical support with per-industry AI config
+- [ ] **Phase 50: Testing & Hardening** - Vitest 80% coverage, Playwright E2E expansion, Testcontainers, Storybook; DB partitioning for scale
 
 ## Phase Details
 
@@ -184,6 +199,84 @@ Plans:
 - [ ] 44-01-PLAN.md — Production Docker Compose + env validation + .env.example update (DEPLOY-01, DEPLOY-03)
 - [ ] 44-02-PLAN.md — Build verification and error fixes (DEPLOY-02)
 
+### Phase 45: Infrastructure Migration
+**Goal**: The application builds and runs on Vercel with Neon PostgreSQL and Upstash Redis — RabbitMQ is gone, the Next.js CVE is patched, and the AI-Powered plan correctly shows unlimited capacity
+**Depends on**: Phase 44 (stable codebase before migration)
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, FIX-01
+**Success Criteria** (what must be TRUE):
+  1. The application deploys to Vercel and is reachable at the production domain with all API routes returning 200 — no RabbitMQ connection errors anywhere in logs
+  2. Database queries succeed via Neon serverless driver — both pooled runtime URL and unpooled migration URL are configured; drizzle-kit migrations run cleanly against the unpooled URL
+  3. Redis operations (get/set/del/expire/incr) succeed via Upstash HTTP client — rate limiting and session caching function correctly on serverless
+  4. Next.js version is >=14.2.25 confirmed in package.json — CI rejects builds below this version
+  5. The AI-Powered plan displays "Unlimited" bookings capacity in the pricing/subscription UI instead of 0
+**Plans**: TBD
+
+### Phase 46: Security Hardening
+**Goal**: The application meets GDPR compliance and production security requirements — PII is encrypted at rest, user-generated content is sanitized, passwords are checked against breach databases, and all state-changing requests are CSRF-protected
+**Depends on**: Phase 45 (Neon + Upstash must be live before running the PII migration)
+**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07
+**Success Criteria** (what must be TRUE):
+  1. Customer email and phone values in the database are AES-256-GCM encrypted ciphertext — plaintext PII is not visible in a raw `SELECT` query; customer search still returns correct results via HMAC index
+  2. Submitting a review, company description, or message template containing `<script>alert(1)</script>` does not execute JavaScript when rendered — sanitized output is stored and displayed safely
+  3. Registering or changing a password that appears in the HIBP breach database returns a clear error message before the password is accepted
+  4. Submitting a POST/PUT/DELETE request without a valid CSRF token returns 403 — webhook delivery endpoints are explicitly excluded from CSRF validation
+  5. Registering a webhook URL pointing to `169.254.0.0/16` or `10.0.0.0/8` (private IP ranges) is rejected with a clear error
+  6. Runtime errors in production are captured in Sentry with a stack trace — the Sentry DSN routes through `/monitoring` to bypass CZ/SK ad-blockers
+  7. A `/[locale]/cookie-policy` page exists, is linked from every public page footer, and renders the Czech/English cookie policy text
+**Plans**: TBD
+
+### Phase 47: Notifications & Super-Admin
+**Goal**: Notification emails and SMS deliver reliably to customers, and platform administrators have the complete super-admin toolset — impersonation, feature flags, tenant management, broadcast, maintenance mode, metrics, and audit log
+**Depends on**: Phase 45 (Upstash Redis required for feature flag cache and maintenance flag), Phase 46 (audit log required to ship simultaneously with impersonation)
+**Requirements**: NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06, ADMIN-07
+**Success Criteria** (what must be TRUE):
+  1. Creating a booking triggers a confirmation email to the customer within 60 seconds — the owner's notification list shows the delivery as "sent" with a timestamp
+  2. 24 hours before a booked appointment, a reminder SMS is sent to the customer's phone via Twilio — the notification list shows "sent"; if delivery fails, status shows "failed"
+  3. Changing a booking status to confirmed, cancelled, or completed triggers the corresponding status email to the customer — all three status transitions send correctly in a test run
+  4. An admin can impersonate any user — a persistent red banner appears on every page during impersonation; every action taken writes an entry to the platform audit log with the admin's ID, target user, and timestamp; the session cannot be extended beyond 15 minutes
+  5. An admin can toggle a feature flag on/off from the admin UI — the flag state is enforced server-side within 60 seconds of the change (Redis TTL); toggling a flag per-company affects only that company
+  6. An admin can suspend a company (with a reason) — suspended companies receive a 403 on login attempts but can still reach billing pages; unsuspending restores full access
+  7. Admin can enable maintenance mode — all public and authenticated pages show a branded status page except for requests authenticated with the super-admin bypass cookie; disabling maintenance mode restores access immediately
+**Plans**: TBD
+
+### Phase 48: Marketplace & UX
+**Goal**: Customers can discover businesses on a public marketplace with search and filtering, and business owners experience improved booking management through modals, real-time updates, and the video/webhooks management pages
+**Depends on**: Phase 45 (Vercel deployment), Phase 46 (DOMPurify sanitization active before displaying marketplace content)
+**Requirements**: MKT-01, MKT-02, MKT-03, MKT-04, MKT-05, MKT-06, UX-01, UX-02, UX-03, UX-04, UX-05
+**Success Criteria** (what must be TRUE):
+  1. Navigating to `/marketplace` shows a searchable list of businesses — searching by business name returns matching results; filtering by category and city narrows results correctly
+  2. Filtering by geolocation radius (e.g., 10 km from a given address) returns only businesses within that radius — sort by distance orders closest first
+  3. Clicking a marketplace listing opens the firm detail page with description, photos, review average, services list, and an embedded map — the "Book Now" button links directly to the business's booking wizard
+  4. AI-Powered tier businesses appear in a "Featured" section or with a featured badge — sort by rating orders highest-rated businesses first
+  5. Clicking a booking row in the owner dashboard opens a detail drawer/modal — confirm, cancel, complete, and no-show actions execute from within the modal without navigating away
+  6. The booking dashboard auto-refreshes every 30 seconds — a "Last updated X seconds ago" indicator is visible; new bookings created in another browser tab appear without a manual page reload
+  7. Owners can manage video meeting links from a dedicated UI page and manage API webhooks (create, test, view delivery log) from a dedicated settings page
+**Plans**: TBD
+
+### Phase 49: Observability & Verticals
+**Goal**: Production errors and performance are visible through Sentry and OpenTelemetry traces on Vercel, and the platform supports medical and automotive industry verticals with per-industry field capture and AI configuration
+**Depends on**: Phase 45 (Vercel deployment with instrumentation.ts), Phase 46 (Sentry SDK initialized)
+**Requirements**: OBS-01, OBS-02, VERT-01, VERT-02, VERT-03, VERT-04
+**Success Criteria** (what must be TRUE):
+  1. API route traces appear in Vercel's observability dashboard — trace sampling rate is 10%; each trace includes route path, duration, and status code; no cold start regression above 300ms compared to baseline
+  2. All API route log output is structured JSON — log lines include `level`, `message`, `route`, `duration_ms`, and `request_id` fields; logs are consumable by Vercel log drain without parsing errors
+  3. A medical-vertical business can capture `birth_number` and `insurance_provider` fields in the booking flow — these fields are stored in `booking_metadata` JSONB and are visible in the booking detail view
+  4. An automotive-vertical business can capture `license_plate` (SPZ) and `vin` fields in the booking flow — these fields are stored in `booking_metadata` JSONB and are visible in the booking detail view
+  5. The booking form labels change based on the company's industry setting — a medical business sees "Patient" instead of "Customer", "Appointment" instead of "Booking"; an automotive business sees "Vehicle" and "License Plate" in the appropriate fields
+**Plans**: TBD
+
+### Phase 50: Testing & Hardening
+**Goal**: The full v3.0 feature set is validated by automated tests meeting the 80% coverage threshold, a Storybook catalog documents the glass design system, and the database is partitioned for long-term scale
+**Depends on**: Phase 45, Phase 46, Phase 47, Phase 48, Phase 49 (tests validate the complete feature set, not partial implementations)
+**Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, HARD-01, HARD-02
+**Success Criteria** (what must be TRUE):
+  1. Running `pnpm test:coverage` reports >=80% coverage on critical business logic paths — `availability-engine.ts` reaches >=90% branch coverage and `lib/payment/saga.ts` reaches >=85% branch coverage; CI fails the build below these thresholds
+  2. The Playwright E2E suite covers booking flow (service select → slot → confirm), Comgate payment initiation, user login/logout, and admin impersonation — all four flows pass in CI against the Neon test database
+  3. Integration tests using Testcontainers spin up a real isolated PostgreSQL instance per suite — tests run cleanly in CI (documented as CI-only; local dev without Docker skips these tests gracefully)
+  4. Storybook renders Button, Card, Dialog, Badge, and DataTable components in all their CVA glass variants — the catalog is browsable at `/storybook` in the dev environment
+  5. The `bookings` table is range-partitioned by month via a raw SQL migration — existing data is migrated into partitions; queries scoped to `company_id + date range` show improved explain plans; the migration is reversible via a documented rollback script
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -232,6 +325,12 @@ Plans:
 | 42. End Customer Booking | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | 2/2 | Complete | 2026-03-13 |
+| 45. Infrastructure Migration | v3.0 | TBD | Not started | - |
+| 46. Security Hardening | v3.0 | TBD | Not started | - |
+| 47. Notifications & Super-Admin | v3.0 | TBD | Not started | - |
+| 48. Marketplace & UX | v3.0 | TBD | Not started | - |
+| 49. Observability & Verticals | v3.0 | TBD | Not started | - |
+| 50. Testing & Hardening | v3.0 | TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -240,4 +339,5 @@ Plans:
 *v1.2 shipped: 2026-02-24*
 *v1.3 shipped: 2026-02-25*
 *v1.4 shipped: 2026-03-12*
-*v2.0 roadmap created: 2026-03-13*
+*v2.0 shipped: 2026-03-16*
+*v3.0 roadmap created: 2026-03-16*

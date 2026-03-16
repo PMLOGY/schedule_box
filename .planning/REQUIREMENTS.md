@@ -118,18 +118,63 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 ## Traceability
 
-Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| INFRA-01 | Phase 45 | Pending |
+| INFRA-02 | Phase 45 | Pending |
+| INFRA-03 | Phase 45 | Pending |
+| INFRA-04 | Phase 45 | Pending |
+| INFRA-05 | Phase 45 | Pending |
+| FIX-01 | Phase 45 | Pending |
+| SEC-01 | Phase 46 | Pending |
+| SEC-02 | Phase 46 | Pending |
+| SEC-03 | Phase 46 | Pending |
+| SEC-04 | Phase 46 | Pending |
+| SEC-05 | Phase 46 | Pending |
+| SEC-06 | Phase 46 | Pending |
+| SEC-07 | Phase 46 | Pending |
+| NOTIF-01 | Phase 47 | Pending |
+| NOTIF-02 | Phase 47 | Pending |
+| NOTIF-03 | Phase 47 | Pending |
+| NOTIF-04 | Phase 47 | Pending |
+| ADMIN-01 | Phase 47 | Pending |
+| ADMIN-02 | Phase 47 | Pending |
+| ADMIN-03 | Phase 47 | Pending |
+| ADMIN-04 | Phase 47 | Pending |
+| ADMIN-05 | Phase 47 | Pending |
+| ADMIN-06 | Phase 47 | Pending |
+| ADMIN-07 | Phase 47 | Pending |
+| MKT-01 | Phase 48 | Pending |
+| MKT-02 | Phase 48 | Pending |
+| MKT-03 | Phase 48 | Pending |
+| MKT-04 | Phase 48 | Pending |
+| MKT-05 | Phase 48 | Pending |
+| MKT-06 | Phase 48 | Pending |
+| UX-01 | Phase 48 | Pending |
+| UX-02 | Phase 48 | Pending |
+| UX-03 | Phase 48 | Pending |
+| UX-04 | Phase 48 | Pending |
+| UX-05 | Phase 48 | Pending |
+| OBS-01 | Phase 49 | Pending |
+| OBS-02 | Phase 49 | Pending |
+| VERT-01 | Phase 49 | Pending |
+| VERT-02 | Phase 49 | Pending |
+| VERT-03 | Phase 49 | Pending |
+| VERT-04 | Phase 49 | Pending |
+| TEST-01 | Phase 50 | Pending |
+| TEST-02 | Phase 50 | Pending |
+| TEST-03 | Phase 50 | Pending |
+| TEST-04 | Phase 50 | Pending |
+| HARD-01 | Phase 50 | Pending |
+| HARD-02 | Phase 50 | Pending |
 
 **Coverage:**
 
-- v3.0 requirements: 46 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 46
+- v3.0 requirements: 47 total
+- Mapped to phases: 47 (100%)
+- Unmapped: 0
 
 ---
 
 _Requirements defined: 2026-03-16_
-_Last updated: 2026-03-16 after initial definition_
+_Last updated: 2026-03-16 after roadmap creation — traceability complete_
