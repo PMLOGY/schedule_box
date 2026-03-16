@@ -18,13 +18,13 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 ### Security
 
-- [ ] **SEC-01**: Sentry error tracking integrated with Next.js App Router (@sentry/nextjs)
+- [x] **SEC-01**: Sentry error tracking integrated with Next.js App Router (@sentry/nextjs)
 - [x] **SEC-02**: DOMPurify sanitizes all user-generated content (reviews, messages, notes)
 - [x] **SEC-03**: PII fields (email, phone) encrypted with AES-256-GCM at rest via expand-contract migration
 - [x] **SEC-04**: HIBP API checks passwords on registration and password change
 - [x] **SEC-05**: SSRF protection — URL whitelist + private IP blocking on webhook URLs
-- [ ] **SEC-06**: CSRF token middleware for state-changing POST/PUT/DELETE requests
-- [ ] **SEC-07**: Cookie Policy page accessible from footer on all public pages
+- [x] **SEC-06**: CSRF token middleware for state-changing POST/PUT/DELETE requests
+- [x] **SEC-07**: Cookie Policy page accessible from footer on all public pages
 
 ### Super-Admin
 
@@ -126,13 +126,13 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | INFRA-04 | Phase 45 | Complete |
 | INFRA-05 | Phase 45 | Complete |
 | FIX-01 | Phase 45 | Complete |
-| SEC-01 | Phase 46 | Pending |
+| SEC-01 | Phase 46 | Complete |
 | SEC-02 | Phase 46 | Complete |
 | SEC-03 | Phase 46 | Complete |
 | SEC-04 | Phase 46 | Complete |
 | SEC-05 | Phase 46 | Complete |
-| SEC-06 | Phase 46 | Pending |
-| SEC-07 | Phase 46 | Pending |
+| SEC-06 | Phase 46 | Complete |
+| SEC-07 | Phase 46 | Complete |
 | NOTIF-01 | Phase 47 | Pending |
 | NOTIF-02 | Phase 47 | Pending |
 | NOTIF-03 | Phase 47 | Pending |
