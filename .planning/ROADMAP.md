@@ -227,7 +227,11 @@ Plans:
   5. Registering a webhook URL pointing to `169.254.0.0/16` or `10.0.0.0/8` (private IP ranges) is rejected with a clear error
   6. Runtime errors in production are captured in Sentry with a stack trace — the Sentry DSN routes through `/monitoring` to bypass CZ/SK ad-blockers
   7. A `/[locale]/cookie-policy` page exists, is linked from every public page footer, and renders the Czech/English cookie policy text
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 46-01-PLAN.md — XSS sanitization + HIBP breach check + SSRF protection (SEC-02, SEC-04, SEC-05)
+- [ ] 46-02-PLAN.md — Sentry integration + CSRF audit + cookie policy page (SEC-01, SEC-06, SEC-07)
+- [ ] 46-03-PLAN.md — PII encryption at rest with AES-256-GCM + HMAC search index (SEC-03)
 
 ### Phase 47: Notifications & Super-Admin
 **Goal**: Notification emails and SMS deliver reliably to customers, and platform administrators have the complete super-admin toolset — impersonation, feature flags, tenant management, broadcast, maintenance mode, metrics, and audit log
@@ -330,7 +334,7 @@ Plans:
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 45. Infrastructure Migration | 3/3 | Complete   | 2026-03-16 | - |
-| 46. Security Hardening | v3.0 | TBD | Not started | - |
+| 46. Security Hardening | v3.0 | 0/3 | In progress | - |
 | 47. Notifications & Super-Admin | v3.0 | TBD | Not started | - |
 | 48. Marketplace & UX | v3.0 | TBD | Not started | - |
 | 49. Observability & Verticals | v3.0 | TBD | Not started | - |
