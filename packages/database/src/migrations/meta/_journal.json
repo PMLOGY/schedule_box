@@ -22,6 +22,13 @@
       "when": 1771967314256,
       "tag": "0002_fluffy_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1773686346780,
+      "tag": "0003_glossy_vermin",
+      "breakpoints": true
     }
   ]
 }
