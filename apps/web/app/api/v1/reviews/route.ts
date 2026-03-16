@@ -19,6 +19,7 @@ import { findCompanyId } from '@/lib/db/tenant-scope';
 import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { createdResponse, paginatedResponse } from '@/lib/utils/response';
 import { createReviewCreatedEvent, publishEvent } from '@schedulebox/events';
+import { sanitizeText } from '@/lib/security/sanitize';
 
 /**
  * GET /api/v1/reviews
@@ -247,6 +248,9 @@ export const POST = createRouteHandler({
     // High ratings (4-5) get external redirect suggestion, low ratings (1-3) stay internal
     const redirectedTo = body.rating >= 4 ? 'google' : 'internal';
 
+    // Sanitize user-generated content before DB insert (SEC-02)
+    const cleanComment = body.comment ? sanitizeText(body.comment) : body.comment;
+
     // Insert review
     const [review] = await db
       .insert(reviews)
@@ -257,7 +261,7 @@ export const POST = createRouteHandler({
         serviceId: booking.serviceId,
         employeeId: booking.employeeId,
         rating: body.rating,
-        comment: body.comment,
+        comment: cleanComment,
         isPublished,
         redirectedTo,
       })

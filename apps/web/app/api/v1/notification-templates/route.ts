@@ -14,6 +14,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse, paginatedResponse } from '@/lib/utils/response';
 import { notificationTemplateCreateSchema } from '@schedulebox/shared';
 import { z } from 'zod';
+import { sanitizeRichText } from '@/lib/security/sanitize';
 
 /**
  * Query schema for listing templates
@@ -99,6 +100,9 @@ export const POST = createRouteHandler({
     const { companyId } = await findCompanyId(userSub);
 
     try {
+      // Sanitize rich text body template before DB insert (SEC-02)
+      const cleanBody = body.bodyTemplate ? sanitizeRichText(body.bodyTemplate) : body.bodyTemplate;
+
       // Insert template
       const [template] = await db
         .insert(notificationTemplates)
@@ -107,7 +111,7 @@ export const POST = createRouteHandler({
           type: body.type,
           channel: body.channel,
           subject: body.subject,
-          bodyTemplate: body.bodyTemplate,
+          bodyTemplate: cleanBody,
           isActive: body.isActive ?? true,
         })
         .returning();

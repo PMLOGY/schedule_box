@@ -22,8 +22,9 @@ import { registerSchema } from '@/validations/auth';
 import { validateBody } from '@/lib/middleware/validate';
 import { handleRouteError } from '@/lib/utils/errors';
 import { createdResponse } from '@/lib/utils/response';
-import { ConflictError } from '@schedulebox/shared';
+import { ConflictError, ValidationError } from '@schedulebox/shared';
 import { sendEmailVerificationEmail } from '@/lib/email/auth-emails';
+import { isPasswordBreached } from '@/lib/auth/hibp';
 
 /**
  * Generate URL-friendly slug from company name
@@ -46,7 +47,15 @@ export async function POST(req: NextRequest) {
     // 1. Validate request body
     const input = await validateBody(registerSchema, req);
 
-    // 2. Check if email already exists (for customers, check users without company)
+    // 2. Check password against HIBP breach database (SEC-04)
+    const breached = await isPasswordBreached(input.password);
+    if (breached) {
+      throw new ValidationError(
+        'This password has appeared in known data breaches. Please choose a different password.',
+      );
+    }
+
+    // 3. Check if email already exists (for customers, check users without company)
     const existingUser = await db
       .select({ id: users.id })
       .from(users)

@@ -14,6 +14,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse, noContentResponse } from '@/lib/utils/response';
 import { notificationTemplateUpdateSchema } from '@schedulebox/shared';
 import { z } from 'zod';
+import { sanitizeRichText } from '@/lib/security/sanitize';
 
 /**
  * Params schema for template ID
@@ -94,11 +95,19 @@ export const PUT = createRouteHandler({
     }
 
     try {
+      // Sanitize rich text body template before DB update (SEC-02)
+      const sanitizedBody =
+        body.bodyTemplate !== undefined ? sanitizeRichText(body.bodyTemplate) : undefined;
+      const sanitizedUpdateData = {
+        ...body,
+        ...(sanitizedBody !== undefined ? { bodyTemplate: sanitizedBody } : {}),
+      };
+
       // Update template
       const [updatedTemplate] = await db
         .update(notificationTemplates)
         .set({
-          ...body,
+          ...sanitizedUpdateData,
           updatedAt: new Date(),
         })
         .where(

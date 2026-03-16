@@ -12,6 +12,7 @@ import { companyUpdateSchema } from '@/validations/settings';
 import { db, companies } from '@schedulebox/database';
 import { eq } from 'drizzle-orm';
 import { NotFoundError } from '@schedulebox/shared';
+import { sanitizeRichText } from '@/lib/security/sanitize';
 
 /**
  * GET /api/v1/settings/company
@@ -79,7 +80,8 @@ export const PUT = createRouteHandler({
     if (body!.phone !== undefined) updateData.phone = body!.phone;
     if (body!.website !== undefined) updateData.website = body!.website;
     if (body!.logo_url !== undefined) updateData.logoUrl = body!.logo_url;
-    if (body!.description !== undefined) updateData.description = body!.description;
+    if (body!.description !== undefined)
+      updateData.description = sanitizeRichText(body!.description);
     if (body!.address_street !== undefined) updateData.addressStreet = body!.address_street;
     if (body!.address_city !== undefined) updateData.addressCity = body!.address_city;
     if (body!.address_zip !== undefined) updateData.addressZip = body!.address_zip;

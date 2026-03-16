@@ -19,6 +19,7 @@ import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { changePasswordSchema } from '@/validations/auth';
 import { successResponse } from '@/lib/utils/response';
 import { UnauthorizedError, ValidationError } from '@schedulebox/shared';
+import { isPasswordBreached } from '@/lib/auth/hibp';
 
 export const POST = createRouteHandler({
   requiresAuth: true,
@@ -50,23 +51,31 @@ export const POST = createRouteHandler({
       throw new ValidationError('Password was recently used. Please choose a different password.');
     }
 
-    // 4. Update password
+    // 4. Check new password against HIBP breach database (SEC-04)
+    const breached = await isPasswordBreached(body.new_password);
+    if (breached) {
+      throw new ValidationError(
+        'This password has appeared in known data breaches. Please choose a different password.',
+      );
+    }
+
+    // 5. Update password
     await updatePassword(userRecord.id, body.new_password);
 
-    // 5. Revoke all refresh tokens (force re-login)
+    // 6. Revoke all refresh tokens (force re-login)
     await db
       .update(refreshTokens)
       .set({ revoked: true })
       .where(eq(refreshTokens.userId, userRecord.id));
 
-    // 6. Blacklist current access token
+    // 7. Blacklist current access token
     const authHeader = req.headers.get('Authorization');
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       await blacklistToken(token);
     }
 
-    // 7. Return success
+    // 8. Return success
     return successResponse({
       message: 'Password changed successfully',
     });

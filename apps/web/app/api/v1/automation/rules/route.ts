@@ -16,6 +16,7 @@ import {
   automationRuleListQuerySchema,
   type AutomationRuleListQuery,
 } from '@schedulebox/shared';
+import { validateWebhookUrl } from '@/lib/security/ssrf';
 
 /**
  * GET /api/v1/automation/rules
@@ -86,6 +87,17 @@ export const POST = createRouteHandler({
   handler: async ({ body, user }) => {
     const userSub = user?.sub ?? '';
     const { companyId } = await findCompanyId(userSub);
+
+    // SSRF protection: reject webhook URLs targeting private/internal networks (SEC-05)
+    if (
+      body.actionType === 'webhook' &&
+      body.actionConfig &&
+      typeof body.actionConfig === 'object' &&
+      'url' in body.actionConfig &&
+      body.actionConfig.url
+    ) {
+      validateWebhookUrl(String(body.actionConfig.url));
+    }
 
     // Insert automation rule
     const [rule] = await db

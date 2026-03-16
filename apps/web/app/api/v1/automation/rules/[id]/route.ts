@@ -14,6 +14,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse, noContentResponse } from '@/lib/utils/response';
 import { automationRuleUpdateSchema } from '@schedulebox/shared';
 import { z } from 'zod';
+import { validateWebhookUrl } from '@/lib/security/ssrf';
 
 /**
  * Params schema for automation rule UUID
@@ -79,6 +80,17 @@ export const PUT = createRouteHandler({
 
     if (!existingRule) {
       throw new AppError('RESOURCE_NOT_FOUND', 'Automation rule not found', 404);
+    }
+
+    // SSRF protection: reject webhook URLs targeting private/internal networks (SEC-05)
+    if (
+      body.actionType === 'webhook' &&
+      body.actionConfig &&
+      typeof body.actionConfig === 'object' &&
+      'url' in body.actionConfig &&
+      body.actionConfig.url
+    ) {
+      validateWebhookUrl(String(body.actionConfig.url));
     }
 
     // Update rule
