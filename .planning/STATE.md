@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 45-infrastructure-migration 45-01-PLAN.md
-last_updated: "2026-03-16T17:20:28.162Z"
+stopped_at: "Completed 45-infrastructure-migration 45-03-PLAN.md (checkpoint: awaiting human-verify Task 2)"
+last_updated: "2026-03-16T17:27:26.463Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
   percent: 97
 ---
 
@@ -74,6 +74,9 @@ v3.0 decisions:
 - [Phase 45-infrastructure-migration]: Upstash redis.set() with { ex } replaces ioredis setex() — different API surface
 - [Phase 45-infrastructure-migration]: PLAN_CONFIG imported from @schedulebox/shared/types subpath to prevent prom-client/fs leaking into client bundles
 - [Phase 45-infrastructure-migration]: booking-completed-consumer.ts handleBookingCompleted kept for direct API invocation, startBookingCompletedConsumer made no-op (RabbitMQ removed)
+- [Phase 45-infrastructure-migration]: output: standalone removed from next.config.mjs — Vercel-native deployment handles file tracing natively
+- [Phase 45-infrastructure-migration]: @neondatabase/serverless added to serverExternalPackages — prevents WebSocket driver bundling into edge functions
+- [Phase 45-infrastructure-migration]: notification-worker deleted — RabbitMQ consumer with no queue after publishEvent became no-op; Phase 47 handles notifications
 
 ## Blockers
 
@@ -95,9 +98,10 @@ v3.0 decisions:
 | v2.0 | 6 | 11 | 3 days |
 | Phase 45-infrastructure-migration P02 | 39 | 2 tasks | 40 files |
 | Phase 45-infrastructure-migration P01 | 45 | 2 tasks | 13 files |
+| Phase 45-infrastructure-migration P03 | 15 | 1 tasks | 45 files |
 
 ## Session Continuity
 
-Last session: 2026-03-16T17:20:28.158Z
-Stopped at: Completed 45-infrastructure-migration 45-01-PLAN.md
+Last session: 2026-03-16T17:27:26.459Z
+Stopped at: Completed 45-infrastructure-migration 45-03-PLAN.md (checkpoint: awaiting human-verify Task 2)
 Resume file: None

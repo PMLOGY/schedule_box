@@ -110,7 +110,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** Close every gap from the GAP analysis to achieve 100% implementation of the v13.0 FINAL documentation spec. Deploy to Vercel (Neon + Upstash), harden security and compliance, complete super-admin tooling, marketplace, UX gaps, observability, industry verticals, and test coverage.
 
-- [ ] **Phase 45: Infrastructure Migration** - Migrate from Railway/RabbitMQ to Vercel/Neon/Upstash; patch CVE-2025-29927; fix AI-Powered plan capacity display
+- [x] **Phase 45: Infrastructure Migration** - Migrate from Railway/RabbitMQ to Vercel/Neon/Upstash; patch CVE-2025-29927; fix AI-Powered plan capacity display (completed 2026-03-16)
 - [ ] **Phase 46: Security Hardening** - PII encryption at rest, XSS sanitization, HIBP breach check, CSRF, SSRF, Sentry, cookie policy page
 - [ ] **Phase 47: Notifications & Super-Admin** - Verify notification delivery pipeline; build complete super-admin tooling (impersonation, feature flags, suspend, broadcast, maintenance, metrics, audit log)
 - [ ] **Phase 48: Marketplace & UX** - Public marketplace with search/filter/map; booking detail modal; real-time polling; video meetings UI; webhooks settings UI
@@ -329,7 +329,7 @@ Plans:
 | 42. End Customer Booking | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 45. Infrastructure Migration | 2/3 | In Progress|  | - |
+| 45. Infrastructure Migration | 3/3 | Complete   | 2026-03-16 | - |
 | 46. Security Hardening | v3.0 | TBD | Not started | - |
 | 47. Notifications & Super-Admin | v3.0 | TBD | Not started | - |
 | 48. Marketplace & UX | v3.0 | TBD | Not started | - |
