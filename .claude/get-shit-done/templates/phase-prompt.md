@@ -20,6 +20,7 @@ wave: N # Execution wave (1, 2, 3...). Pre-computed at plan time.
 depends_on: [] # Plan IDs this plan requires (e.g., ["01-01"]).
 files_modified: [] # Files this plan modifies.
 autonomous: true # false if plan has checkpoints requiring user interaction
+requirements: [] # REQUIRED — Requirement IDs from ROADMAP this plan addresses. MUST NOT be empty.
 user_setup: [] # Human-required setup Claude cannot automate (see below)
 
 # Goal-backward verification (derived during planning, verified after execution)
@@ -123,17 +124,18 @@ After completion, create `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
 ## Frontmatter Fields
 
-| Field            | Required | Purpose                                                        |
-| ---------------- | -------- | -------------------------------------------------------------- |
-| `phase`          | Yes      | Phase identifier (e.g., `01-foundation`)                       |
-| `plan`           | Yes      | Plan number within phase (e.g., `01`, `02`)                    |
-| `type`           | Yes      | Always `execute` for standard plans, `tdd` for TDD plans       |
-| `wave`           | Yes      | Execution wave number (1, 2, 3...). Pre-computed at plan time. |
-| `depends_on`     | Yes      | Array of plan IDs this plan requires.                          |
-| `files_modified` | Yes      | Files this plan touches.                                       |
-| `autonomous`     | Yes      | `true` if no checkpoints, `false` if has checkpoints           |
-| `user_setup`     | No       | Array of human-required setup items (external services)        |
-| `must_haves`     | Yes      | Goal-backward verification criteria (see below)                |
+| Field            | Required | Purpose                                                                                                 |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `phase`          | Yes      | Phase identifier (e.g., `01-foundation`)                                                                |
+| `plan`           | Yes      | Plan number within phase (e.g., `01`, `02`)                                                             |
+| `type`           | Yes      | Always `execute` for standard plans, `tdd` for TDD plans                                                |
+| `wave`           | Yes      | Execution wave number (1, 2, 3...). Pre-computed at plan time.                                          |
+| `depends_on`     | Yes      | Array of plan IDs this plan requires.                                                                   |
+| `files_modified` | Yes      | Files this plan touches.                                                                                |
+| `autonomous`     | Yes      | `true` if no checkpoints, `false` if has checkpoints                                                    |
+| `requirements`   | Yes      | **MUST** list requirement IDs from ROADMAP. Every roadmap requirement MUST appear in at least one plan. |
+| `user_setup`     | No       | Array of human-required setup items (external services)                                                 |
+| `must_haves`     | Yes      | Goal-backward verification criteria (see below)                                                         |
 
 **Wave is pre-computed:** Wave numbers are assigned during `/gsd:plan-phase`. Execute-phase reads `wave` directly from frontmatter and groups plans by wave number. No runtime dependency analysis needed.
 
