@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Migrate ScheduleBox from local/Railway deployment to Vercel. Replace RabbitMQ with no-op, swap postgres.js for @vercel/postgres, swap ioredis for @upstash/redis, patch CVE-2025-29927, fix AI-Powered plan capacity bug. App must be fully functional on Vercel — no external services except Upstash Redis.
+Migrate ScheduleBox from local/Railway deployment to Vercel. Replace RabbitMQ with no-op, swap postgres.js for @neondatabase/serverless, swap ioredis for @upstash/redis, patch CVE-2025-29927, fix AI-Powered plan capacity bug. App must be fully functional on Vercel — no external services except Upstash Redis.
 
 </domain>
 
@@ -18,12 +18,12 @@ Migrate ScheduleBox from local/Railway deployment to Vercel. Replace RabbitMQ wi
 - Claude's discretion on no-op approach (silent no-op vs console.log stub — pick what's best for Vercel serverless)
 - Full cleanup: remove amqplib package, delete consumer.ts, clean up all RabbitMQ connection code from packages/events/
 - Notification-worker service: Claude decides whether to remove entirely (wire notifications directly in Phase 47) or convert to Vercel Cron — pick the simplest path
-- AI service: move inference endpoints to Vercel Python functions. Model training stays in GitHub Actions weekly cron (`train-models.yml`)
+- AI service: inference migration to Vercel Python functions deferred to Phase 49 (Observability & Verticals) — Phase 45 focuses on web app infrastructure only. AI service continues running separately until then.
 - All 38 publishEvent call sites across 16 files remain unchanged — only publisher.ts body changes
 
 ### Database Migration
 
-- Use @vercel/postgres (Vercel's official SDK, Neon under the hood) — auto-configured env vars
+- Use @neondatabase/serverless (supersedes initial @vercel/postgres decision — research showed Neon direct driver has better Drizzle ORM integration, supports both HTTP and WebSocket transports for transactions, and works with standard DATABASE_URL env var)
 - Local PostgreSQL stays for development (user has it installed locally, no Docker)
 - Vercel Postgres for production — set up via Vercel dashboard
 - Production data: export existing local data (pg_dump) and import to Vercel Postgres — preserve test companies and demo data for showcase
@@ -104,7 +104,7 @@ Migrate ScheduleBox from local/Railway deployment to Vercel. Replace RabbitMQ wi
 <deferred>
 ## Deferred Ideas
 
-None — discussion stayed within phase scope
+- AI inference migration to Vercel Python functions — deferred to Phase 49 (Observability & Verticals). AI service continues running on current host until then.
 
 </deferred>
 
