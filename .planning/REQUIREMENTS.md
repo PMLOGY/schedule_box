@@ -31,9 +31,9 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 - [x] **ADMIN-01**: Admin can impersonate any user with mandatory audit trail entry
 - [x] **ADMIN-02**: Feature flags table + admin UI to toggle features per company
 - [x] **ADMIN-03**: Admin can suspend/unsuspend companies with reason field
-- [ ] **ADMIN-04**: Admin can broadcast messages to all active companies
+- [x] **ADMIN-04**: Admin can broadcast messages to all active companies
 - [x] **ADMIN-05**: Maintenance mode toggle blocks public access with branded status page
-- [ ] **ADMIN-06**: Platform daily metrics dashboard (new companies, bookings, revenue, churn)
+- [x] **ADMIN-06**: Platform daily metrics dashboard (new companies, bookings, revenue, churn)
 - [x] **ADMIN-07**: Platform audit log of all admin actions with timestamp, actor, and details
 
 ### Notifications
@@ -140,9 +140,9 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | ADMIN-01 | Phase 47 | Complete |
 | ADMIN-02 | Phase 47 | Complete |
 | ADMIN-03 | Phase 47 | Complete |
-| ADMIN-04 | Phase 47 | Pending |
+| ADMIN-04 | Phase 47 | Complete |
 | ADMIN-05 | Phase 47 | Complete |
-| ADMIN-06 | Phase 47 | Pending |
+| ADMIN-06 | Phase 47 | Complete |
 | ADMIN-07 | Phase 47 | Complete |
 | MKT-01 | Phase 48 | Pending |
 | MKT-02 | Phase 48 | Pending |
