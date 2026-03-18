@@ -2232,6 +2232,65 @@
       "toggleError": "Nepodarilo sa zmeniť režim údržby",
       "save": "Uložiť",
       "saving": "Ukladám..."
+    },
+    "broadcast": {
+      "title": "Hromadné správy",
+      "createBroadcast": "Vytvoriť správu",
+      "createBroadcastTitle": "Vytvoriť hromadnú správu",
+      "created": "Správa bola úspešne naplánovaná",
+      "createError": "Nepodarilo sa vytvoriť správu",
+      "creating": "Vytváram...",
+      "send": "Naplánovať správu",
+      "noBroadcasts": "Zatiaľ žiadne hromadné správy.",
+      "statusSent": "Odoslané",
+      "statusScheduled": "Naplánované",
+      "statusDraft": "Čaká",
+      "targetLoading": "Načítavam počet príjemcov...",
+      "targetCount": "Cieľová skupina: {count} firiem",
+      "confirmMismatch": "Počet nezodpovedá — zadajte presný počet cieľových firiem",
+      "confirmMatch": "Potvrdené",
+      "audienceAll": "Všetky firmy",
+      "audienceFree": "Bezplatný plán",
+      "audienceEssential": "Plán Essential",
+      "audienceGrowth": "Plán Growth",
+      "audienceAiPowered": "Plán AI-Powered",
+      "columns": {
+        "message": "Správa",
+        "audience": "Cieľová skupina",
+        "scheduledAt": "Naplánované na",
+        "sentAt": "Odoslané",
+        "status": "Stav"
+      },
+      "fields": {
+        "message": "Text správy",
+        "messagePlaceholder": "Zadajte text hromadnej správy (max. 1000 znakov)...",
+        "scheduledAt": "Dátum a čas odoslania",
+        "audience": "Cieľová skupina",
+        "confirmCount": "Pre potvrdenie zadajte počet cieľových firiem ({count})"
+      }
+    },
+    "metrics": {
+      "title": "Metriky platformy",
+      "subtitle": "Obchodné KPI a prevádzkové zdravie",
+      "lastUpdated": "Aktualizované: {time}",
+      "refresh": "Obnoviť",
+      "kpis": {
+        "title": "Obchodné KPI",
+        "newSignupsToday": "Nové registrácie dnes",
+        "newSignupsThisWeek": "Nové registrácie tento týždeň",
+        "totalActiveCompanies": "Aktívne firmy",
+        "totalBookingsThisWeek": "Rezervácie tento týždeň",
+        "mrr": "MRR",
+        "churnRate": "Miera odchodu"
+      },
+      "health": {
+        "title": "Prevádzkové zdravie",
+        "notificationDeliveryRate": "Doručenie notifikácií",
+        "smsDeliveryRate": "Doručenie SMS",
+        "failedPaymentsToday": "Neúspešné platby dnes",
+        "apiErrorRate": "Chybovosť API"
+      },
+      "pending": "N/A — Sentry čaká"
     }
   },
   "portal": {

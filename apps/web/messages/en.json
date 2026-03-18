@@ -2306,6 +2306,65 @@
       "toggleError": "Failed to update maintenance mode",
       "save": "Apply",
       "saving": "Applying..."
+    },
+    "broadcast": {
+      "title": "Broadcast Messages",
+      "createBroadcast": "Create Broadcast",
+      "createBroadcastTitle": "Create Broadcast Message",
+      "created": "Broadcast created successfully",
+      "createError": "Failed to create broadcast",
+      "creating": "Creating...",
+      "send": "Schedule Broadcast",
+      "noBroadcasts": "No broadcast messages yet.",
+      "statusSent": "Sent",
+      "statusScheduled": "Scheduled",
+      "statusDraft": "Pending",
+      "targetLoading": "Loading target count...",
+      "targetCount": "Target audience: {count} companies",
+      "confirmMismatch": "Count does not match — please enter the exact target count",
+      "confirmMatch": "Confirmed",
+      "audienceAll": "All Companies",
+      "audienceFree": "Free Plan",
+      "audienceEssential": "Essential Plan",
+      "audienceGrowth": "Growth Plan",
+      "audienceAiPowered": "AI-Powered Plan",
+      "columns": {
+        "message": "Message",
+        "audience": "Audience",
+        "scheduledAt": "Scheduled For",
+        "sentAt": "Sent At",
+        "status": "Status"
+      },
+      "fields": {
+        "message": "Message",
+        "messagePlaceholder": "Enter your broadcast message (max 1000 characters)...",
+        "scheduledAt": "Schedule Date & Time",
+        "audience": "Target Audience",
+        "confirmCount": "Type the target count ({count}) to confirm"
+      }
+    },
+    "metrics": {
+      "title": "Platform Metrics",
+      "subtitle": "Business KPIs and operational health",
+      "lastUpdated": "Last updated: {time}",
+      "refresh": "Refresh",
+      "kpis": {
+        "title": "Business KPIs",
+        "newSignupsToday": "New Signups Today",
+        "newSignupsThisWeek": "New Signups This Week",
+        "totalActiveCompanies": "Active Companies",
+        "totalBookingsThisWeek": "Bookings This Week",
+        "mrr": "MRR",
+        "churnRate": "Churn Rate"
+      },
+      "health": {
+        "title": "Operational Health",
+        "notificationDeliveryRate": "Notification Delivery",
+        "smsDeliveryRate": "SMS Delivery",
+        "failedPaymentsToday": "Failed Payments Today",
+        "apiErrorRate": "API Error Rate"
+      },
+      "pending": "N/A — Sentry pending"
     }
   },
   "portal": {

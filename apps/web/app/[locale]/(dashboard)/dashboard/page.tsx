@@ -18,6 +18,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Brain } from 'lucide-react';
+import { BroadcastBanner } from '@/components/shared/broadcast-banner';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
@@ -90,6 +91,9 @@ export default function DashboardPage() {
 
       {/* Public Booking Link */}
       <BookingLinkCard />
+
+      {/* Platform broadcast banner (dismissible, shown when admin has sent an active broadcast) */}
+      <BroadcastBanner />
 
       {/* KPI Summary Row */}
       <DashboardGrid />

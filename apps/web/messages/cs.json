@@ -2306,6 +2306,65 @@
       "toggleError": "Nepodařilo se změnit režim údržby",
       "save": "Uložit",
       "saving": "Ukládám..."
+    },
+    "broadcast": {
+      "title": "Hromadné zprávy",
+      "createBroadcast": "Vytvořit zprávu",
+      "createBroadcastTitle": "Vytvořit hromadnou zprávu",
+      "created": "Zpráva byla úspěšně naplánována",
+      "createError": "Nepodařilo se vytvořit zprávu",
+      "creating": "Vytvářím...",
+      "send": "Naplánovat zprávu",
+      "noBroadcasts": "Zatím žádné hromadné zprávy.",
+      "statusSent": "Odesláno",
+      "statusScheduled": "Naplánováno",
+      "statusDraft": "Čeká",
+      "targetLoading": "Načítám počet příjemců...",
+      "targetCount": "Cílová skupina: {count} firem",
+      "confirmMismatch": "Počet neodpovídá — zadejte přesný počet cílových firem",
+      "confirmMatch": "Potvrzeno",
+      "audienceAll": "Všechny firmy",
+      "audienceFree": "Bezplatný plán",
+      "audienceEssential": "Plán Essential",
+      "audienceGrowth": "Plán Growth",
+      "audienceAiPowered": "Plán AI-Powered",
+      "columns": {
+        "message": "Zpráva",
+        "audience": "Cílová skupina",
+        "scheduledAt": "Naplánováno na",
+        "sentAt": "Odesláno",
+        "status": "Stav"
+      },
+      "fields": {
+        "message": "Text zprávy",
+        "messagePlaceholder": "Zadejte text hromadné zprávy (max. 1000 znaků)...",
+        "scheduledAt": "Datum a čas odeslání",
+        "audience": "Cílová skupina",
+        "confirmCount": "Pro potvrzení zadejte počet cílových firem ({count})"
+      }
+    },
+    "metrics": {
+      "title": "Metriky platformy",
+      "subtitle": "Obchodní KPI a provozní zdraví",
+      "lastUpdated": "Aktualizováno: {time}",
+      "refresh": "Obnovit",
+      "kpis": {
+        "title": "Obchodní KPI",
+        "newSignupsToday": "Nové registrace dnes",
+        "newSignupsThisWeek": "Nové registrace tento týden",
+        "totalActiveCompanies": "Aktivní firmy",
+        "totalBookingsThisWeek": "Rezervace tento týden",
+        "mrr": "MRR",
+        "churnRate": "Míra odchodu"
+      },
+      "health": {
+        "title": "Provozní zdraví",
+        "notificationDeliveryRate": "Doručení notifikací",
+        "smsDeliveryRate": "Doručení SMS",
+        "failedPaymentsToday": "Neúspěšné platby dnes",
+        "apiErrorRate": "Chybovost API"
+      },
+      "pending": "N/A — Sentry čeká"
     }
   },
   "portal": {

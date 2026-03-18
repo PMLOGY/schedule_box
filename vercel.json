@@ -3,6 +3,10 @@
     {
       "path": "/api/v1/cron/sms-reminders",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/v1/cron/broadcast-dispatch",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
