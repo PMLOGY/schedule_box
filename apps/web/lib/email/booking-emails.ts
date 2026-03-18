@@ -44,6 +44,8 @@ export interface BookingEmailData {
   companyPhone: string | null;
   bookingUuid: string;
   locale?: 'cs' | 'sk' | 'en';
+  /** Optional video meeting link — included in emails when set */
+  meetingUrl?: string | null;
 }
 
 // ============================================================================
@@ -123,12 +125,16 @@ function buildDetailsTable(data: BookingEmailData): string {
   const phoneRow = data.companyPhone
     ? `<tr><td>Telefon:</td><td>${data.companyPhone}</td></tr>`
     : '';
+  const meetingRow = data.meetingUrl
+    ? `<tr><td>Video schůzka:</td><td><a href="${data.meetingUrl}" style="color: #0057FF; word-break: break-all;">${data.meetingUrl}</a></td></tr>`
+    : '';
 
   return `
     <table class="details-table">
       <tr><td>Datum a čas:</td><td>${dateStr}</td></tr>
       <tr><td>Služba:</td><td>${data.serviceName}</td></tr>
       ${employeeRow}
+      ${meetingRow}
       <tr><td>Provozovna:</td><td>${data.companyName}</td></tr>
       ${phoneRow}
       <tr><td>Číslo rezervace:</td><td>${data.bookingUuid}</td></tr>
@@ -143,6 +149,7 @@ function buildDetailsText(data: BookingEmailData): string {
   const dateStr = formatDateTime(data.startTime, data.locale ?? 'cs');
   const lines = [`Datum a čas: ${dateStr}`, `Služba: ${data.serviceName}`];
   if (data.employeeName) lines.push(`Poskytovatel: ${data.employeeName}`);
+  if (data.meetingUrl) lines.push(`Video schůzka: ${data.meetingUrl}`);
   lines.push(`Provozovna: ${data.companyName}`);
   if (data.companyPhone) lines.push(`Telefon: ${data.companyPhone}`);
   lines.push(`Číslo rezervace: ${data.bookingUuid}`);

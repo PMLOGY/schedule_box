@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Wallet,
   Store,
+  Video,
   type LucideIcon,
 } from 'lucide-react';
 import type { SubscriptionPlan } from '@schedulebox/shared/types';
@@ -156,6 +157,12 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'settings',
     href: '/settings',
     icon: Settings,
+    roles: ['owner'],
+  },
+  {
+    key: 'videoMeetings',
+    href: '/settings/video-meetings',
+    icon: Video,
     roles: ['owner'],
   },
 ];

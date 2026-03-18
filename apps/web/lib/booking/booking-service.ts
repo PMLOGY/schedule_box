@@ -94,6 +94,7 @@ async function fireBookingCreatedNotifications(
         employeeName: employees.name,
         companyName: companies.name,
         companyPhone: companies.phone,
+        customMeetingUrl: companies.customMeetingUrl,
       })
       .from(bookings)
       .innerJoin(customers, eq(bookings.customerId, customers.id))
@@ -131,6 +132,7 @@ async function fireBookingCreatedNotifications(
         companyName: row.companyName,
         companyPhone: row.companyPhone ?? null,
         bookingUuid: row.bookingUuid,
+        meetingUrl: row.customMeetingUrl ?? null,
       })
         .then(async () => {
           await db

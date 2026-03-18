@@ -68,6 +68,7 @@ export const companies = pgTable(
     organizationId: integer('organization_id'),
     busyAppearanceEnabled: boolean('busy_appearance_enabled').default(false),
     busyAppearancePercent: smallint('busy_appearance_percent').default(0),
+    customMeetingUrl: varchar('custom_meeting_url', { length: 500 }),
     isActive: boolean('is_active').default(true),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
