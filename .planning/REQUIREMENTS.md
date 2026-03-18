@@ -47,8 +47,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 - [ ] **MKT-01**: Public marketplace page at /marketplace with full-text search across firms
 - [ ] **MKT-02**: Filter by category, subcategory, city, and geolocation radius
-- [ ] **MKT-03**: Firm detail page with description, photos, reviews, services list, and map
-- [ ] **MKT-04**: Direct booking from marketplace firm profile (links to existing booking wizard)
+- [x] **MKT-03**: Firm detail page with description, photos, reviews, services list, and map
+- [x] **MKT-04**: Direct booking from marketplace firm profile (links to existing booking wizard)
 - [ ] **MKT-05**: Premium listing placement for AI-Powered tier companies (featured flag)
 - [ ] **MKT-06**: Sort by average rating, distance, and featured status
 
@@ -146,8 +146,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | ADMIN-07 | Phase 47 | Complete |
 | MKT-01 | Phase 48 | Pending |
 | MKT-02 | Phase 48 | Pending |
-| MKT-03 | Phase 48 | Pending |
-| MKT-04 | Phase 48 | Pending |
+| MKT-03 | Phase 48 | Complete |
+| MKT-04 | Phase 48 | Complete |
 | MKT-05 | Phase 48 | Pending |
 | MKT-06 | Phase 48 | Pending |
 | UX-01 | Phase 48 | Complete |

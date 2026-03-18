@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 48-marketplace-ux 48-03-PLAN.md
-last_updated: "2026-03-18T17:39:18.603Z"
+stopped_at: Completed 48-marketplace-ux 48-02-PLAN.md
+last_updated: "2026-03-18T17:40:31.712Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 9
   total_plans: 27
-  completed_plans: 23
+  completed_plans: 24
   percent: 96
 ---
 
@@ -114,6 +114,8 @@ v3.0 decisions:
 - [Phase 48-marketplace-ux]: refetchInterval: 30_000 matches staleTime to avoid window-focus redundant refetches
 - [Phase 48-marketplace-ux]: BookingDetailPanel keeps panel open after action via query invalidation, no onClose()
 - [Phase 48-marketplace-ux]: animate-glow-blue uses CSS keyframes (not framer-motion) — simpler, no JS
+- [Phase 48-marketplace-ux]: OpenStreetMap iframe (not Leaflet) for map embed — zero npm install, sufficient UX for location display
+- [Phase 48-marketplace-ux]: sanitizeImageUrl validates http/https-only protocol to block XSS via javascript:/data: URIs in user image arrays
 
 ## Blockers
 
@@ -145,9 +147,10 @@ v3.0 decisions:
 | Phase 47-notifications-super-admin P04 | 15min | 2 tasks | 15 files |
 | Phase 47-notifications-super-admin P05 | 10min | 2 tasks | 10 files |
 | Phase 48-marketplace-ux P03 | 10min | 2 tasks | 7 files |
+| Phase 48-marketplace-ux P02 | 5min | 1 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T17:39:18.598Z
-Stopped at: Completed 48-marketplace-ux 48-03-PLAN.md
+Last session: 2026-03-18T17:40:31.708Z
+Stopped at: Completed 48-marketplace-ux 48-02-PLAN.md
 Resume file: None
