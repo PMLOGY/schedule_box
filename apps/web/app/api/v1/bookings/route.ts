@@ -5,6 +5,7 @@
  */
 
 import { eq } from 'drizzle-orm';
+import { trace } from '@opentelemetry/api';
 import { db, users } from '@schedulebox/database';
 import { AppError } from '@schedulebox/shared';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
@@ -19,6 +20,7 @@ import {
 } from '@/validations/booking';
 import { createBooking, listBookings } from '@/lib/booking/booking-service';
 import { checkBookingLimit, incrementBookingCounter } from '@/lib/usage/usage-service';
+import { logRouteComplete, getRequestId } from '@/lib/logger/route-logger';
 
 /**
  * GET /api/v1/bookings
@@ -28,17 +30,49 @@ export const GET = createRouteHandler({
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.BOOKINGS_READ],
   handler: async ({ req, user }) => {
-    // Find user's company ID for tenant isolation
-    const userSub = user?.sub ?? '';
-    const { companyId } = await findCompanyId(userSub);
+    const startTime = Date.now();
+    const requestId = getRequestId(req);
 
-    // Parse and validate query parameters
-    const query = validateQuery(bookingListQuerySchema, req) as BookingListQuery;
+    return trace
+      .getTracer('schedulebox')
+      .startActiveSpan('schedulebox.booking.list', async (span) => {
+        try {
+          // Find user's company ID for tenant isolation
+          const userSub = user?.sub ?? '';
+          const { companyId } = await findCompanyId(userSub);
 
-    // Call service layer
-    const { data, meta } = await listBookings(query, companyId);
+          span.setAttributes({ 'http.route': '/api/v1/bookings', 'booking.company_id': companyId });
 
-    return paginatedResponse(data, meta);
+          // Parse and validate query parameters
+          const query = validateQuery(bookingListQuerySchema, req) as BookingListQuery;
+
+          // Call service layer
+          const { data, meta } = await listBookings(query, companyId);
+
+          const response = paginatedResponse(data, meta);
+          span.end();
+          logRouteComplete({
+            route: '/api/v1/bookings',
+            method: 'GET',
+            status: 200,
+            duration_ms: Date.now() - startTime,
+            request_id: requestId,
+          });
+          return response;
+        } catch (error) {
+          span.recordException(error as Error);
+          span.end();
+          logRouteComplete({
+            route: '/api/v1/bookings',
+            method: 'GET',
+            status: 500,
+            duration_ms: Date.now() - startTime,
+            request_id: requestId,
+            error: error as Error,
+          });
+          throw error;
+        }
+      });
   },
 });
 
@@ -56,44 +90,78 @@ export const POST = createRouteHandler({
   bodySchema: bookingCreateSchema,
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.BOOKINGS_CREATE],
-  handler: async ({ body, user }) => {
-    // Find user's company ID and user internal ID for tenant isolation
-    const userSub = user?.sub ?? '';
-    const { companyId } = await findCompanyId(userSub);
+  handler: async ({ body, req, user }) => {
+    const startTime = Date.now();
+    const requestId = getRequestId(req);
 
-    // Check booking limit for company's plan tier
-    await checkBookingLimit(companyId);
+    return trace
+      .getTracer('schedulebox')
+      .startActiveSpan('schedulebox.booking.list', async (span) => {
+        try {
+          // Find user's company ID and user internal ID for tenant isolation
+          const userSub = user?.sub ?? '';
+          const { companyId } = await findCompanyId(userSub);
 
-    // Get user internal ID (needed for audit trail)
-    const [userRecord] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.uuid, userSub))
-      .limit(1);
+          span.setAttributes({
+            'http.route': '/api/v1/bookings',
+            'booking.company_id': companyId,
+          });
 
-    if (!userRecord) {
-      throw new AppError('UNAUTHORIZED', 'User not found', 401);
-    }
+          // Check booking limit for company's plan tier
+          await checkBookingLimit(companyId);
 
-    // Call service layer (may throw AppError with code SLOT_TAKEN if conflict)
-    // Source defaults to 'online' if not provided (applied by Zod schema)
-    const booking = await createBooking(
-      {
-        ...body,
-        source: body.source ?? 'online',
-      },
-      {
-        companyId,
-        userId: userRecord.id,
-      },
-    );
+          // Get user internal ID (needed for audit trail)
+          const [userRecord] = await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.uuid, userSub))
+            .limit(1);
 
-    // Increment booking counter for usage tracking (fire-and-forget, non-blocking)
-    incrementBookingCounter(companyId).catch((err) => {
-      console.error('[UsageCounter] Failed to increment booking counter:', err);
-    });
+          if (!userRecord) {
+            throw new AppError('UNAUTHORIZED', 'User not found', 401);
+          }
 
-    // Return 201 Created
-    return successResponse(booking, 201);
+          // Call service layer (may throw AppError with code SLOT_TAKEN if conflict)
+          // Source defaults to 'online' if not provided (applied by Zod schema)
+          const booking = await createBooking(
+            {
+              ...body,
+              source: body.source ?? 'online',
+            },
+            {
+              companyId,
+              userId: userRecord.id,
+            },
+          );
+
+          // Increment booking counter for usage tracking (fire-and-forget, non-blocking)
+          incrementBookingCounter(companyId).catch((err) => {
+            console.error('[UsageCounter] Failed to increment booking counter:', err);
+          });
+
+          const response = successResponse(booking, 201);
+          span.end();
+          logRouteComplete({
+            route: '/api/v1/bookings',
+            method: 'POST',
+            status: 201,
+            duration_ms: Date.now() - startTime,
+            request_id: requestId,
+          });
+          return response;
+        } catch (error) {
+          span.recordException(error as Error);
+          span.end();
+          logRouteComplete({
+            route: '/api/v1/bookings',
+            method: 'POST',
+            status: 500,
+            duration_ms: Date.now() - startTime,
+            request_id: requestId,
+            error: error as Error,
+          });
+          throw error;
+        }
+      });
   },
 });
