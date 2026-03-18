@@ -23,5 +23,13 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "vitest.config.ts", "vitest.setup.ts", "e2e/**"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "e2e/**",
+    "**/*.stories.tsx",
+    "**/*.stories.ts"
+  ]
 }
