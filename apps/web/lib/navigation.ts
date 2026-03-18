@@ -18,6 +18,7 @@ import {
   Wallet,
   Store,
   Video,
+  Globe,
   type LucideIcon,
 } from 'lucide-react';
 import type { SubscriptionPlan } from '@schedulebox/shared/types';
@@ -163,6 +164,12 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'videoMeetings',
     href: '/settings/video-meetings',
     icon: Video,
+    roles: ['owner'],
+  },
+  {
+    key: 'webhooks',
+    href: '/settings/webhooks',
+    icon: Globe,
     roles: ['owner'],
   },
 ];
