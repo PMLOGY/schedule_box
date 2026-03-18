@@ -78,10 +78,10 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 ### Industry Verticals
 
-- [ ] **VERT-01**: Medical vertical — booking_metadata JSONB supports birth_number, insurance fields
-- [ ] **VERT-02**: Automotive vertical — booking_metadata JSONB supports SPZ/VIN fields
-- [ ] **VERT-03**: Per-industry UI labels dynamically rendered from industry config
-- [ ] **VERT-04**: Per-industry AI config (disable upselling for medical, adjust capacity for fitness)
+- [x] **VERT-01**: Medical vertical — booking_metadata JSONB supports birth_number, insurance fields
+- [x] **VERT-02**: Automotive vertical — booking_metadata JSONB supports SPZ/VIN fields
+- [x] **VERT-03**: Per-industry UI labels dynamically rendered from industry config
+- [x] **VERT-04**: Per-industry AI config (disable upselling for medical, adjust capacity for fitness)
 
 ### Infrastructure Hardening
 
@@ -157,10 +157,10 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | UX-05 | Phase 48 | Complete |
 | OBS-01 | Phase 49 | Pending |
 | OBS-02 | Phase 49 | Pending |
-| VERT-01 | Phase 49 | Pending |
-| VERT-02 | Phase 49 | Pending |
-| VERT-03 | Phase 49 | Pending |
-| VERT-04 | Phase 49 | Pending |
+| VERT-01 | Phase 49 | Complete |
+| VERT-02 | Phase 49 | Complete |
+| VERT-03 | Phase 49 | Complete |
+| VERT-04 | Phase 49 | Complete |
 | TEST-01 | Phase 50 | Pending |
 | TEST-02 | Phase 50 | Pending |
 | TEST-03 | Phase 50 | Pending |

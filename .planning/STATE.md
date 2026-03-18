@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 48-marketplace-ux 48-05-PLAN.md
-last_updated: "2026-03-18T17:58:40.227Z"
+stopped_at: Completed 49-observability-verticals 49-02-PLAN.md
+last_updated: "2026-03-18T20:38:48.553Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 10
-  total_plans: 27
-  completed_plans: 27
+  total_plans: 35
+  completed_plans: 28
   percent: 96
 ---
 
@@ -121,6 +121,9 @@ v3.0 decisions:
 - [Phase 48-marketplace-ux]: Webhook tables applied via raw SQL (postgres superuser) because schedulebox user lacks CREATE privilege; consistent with Phase 47 pattern
 - [Phase 48-marketplace-ux]: Webhook retry scheduling via DB records (not RabbitMQ): two pending delivery records at failure time, cron processes scheduled_at <= now
 - [Phase 48-marketplace-ux]: HMAC secret: randomBytes(32).hex() encrypted with AES-256-GCM (Phase 46 module), plaintext returned once on creation, never stored in DB
+- [Phase 49-observability-verticals]: Industry labels are NOT i18n translations — domain terminology per vertical stored as TypeScript constants (medical = Pacient, auto = Vozidlo)
+- [Phase 49-observability-verticals]: bookingMetadata validation at Zod API layer only, no DB CHECK constraint — allows future verticals without DDL changes
+- [Phase 49-observability-verticals]: ALTER TABLE booking_metadata applied via postgres superuser consistent with Phase 47/48 pattern
 
 ## Blockers
 
@@ -156,9 +159,10 @@ v3.0 decisions:
 | Phase 48-marketplace-ux P04 | 7 | 1 tasks | 9 files |
 | Phase 48-marketplace-ux P01 | 20min | 2 tasks | 4 files |
 | Phase 48-marketplace-ux P05 | 18min | 3 tasks | 22 files |
+| Phase 49-observability-verticals P02 | 24min | 2 tasks | 9 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T17:53:58.494Z
-Stopped at: Completed 48-marketplace-ux 48-05-PLAN.md
+Last session: 2026-03-18T20:38:48.548Z
+Stopped at: Completed 49-observability-verticals 49-02-PLAN.md
 Resume file: None
