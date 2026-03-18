@@ -37,6 +37,10 @@
     "./metrics/business": {
       "types": "./src/metrics/business.ts",
       "default": "./src/metrics/business.ts"
+    },
+    "./logger": {
+      "types": "./src/logger/index.ts",
+      "default": "./src/logger/index.ts"
     }
   },
   "scripts": {

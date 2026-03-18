@@ -5,6 +5,9 @@ import { routing } from '@/lib/i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(req: NextRequest) {
+  // Generate a unique request ID for log correlation across the request lifecycle.
+  const requestId = crypto.randomUUID();
+
   const { pathname } = req.nextUrl;
 
   // Skip maintenance check for maintenance page itself, admin paths, and API routes
@@ -32,7 +35,12 @@ export default async function middleware(req: NextRequest) {
             // Extract locale from path (first segment) for redirect
             const segments = pathname.split('/').filter(Boolean);
             const locale = segments[0] || 'cs';
-            return NextResponse.redirect(new URL(`/${locale}/maintenance`, req.url));
+            const redirectResponse = NextResponse.redirect(
+              new URL(`/${locale}/maintenance`, req.url),
+            );
+            redirectResponse.headers.set('X-Request-Id', requestId);
+            redirectResponse.headers.set('x-request-id', requestId);
+            return redirectResponse;
           }
         }
       } catch {
@@ -41,7 +49,13 @@ export default async function middleware(req: NextRequest) {
     }
   }
 
-  return intlMiddleware(req);
+  const response = intlMiddleware(req);
+
+  // Attach the request ID to outgoing headers so API routes and logs can correlate requests.
+  response.headers.set('X-Request-Id', requestId);
+  response.headers.set('x-request-id', requestId);
+
+  return response;
 }
 
 export const config = {
