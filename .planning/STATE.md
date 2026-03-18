@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 47-notifications-super-admin 47-02-PLAN.md
-last_updated: "2026-03-18T15:25:45.791Z"
+stopped_at: Completed 47-notifications-super-admin 47-03-PLAN.md
+last_updated: "2026-03-18T15:32:01.895Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 8
   total_plans: 22
-  completed_plans: 18
+  completed_plans: 20
   percent: 96
 ---
 
@@ -104,6 +104,8 @@ v3.0 decisions:
 - [Phase 47-notifications-super-admin]: crypto.randomUUID().slice(0,16) used as requestId fallback in writeAuditLog() to avoid nanoid dependency
 - [Phase 47-notifications-super-admin]: Fire-and-forget email pattern: email calls outside DB transactions, failure never rolls back booking
 - [Phase 47-notifications-super-admin]: SMS reminder row created at booking time (scheduledAt = startTime - 24h), delivered by Vercel Cron
+- [Phase 47-notifications-super-admin]: sessionStorage for impersonation banner: HttpOnly imp_token not JS-readable; POST response body carries display data
+- [Phase 47-notifications-super-admin]: Login 403 COMPANY_SUSPENDED: structured code field enables frontend to detect and handle suspension specifically
 
 ## Blockers
 
@@ -131,9 +133,10 @@ v3.0 decisions:
 | Phase 46-security-hardening P02 | 47min | 2 tasks | 14 files |
 | Phase 47-notifications-super-admin P01 | 16min | 2 tasks | 7 files |
 | Phase 47-notifications-super-admin P02 | 20min | 2 tasks | 7 files |
+| Phase 47-notifications-super-admin P03 | 14min | 2 tasks | 12 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T15:25:45.786Z
-Stopped at: Completed 47-notifications-super-admin 47-02-PLAN.md
+Last session: 2026-03-18T15:32:01.891Z
+Stopped at: Completed 47-notifications-super-admin 47-03-PLAN.md
 Resume file: None
