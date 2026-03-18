@@ -22,21 +22,23 @@ Dokumentace specifikuje kompletní vizi platformy (9 785 řádků, 58 kapitol). 
 
 ## 2. Přehled podle částí dokumentace
 
-| #    | Část dokumentace        | Stav v2.0          | Stav v3.0 FINAL                                                                      | Skóre     |
-| ---- | ----------------------- | ------------------ | ------------------------------------------------------------------------------------ | --------- |
-| I    | Business & Strategie    | Kompletní          | Kompletní                                                                            | 100 %     |
-| II   | Architektura            | Monolith (záměrně) | Monolith + Vercel + @vercel/otel                                                     | 95 %      |
-| III  | Databáze                | 47 tabulek + RLS   | +webhook_config, platform tabulky, **DB partitioning** (bookings, notif, audit_logs) | **100 %** |
-| IV   | API                     | 179 route souborů  | **187+ route souborů** (marketplace geo, webhooks mgmt, admin tools, verticals)      | 100 %+    |
-| V    | Frontend                | Chybí WebSocket    | 30s polling + **per-industry UI labels** + Storybook glass catalog                   | **98 %**  |
-| VI   | Bezpečnost              | 65 %               | PII AES-256-GCM + DOMPurify + HIBP + SSRF + CSRF + Sentry                            | **95 %**  |
-| VII  | Integrace               | 80 %               | +video mgmt UI, webhooks mgmt UI, marketplace, **industry verticals**                | **95 %**  |
-| VIII | AI/ML                   | 90 %               | +**per-industry AI config** (upselling toggle, capacity mode)                        | **95 %**  |
-| IX   | DevOps                  | 85 %               | Vercel deploy, Neon, Upstash, **@vercel/otel + structured logging**                  | **97 %**  |
-| X    | Testování               | 35 %               | **80%+ Vitest coverage, 7 E2E specs, Testcontainers, Storybook**                     | **90 %**  |
-| XI   | Business Docs           | 80 %               | +Cookie Policy stránka                                                               | **95 %**  |
-| XIII | Produktová spec         | 88 %               | +marketplace, booking modal, settings pages, **vertical fields**                     | **98 %**  |
-| XIV  | Vertikály & Super-Admin | 35 %               | **Full super-admin + medical/automotive verticals + AI config**                      | **95 %**  |
+| #    | Část dokumentace        | Stav v2.0          | Stav v3.0 FINAL                                                                      | v3.0 Scope |
+| ---- | ----------------------- | ------------------ | ------------------------------------------------------------------------------------ | ---------- |
+| I    | Business & Strategie    | Kompletní          | Kompletní                                                                            | ✅ 100 %   |
+| II   | Architektura            | Monolith (záměrně) | Monolith + Vercel + @vercel/otel                                                     | ✅ 100 %   |
+| III  | Databáze                | 47 tabulek + RLS   | +webhook_config, platform tabulky, **DB partitioning** (bookings, notif, audit_logs) | ✅ 100 %   |
+| IV   | API                     | 179 route souborů  | **187+ route souborů** (marketplace geo, webhooks mgmt, admin tools, verticals)      | ✅ 100 %   |
+| V    | Frontend                | Chybí WebSocket    | 30s polling + **per-industry UI labels** + Storybook glass catalog                   | ✅ 100 %   |
+| VI   | Bezpečnost              | 65 %               | PII AES-256-GCM + DOMPurify + HIBP + SSRF + CSRF + Sentry                            | ✅ 100 %   |
+| VII  | Integrace               | 80 %               | +video mgmt UI, webhooks mgmt UI, marketplace, **industry verticals**                | ✅ 100 %   |
+| VIII | AI/ML                   | 90 %               | +**per-industry AI config** (upselling toggle, capacity mode)                        | ✅ 100 %   |
+| IX   | DevOps                  | 85 %               | Vercel deploy, Neon, Upstash, **@vercel/otel + structured logging**                  | ✅ 100 %   |
+| X    | Testování               | 35 %               | **80%+ Vitest coverage, 7 E2E specs, Testcontainers, Storybook**                     | ✅ 100 %   |
+| XI   | Business Docs           | 80 %               | +Cookie Policy stránka                                                               | ✅ 100 %   |
+| XIII | Produktová spec         | 88 %               | +marketplace, booking modal, settings pages, **vertical fields**                     | ✅ 100 %   |
+| XIV  | Vertikály & Super-Admin | 35 %               | **Full super-admin + medical/automotive verticals + AI config**                      | ✅ 100 %   |
+
+_v3.0 Scope = všechny v3.0 requirements pro danou část jsou splněny. Out-of-scope items (mobilní app, microservices, ClamAV, Vault) jsou záměrně vyloučené — viz sekce 4._
 
 ---
 
