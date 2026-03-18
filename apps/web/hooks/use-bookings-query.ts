@@ -30,6 +30,7 @@ export function useBookingsQuery(params: BookingListQuery) {
       return response;
     },
     staleTime: 30_000, // 30 seconds - bookings change frequently
+    refetchInterval: 30_000, // auto-refresh every 30 seconds
   });
 }
 
