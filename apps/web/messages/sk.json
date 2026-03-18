@@ -2263,5 +2263,9 @@
       "saved": "Profil bol uložený.",
       "saveError": "Nepodarilo sa uložiť profil."
     }
+  },
+  "maintenance": {
+    "title": "Prebieha údržba systému",
+    "message": "Pracujeme na vylepšení služby. Čoskoro budeme späť."
   }
 }
