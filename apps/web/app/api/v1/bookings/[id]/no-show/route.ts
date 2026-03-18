@@ -12,6 +12,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse } from '@/lib/utils/response';
 import { bookingIdParamSchema, type BookingIdParam } from '@/validations/booking';
 import { markNoShow } from '@/lib/booking/booking-transitions';
+import { triggerWebhooks } from '@/lib/webhooks/trigger';
 
 /**
  * POST /api/v1/bookings/:id/no-show
@@ -46,6 +47,15 @@ export const POST = createRouteHandler<undefined, BookingIdParam>({
 
     // Call transition service
     const booking = await markNoShow(bookingRecord.id, companyId);
+
+    // Fire-and-forget webhook trigger
+    void triggerWebhooks(companyId, 'booking.no_show', {
+      booking_id: booking.id,
+      customer_name: booking.customer.name,
+      service_name: booking.service.name,
+      start_time: booking.startTime,
+      status: 'no_show',
+    });
 
     return successResponse(booking);
   },

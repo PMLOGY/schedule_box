@@ -16,6 +16,7 @@ import {
   type BookingIdParam,
 } from '@/validations/booking';
 import { cancelBooking } from '@/lib/booking/booking-transitions';
+import { triggerWebhooks } from '@/lib/webhooks/trigger';
 
 /**
  * POST /api/v1/bookings/:id/cancel
@@ -69,6 +70,15 @@ export const POST = createRouteHandler<{ reason?: string }, BookingIdParam>({
         { reason: body.reason },
         { companyId, userId, userRole },
       );
+
+      // Fire-and-forget webhook trigger
+      void triggerWebhooks(companyId, 'booking.cancelled', {
+        booking_id: booking.id,
+        customer_name: booking.customer.name,
+        service_name: booking.service.name,
+        start_time: booking.startTime,
+        status: 'cancelled',
+      });
 
       return successResponse(booking);
     } catch (error) {

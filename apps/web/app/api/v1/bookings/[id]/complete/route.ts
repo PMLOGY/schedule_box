@@ -12,6 +12,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse } from '@/lib/utils/response';
 import { bookingIdParamSchema, type BookingIdParam } from '@/validations/booking';
 import { completeBooking } from '@/lib/booking/booking-transitions';
+import { triggerWebhooks } from '@/lib/webhooks/trigger';
 
 /**
  * POST /api/v1/bookings/:id/complete
@@ -44,6 +45,15 @@ export const POST = createRouteHandler<undefined, BookingIdParam>({
 
     // Call transition service
     const booking = await completeBooking(bookingRecord.id, companyId);
+
+    // Fire-and-forget webhook trigger
+    void triggerWebhooks(companyId, 'booking.completed', {
+      booking_id: booking.id,
+      customer_name: booking.customer.name,
+      service_name: booking.service.name,
+      start_time: booking.startTime,
+      status: 'completed',
+    });
 
     return successResponse(booking);
   },

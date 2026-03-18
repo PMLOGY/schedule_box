@@ -35,6 +35,7 @@ import { redeemPoints } from '@/lib/loyalty/points-engine';
 import { z } from 'zod';
 import { lt, gt, or, sql } from 'drizzle-orm';
 import { encrypt, hmacIndex } from '@/lib/security/encryption';
+import { triggerWebhooks } from '@/lib/webhooks/trigger';
 
 // ============================================================================
 // SCHEMAS
@@ -483,6 +484,15 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
     // 8. Increment booking counter (fire-and-forget)
     incrementBookingCounter(companyId).catch((err) => {
       console.error('[Public Booking] Failed to increment booking counter:', err);
+    });
+
+    // 8a. Trigger webhooks for booking.created (fire-and-forget)
+    void triggerWebhooks(companyId, 'booking.created', {
+      booking_id: booking.uuid,
+      customer_name: body.customer_name,
+      service_name: service.name,
+      start_time: booking.startTime.toISOString(),
+      status: 'pending',
     });
 
     // 9. Return public-safe booking response
