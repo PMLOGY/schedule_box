@@ -23,6 +23,7 @@ import {
   index,
   check,
   unique,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { companies } from './auth';
@@ -65,6 +66,8 @@ export const bookings = pgTable(
       >(),
     notes: text('notes'),
     internalNotes: text('internal_notes'),
+    // Industry vertical metadata (validated at API layer via bookingMetadataSchema)
+    bookingMetadata: jsonb('booking_metadata'),
     // Pricing (snapshot at booking time)
     price: numeric('price', { precision: 10, scale: 2 }).notNull(),
     currency: varchar('currency', { length: 3 }).default('CZK'),
