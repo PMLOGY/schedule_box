@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 50-testing-hardening 50-02-PLAN.md
-last_updated: "2026-03-18T21:23:35.252Z"
+stopped_at: Completed 50-testing-hardening 50-04-PLAN.md
+last_updated: "2026-03-18T21:35:26.913Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 11
   total_plans: 35
-  completed_plans: 33
+  completed_plans: 34
 ---
 
 ---
@@ -151,6 +151,8 @@ v3.0 decisions:
 - [Phase 50-testing-hardening]: .storybook/ excluded from ESLint projectService — storybook config files not included in any app tsconfig, exclusion is correct fix
 - [Phase 50-testing-hardening]: Mock db.select() chains inline per test rather than shared helpers to avoid state bleed
 - [Phase 50-testing-hardening]: callCount pattern in dbTx.transaction for multi-step query chains in rescheduleBooking
+- [Phase 50-testing-hardening]: describe.skipIf(SKIP_DOCKER) chosen over inject() guard — process.env available at module eval time, inject() is not
+- [Phase 50-testing-hardening]: admin-chromium Playwright project with dedicated testMatch /admin-.*\.spec\.ts/ isolates admin E2E from regular user auth
 
 ## Blockers
 
@@ -192,9 +194,10 @@ v3.0 decisions:
 | Phase 50-testing-hardening P01 | 15min | 2 tasks | 2 files |
 | Phase 50-testing-hardening PP03 | 20min | 2 tasks | 10 files |
 | Phase 50-testing-hardening P02 | 8min | 2 tasks | 3 files |
+| Phase 50-testing-hardening P04 | 10min | 2 tasks | 11 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T21:23:35.248Z
-Stopped at: Completed 50-testing-hardening 50-02-PLAN.md
+Last session: 2026-03-18T21:35:26.909Z
+Stopped at: Completed 50-testing-hardening 50-04-PLAN.md
 Resume file: None
