@@ -114,7 +114,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 - [x] **Phase 46: Security Hardening** - PII encryption at rest, XSS sanitization, HIBP breach check, CSRF, SSRF, Sentry, cookie policy page (completed 2026-03-16)
 - [x] **Phase 47: Notifications & Super-Admin** - Verify notification delivery pipeline; build complete super-admin tooling (impersonation, feature flags, suspend, broadcast, maintenance, metrics, audit log) (completed 2026-03-18)
 - [x] **Phase 48: Marketplace & UX** - Public marketplace with search/filter/map; booking detail modal; real-time polling; video meetings UI; webhooks settings UI (completed 2026-03-18)
-- [ ] **Phase 49: Observability & Verticals** - OpenTelemetry + structured logging; medical and automotive industry vertical support with per-industry AI config
+- [x] **Phase 49: Observability & Verticals** - OpenTelemetry + structured logging; medical and automotive industry vertical support with per-industry AI config (completed 2026-03-18)
 - [ ] **Phase 50: Testing & Hardening** - Vitest 80% coverage, Playwright E2E expansion, Testcontainers, Storybook; DB partitioning for scale
 
 ## Phase Details
@@ -359,7 +359,7 @@ Plans:
 | 46. Security Hardening | 3/3 | Complete   | 2026-03-16 | - |
 | 47. Notifications & Super-Admin | 5/5 | Complete    | 2026-03-18 | - |
 | 48. Marketplace & UX | 5/5 | Complete    | 2026-03-18 | - |
-| 49. Observability & Verticals | 2/3 | In Progress|  | - |
+| 49. Observability & Verticals | 3/3 | Complete   | 2026-03-18 | - |
 | 50. Testing & Hardening | v3.0 | 0/5 | Not started | - |
 
 ---

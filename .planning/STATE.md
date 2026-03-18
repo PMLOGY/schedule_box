@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 49-observability-verticals 49-01-PLAN.md
-last_updated: "2026-03-18T20:48:26.224Z"
+stopped_at: Completed 49-observability-verticals 49-03-PLAN.md
+last_updated: "2026-03-18T21:02:34.797Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 35
-  completed_plans: 29
+  completed_plans: 30
   percent: 96
 ---
 
@@ -127,6 +127,8 @@ v3.0 decisions:
 - [Phase 49-observability-verticals]: @vercel/otel registerOTel called without NEXT_RUNTIME guard — handles both nodejs and edge runtimes internally
 - [Phase 49-observability-verticals]: @schedulebox/shared/logger subpath export added to packages/shared/package.json to expose logInfo/logError without bundling winston into main index
 - [Phase 49-observability-verticals]: OTEL_TRACES_SAMPLER=parentbased_traceidratio + OTEL_TRACES_SAMPLER_ARG=0.1 via env vars; set in Vercel project settings for production 10% sampling
+- [Phase 49-observability-verticals]: Step3CustomerInfo reads company industryType from useCompanySettingsQuery; metadata spoofing prevented by validating industry_type match in public booking API
+- [Phase 49-observability-verticals]: Upselling gate uses fail-open pattern: DB errors never block upselling compute; UpsellingSuggestions uses retry:false to avoid auth errors in public booking flow
 
 ## Blockers
 
@@ -164,9 +166,10 @@ v3.0 decisions:
 | Phase 48-marketplace-ux P05 | 18min | 3 tasks | 22 files |
 | Phase 49-observability-verticals P02 | 24min | 2 tasks | 9 files |
 | Phase 49-observability-verticals P01 | 33min | 2 tasks | 9 files |
+| Phase 49-observability-verticals P03 | 11min | 2 tasks | 10 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T20:48:26.219Z
-Stopped at: Completed 49-observability-verticals 49-01-PLAN.md
+Last session: 2026-03-18T21:02:34.793Z
+Stopped at: Completed 49-observability-verticals 49-03-PLAN.md
 Resume file: None
