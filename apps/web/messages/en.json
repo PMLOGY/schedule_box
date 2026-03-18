@@ -131,7 +131,8 @@
     "users": "Users",
     "adminAnalytics": "Admin Analytics",
     "portal": "Portal",
-    "onboarding": "Setup Wizard"
+    "onboarding": "Setup Wizard",
+    "videoMeetings": "Video Meetings"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2432,5 +2433,24 @@
   "maintenance": {
     "title": "System Maintenance",
     "message": "We're improving the service. We'll be back soon."
+  },
+  "videoMeetings": {
+    "title": "Video Meetings",
+    "description": "Set a video meeting link (Zoom, Teams, Meet, etc.) to include in booking confirmation emails.",
+    "urlCard": {
+      "title": "Video Meeting Link",
+      "description": "Paste your meeting link — it will be automatically attached to booking confirmation emails.",
+      "label": "Video Meeting URL",
+      "placeholder": "https://zoom.us/j/...",
+      "save": "Save",
+      "clear": "Clear",
+      "currentUrl": "Currently saved link"
+    },
+    "infoCard": {
+      "title": "How it works",
+      "body": "Once saved, the link will be automatically included in confirmation emails sent to customers when a booking is created. It appears in the \"Video Meeting\" row of the email."
+    },
+    "saveSuccess": "Video meeting link saved",
+    "saveError": "Failed to save link"
   }
 }

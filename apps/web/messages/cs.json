@@ -131,7 +131,8 @@
     "users": "Uživatelé",
     "adminAnalytics": "Admin analytika",
     "portal": "Portál",
-    "onboarding": "Průvodce nastavením"
+    "onboarding": "Průvodce nastavením",
+    "videoMeetings": "Video schůzky"
   },
   "dashboard": {
     "title": "Přehled",
@@ -2432,5 +2433,24 @@
   "maintenance": {
     "title": "Probíhá údržba systému",
     "message": "Pracujeme na vylepšení služby. Brzy budeme zpět."
+  },
+  "videoMeetings": {
+    "title": "Video schůzky",
+    "description": "Nastavte odkaz na video schůzku (Zoom, Teams, Meet, apod.) pro zahrnutí do potvrzovacích e-mailů.",
+    "urlCard": {
+      "title": "Odkaz na video schůzku",
+      "description": "Vložte odkaz na vaši schůzku — bude automaticky přiložen k potvrzovacím e-mailům rezervací.",
+      "label": "URL adresa video schůzky",
+      "placeholder": "https://zoom.us/j/...",
+      "save": "Uložit",
+      "clear": "Smazat",
+      "currentUrl": "Aktuálně uložený odkaz"
+    },
+    "infoCard": {
+      "title": "Jak to funguje?",
+      "body": "Po uložení odkazu bude automaticky zahrnut do potvrzovacích e-mailů odesílaných zákazníkům při vytvoření rezervace. Odkaz se zobrazí v sekci \"Video schůzka\" v e-mailu."
+    },
+    "saveSuccess": "Odkaz na video schůzku byl uložen",
+    "saveError": "Nepodařilo se uložit odkaz"
   }
 }
