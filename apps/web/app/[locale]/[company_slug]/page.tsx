@@ -9,11 +9,12 @@ import {
   customers,
   marketplaceListings,
 } from '@schedulebox/database';
-import { Star, MapPin, Clock, Phone, Mail, Globe } from 'lucide-react';
+import { Star, MapPin, Clock, Phone, Mail, Globe, BadgeCheck } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { sanitizeText } from '@/lib/security/sanitize';
 
 // ============================================================================
 // TYPES
@@ -44,6 +45,20 @@ function formatPrice(price: string, currency: string, locale: string): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(parseFloat(price));
+}
+
+/**
+ * Sanitize an image URL — only allow http/https protocols to prevent XSS via
+ * javascript: or data: URIs in user-supplied image arrays.
+ */
+function sanitizeImageUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
+    return url;
+  } catch {
+    return null;
+  }
 }
 
 // ============================================================================
@@ -163,6 +178,27 @@ export default async function PublicCompanyPage({ params }: PageProps) {
     ? { street: listing.addressStreet, city: listing.addressCity, zip: listing.addressZip }
     : { street: company.addressStreet, city: company.addressCity, zip: company.addressZip };
 
+  // Sanitized description for display
+  const companyDescription = sanitizeText(listing?.description || company.description || '');
+
+  // Photo gallery — validate each URL (user-supplied)
+  const galleryImages: string[] = (listing?.images ?? [])
+    .map((url) => sanitizeImageUrl(url))
+    .filter((url): url is string => url !== null);
+
+  // Map coordinates
+  const lat = listing?.latitude ? parseFloat(listing.latitude) : null;
+  const lng = listing?.longitude ? parseFloat(listing.longitude) : null;
+  const hasMap = lat !== null && lng !== null;
+  // Pre-compute OSM embed src to avoid non-null assertions in JSX
+  const mapSrc =
+    lat !== null && lng !== null
+      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01},${lat - 0.01},${lng + 0.01},${lat + 0.01}&layer=mapnik&marker=${lat},${lng}`
+      : '';
+
+  // Featured badge
+  const isFeatured = listing?.featured === true;
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
@@ -197,11 +233,19 @@ export default async function PublicCompanyPage({ params }: PageProps) {
           <CardContent className="pt-8 pb-8">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
-                  {company.name}
-                </h1>
-                {listing?.description && (
-                  <p className="text-base text-muted-foreground max-w-2xl">{listing.description}</p>
+                <div className="flex items-center gap-3 flex-wrap mb-2">
+                  <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                    {company.name}
+                  </h1>
+                  {isFeatured && (
+                    <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20 text-foreground px-3 py-1 rounded-full text-sm font-medium">
+                      <BadgeCheck className="w-4 h-4 text-blue-400" />
+                      {t('featured')}
+                    </span>
+                  )}
+                </div>
+                {companyDescription && (
+                  <p className="text-base text-muted-foreground max-w-2xl">{companyDescription}</p>
                 )}
                 {reviewCount > 0 && (
                   <div className="flex items-center gap-2 mt-4">
@@ -233,12 +277,42 @@ export default async function PublicCompanyPage({ params }: PageProps) {
             </div>
 
             <div className="mt-6">
-              <Button size="lg" className="px-8" asChild>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-semibold"
+                asChild
+              >
                 <Link href={`/${locale}/${slug}/book`}>{t('book')}</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Photo Gallery Section — only when images are available */}
+        {galleryImages.length > 0 && (
+          <section aria-label={t('photos')}>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-5">
+              {t('photos')}
+            </h2>
+            <div className="overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1">
+              <div className="flex gap-4" style={{ width: 'max-content' }}>
+                {galleryImages.map((src, idx) => (
+                  <div
+                    key={idx}
+                    className="snap-start shrink-0 w-64 h-48 rounded-xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
+                  >
+                    <img
+                      src={src}
+                      alt={`${company.name} – ${idx + 1}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Services Section */}
         <section>
@@ -270,7 +344,7 @@ export default async function PublicCompanyPage({ params }: PageProps) {
                     </div>
                     {service.description && (
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {service.description}
+                        {sanitizeText(service.description)}
                       </p>
                     )}
                     <div className="flex items-center justify-between">
@@ -291,12 +365,52 @@ export default async function PublicCompanyPage({ params }: PageProps) {
           )}
         </section>
 
+        {/* Map Embed Section — only when coordinates are available */}
+        {hasMap && (
+          <section>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-5">
+              {t('location')}
+            </h2>
+            <Card className="border-white/40 bg-white/60 backdrop-blur-xl shadow-sm dark:border-white/10 dark:bg-white/5 overflow-hidden">
+              <iframe
+                title={`${company.name} ${t('location')}`}
+                src={mapSrc}
+                className="w-full h-48 border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
+            </Card>
+          </section>
+        )}
+
         {/* Reviews Section */}
         {companyReviews.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-5">
-              {t('reviews')}
-            </h2>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">{t('reviews')}</h2>
+              {reviewCount > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-5 h-5 ${
+                          star <= Math.round(averageRating)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-muted-foreground/30'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-base font-semibold text-foreground">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    ({t('reviewCount', { count: reviewCount })})
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="space-y-4">
               {companyReviews.map((review) => {
                 const nameParts = review.customerName?.split(' ') || [];
@@ -336,14 +450,18 @@ export default async function PublicCompanyPage({ params }: PageProps) {
                         </span>
                       </div>
                       {review.comment && (
-                        <p className="text-sm text-foreground/80 mb-2">{review.comment}</p>
+                        <p className="text-sm text-foreground/80 mb-2">
+                          {sanitizeText(review.comment)}
+                        </p>
                       )}
                       {review.reply && (
                         <div className="mt-3 pl-4 border-l-2 border-primary/50">
                           <p className="text-sm font-semibold text-foreground/70">
                             {t('ownerReply')}
                           </p>
-                          <p className="text-sm text-muted-foreground">{review.reply}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {sanitizeText(review.reply)}
+                          </p>
                         </div>
                       )}
                     </CardContent>
@@ -420,6 +538,17 @@ export default async function PublicCompanyPage({ params }: PageProps) {
             </Card>
           </section>
         )}
+
+        {/* Sticky Book Now — mobile CTA footer */}
+        <div className="sticky bottom-4 flex justify-center md:hidden">
+          <Button
+            size="lg"
+            className="shadow-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-3 rounded-2xl font-semibold backdrop-blur-sm"
+            asChild
+          >
+            <Link href={`/${locale}/${slug}/book`}>{t('book')}</Link>
+          </Button>
+        </div>
       </div>
     </>
   );

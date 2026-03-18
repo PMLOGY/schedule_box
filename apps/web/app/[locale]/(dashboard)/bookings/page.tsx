@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Plus, Search } from 'lucide-react';
 import { Link } from '@/lib/i18n/navigation';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card } from '@/components/ui/card';
@@ -59,6 +59,39 @@ export default function BookingsPage() {
   const ownerQuery = useBookingsQuery({ page, limit: 20, status });
   const { data, isLoading } = isEmployee ? employeeQuery : ownerQuery;
 
+  // Last-updated indicator state
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [, setTick] = useState(0);
+
+  // New booking glow state
+  const prevIdsRef = useRef<Set<string>>(new Set());
+  const [newBookingIds, setNewBookingIds] = useState<Set<string>>(new Set());
+
+  // Update lastUpdated timestamp whenever data changes
+  useEffect(() => {
+    if (data) setLastUpdated(new Date());
+  }, [data]);
+
+  // Tick every second to keep relative time display fresh
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Detect newly appeared bookings and trigger glow animation
+  useEffect(() => {
+    if (!data?.data) return;
+    const currentIds = new Set(data.data.map((b) => String(b.id)));
+    if (prevIdsRef.current.size > 0) {
+      const newIds = [...currentIds].filter((id) => !prevIdsRef.current.has(id));
+      if (newIds.length > 0) {
+        setNewBookingIds(new Set(newIds));
+        setTimeout(() => setNewBookingIds(new Set()), 4000);
+      }
+    }
+    prevIdsRef.current = currentIds;
+  }, [data]);
+
   const handleRowClick = (bookingId: string) => {
     setSelectedBookingId(bookingId);
     setDetailPanelOpen(true);
@@ -89,15 +122,24 @@ export default function BookingsPage() {
         <Card variant="glass" className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <PageHeader title={isEmployee ? t('myBookings') : t('title')} />
-            {/* Employees don't create bookings — hide the button for them */}
-            {!isEmployee && (
-              <Button asChild>
-                <Link href="/bookings/new">
-                  <Plus className="h-4 w-4 mr-2" />
-                  {tBooking('new.title')}
-                </Link>
-              </Button>
-            )}
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">
+                {t('lastUpdated')}{' '}
+                {formatDistanceToNow(lastUpdated, {
+                  addSuffix: true,
+                  locale: dateLocale,
+                })}
+              </span>
+              {/* Employees don't create bookings — hide the button for them */}
+              {!isEmployee && (
+                <Button asChild>
+                  <Link href="/bookings/new">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {tBooking('new.title')}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Filters */}
@@ -175,7 +217,7 @@ export default function BookingsPage() {
                   .map((booking) => (
                     <TableRow
                       key={booking.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className={`cursor-pointer hover:bg-muted/50${newBookingIds.has(String(booking.id)) ? ' animate-glow-blue' : ''}`}
                       onClick={() => handleRowClick(String(booking.id))}
                     >
                       <TableCell className="font-medium">

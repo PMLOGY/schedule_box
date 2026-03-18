@@ -91,8 +91,11 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
     },
     onSuccess: (_, { action }) => {
       toast.success(t(`actions.${actionToKey(action)}.success`));
+      // Invalidate detail query so panel shows updated status without closing
+      queryClient.invalidateQueries({ queryKey: ['bookings', bookingId] });
+      // Also invalidate list so the table reflects the change
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      onClose();
+      // Panel stays open — user can close manually with the close button
     },
     onError: (error: { message?: string }, { action }) => {
       toast.error(t(`actions.${actionToKey(action)}.error`), {

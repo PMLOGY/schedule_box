@@ -287,3 +287,23 @@
     animation: none;
   }
 }
+
+/* New booking glow animation — highlights newly appeared bookings */
+@keyframes glow-blue {
+  0% {
+    box-shadow: 0 0 12px rgba(0, 87, 255, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(0, 87, 255, 0);
+  }
+}
+
+.animate-glow-blue {
+  animation: glow-blue 4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-glow-blue {
+    animation: none;
+  }
+}

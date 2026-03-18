@@ -257,7 +257,8 @@
         "price": "Cena",
         "actions": "Akcie"
       },
-      "noBookings": "Žiadne rezervácie"
+      "noBookings": "Žiadne rezervácie",
+      "lastUpdated": "Aktualizované"
     },
     "wizard": {
       "stepXofY": "Krok {current} zo {total}",
@@ -2070,7 +2071,10 @@
     "web": "Web",
     "reviewCount": "{count, plural, one {# recenzia} few {# recenzie} other {# recenzií}}",
     "noServices": "Momentálne nie sú k dispozícii žiadne služby.",
-    "poweredBy": "Vytvorené pomocou"
+    "poweredBy": "Vytvorené pomocou",
+    "featured": "Odporúčané",
+    "photos": "Fotografie",
+    "location": "Poloha"
   },
   "marketplace": {
     "title": "Marketplace",
@@ -2096,7 +2100,28 @@
       "save": "Uložiť profil"
     },
     "saveSuccess": "Profil na trhovisku bol uložený.",
-    "saveError": "Nepodarilo sa uložiť profil."
+    "saveError": "Nepodarilo sa uložiť profil.",
+    "filters": "Filtre",
+    "filtersHide": "Skryť filtre",
+    "filterCategory": "Kategória",
+    "filterCategoryAll": "Všetky kategórie",
+    "filterCity": "Mesto",
+    "filterCityPlaceholder": "napr. Bratislava",
+    "filterNearMe": "V mojom okolí",
+    "filterRadius": "Vzdialenosť",
+    "filterRadiusKm": "{km} km",
+    "filterClearGeo": "Zrušiť polohu",
+    "filterGeoActive": "Poloha aktívna",
+    "sortBy": "Zoradiť podľa",
+    "sortRating": "Hodnotenie",
+    "sortDistance": "Vzdialenosť",
+    "sortFeatured": "Odporúčané",
+    "sortName": "Názov",
+    "viewGrid": "Mriežka",
+    "viewList": "Zoznam",
+    "featuredSection": "Odporúčané firmy",
+    "featuredBadge": "Odporúčané",
+    "verifiedBadge": "Overené"
   },
   "admin": {
     "nav": {

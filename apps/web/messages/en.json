@@ -257,7 +257,8 @@
         "price": "Price",
         "actions": "Actions"
       },
-      "noBookings": "No bookings"
+      "noBookings": "No bookings",
+      "lastUpdated": "Updated"
     },
     "wizard": {
       "stepXofY": "Step {current} of {total}",
@@ -2144,7 +2145,10 @@
     "web": "Web",
     "reviewCount": "{count, plural, one {# review} other {# reviews}}",
     "noServices": "No services available at the moment.",
-    "poweredBy": "Powered by"
+    "poweredBy": "Powered by",
+    "featured": "Featured",
+    "photos": "Photos",
+    "location": "Location"
   },
   "marketplace": {
     "title": "Marketplace",
@@ -2170,7 +2174,35 @@
       "save": "Save Listing"
     },
     "saveSuccess": "Marketplace listing saved successfully.",
-    "saveError": "Failed to save marketplace listing."
+    "saveError": "Failed to save marketplace listing.",
+    "filters": "Filters",
+    "filtersHide": "Hide Filters",
+    "filterCategory": "Category",
+    "filterCategoryAll": "All categories",
+    "filterCity": "City",
+    "filterCityPlaceholder": "e.g. Prague",
+    "filterNearMe": "Near me",
+    "filterRadius": "Radius",
+    "filterRadiusKm": "{km} km",
+    "filterClearGeo": "Clear location",
+    "filterGeoActive": "Location active",
+    "sortBy": "Sort by",
+    "sortRating": "Rating",
+    "sortDistance": "Distance",
+    "sortFeatured": "Featured",
+    "sortName": "Name",
+    "viewGrid": "Grid view",
+    "viewList": "List view",
+    "featuredSection": "Featured Businesses",
+    "featuredBadge": "Featured",
+    "verifiedBadge": "Verified",
+    "categoriesHealth": "Health",
+    "categoriesBeauty": "Beauty",
+    "categoriesAutomotive": "Automotive",
+    "categoriesEducation": "Education",
+    "categoriesFitness": "Fitness",
+    "categoriesRestaurant": "Restaurant",
+    "categoriesOther": "Other"
   },
   "admin": {
     "nav": {

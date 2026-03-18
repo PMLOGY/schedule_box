@@ -257,7 +257,8 @@
         "price": "Cena",
         "actions": "Akce"
       },
-      "noBookings": "Žádné rezervace"
+      "noBookings": "Žádné rezervace",
+      "lastUpdated": "Aktualizováno"
     },
     "wizard": {
       "stepXofY": "Krok {current} ze {total}",
@@ -2144,7 +2145,10 @@
     "web": "Web",
     "reviewCount": "{count, plural, one {# recenze} few {# recenze} other {# recenzí}}",
     "noServices": "Momentálně nejsou k dispozici žádné služby.",
-    "poweredBy": "Vytvořeno pomocí"
+    "poweredBy": "Vytvořeno pomocí",
+    "featured": "Doporučeno",
+    "photos": "Fotografie",
+    "location": "Poloha"
   },
   "marketplace": {
     "title": "Marketplace",
@@ -2170,7 +2174,35 @@
       "save": "Uložit profil"
     },
     "saveSuccess": "Profil na tržišti byl uložen.",
-    "saveError": "Nepodařilo se uložit profil."
+    "saveError": "Nepodařilo se uložit profil.",
+    "filters": "Filtry",
+    "filtersHide": "Skryt filtry",
+    "filterCategory": "Kategorie",
+    "filterCategoryAll": "Vše kategorie",
+    "filterCity": "Město",
+    "filterCityPlaceholder": "např. Praha",
+    "filterNearMe": "V mém okolí",
+    "filterRadius": "Vzdálenost",
+    "filterRadiusKm": "{km} km",
+    "filterClearGeo": "Zrušit polohu",
+    "filterGeoActive": "Poloha aktivní",
+    "sortBy": "Řadit podle",
+    "sortRating": "Hodnocení",
+    "sortDistance": "Vzdálenost",
+    "sortFeatured": "Doporučené",
+    "sortName": "Název",
+    "viewGrid": "Mřížka",
+    "viewList": "Seznam",
+    "featuredSection": "Doporučené firmy",
+    "featuredBadge": "Doporučeno",
+    "verifiedBadge": "Ověřeno",
+    "categoriesHealth": "Zdraví",
+    "categoriesBeauty": "Krása",
+    "categoriesAutomotive": "Automobily",
+    "categoriesEducation": "Vzdělání",
+    "categoriesFitness": "Fitness",
+    "categoriesRestaurant": "Restaurace",
+    "categoriesOther": "Ostatní"
   },
   "admin": {
     "nav": {

@@ -59,10 +59,10 @@ function ListingCard({
 
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center gap-1.5">
-          {listing.rating !== null && listing.rating > 0 ? (
+          {listing.rating != null && listing.rating > 0 ? (
             <>
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{listing.rating.toFixed(1)}</span>
+              <span className="text-sm font-medium">{listing.rating?.toFixed(1)}</span>
               <span className="text-xs text-muted-foreground">({listing.review_count})</span>
             </>
           ) : (
