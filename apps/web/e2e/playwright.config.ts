@@ -37,10 +37,16 @@ export default defineConfig({
   },
 
   projects: [
-    // Setup project: authenticate once and save storageState
+    // Setup project: authenticate once and save storageState (regular user)
     {
       name: 'setup',
-      testMatch: /.*\.setup\.ts/,
+      testMatch: /auth\.setup\.ts/,
+    },
+
+    // Admin setup project: authenticate as platform admin
+    {
+      name: 'admin-setup',
+      testMatch: /admin\.setup\.ts/,
     },
 
     // Browser projects: all depend on setup for authenticated state
@@ -67,6 +73,17 @@ export default defineConfig({
         storageState: path.join(__dirname, 'playwright/.auth/user.json'),
       },
       dependencies: ['setup'],
+    },
+
+    // Admin project: platform admin flows (impersonation, super-admin panel)
+    {
+      name: 'admin-chromium',
+      testMatch: /admin-.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: path.join(__dirname, 'playwright/.auth/admin.json'),
+      },
+      dependencies: ['admin-setup'],
     },
 
     // Visual regression projects: public embed widget, no auth needed

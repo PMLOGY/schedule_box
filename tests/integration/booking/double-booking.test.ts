@@ -42,12 +42,14 @@ let customerId: number;
 // ============================================================================
 
 beforeAll(() => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
   // Need max:10 connections for concurrent transaction tests
   superClient = postgres(inject('DATABASE_URL'), { max: 10 });
   db = drizzle(superClient, { schema });
 });
 
 beforeEach(async () => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
   // Clean state before every test
   await truncateAllTables(superClient);
 
@@ -68,7 +70,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await superClient.end();
+  await superClient?.end();
 });
 
 // ============================================================================
@@ -88,7 +90,7 @@ function tomorrowSlot(startHour: number, endHour: number): { startTime: Date; en
 // Tests
 // ============================================================================
 
-describe('double-booking prevention', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('double-booking prevention', () => {
   it('concurrent bookings to same slot — exactly one succeeds', async () => {
     const { startTime, endTime } = tomorrowSlot(10, 11);
     const startIso = startTime.toISOString();

@@ -58,6 +58,15 @@ const SQL_FILES = [
 const MIGRATIONS_FOLDER = resolve(__dirname, '../../packages/database/src/migrations');
 
 export async function setup(project: TestProject) {
+  if (process.env.SKIP_DOCKER === 'true') {
+    console.log('[Integration] Skipping — SKIP_DOCKER=true');
+    project.provide('DATABASE_URL', '');
+    project.provide('DATABASE_URL_APP', '');
+    project.provide('REDIS_URL', '');
+    project.provide('RABBITMQ_URL', '');
+    return;
+  }
+
   console.log('\n[Integration] Starting containers...');
 
   // Start all three containers in parallel

@@ -87,11 +87,13 @@ async function getBookingStatus(id: number): Promise<string> {
 // ============================================================================
 
 beforeAll(() => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
   superClient = postgres(inject('DATABASE_URL'), { max: 10 });
   db = drizzle(superClient, { schema });
 });
 
 beforeEach(async () => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
   await truncateAllTables(superClient);
 
   // Seed: company, service, employee, customer, employee_service link
@@ -129,14 +131,14 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await superClient.end();
+  await superClient?.end();
 });
 
 // ============================================================================
 // Tests: valid transitions
 // ============================================================================
 
-describe('booking status transitions', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('booking status transitions', () => {
   describe('valid transitions from pending', () => {
     it('pending -> confirmed is valid', async () => {
       // Verify initial state

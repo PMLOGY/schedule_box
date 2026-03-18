@@ -158,6 +158,7 @@ async function testValidateLocationAccess(
 // ============================================================================
 
 beforeAll(async () => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
   superClient = postgres(inject('DATABASE_URL'), { max: 5 });
   superDb = drizzle(superClient, { schema });
 
@@ -290,14 +291,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await superClient.end();
+  await superClient?.end();
 });
 
 // ============================================================================
 // Tests: franchise_owner access
 // ============================================================================
 
-describe('Switch Location — franchise_owner', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('Switch Location — franchise_owner', () => {
   it('CAN switch within their organization (A1 -> A2)', async () => {
     const result = await testValidateLocationAccess(superDb, user1.uuid, companyA2.uuid);
 
@@ -324,7 +325,7 @@ describe('Switch Location — franchise_owner', () => {
 // Tests: location_manager access
 // ============================================================================
 
-describe('Switch Location — location_manager', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('Switch Location — location_manager', () => {
   it('CAN access their assigned location (A1)', async () => {
     const result = await testValidateLocationAccess(superDb, user2.uuid, companyA1.uuid);
 
@@ -349,7 +350,7 @@ describe('Switch Location — location_manager', () => {
 // Tests: cross-org rejection
 // ============================================================================
 
-describe('Switch Location — cross-org rejection', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('Switch Location — cross-org rejection', () => {
   it('User from Org B CANNOT access Org A company', async () => {
     await expect(testValidateLocationAccess(superDb, user3.uuid, companyA1.uuid)).rejects.toThrow(
       'FORBIDDEN',
@@ -367,7 +368,7 @@ describe('Switch Location — cross-org rejection', () => {
 // Tests: edge cases
 // ============================================================================
 
-describe('Switch Location — edge cases', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('Switch Location — edge cases', () => {
   it('Switch to non-existent company returns NOT_FOUND', async () => {
     const fakeUuid = '00000000-0000-4000-8000-000000000000';
     await expect(testValidateLocationAccess(superDb, user1.uuid, fakeUuid)).rejects.toThrow(

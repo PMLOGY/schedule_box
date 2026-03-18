@@ -53,6 +53,8 @@ let employeeBId: number;
 // ============================================================================
 
 beforeAll(async () => {
+  if (process.env.SKIP_DOCKER === 'true') return; // no containers — skip setup
+
   // Superuser client: bypasses RLS — used for seeding only
   superClient = postgres(inject('DATABASE_URL'), { max: 5 });
 
@@ -160,8 +162,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await superClient.end();
-  await appClient.end();
+  await superClient?.end();
+  await appClient?.end();
 });
 
 // ============================================================================
@@ -185,7 +187,7 @@ async function withRlsContext<T>(
 // customers table isolation
 // ============================================================================
 
-describe('RLS — customers table', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — customers table', () => {
   it('Company A sees only its own customers', async () => {
     const rows = await withRlsContext(companyAId, async (tx) => {
       return tx.unsafe<{ id: number; company_id: number }[]>(
@@ -236,7 +238,7 @@ describe('RLS — customers table', () => {
 // bookings table isolation
 // ============================================================================
 
-describe('RLS — bookings table', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — bookings table', () => {
   it('Company A sees only its own bookings', async () => {
     const rows = await withRlsContext(companyAId, async (tx) => {
       return tx.unsafe<{ id: number; company_id: number }[]>(`SELECT id, company_id FROM bookings`);
@@ -264,7 +266,7 @@ describe('RLS — bookings table', () => {
 // services table isolation
 // ============================================================================
 
-describe('RLS — services table', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — services table', () => {
   it('Company A sees only its own services', async () => {
     const rows = await withRlsContext(companyAId, async (tx) => {
       return tx.unsafe<{ id: number; company_id: number }[]>(`SELECT id, company_id FROM services`);
@@ -284,7 +286,7 @@ describe('RLS — services table', () => {
 // employees table isolation
 // ============================================================================
 
-describe('RLS — employees table', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — employees table', () => {
   it('Company A sees only its own employees', async () => {
     const rows = await withRlsContext(companyAId, async (tx) => {
       return tx.unsafe<{ id: number; company_id: number }[]>(
@@ -306,7 +308,7 @@ describe('RLS — employees table', () => {
 // Cross-table isolation test
 // ============================================================================
 
-describe('RLS — cross-table isolation', () => {
+describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — cross-table isolation', () => {
   it('RLS prevents cross-tenant data access across all key tables', async () => {
     // Query all 4 key tables in a single Company A transaction
     const [customersA, servicesA, employeesA, bookingsA] = await withRlsContext(
