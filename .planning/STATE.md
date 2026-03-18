@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 48-marketplace-ux 48-01-PLAN.md
-last_updated: "2026-03-18T17:47:30.441Z"
+stopped_at: Completed 48-marketplace-ux 48-05-PLAN.md
+last_updated: "2026-03-18T17:53:58.498Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 27
-  completed_plans: 26
+  completed_plans: 27
   percent: 96
 ---
 
@@ -118,6 +118,9 @@ v3.0 decisions:
 - [Phase 48-marketplace-ux]: sanitizeImageUrl validates http/https-only protocol to block XSS via javascript:/data: URIs in user image arrays
 - [Phase 48-marketplace-ux]: custom_meeting_url column on companies table (not video_meetings table) — avoids CHECK provider constraint issue
 - [Phase 48-marketplace-ux]: company_slug via LEFT JOIN companies in both route branches, featured sort added to sortByEnum
+- [Phase 48-marketplace-ux]: Webhook tables applied via raw SQL (postgres superuser) because schedulebox user lacks CREATE privilege; consistent with Phase 47 pattern
+- [Phase 48-marketplace-ux]: Webhook retry scheduling via DB records (not RabbitMQ): two pending delivery records at failure time, cron processes scheduled_at <= now
+- [Phase 48-marketplace-ux]: HMAC secret: randomBytes(32).hex() encrypted with AES-256-GCM (Phase 46 module), plaintext returned once on creation, never stored in DB
 
 ## Blockers
 
@@ -152,9 +155,10 @@ v3.0 decisions:
 | Phase 48-marketplace-ux P02 | 5min | 1 tasks | 5 files |
 | Phase 48-marketplace-ux P04 | 7 | 1 tasks | 9 files |
 | Phase 48-marketplace-ux P01 | 20min | 2 tasks | 4 files |
+| Phase 48-marketplace-ux P05 | 18min | 3 tasks | 22 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T17:47:30.437Z
-Stopped at: Completed 48-marketplace-ux 48-01-PLAN.md
+Last session: 2026-03-18T17:53:58.494Z
+Stopped at: Completed 48-marketplace-ux 48-05-PLAN.md
 Resume file: None
