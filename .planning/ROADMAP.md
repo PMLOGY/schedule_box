@@ -283,7 +283,11 @@ Plans:
   3. A medical-vertical business can capture `birth_number` and `insurance_provider` fields in the booking flow — these fields are stored in `booking_metadata` JSONB and are visible in the booking detail view
   4. An automotive-vertical business can capture `license_plate` (SPZ) and `vin` fields in the booking flow — these fields are stored in `booking_metadata` JSONB and are visible in the booking detail view
   5. The booking form labels change based on the company's industry setting — a medical business sees "Patient" instead of "Customer", "Appointment" instead of "Booking"; an automotive business sees "Vehicle" and "License Plate" in the appropriate fields
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 49-01-PLAN.md — OpenTelemetry tracing + structured logging + request ID middleware
+- [ ] 49-02-PLAN.md — Industry vertical config modules + booking_metadata DB column
+- [ ] 49-03-PLAN.md — Vertical fields in booking UI + AI settings page + upselling gate
 
 ### Phase 50: Testing & Hardening
 **Goal**: The full v3.0 feature set is validated by automated tests meeting the 80% coverage threshold, a Storybook catalog documents the glass design system, and the database is partitioned for long-term scale
@@ -349,7 +353,7 @@ Plans:
 | 46. Security Hardening | 3/3 | Complete   | 2026-03-16 | - |
 | 47. Notifications & Super-Admin | 5/5 | Complete    | 2026-03-18 | - |
 | 48. Marketplace & UX | 5/5 | Complete    | 2026-03-18 | - |
-| 49. Observability & Verticals | v3.0 | TBD | Not started | - |
+| 49. Observability & Verticals | v3.0 | 0/3 | In progress | - |
 | 50. Testing & Hardening | v3.0 | TBD | Not started | - |
 
 ---
