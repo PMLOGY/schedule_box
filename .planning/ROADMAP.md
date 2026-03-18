@@ -265,7 +265,13 @@ Plans:
   5. Clicking a booking row in the owner dashboard opens a detail drawer/modal — confirm, cancel, complete, and no-show actions execute from within the modal without navigating away
   6. The booking dashboard auto-refreshes every 30 seconds — a "Last updated X seconds ago" indicator is visible; new bookings created in another browser tab appear without a manual page reload
   7. Owners can manage video meeting links from a dedicated UI page and manage API webhooks (create, test, view delivery log) from a dedicated settings page
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 48-01-PLAN.md — Marketplace search, filter, sort, featured carousel
+- [ ] 48-02-PLAN.md — Firm detail page: photos, map, featured badge, reviews
+- [ ] 48-03-PLAN.md — Booking 30s polling, last-updated indicator, glow animation, panel polish
+- [ ] 48-04-PLAN.md — Video meetings settings page
+- [ ] 48-05-PLAN.md — Webhooks settings: DB, API, HMAC, delivery log, Stripe-like UI
 
 ### Phase 49: Observability & Verticals
 **Goal**: Production errors and performance are visible through Sentry and OpenTelemetry traces on Vercel, and the platform supports medical and automotive industry verticals with per-industry field capture and AI configuration
