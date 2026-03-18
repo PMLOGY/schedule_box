@@ -2240,6 +2240,29 @@
       "deactivated": "Uživatel byl deaktivován",
       "toggleError": "Nepodařilo se změnit stav uživatele"
     },
+    "impersonation": {
+      "button": "Napodobit",
+      "active": "Napodobujete: {name} ({email})",
+      "expires": "Vyprší za {time}",
+      "endSession": "Ukončit relaci",
+      "started": "Napodobování zahájeno pro {name}",
+      "startError": "Nepodařilo se zahájit napodobování",
+      "ended": "Napodobovací relace ukončena"
+    },
+    "auditLog": {
+      "title": "Audit log",
+      "search": "Hledat admina...",
+      "allActions": "Všechny akce",
+      "columns": {
+        "timestamp": "Čas",
+        "admin": "Admin",
+        "action": "Akce",
+        "target": "Cíl",
+        "ip": "IP adresa",
+        "before": "Před",
+        "after": "Po"
+      }
+    },
     "featureFlags": {
       "title": "Feature Flags",
       "createFlag": "Vytvořit flag",

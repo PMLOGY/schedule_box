@@ -2240,6 +2240,29 @@
       "deactivated": "User has been deactivated",
       "toggleError": "Failed to change user status"
     },
+    "impersonation": {
+      "button": "Impersonate",
+      "active": "Impersonating: {name} ({email})",
+      "expires": "Expires in {time}",
+      "endSession": "End Session",
+      "started": "Impersonation started for {name}",
+      "startError": "Failed to start impersonation",
+      "ended": "Impersonation session ended"
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "search": "Search admin...",
+      "allActions": "All Actions",
+      "columns": {
+        "timestamp": "Timestamp",
+        "admin": "Admin",
+        "action": "Action",
+        "target": "Target",
+        "ip": "IP Address",
+        "before": "Before",
+        "after": "After"
+      }
+    },
     "featureFlags": {
       "title": "Feature Flags",
       "createFlag": "Create Flag",
