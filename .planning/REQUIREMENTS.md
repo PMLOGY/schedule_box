@@ -41,7 +41,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 - [x] **NOTIF-01**: Booking confirmation email sends on booking creation via SMTP
 - [x] **NOTIF-02**: Booking reminder SMS sends 24h before appointment via Twilio
 - [x] **NOTIF-03**: Booking status change emails (confirmed, cancelled, completed) send correctly
-- [ ] **NOTIF-04**: Notification delivery status visible in owner notification list (sent/failed/pending)
+- [x] **NOTIF-04**: Notification delivery status visible in owner notification list (sent/failed/pending)
 
 ### Marketplace
 
@@ -136,7 +136,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | NOTIF-01 | Phase 47 | Complete |
 | NOTIF-02 | Phase 47 | Complete |
 | NOTIF-03 | Phase 47 | Complete |
-| NOTIF-04 | Phase 47 | Pending |
+| NOTIF-04 | Phase 47 | Complete |
 | ADMIN-01 | Phase 47 | Pending |
 | ADMIN-02 | Phase 47 | Pending |
 | ADMIN-03 | Phase 47 | Pending |

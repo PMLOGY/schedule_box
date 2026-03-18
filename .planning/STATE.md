@@ -3,11 +3,27 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
+stopped_at: Completed 47-notifications-super-admin 47-02-PLAN.md
+last_updated: "2026-03-18T15:25:45.791Z"
+last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
+progress:
+  total_phases: 12
+  completed_phases: 8
+  total_plans: 22
+  completed_plans: 18
+  percent: 96
+---
+
+---
+gsd_state_version: 1.0
+milestone: v3.0
+milestone_name: Production Launch & 100% Documentation Coverage
+status: active
 stopped_at: Completed 47-notifications-super-admin 47-01-PLAN.md
 last_updated: "2026-03-18T15:14:55.432Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
-  total_phases: 12
+  [██████████] 96%
   completed_phases: 8
   total_plans: 22
   completed_plans: 18
@@ -86,6 +102,8 @@ v3.0 decisions:
 - [Phase 46-security-hardening]: Sentry autoInstrument* disabled — Sentry 10.43 webpack wrappers conflict with Next.js 15.5 build; SDK init via instrumentation.ts + onRequestError hook is sufficient
 - [Phase 47-notifications-super-admin]: Platform schema DDL applied via postgres superuser (not drizzle-kit push) because schedulebox user lacks CREATE privilege; grants issued to schedulebox after table creation
 - [Phase 47-notifications-super-admin]: crypto.randomUUID().slice(0,16) used as requestId fallback in writeAuditLog() to avoid nanoid dependency
+- [Phase 47-notifications-super-admin]: Fire-and-forget email pattern: email calls outside DB transactions, failure never rolls back booking
+- [Phase 47-notifications-super-admin]: SMS reminder row created at booking time (scheduledAt = startTime - 24h), delivered by Vercel Cron
 
 ## Blockers
 
@@ -112,9 +130,10 @@ v3.0 decisions:
 | Phase 46-security-hardening P01 | 14min | 2 tasks | 17 files |
 | Phase 46-security-hardening P02 | 47min | 2 tasks | 14 files |
 | Phase 47-notifications-super-admin P01 | 16min | 2 tasks | 7 files |
+| Phase 47-notifications-super-admin P02 | 20min | 2 tasks | 7 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T15:14:55.428Z
-Stopped at: Completed 47-notifications-super-admin 47-01-PLAN.md
+Last session: 2026-03-18T15:25:45.786Z
+Stopped at: Completed 47-notifications-super-admin 47-02-PLAN.md
 Resume file: None
