@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 47-notifications-super-admin 47-03-PLAN.md
-last_updated: "2026-03-18T15:32:01.895Z"
+stopped_at: Completed 47-notifications-super-admin 47-04-PLAN.md
+last_updated: "2026-03-18T15:34:53.615Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
   completed_phases: 8
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 96
 ---
 
@@ -106,6 +106,8 @@ v3.0 decisions:
 - [Phase 47-notifications-super-admin]: SMS reminder row created at booking time (scheduledAt = startTime - 24h), delivered by Vercel Cron
 - [Phase 47-notifications-super-admin]: sessionStorage for impersonation banner: HttpOnly imp_token not JS-readable; POST response body carries display data
 - [Phase 47-notifications-super-admin]: Login 403 COMPANY_SUSPENDED: structured code field enables frontend to detect and handle suspension specifically
+- [Phase 47-notifications-super-admin]: Upstash REST HTTP in middleware instead of SDK import to avoid heavy Edge bundle
+- [Phase 47-notifications-super-admin]: Maintenance middleware fail-open policy: Redis errors never block users
 
 ## Blockers
 
@@ -134,9 +136,10 @@ v3.0 decisions:
 | Phase 47-notifications-super-admin P01 | 16min | 2 tasks | 7 files |
 | Phase 47-notifications-super-admin P02 | 20min | 2 tasks | 7 files |
 | Phase 47-notifications-super-admin P03 | 14min | 2 tasks | 12 files |
+| Phase 47-notifications-super-admin P04 | 15min | 2 tasks | 15 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T15:32:01.891Z
-Stopped at: Completed 47-notifications-super-admin 47-03-PLAN.md
+Last session: 2026-03-18T15:34:53.611Z
+Stopped at: Completed 47-notifications-super-admin 47-04-PLAN.md
 Resume file: None
