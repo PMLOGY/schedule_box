@@ -9,7 +9,7 @@
 
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
-import { db, dbTx, users, employees, workingHours } from '@schedulebox/database';
+import { db, users, employees, workingHours } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { successResponse } from '@/lib/utils/response';
 import { NotFoundError, ForbiddenError } from '@schedulebox/shared';
@@ -72,12 +72,8 @@ export const GET = createRouteHandler({
  */
 const workingHourSchema = z.object({
   day_of_week: z.number().int().min(0).max(6),
-  start_time: z
-    .string()
-    .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Time must be HH:MM or HH:MM:SS'),
-  end_time: z
-    .string()
-    .regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/, 'Time must be HH:MM or HH:MM:SS'),
+  start_time: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be HH:MM'),
+  end_time: z.string().regex(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, 'Time must be HH:MM'),
   is_active: z.boolean(),
 });
 
@@ -94,7 +90,7 @@ export const PUT = createRouteHandler({
     const employee = await resolveEmployee(user.sub, user.company_id);
 
     // Replace all working hours for this employee in a transaction
-    await dbTx.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       // Delete existing working hours for this employee
       await tx
         .delete(workingHours)

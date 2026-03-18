@@ -34,6 +34,7 @@ import { checkBookingLimit, incrementBookingCounter } from '@/lib/usage/usage-se
 import { redeemPoints } from '@/lib/loyalty/points-engine';
 import { z } from 'zod';
 import { lt, gt, or, sql } from 'drizzle-orm';
+import { encrypt, hmacIndex } from '@/lib/security/encryption';
 
 // ============================================================================
 // SCHEMAS
@@ -213,23 +214,45 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
     }
 
     // 5. Find or create customer by email + company_id
-    let customer = await db.query.customers.findFirst({
-      where: and(
-        eq(customers.email, body.customer_email),
-        eq(customers.companyId, companyId),
-        isNull(customers.deletedAt),
-      ),
-      columns: {
-        id: true,
-        uuid: true,
-        name: true,
-        email: true,
-        phone: true,
-      },
-    });
+    // Prefer HMAC lookup when ENCRYPTION_KEY is set (handles encrypted rows)
+    const encKey = process.env.ENCRYPTION_KEY ?? null;
+    const emailHmac = encKey ? hmacIndex(body.customer_email, encKey) : null;
+
+    // Try HMAC lookup first (encrypted rows), then fall back to plaintext
+    let customer = emailHmac
+      ? await db.query.customers.findFirst({
+          where: and(
+            eq(customers.emailHmac, emailHmac),
+            eq(customers.companyId, companyId),
+            isNull(customers.deletedAt),
+          ),
+          columns: { id: true, uuid: true, name: true, email: true, phone: true },
+        })
+      : null;
 
     if (!customer) {
-      // Create new customer
+      // Fall back to plaintext lookup (rows not yet back-filled or no encryption key)
+      customer = await db.query.customers.findFirst({
+        where: and(
+          eq(customers.email, body.customer_email),
+          eq(customers.companyId, companyId),
+          isNull(customers.deletedAt),
+        ),
+        columns: { id: true, uuid: true, name: true, email: true, phone: true },
+      });
+    }
+
+    if (!customer) {
+      // Create new customer — dual-write: plaintext + ciphertext (expand phase)
+      const encryptedFields =
+        encKey !== null
+          ? {
+              emailCiphertext: encrypt(body.customer_email, encKey),
+              phoneCiphertext: body.customer_phone ? encrypt(body.customer_phone, encKey) : null,
+              emailHmac: hmacIndex(body.customer_email, encKey),
+            }
+          : {};
+
       const [newCustomer] = await db
         .insert(customers)
         .values({
@@ -238,6 +261,7 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
           email: body.customer_email,
           phone: body.customer_phone || null,
           source: 'online',
+          ...encryptedFields,
         })
         .returning({
           id: customers.id,
@@ -248,17 +272,23 @@ export const POST = createRouteHandler<PublicBookingCreate, CompanySlugParam>({
         });
       customer = newCustomer;
     } else {
-      // Update customer name and phone if changed
+      // Update customer name and phone if changed — dual-write phone ciphertext too
       if (
         customer.name !== body.customer_name ||
         (body.customer_phone && customer.phone !== body.customer_phone)
       ) {
+        const updatedPhoneFields =
+          encKey !== null && body.customer_phone
+            ? { phoneCiphertext: encrypt(body.customer_phone, encKey) }
+            : {};
+
         await db
           .update(customers)
           .set({
             name: body.customer_name,
             ...(body.customer_phone ? { phone: body.customer_phone } : {}),
             updatedAt: new Date(),
+            ...updatedPhoneFields,
           })
           .where(eq(customers.id, customer.id));
       }

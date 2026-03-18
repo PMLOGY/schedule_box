@@ -44,7 +44,7 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
   if (pathname.startsWith('/portal')) {
     return role === 'customer';
   }
-  // Dashboard routes — owner, employee, manager (admin should use /admin panel)
+  // Dashboard routes — owner, employee, manager (not customer, not admin in normal dashboard)
   if (
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/bookings') ||
@@ -65,10 +65,9 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
     pathname.startsWith('/marketplace') ||
     pathname.startsWith('/settings') ||
     pathname.startsWith('/onboarding') ||
-    pathname.startsWith('/schedule') ||
-    pathname.startsWith('/profile')
+    pathname.startsWith('/schedule')
   ) {
-    return ['owner', 'manager', 'employee'].includes(role);
+    return ['owner', 'manager', 'employee', 'admin'].includes(role);
   }
   // Allow everything else (public booking pages, etc.)
   return true;
@@ -77,24 +76,11 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
 export function useAuth() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Wait for Zustand store to rehydrate from localStorage before making any
-    // auth decisions. Without this guard, the store briefly reports
-    // isAuthenticated=false on page reload, causing a false redirect to /login.
-    if (!_hasHydrated) {
-      return;
-    }
-
-    // Authenticated users on public routes (login/register) should be
-    // redirected to their role home — they're already logged in.
     if (isPublicRoute(pathname)) {
-      if (isAuthenticated && user) {
-        router.push(getHomeForRole(user.role));
-        return;
-      }
       setIsLoading(false);
       return;
     }
@@ -112,7 +98,7 @@ export function useAuth() {
     }
 
     setIsLoading(false);
-  }, [isAuthenticated, user, pathname, router, _hasHydrated]);
+  }, [isAuthenticated, user, pathname, router]);
 
   return {
     user,

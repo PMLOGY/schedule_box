@@ -10,7 +10,7 @@
  * - imp_token set as HttpOnly cookie, not accessible to JS
  */
 
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { users, roles, rolePermissions, permissions } from '@schedulebox/database';

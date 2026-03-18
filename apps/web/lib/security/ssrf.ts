@@ -21,17 +21,17 @@ import { ValidationError } from '@schedulebox/shared';
  *         IPv6 loopback, IPv6 unique local, IPv6 link-local.
  */
 const PRIVATE_RANGES: RegExp[] = [
-  /^127\./,                                           // IPv4 loopback
-  /^10\./,                                            // RFC 1918 Class A
-  /^172\.(1[6-9]|2\d|3[01])\./,                      // RFC 1918 Class B (172.16–172.31)
-  /^192\.168\./,                                      // RFC 1918 Class C
-  /^169\.254\./,                                      // Link-local (APIPA) RFC 3927
-  /^::1$/,                                            // IPv6 loopback
-  /^fc00:/i,                                          // IPv6 unique local FC00::/7
-  /^fd[0-9a-f]{2}:/i,                                 // IPv6 unique local FD00::/8
-  /^fe80:/i,                                          // IPv6 link-local
-  /^0\./,                                             // Reserved (0.0.0.0/8)
-  /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./,        // CGNAT RFC 6598 (100.64–100.127)
+  /^127\./, // IPv4 loopback
+  /^10\./, // RFC 1918 Class A
+  /^172\.(1[6-9]|2\d|3[01])\./, // RFC 1918 Class B (172.16–172.31)
+  /^192\.168\./, // RFC 1918 Class C
+  /^169\.254\./, // Link-local (APIPA) RFC 3927
+  /^::1$/, // IPv6 loopback
+  /^fc00:/i, // IPv6 unique local FC00::/7
+  /^fd[0-9a-f]{2}:/i, // IPv6 unique local FD00::/8
+  /^fe80:/i, // IPv6 link-local
+  /^0\./, // Reserved (0.0.0.0/8)
+  /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./, // CGNAT RFC 6598 (100.64–100.127)
 ];
 
 /**

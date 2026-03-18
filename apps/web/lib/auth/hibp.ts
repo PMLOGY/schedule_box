@@ -48,7 +48,10 @@ export async function isPasswordBreached(password: string): Promise<boolean> {
     });
   } catch (error) {
     // Network error or other failure — fail open
-    console.warn('[HIBP] Breach check failed, skipping:', error instanceof Error ? error.message : error);
+    console.warn(
+      '[HIBP] Breach check failed, skipping:',
+      error instanceof Error ? error.message : error,
+    );
     return false;
   }
 }

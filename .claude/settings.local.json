@@ -100,7 +100,9 @@
       "Bash(for file:*)",
       "Bash(do echo:*)",
       "Read(//d/Project/ScheduleBox/**)",
-      "Bash(powershell.exe -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force\" 2>&1; sleep 2)"
+      "Bash(powershell.exe -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force\" 2>&1; sleep 2)",
+      "Bash(gh run:*)",
+      "Skill(gsd:new-milestone)"
     ]
   }
 }
