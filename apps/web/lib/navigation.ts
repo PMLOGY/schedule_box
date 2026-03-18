@@ -19,6 +19,7 @@ import {
   Store,
   Video,
   Globe,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import type { SubscriptionPlan } from '@schedulebox/shared/types';
@@ -170,6 +171,12 @@ export const NAV_ITEMS: NavItem[] = [
     key: 'webhooks',
     href: '/settings/webhooks',
     icon: Globe,
+    roles: ['owner'],
+  },
+  {
+    key: 'aiSettings',
+    href: '/settings/ai',
+    icon: Sparkles,
     roles: ['owner'],
   },
 ];

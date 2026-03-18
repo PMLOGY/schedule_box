@@ -13,11 +13,17 @@
 
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
 import { useUpselling } from '@/hooks/useOptimization';
+import { apiClient } from '@/lib/api-client';
+
+interface AiSettings {
+  upselling_enabled: boolean;
+}
 
 interface UpsellingSuggestionsProps {
   selectedServiceId: number | null;
@@ -29,6 +35,20 @@ export function UpsellingSuggestions({
   onAddService,
 }: UpsellingSuggestionsProps) {
   const { data, isLoading, isError } = useUpselling(selectedServiceId);
+
+  // Check if upselling is enabled for this company's industry
+  const { data: aiSettings } = useQuery({
+    queryKey: ['settings', 'ai'],
+    queryFn: () => apiClient.get<AiSettings>('/settings/ai'),
+    staleTime: 120_000,
+    // Fail silently — never block upselling render on auth errors (public booking flow)
+    retry: false,
+  });
+
+  // Gate: hide upselling when industry config disables it
+  if (aiSettings?.upselling_enabled === false) {
+    return null;
+  }
 
   // Do NOT show spinner while loading - upselling must not block flow
   if (isLoading) {

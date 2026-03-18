@@ -11,10 +11,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
 import { format } from 'date-fns';
 import { cs, sk, enUS } from 'date-fns/locale';
-import { Loader2, Calendar, User, Briefcase, Clock, Coins, FileText } from 'lucide-react';
+import {
+  Loader2,
+  Calendar,
+  User,
+  Briefcase,
+  Clock,
+  Coins,
+  FileText,
+  ClipboardList,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useBookingDetail } from '@/hooks/use-bookings-query';
 import { apiClient } from '@/lib/api-client';
+import { VERTICAL_FIELDS } from '@/lib/industry/industry-fields';
+import { useIndustryLabels } from '@/hooks/use-industry-labels';
 import {
   Sheet,
   SheetContent,
@@ -49,6 +60,7 @@ interface BookingDetail {
   cancelledBy: string | null;
   createdAt: string;
   updatedAt: string;
+  bookingMetadata?: Record<string, unknown> | null;
 }
 
 interface BookingDetailPanelProps {
@@ -68,6 +80,7 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
   const tCommon = useTranslations('common');
   const locale = useLocale() as 'cs' | 'sk' | 'en';
   const queryClient = useQueryClient();
+  const labels = useIndustryLabels();
 
   const { data: booking, isLoading } = useBookingDetail(bookingId) as {
     data: BookingDetail | null | undefined;
@@ -266,6 +279,36 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
                   )}
                 </div>
               </div>
+
+              {/* Vertical Metadata (medical/auto specific fields) */}
+              {booking.bookingMetadata && Object.keys(booking.bookingMetadata).length > 1 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <ClipboardList className="h-4 w-4" />
+                      {labels.customer} — doplňkové údaje
+                    </div>
+                    <div className="pl-6 space-y-1 text-sm">
+                      {Object.entries(booking.bookingMetadata)
+                        .filter(([key]) => key !== 'industry_type')
+                        .map(([key, value]) => {
+                          const industryType = (booking.bookingMetadata as Record<string, unknown>)
+                            ?.industry_type;
+                          const fields = VERTICAL_FIELDS[String(industryType ?? '')] ?? [];
+                          const fieldDef = fields.find((f) => f.key === key);
+                          const label = fieldDef?.label ?? key;
+                          return (
+                            <div key={key} className="flex justify-between">
+                              <span className="text-muted-foreground">{label}</span>
+                              <span className="font-medium">{String(value)}</span>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* AI No-Show Prediction */}
               <NoShowRiskDetail probability={booking.noShowProbability} />
