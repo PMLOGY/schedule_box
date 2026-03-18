@@ -85,8 +85,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 ### Infrastructure Hardening
 
-- [ ] **HARD-01**: DB partitioning for bookings table by month (raw SQL migration)
-- [ ] **HARD-02**: DB partitioning for notifications and audit_logs tables
+- [x] **HARD-01**: DB partitioning for bookings table by month (raw SQL migration)
+- [x] **HARD-02**: DB partitioning for notifications and audit_logs tables
 
 ## Future Requirements (v3.1+)
 
@@ -165,8 +165,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | TEST-02 | Phase 50 | Complete |
 | TEST-03 | Phase 50 | Complete |
 | TEST-04 | Phase 50 | Complete |
-| HARD-01 | Phase 50 | Pending |
-| HARD-02 | Phase 50 | Pending |
+| HARD-01 | Phase 50 | Complete |
+| HARD-02 | Phase 50 | Complete |
 
 **Coverage:**
 

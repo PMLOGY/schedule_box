@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
-stopped_at: Completed 50-testing-hardening 50-04-PLAN.md
-last_updated: "2026-03-18T21:35:26.913Z"
+stopped_at: Completed 50-testing-hardening 50-05-PLAN.md
+last_updated: "2026-03-18T21:41:59.329Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
 progress:
   total_phases: 12
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 35
-  completed_plans: 34
+  completed_plans: 35
 ---
 
 ---
@@ -153,6 +153,8 @@ v3.0 decisions:
 - [Phase 50-testing-hardening]: callCount pattern in dbTx.transaction for multi-step query chains in rescheduleBooking
 - [Phase 50-testing-hardening]: describe.skipIf(SKIP_DOCKER) chosen over inject() guard — process.env available at module eval time, inject() is not
 - [Phase 50-testing-hardening]: admin-chromium Playwright project with dedicated testMatch /admin-.*\.spec\.ts/ isolates admin E2E from regular user auth
+- [Phase 50-testing-hardening]: notifications partitioned by created_at (not scheduled_at): scheduled_at is NULLABLE — NULL range keys defeat partition pruning
+- [Phase 50-testing-hardening]: btree_gist exclusion constraint not added to partitioned parent: PG 16 prohibits EXCLUDE USING gist on partitioned table parents; SELECT FOR UPDATE is the authoritative double-booking guard
 
 ## Blockers
 
@@ -195,9 +197,10 @@ v3.0 decisions:
 | Phase 50-testing-hardening PP03 | 20min | 2 tasks | 10 files |
 | Phase 50-testing-hardening P02 | 8min | 2 tasks | 3 files |
 | Phase 50-testing-hardening P04 | 10min | 2 tasks | 11 files |
+| Phase 50-testing-hardening P05 | 7min | 2 tasks | 5 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T21:35:26.909Z
-Stopped at: Completed 50-testing-hardening 50-04-PLAN.md
+Last session: 2026-03-18T21:41:59.324Z
+Stopped at: Completed 50-testing-hardening 50-05-PLAN.md
 Resume file: None
