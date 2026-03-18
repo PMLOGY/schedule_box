@@ -26,22 +26,17 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder + glass primitives (GlassPanel, GradientMesh, GlassShimmer)
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v3.0 Production Launch & 100% Documentation Coverage
+## Current Milestone: v3.1 Go Live & Revenue
 
-**Goal:** Close every gap from the GAP analysis to achieve 100% implementation of the v13.0 FINAL documentation, deploy to Vercel, and harden security/testing for production.
+**Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Vercel, businesses can collect payments from customers via their own Comgate merchant account, and the full platform is verified through manual + automated testing.
 
 **Target features:**
-- P0: Remove RabbitMQ dependency (safe no-op publishEvent for Vercel)
-- P1: Security hardening (Sentry, DOMPurify XSS, PII AES-256-GCM encryption, HIBP password check)
-- P1: Test coverage to 80% (Vitest unit + Playwright E2E for critical flows)
-- P2: Super-Admin completion (impersonation, platform metrics, audit logs, suspend, broadcast, maintenance mode, feature flags)
-- P2: Real-time updates (polling/SSE for Vercel compatibility)
-- P2: Missing pages (cookie policy, webhooks settings UI, video meetings UI)
-- P2: Observability (OpenTelemetry instrumentation, Sentry SDK)
-- P2: Security (SSRF protection, CSRF tokens)
-- P3: Industry verticals (medical/automotive DB fields, per-industry UI labels, per-industry AI config)
-- P3: Testing infrastructure (Storybook, contract tests, integration tests, DB partitioning)
-- Deploy: Vercel + Upstash Redis + Neon PostgreSQL (no RabbitMQ, no Kubernetes)
+- Per-company payment gateway (Comgate, provider-agnostic design for future Stripe)
+- End-to-end verification: Playwright automated + manual walkthrough of every major flow
+- Bug fixing: find and fix everything broken from v3.0 agent-written code
+- Production Vercel deployment with real env vars, DNS, SSL
+- Subscription billing verification (Comgate recurring on merchant 498621)
+- Full platform working day one: booking, payments, emails, admin, marketplace, notifications, AI
 
 ## Current State
 
