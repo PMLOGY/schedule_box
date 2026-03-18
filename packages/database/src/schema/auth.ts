@@ -62,6 +62,7 @@ export const companies = pgTable(
     onboardingCompleted: boolean('onboarding_completed').default(false),
     trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
     suspendedAt: timestamp('suspended_at', { withTimezone: true }),
+    suspendedReason: text('suspended_reason'),
     featuresEnabled: jsonb('features_enabled').default({}),
     settings: jsonb('settings').default({}),
     organizationId: integer('organization_id'),
