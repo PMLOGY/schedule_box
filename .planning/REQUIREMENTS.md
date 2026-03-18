@@ -57,7 +57,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 - [x] **UX-01**: Booking detail opens in modal/drawer instead of full page navigation
 - [x] **UX-02**: Booking status changes (confirm/cancel/complete/no-show) via modal actions
 - [x] **UX-03**: Real-time dashboard updates via 30s TanStack Query polling (refetchInterval)
-- [ ] **UX-04**: Video meetings management UI page for owners
+- [x] **UX-04**: Video meetings management UI page for owners
 - [ ] **UX-05**: Webhooks settings UI page for owners to manage API webhooks
 
 ### Bug Fixes
@@ -153,7 +153,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | UX-01 | Phase 48 | Complete |
 | UX-02 | Phase 48 | Complete |
 | UX-03 | Phase 48 | Complete |
-| UX-04 | Phase 48 | Pending |
+| UX-04 | Phase 48 | Complete |
 | UX-05 | Phase 48 | Pending |
 | OBS-01 | Phase 49 | Pending |
 | OBS-02 | Phase 49 | Pending |
