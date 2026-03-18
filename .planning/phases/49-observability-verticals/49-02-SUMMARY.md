@@ -152,3 +152,20 @@ None — no external service configuration required.
 
 _Phase: 49-observability-verticals_
 _Completed: 2026-03-18_
+
+## Self-Check: PASSED
+
+Files verified:
+- apps/web/lib/industry/industry-labels.ts: FOUND
+- apps/web/lib/industry/industry-fields.ts: FOUND
+- apps/web/lib/industry/industry-ai-defaults.ts: FOUND
+- apps/web/hooks/use-industry-labels.ts: FOUND
+- apps/web/lib/industry/__tests__/industry-labels.test.ts: FOUND
+- apps/web/lib/industry/__tests__/industry-ai-defaults.test.ts: FOUND
+- apps/web/lib/industry/__tests__/booking-metadata.test.ts: FOUND
+- packages/database/src/schema/bookings.ts: FOUND
+- .planning/phases/49-observability-verticals/49-02-SUMMARY.md: FOUND
+
+Commits verified:
+- 55a432d: FOUND (Task 1)
+- d09987e: FOUND (Task 2)

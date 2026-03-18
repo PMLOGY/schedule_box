@@ -66,5 +66,9 @@ nul
 *.backup
 *.tmp
 
+# Storybook build output
+storybook-static/
+apps/web/storybook-static/
+
 # Misc
 *.tsbuildinfo
