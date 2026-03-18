@@ -66,8 +66,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 
 ### Observability
 
-- [ ] **OBS-01**: OpenTelemetry instrumentation on API routes with @vercel/otel + 10% sampling
-- [ ] **OBS-02**: Structured JSON logging compatible with Vercel log drain
+- [x] **OBS-01**: OpenTelemetry instrumentation on API routes with @vercel/otel + 10% sampling
+- [x] **OBS-02**: Structured JSON logging compatible with Vercel log drain
 
 ### Testing
 
@@ -155,8 +155,8 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | UX-03 | Phase 48 | Complete |
 | UX-04 | Phase 48 | Complete |
 | UX-05 | Phase 48 | Complete |
-| OBS-01 | Phase 49 | Pending |
-| OBS-02 | Phase 49 | Pending |
+| OBS-01 | Phase 49 | Complete |
+| OBS-02 | Phase 49 | Complete |
 | VERT-01 | Phase 49 | Complete |
 | VERT-02 | Phase 49 | Complete |
 | VERT-03 | Phase 49 | Complete |
