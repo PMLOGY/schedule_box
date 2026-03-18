@@ -14,7 +14,17 @@
  */
 
 import { eq, and, isNull, or, lt, gt, ne } from 'drizzle-orm';
-import { db, dbTx, bookings, services, employees, employeeServices } from '@schedulebox/database';
+import {
+  db,
+  dbTx,
+  bookings,
+  services,
+  employees,
+  employeeServices,
+  notifications,
+  customers,
+  companies,
+} from '@schedulebox/database';
 import { AppError, NotFoundError, ValidationError } from '@schedulebox/shared';
 import {
   publishEvent,
@@ -27,6 +37,99 @@ import {
 import type { BookingWithRelations } from './booking-service';
 import { getBooking } from './booking-service';
 import { awardPointsForBooking } from '@/lib/loyalty/points-engine';
+import { sendBookingStatusChangeEmail } from '@/lib/email/booking-emails';
+
+// ============================================================================
+// EMAIL NOTIFICATION HELPER
+// ============================================================================
+
+/**
+ * Fetch data needed for booking emails and fire status change email.
+ * Inserts a notification record (pending → sent/failed) in fire-and-forget fashion.
+ * Never throws — email failure must not affect booking operations.
+ */
+async function fireStatusChangeEmail(
+  bookingId: number,
+  companyId: number,
+  newStatus: 'confirmed' | 'cancelled' | 'completed',
+): Promise<void> {
+  try {
+    // Fetch booking with customer, service, employee, and company data
+    const [row] = await db
+      .select({
+        bookingUuid: bookings.uuid,
+        startTime: bookings.startTime,
+        customerName: customers.name,
+        customerEmail: customers.email,
+        serviceName: services.name,
+        employeeName: employees.name,
+        companyName: companies.name,
+        companyPhone: companies.phone,
+      })
+      .from(bookings)
+      .innerJoin(customers, eq(bookings.customerId, customers.id))
+      .innerJoin(services, eq(bookings.serviceId, services.id))
+      .innerJoin(companies, eq(bookings.companyId, companies.id))
+      .leftJoin(employees, eq(bookings.employeeId, employees.id))
+      .where(and(eq(bookings.id, bookingId), eq(bookings.companyId, companyId)))
+      .limit(1);
+
+    if (!row || !row.customerEmail) {
+      // No email address — skip silently
+      return;
+    }
+
+    const subjectMap: Record<string, string> = {
+      confirmed: 'Rezervace potvrzena',
+      cancelled: 'Rezervace zrušena',
+      completed: 'Rezervace dokončena',
+    };
+
+    const bodyText = `Vaše rezervace (${row.bookingUuid}) — ${subjectMap[newStatus]}`;
+
+    // Insert notification record with pending status
+    const [notifRecord] = await db
+      .insert(notifications)
+      .values({
+        companyId,
+        channel: 'email',
+        recipient: row.customerEmail,
+        subject: subjectMap[newStatus],
+        body: bodyText,
+        status: 'pending',
+      })
+      .returning({ id: notifications.id });
+
+    // Fire-and-forget email
+    sendBookingStatusChangeEmail({
+      to: row.customerEmail,
+      customerName: row.customerName,
+      serviceName: row.serviceName,
+      employeeName: row.employeeName ?? null,
+      startTime: row.startTime,
+      companyName: row.companyName,
+      companyPhone: row.companyPhone ?? null,
+      bookingUuid: row.bookingUuid,
+      newStatus,
+    })
+      .then(async () => {
+        await db
+          .update(notifications)
+          .set({ status: 'sent', sentAt: new Date() })
+          .where(eq(notifications.id, notifRecord.id));
+      })
+      .catch(async (err: unknown) => {
+        console.error(`[BookingEmails] Status change email (${newStatus}) failed:`, err);
+        await db
+          .update(notifications)
+          .set({ status: 'failed', errorMessage: String(err) })
+          .where(eq(notifications.id, notifRecord.id));
+      });
+  } catch (err) {
+    // Non-critical path — log and continue
+    console.error('[BookingEmails] fireStatusChangeEmail error:', err);
+  }
+}
 
 // ============================================================================
 // STATE MACHINE DEFINITION
@@ -97,6 +200,9 @@ export async function confirmBooking(
     // Event publishing is fire-and-forget in MVP
     console.error('[Booking Transitions] Failed to publish booking.confirmed event:', error);
   }
+
+  // Fire status change email (fire-and-forget — never throws)
+  void fireStatusChangeEmail(bookingId, companyId, 'confirmed');
 
   // Return updated booking
   const updated = await getBooking(bookingId, companyId);
@@ -223,6 +329,9 @@ export async function cancelBooking(
     console.error('[Booking Transitions] Failed to publish booking.cancelled event:', error);
   }
 
+  // Fire status change email (fire-and-forget — never throws)
+  void fireStatusChangeEmail(bookingId, companyId, 'cancelled');
+
   // Return updated booking
   const updated = await getBooking(bookingId, companyId);
   if (!updated) {
@@ -280,6 +389,9 @@ export async function completeBooking(
   } catch (error) {
     console.error('[Booking Transitions] Failed to publish booking.completed event:', error);
   }
+
+  // Fire status change email (fire-and-forget — never throws)
+  void fireStatusChangeEmail(bookingId, companyId, 'completed');
 
   // Award loyalty points synchronously (fallback for when RabbitMQ is not running)
   // awardPointsForBooking is idempotent — safe to call even if consumer also processes the event

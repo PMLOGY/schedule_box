@@ -18,10 +18,13 @@ import {
   employees,
   employeeServices,
   customers,
+  notifications,
+  companies,
 } from '@schedulebox/database';
 import { AppError, NotFoundError, ValidationError, type PaginationMeta } from '@schedulebox/shared';
 import { publishEvent, createBookingCreatedEvent } from '@schedulebox/events';
 import type { BookingCreate, BookingUpdate, BookingListQuery } from '@schedulebox/shared';
+import { sendBookingConfirmationEmail } from '@/lib/email/booking-emails';
 
 // ============================================================================
 // TYPES
@@ -64,6 +67,106 @@ export interface BookingWithRelations {
   cancelledBy: 'customer' | 'employee' | 'admin' | 'system' | null;
   createdAt: string;
   updatedAt: string;
+}
+
+// ============================================================================
+// NOTIFICATION HELPERS
+// ============================================================================
+
+/**
+ * Fire confirmation email and create SMS reminder notification row.
+ * Called after booking creation — entirely fire-and-forget, never throws.
+ */
+async function fireBookingCreatedNotifications(
+  bookingId: number,
+  companyId: number,
+  startTime: Date,
+): Promise<void> {
+  try {
+    // Fetch booking with customer, service, employee, and company data
+    const [row] = await db
+      .select({
+        bookingUuid: bookings.uuid,
+        customerName: customers.name,
+        customerEmail: customers.email,
+        customerPhone: customers.phone,
+        serviceName: services.name,
+        employeeName: employees.name,
+        companyName: companies.name,
+        companyPhone: companies.phone,
+      })
+      .from(bookings)
+      .innerJoin(customers, eq(bookings.customerId, customers.id))
+      .innerJoin(services, eq(bookings.serviceId, services.id))
+      .innerJoin(companies, eq(bookings.companyId, companies.id))
+      .leftJoin(employees, eq(bookings.employeeId, employees.id))
+      .where(and(eq(bookings.id, bookingId), eq(bookings.companyId, companyId)))
+      .limit(1);
+
+    if (!row) return;
+
+    // --- Email confirmation ---
+    if (row.customerEmail) {
+      const bodyText = `Potvrzení rezervace (${row.bookingUuid}) u ${row.companyName}`;
+
+      const [notifRecord] = await db
+        .insert(notifications)
+        .values({
+          companyId,
+          bookingId,
+          channel: 'email',
+          recipient: row.customerEmail,
+          subject: 'Potvrzení rezervace',
+          body: bodyText,
+          status: 'pending',
+        })
+        .returning({ id: notifications.id });
+
+      sendBookingConfirmationEmail({
+        to: row.customerEmail,
+        customerName: row.customerName,
+        serviceName: row.serviceName,
+        employeeName: row.employeeName ?? null,
+        startTime,
+        companyName: row.companyName,
+        companyPhone: row.companyPhone ?? null,
+        bookingUuid: row.bookingUuid,
+      })
+        .then(async () => {
+          await db
+            .update(notifications)
+            .set({ status: 'sent', sentAt: new Date() })
+            .where(eq(notifications.id, notifRecord.id));
+        })
+        .catch(async (err: unknown) => {
+          console.error('[BookingEmails] Confirmation email failed:', err);
+          await db
+            .update(notifications)
+            .set({ status: 'failed', errorMessage: String(err) })
+            .where(eq(notifications.id, notifRecord.id));
+        });
+    }
+
+    // --- SMS reminder row (picked up by cron job 24h before) ---
+    if (row.customerPhone) {
+      const scheduledAt = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
+      const smsBody = `Připomínka: Vaše rezervace (${row.serviceName}) u ${row.companyName} je ${startTime.toLocaleString('cs-CZ')}.`;
+
+      await db.insert(notifications).values({
+        companyId,
+        bookingId,
+        channel: 'sms',
+        recipient: row.customerPhone,
+        subject: null,
+        body: smsBody,
+        status: 'pending',
+        scheduledAt,
+      });
+    }
+  } catch (err) {
+    // Non-critical path — log and continue
+    console.error('[BookingNotifications] fireBookingCreatedNotifications error:', err);
+  }
 }
 
 // ============================================================================
@@ -326,6 +429,9 @@ export async function createBooking(
   if (!createdBooking) {
     throw new NotFoundError('Failed to retrieve created booking');
   }
+
+  // 10. Fire confirmation email + create SMS reminder row (fire-and-forget, non-blocking)
+  void fireBookingCreatedNotifications(booking.id, companyId, booking.startTime);
 
   return createdBooking;
 }

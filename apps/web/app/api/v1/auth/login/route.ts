@@ -67,7 +67,6 @@ export async function POST(req: NextRequest) {
         emailVerified: users.emailVerified,
         companyId: users.companyId,
         companyUuid: companies.uuid,
-        companyIsActive: companies.isActive,
         roleId: users.roleId,
         roleName: roles.name,
       })
@@ -87,15 +86,6 @@ export async function POST(req: NextRequest) {
       throw new UnauthorizedError('Account is inactive');
     }
 
-    // 3.5. Check if user's company is active (applies to owners and employees only)
-    if (
-      userRecord.companyId &&
-      userRecord.companyIsActive === false &&
-      userRecord.roleName !== 'admin'
-    ) {
-      throw new UnauthorizedError('Company account is deactivated');
-    }
-
     // 4. Verify password
     const isValidPassword = await verifyPassword(userRecord.passwordHash, input.password);
     if (!isValidPassword) {
@@ -107,7 +97,7 @@ export async function POST(req: NextRequest) {
           await redis.expire(failKey, LOGIN_LOCKOUT_SECONDS);
         }
         if (failures >= LOGIN_LOCKOUT_THRESHOLD) {
-          await redis.set(lockoutKey, '1', { ex: LOGIN_LOCKOUT_SECONDS });
+          await redis.setex(lockoutKey, LOGIN_LOCKOUT_SECONDS, '1');
           await redis.del(failKey);
           throw new UnauthorizedError(
             'Account temporarily locked due to too many failed attempts. Try again in 15 minutes.',
@@ -135,7 +125,7 @@ export async function POST(req: NextRequest) {
       if (!input.mfa_code) {
         // MFA required but code not provided → return challenge
         const mfaToken = nanoid(32);
-        await redis.set(`mfa:${mfaToken}`, userRecord.id.toString(), { ex: 300 }); // 5 min TTL
+        await redis.setex(`mfa:${mfaToken}`, 300, userRecord.id.toString()); // 5 min TTL
 
         return successResponse({
           mfa_required: true,
@@ -176,13 +166,30 @@ export async function POST(req: NextRequest) {
       await redis.del(mfaAttemptKey);
     }
 
-    // 6. Ensure user has a company (admins and customers bypass this check)
-    if (
-      !userRecord.companyId &&
-      userRecord.roleName !== 'admin' &&
-      userRecord.roleName !== 'customer'
-    ) {
+    // 6. Ensure user has a company (superadmins bypass this check)
+    if (!userRecord.companyId && userRecord.roleName !== 'admin') {
       throw new UnauthorizedError('User is not associated with a company');
+    }
+
+    // 6.5. Check if company is suspended (non-admin users only)
+    if (userRecord.companyId && userRecord.roleName !== 'admin') {
+      const [companyRecord] = await db
+        .select({ suspendedAt: companies.suspendedAt, suspendedReason: companies.suspendedReason })
+        .from(companies)
+        .where(eq(companies.id, userRecord.companyId))
+        .limit(1);
+
+      if (companyRecord?.suspendedAt) {
+        return NextResponse.json(
+          {
+            error: {
+              code: 'COMPANY_SUSPENDED',
+              message: `Ucet byl pozastaven: ${companyRecord.suspendedReason ?? 'Kontaktujte podporu'}`,
+            },
+          },
+          { status: 403 },
+        );
+      }
     }
 
     // 7. Generate JWT token pair
@@ -222,7 +229,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
-      path: '/api/v1/auth',
+      path: '/api/v1/auth/refresh',
     });
 
     return response;
