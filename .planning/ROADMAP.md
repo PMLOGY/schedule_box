@@ -8,7 +8,8 @@
 - ✅ **v1.3 Revenue & Growth** — Phases 28-32 (shipped 2026-02-25)
 - ✅ **v1.4 Design Overhaul** — Phases 33-38 (shipped 2026-03-12)
 - ✅ **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (shipped 2026-03-16)
-- 🚧 **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (in progress)
+- ✅ **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (shipped 2026-03-18)
+- 🚧 **v3.1 Go Live & Revenue** — Phases 51-53 (in progress)
 
 ## Phases
 
@@ -106,16 +107,27 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### v3.0 Production Launch & 100% Documentation Coverage (In Progress)
+<details>
+<summary>✅ v3.0 Production Launch & 100% Documentation Coverage (Phases 45-50) — SHIPPED 2026-03-18</summary>
 
 **Milestone Goal:** Close every gap from the GAP analysis to achieve 100% implementation of the v13.0 FINAL documentation spec. Deploy to Vercel (Neon + Upstash), harden security and compliance, complete super-admin tooling, marketplace, UX gaps, observability, industry verticals, and test coverage.
 
 - [x] **Phase 45: Infrastructure Migration** - Migrate from Railway/RabbitMQ to Vercel/Neon/Upstash; patch CVE-2025-29927; fix AI-Powered plan capacity display (completed 2026-03-16)
 - [x] **Phase 46: Security Hardening** - PII encryption at rest, XSS sanitization, HIBP breach check, CSRF, SSRF, Sentry, cookie policy page (completed 2026-03-16)
-- [x] **Phase 47: Notifications & Super-Admin** - Verify notification delivery pipeline; build complete super-admin tooling (impersonation, feature flags, suspend, broadcast, maintenance, metrics, audit log) (completed 2026-03-18)
+- [x] **Phase 47: Notifications & Super-Admin** - Verify notification delivery pipeline; build complete super-admin tooling (impersonation, feature flags, suspend, broadcast, maintenance, metrics, audit log) (completed 2026-03-18)
 - [x] **Phase 48: Marketplace & UX** - Public marketplace with search/filter/map; booking detail modal; real-time polling; video meetings UI; webhooks settings UI (completed 2026-03-18)
 - [x] **Phase 49: Observability & Verticals** - OpenTelemetry + structured logging; medical and automotive industry vertical support with per-industry AI config (completed 2026-03-18)
 - [x] **Phase 50: Testing & Hardening** - Vitest 80% coverage, Playwright E2E expansion, Testcontainers, Storybook; DB partitioning for scale (completed 2026-03-18)
+
+</details>
+
+### v3.1 Go Live & Revenue (In Progress)
+
+**Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Vercel, businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
+
+- [ ] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04)
+- [ ] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Vercel-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08)
+- [ ] **Phase 53: Deployment & Go Live** - App deployed to Vercel with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
 
 ## Phase Details
 
@@ -307,6 +319,43 @@ Plans:
 - [ ] 50-04-PLAN.md — Booking service tests + E2E expansion + Testcontainers guard (TEST-01, TEST-02, TEST-03)
 - [ ] 50-05-PLAN.md — DB partitioning for bookings, notifications, audit_logs (HARD-01, HARD-02)
 
+### Phase 51: Per-Company Payments
+**Goal**: Each business can accept customer payments through their own Comgate merchant account, and the DB schema is provider-agnostic so adding Stripe later requires no structural changes
+**Depends on**: Phase 50 (v3.0 complete)
+**Requirements**: PAY-01, PAY-02, PAY-03, PAY-04
+**Success Criteria** (what must be TRUE):
+  1. A business owner navigates to Settings > Payments, enters their Comgate merchant ID and secret, saves, and the credentials are stored encrypted — the page confirms the configuration is active
+  2. When a customer completes a booking with payment, the Comgate payment is initiated via the business's own merchant credentials, not the platform account — the payment appears in the business owner's Comgate dashboard
+  3. The `payment_providers` table exists in the database with a provider-agnostic schema (provider field, credentials JSONB, company_id) — adding a second provider (e.g., Stripe) requires no DDL changes beyond inserting a new row
+  4. Platform subscription charges still route through the platform Comgate account (merchant 498621), not the business's Comgate account — the two payment paths are independently verifiable in test
+**Plans**: TBD
+
+### Phase 52: Verification & Bug Fixing
+**Goal**: Every major user flow runs without errors on the Vercel-compatible stack, all bugs introduced or discovered from v3.0 agent-written code are fixed, and the platform is safe to deploy
+**Depends on**: Phase 51 (per-company payments must be working to verify the payment flow end-to-end)
+**Requirements**: VER-01, VER-02, VER-03, VER-04, VER-05, VER-06, VER-08
+**Success Criteria** (what must be TRUE):
+  1. Running `pnpm dev` (with Neon + Upstash config) produces zero console errors and zero failed API calls on first load — the dev server is ready within 30 seconds
+  2. A new user can sign up, complete the onboarding wizard, create a service, create an employee, and assign the service to the employee — all steps complete without errors or blank screens
+  3. A customer visiting the public booking URL can select a service, pick a slot, enter their details, complete a payment via the business's Comgate account, and receive a confirmation — the booking appears in the owner's dashboard
+  4. An admin logging in can access impersonation, feature flags, company suspend/unsuspend, broadcast, maintenance mode, platform metrics, and the audit log — each feature responds correctly with real data
+  5. The marketplace search returns results, a firm detail page loads with services and reviews, and "Book Now" navigates to the correct public booking wizard
+  6. Booking confirmation emails send within 60 seconds of booking creation, and status-change emails send on confirm/cancel/complete — verified by checking the notification log in the admin panel
+  7. All bugs identified during manual walkthrough of flows 1-6 above are fixed and re-verified — no known P1 or P2 bugs remain open
+**Plans**: TBD
+
+### Phase 53: Deployment & Go Live
+**Goal**: ScheduleBox is live on Vercel with a custom domain, SSL, production environment variables, a seeded demo company, and Comgate recurring billing verified — Playwright E2E passes green as the final gate
+**Depends on**: Phase 52 (all bugs fixed before deploying to production)
+**Requirements**: VER-07, DEP-01, DEP-02, DEP-03, DEP-04
+**Success Criteria** (what must be TRUE):
+  1. The full Playwright E2E suite (all 7 existing specs plus the new per-company payment spec) passes green in CI against the Neon production database — zero flaky tests, zero skipped tests
+  2. The app is reachable at the production Vercel URL with HTTPS — all API routes return expected responses, no 500 errors on the health check or homepage
+  3. A custom domain (when provided) resolves to the Vercel deployment with a valid SSL certificate — HTTP redirects to HTTPS automatically
+  4. The Neon production database contains a seeded demo company with services, employees, and sample bookings — logging in as the demo owner shows a populated dashboard
+  5. A test subscription upgrade on production successfully triggers Comgate recurring billing on merchant 498621 — the subscription state transitions from trial/free to the paid plan and the invoice PDF is generated
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -355,12 +404,15 @@ Plans:
 | 42. End Customer Booking | v2.0 | 2/2 | Complete | 2026-03-13 |
 | 43. Admin Platform | v2.0 | 1/1 | Complete | 2026-03-13 |
 | 44. Production Deployment | v2.0 | 2/2 | Complete | 2026-03-13 |
-| 45. Infrastructure Migration | 3/3 | Complete   | 2026-03-16 | - |
-| 46. Security Hardening | 3/3 | Complete   | 2026-03-16 | - |
-| 47. Notifications & Super-Admin | 5/5 | Complete    | 2026-03-18 | - |
-| 48. Marketplace & UX | 5/5 | Complete    | 2026-03-18 | - |
-| 49. Observability & Verticals | 3/3 | Complete    | 2026-03-18 | - |
-| 50. Testing & Hardening | 5/5 | Complete    | 2026-03-18 | - |
+| 45. Infrastructure Migration | v3.0 | 3/3 | Complete | 2026-03-16 |
+| 46. Security Hardening | v3.0 | 3/3 | Complete | 2026-03-16 |
+| 47. Notifications & Super-Admin | v3.0 | 5/5 | Complete | 2026-03-18 |
+| 48. Marketplace & UX | v3.0 | 5/5 | Complete | 2026-03-18 |
+| 49. Observability & Verticals | v3.0 | 3/3 | Complete | 2026-03-18 |
+| 50. Testing & Hardening | v3.0 | 5/5 | Complete | 2026-03-18 |
+| 51. Per-Company Payments | v3.1 | 0/TBD | Not started | - |
+| 52. Verification & Bug Fixing | v3.1 | 0/TBD | Not started | - |
+| 53. Deployment & Go Live | v3.1 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -370,4 +422,5 @@ Plans:
 *v1.3 shipped: 2026-02-25*
 *v1.4 shipped: 2026-03-12*
 *v2.0 shipped: 2026-03-16*
-*v3.0 roadmap created: 2026-03-16*
+*v3.0 shipped: 2026-03-18*
+*v3.1 roadmap created: 2026-03-18*

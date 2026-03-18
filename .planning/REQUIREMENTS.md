@@ -89,4 +89,4 @@ Source: v3.0 completion review + production readiness assessment.
 ---
 
 _Requirements defined: 2026-03-18_
-_Last updated: 2026-03-18 after milestone v3.1 definition_
+_Last updated: 2026-03-18 after v3.1 roadmap created_
