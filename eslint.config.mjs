@@ -90,6 +90,8 @@ export default tseslint.config(
       'k8s/**',
       '.planning/**',
       '.claude/**',
+      '.storybook/**',
+      'storybook-static/**',
       'load-tests/**',
       'helm/**',
       '_*.cjs',

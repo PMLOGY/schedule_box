@@ -3,6 +3,21 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Production Launch & 100% Documentation Coverage
 status: active
+stopped_at: Completed 50-testing-hardening 50-01-PLAN.md
+last_updated: "2026-03-18T21:19:23.678Z"
+last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
+progress:
+  total_phases: 12
+  completed_phases: 11
+  total_plans: 35
+  completed_plans: 31
+---
+
+---
+gsd_state_version: 1.0
+milestone: v3.0
+milestone_name: Production Launch & 100% Documentation Coverage
+status: active
 stopped_at: Phase 50 planned (5 plans, 3 waves)
 last_updated: "2026-03-18T21:12:19.714Z"
 last_activity: 2026-03-16 — v3.0 roadmap created, 6 phases defined, 47 requirements mapped
@@ -129,6 +144,7 @@ v3.0 decisions:
 - [Phase 49-observability-verticals]: OTEL_TRACES_SAMPLER=parentbased_traceidratio + OTEL_TRACES_SAMPLER_ARG=0.1 via env vars; set in Vercel project settings for production 10% sampling
 - [Phase 49-observability-verticals]: Step3CustomerInfo reads company industryType from useCompanySettingsQuery; metadata spoofing prevented by validating industry_type match in public booking API
 - [Phase 49-observability-verticals]: Upselling gate uses fail-open pattern: DB errors never block upselling compute; UpsellingSuggestions uses retry:false to avoid auth errors in public booking flow
+- [Phase 50-testing-hardening]: db.query.* relational API mocked as vi.fn() on query namespace; db.select() chain mocked with makeSelectChain() helper; drizzle-orm operators mocked entirely; date-fns and buffer-time.ts run real
 
 ## Blockers
 
@@ -167,9 +183,10 @@ v3.0 decisions:
 | Phase 49-observability-verticals P02 | 24min | 2 tasks | 9 files |
 | Phase 49-observability-verticals P01 | 33min | 2 tasks | 9 files |
 | Phase 49-observability-verticals P03 | 11min | 2 tasks | 10 files |
+| Phase 50-testing-hardening P01 | 15min | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-18T21:12:19.709Z
-Stopped at: Phase 50 planned (5 plans, 3 waves)
-Resume file: .planning/phases/50-testing-hardening/50-01-PLAN.md
+Last session: 2026-03-18T21:19:23.674Z
+Stopped at: Completed 50-testing-hardening 50-01-PLAN.md
+Resume file: None
