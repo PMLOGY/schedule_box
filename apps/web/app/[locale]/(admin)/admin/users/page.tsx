@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/shared/page-header';
-import { Search } from 'lucide-react';
+import { Search, UserCog } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -27,13 +28,19 @@ import {
 import { useAdminUsers, useToggleUserActive } from '@/hooks/use-admin-queries';
 import { format } from 'date-fns';
 import { cs } from 'date-fns/locale';
+import { storeImpersonationSession } from '@/components/admin/impersonation-banner';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function AdminUsersPage() {
   const t = useTranslations('admin.users');
+  const tImp = useTranslations('admin.impersonation');
   const tCommon = useTranslations('common');
+  const router = useRouter();
+  const accessToken = useAuthStore((s) => s.accessToken);
   const [page, setPage] = useState(1);
   const [roleFilter, setRoleFilter] = useState<string | undefined>(undefined);
   const [search, setSearch] = useState('');
+  const [impersonatingUuid, setImpersonatingUuid] = useState<string | null>(null);
 
   const { data, isLoading } = useAdminUsers({
     page,
@@ -49,6 +56,56 @@ export default function AdminUsersPage() {
       toast.success(currentlyActive ? t('deactivated') : t('activated'));
     } catch {
       toast.error(t('toggleError'));
+    }
+  };
+
+  const handleImpersonate = async (uuid: string, role: string) => {
+    if (role === 'admin') return;
+    setImpersonatingUuid(uuid);
+    try {
+      const res = await fetch('/api/v1/admin/impersonate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ targetUserUuid: uuid }),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(
+          (err as { error?: { message?: string } })?.error?.message ?? tImp('startError'),
+        );
+      }
+
+      const result = (await res.json()) as {
+        data: {
+          targetUser: { name: string; email: string; role: string };
+          expiresAt: string;
+        };
+      };
+      const { data: impData } = result;
+
+      storeImpersonationSession({
+        name: impData.targetUser.name,
+        email: impData.targetUser.email,
+        role: impData.targetUser.role,
+        expiresAt: impData.expiresAt,
+      });
+
+      toast.success(tImp('started', { name: impData.targetUser.name }));
+
+      if (impData.targetUser.role === 'customer') {
+        router.push('/');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : tImp('startError'));
+    } finally {
+      setImpersonatingUuid(null);
     }
   };
 
@@ -157,14 +214,29 @@ export default function AdminUsersPage() {
                       : '-'}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleToggleActive(user.uuid, user.is_active)}
-                      disabled={toggleMutation.isPending}
-                    >
-                      {user.is_active ? t('deactivate') : t('activate')}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleToggleActive(user.uuid, user.is_active)}
+                        disabled={toggleMutation.isPending}
+                      >
+                        {user.is_active ? t('deactivate') : t('activate')}
+                      </Button>
+                      {user.role !== 'admin' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => handleImpersonate(user.uuid, user.role)}
+                          disabled={impersonatingUuid === user.uuid}
+                          title={tImp('button')}
+                        >
+                          <UserCog className="h-4 w-4 mr-1" aria-hidden="true" />
+                          {tImp('button')}
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

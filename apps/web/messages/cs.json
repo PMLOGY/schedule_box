@@ -2177,6 +2177,11 @@
       "dashboard": "Přehled",
       "companies": "Firmy",
       "users": "Uživatelé",
+      "featureFlags": "Feature Flags",
+      "broadcast": "Vysílání",
+      "maintenance": "Údržba",
+      "metrics": "Metriky",
+      "auditLog": "Audit log",
       "backToDashboard": "Zpět na dashboard",
       "collapse": "Skrýt"
     },
@@ -2234,6 +2239,50 @@
       "activated": "Uživatel byl aktivován",
       "deactivated": "Uživatel byl deaktivován",
       "toggleError": "Nepodařilo se změnit stav uživatele"
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "createFlag": "Vytvořit flag",
+      "createFlagTitle": "Vytvořit feature flag",
+      "created": "Feature flag byl vytvořen",
+      "createError": "Nepodařilo se vytvořit feature flag",
+      "updated": "Feature flag byl aktualizován",
+      "updateError": "Nepodařilo se aktualizovat feature flag",
+      "deleted": "Feature flag byl smazán",
+      "deleteError": "Nepodařilo se smazat feature flag",
+      "enabled": "Zapnuto",
+      "disabled": "Vypnuto",
+      "overridesTitle": "Přepsání pro firmy",
+      "noOverrides": "Žádná přepsání pro firmy nejsou nastavena.",
+      "overrideUpdated": "Přepsání pro firmu bylo aktualizováno",
+      "overrideError": "Nepodařilo se aktualizovat přepsání pro firmu",
+      "columns": {
+        "name": "Název",
+        "description": "Popis",
+        "globalStatus": "Globální stav",
+        "overrides": "Přepsání"
+      },
+      "fields": {
+        "name": "Název flagu",
+        "description": "Popis",
+        "descriptionPlaceholder": "Volitelný popis tohoto feature flagu",
+        "enableGlobally": "Zapnout globálně"
+      }
+    },
+    "maintenance": {
+      "title": "Režim údržby",
+      "status": "Aktuální stav",
+      "statusNormal": "Normální — platforma je dostupná",
+      "statusMaintenance": "Údržba aktivní — uživatelé jsou přesměrováni",
+      "enableToggle": "Zapnout režim údržby",
+      "customMessage": "Vlastní zpráva (volitelné)",
+      "customMessagePlaceholder": "Zpráva zobrazená uživatelům na stránce údržby",
+      "warning": "Pokud je zapnuto, všichni uživatelé bez admin role uvidí stránku údržby.",
+      "enabled": "Režim údržby byl zapnut",
+      "disabled": "Režim údržby byl vypnut",
+      "toggleError": "Nepodařilo se změnit režim údržby",
+      "save": "Uložit",
+      "saving": "Ukládám..."
     }
   },
   "portal": {

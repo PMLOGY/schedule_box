@@ -2103,6 +2103,11 @@
       "dashboard": "Prehľad",
       "companies": "Firmy",
       "users": "Používatelia",
+      "featureFlags": "Feature Flags",
+      "broadcast": "Vysielanie",
+      "maintenance": "Údržba",
+      "metrics": "Metriky",
+      "auditLog": "Audit log",
       "backToDashboard": "Späť na dashboard",
       "collapse": "Skryť"
     },
@@ -2160,6 +2165,73 @@
       "activated": "Používateľ bol aktivovaný",
       "deactivated": "Používateľ bol deaktivovaný",
       "toggleError": "Nepodarilo sa zmeniť stav používateľa"
+    },
+    "impersonation": {
+      "button": "Napodobniť",
+      "active": "Napodobujete: {name} ({email})",
+      "expires": "Vyprší za {time}",
+      "endSession": "Ukončiť reláciu",
+      "started": "Napodobovanie zahájené pre {name}",
+      "startError": "Nepodarilo sa zahájit napodobovanie",
+      "ended": "Napodobovacia relácia ukončená"
+    },
+    "auditLog": {
+      "title": "Audit log",
+      "search": "Hľadať admina...",
+      "allActions": "Všetky akcie",
+      "columns": {
+        "timestamp": "Čas",
+        "admin": "Admin",
+        "action": "Akcia",
+        "target": "Cieľ",
+        "ip": "IP adresa",
+        "before": "Pred",
+        "after": "Po"
+      }
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "createFlag": "Vytvoriť flag",
+      "createFlagTitle": "Vytvoriť feature flag",
+      "created": "Feature flag bol vytvorený",
+      "createError": "Nepodarilo sa vytvoriť feature flag",
+      "updated": "Feature flag bol aktualizovaný",
+      "updateError": "Nepodarilo sa aktualizovať feature flag",
+      "deleted": "Feature flag bol zmazaný",
+      "deleteError": "Nepodarilo sa zmazať feature flag",
+      "enabled": "Zapnuté",
+      "disabled": "Vypnuté",
+      "overridesTitle": "Prepísania pre firmy",
+      "noOverrides": "Žiadne prepísania pre firmy nie sú nastavené.",
+      "overrideUpdated": "Prepísanie pre firmu bolo aktualizované",
+      "overrideError": "Nepodarilo sa aktualizovať prepísanie pre firmu",
+      "columns": {
+        "name": "Názov",
+        "description": "Popis",
+        "globalStatus": "Globálny stav",
+        "overrides": "Prepísania"
+      },
+      "fields": {
+        "name": "Názov flagu",
+        "description": "Popis",
+        "descriptionPlaceholder": "Voliteľný popis tohto feature flagu",
+        "enableGlobally": "Zapnúť globálne"
+      }
+    },
+    "maintenance": {
+      "title": "Režim údržby",
+      "status": "Aktuálny stav",
+      "statusNormal": "Normálny — platforma je dostupná",
+      "statusMaintenance": "Údržba aktívna — používatelia sú presmerovaní",
+      "enableToggle": "Zapnúť režim údržby",
+      "customMessage": "Vlastná správa (voliteľné)",
+      "customMessagePlaceholder": "Správa zobrazená používateľom na stránke údržby",
+      "warning": "Ak je zapnuté, všetci používatelia bez admin role uvidia stránku údržby.",
+      "enabled": "Režim údržby bol zapnutý",
+      "disabled": "Režim údržby bol vypnutý",
+      "toggleError": "Nepodarilo sa zmeniť režim údržby",
+      "save": "Uložiť",
+      "saving": "Ukladám..."
     }
   },
   "portal": {

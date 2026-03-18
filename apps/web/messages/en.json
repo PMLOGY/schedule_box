@@ -2177,6 +2177,11 @@
       "dashboard": "Dashboard",
       "companies": "Companies",
       "users": "Users",
+      "featureFlags": "Feature Flags",
+      "broadcast": "Broadcast",
+      "maintenance": "Maintenance",
+      "metrics": "Metrics",
+      "auditLog": "Audit Log",
       "backToDashboard": "Back to Dashboard",
       "collapse": "Hide"
     },
@@ -2234,6 +2239,50 @@
       "activated": "User has been activated",
       "deactivated": "User has been deactivated",
       "toggleError": "Failed to change user status"
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "createFlag": "Create Flag",
+      "createFlagTitle": "Create Feature Flag",
+      "created": "Feature flag created",
+      "createError": "Failed to create feature flag",
+      "updated": "Feature flag updated",
+      "updateError": "Failed to update feature flag",
+      "deleted": "Feature flag deleted",
+      "deleteError": "Failed to delete feature flag",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "overridesTitle": "Per-Company Overrides",
+      "noOverrides": "No per-company overrides configured.",
+      "overrideUpdated": "Company override updated",
+      "overrideError": "Failed to update company override",
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "globalStatus": "Global Status",
+        "overrides": "Overrides"
+      },
+      "fields": {
+        "name": "Flag Name",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description of this feature flag",
+        "enableGlobally": "Enable globally"
+      }
+    },
+    "maintenance": {
+      "title": "Maintenance Mode",
+      "status": "Current Status",
+      "statusNormal": "Normal — platform is accessible",
+      "statusMaintenance": "Maintenance Active — users are redirected",
+      "enableToggle": "Enable Maintenance Mode",
+      "customMessage": "Custom Message (optional)",
+      "customMessagePlaceholder": "Message shown to users on the maintenance page",
+      "warning": "When enabled, all non-admin users will see the maintenance page.",
+      "enabled": "Maintenance mode enabled",
+      "disabled": "Maintenance mode disabled",
+      "toggleError": "Failed to update maintenance mode",
+      "save": "Apply",
+      "saving": "Applying..."
     }
   },
   "portal": {
