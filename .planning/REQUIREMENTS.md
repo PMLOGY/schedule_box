@@ -74,7 +74,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 - [x] **TEST-01**: Vitest unit test coverage reaches 80% on critical business logic paths
 - [ ] **TEST-02**: Playwright E2E tests for booking flow, payments, auth, and admin
 - [ ] **TEST-03**: Testcontainers integration tests for DB operations (CI-only)
-- [ ] **TEST-04**: Storybook for core UI components (Button, Card, Dialog, Badge, DataTable)
+- [x] **TEST-04**: Storybook for core UI components (Button, Card, Dialog, Badge, DataTable)
 
 ### Industry Verticals
 
@@ -164,7 +164,7 @@ Source: GAP Analysis (32 gaps) + Employee Review Feedback (5 items).
 | TEST-01 | Phase 50 | Complete |
 | TEST-02 | Phase 50 | Pending |
 | TEST-03 | Phase 50 | Pending |
-| TEST-04 | Phase 50 | Pending |
+| TEST-04 | Phase 50 | Complete |
 | HARD-01 | Phase 50 | Pending |
 | HARD-02 | Phase 50 | Pending |
 
