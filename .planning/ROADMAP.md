@@ -299,7 +299,13 @@ Plans:
   3. Integration tests using Testcontainers spin up a real isolated PostgreSQL instance per suite — tests run cleanly in CI (documented as CI-only; local dev without Docker skips these tests gracefully)
   4. Storybook renders Button, Card, Dialog, Badge, and DataTable components in all their CVA glass variants — the catalog is browsable at `/storybook` in the dev environment
   5. The `bookings` table is range-partitioned by month via a raw SQL migration — existing data is migrated into partitions; queries scoped to `company_id + date range` show improved explain plans; the migration is reversible via a documented rollback script
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 50-01-PLAN.md — Availability engine + buffer-time unit tests (TEST-01)
+- [ ] 50-02-PLAN.md — Payment saga + transitions + expiration unit tests (TEST-01)
+- [ ] 50-03-PLAN.md — Storybook 8 setup + glass component stories (TEST-04)
+- [ ] 50-04-PLAN.md — Booking service tests + E2E expansion + Testcontainers guard (TEST-01, TEST-02, TEST-03)
+- [ ] 50-05-PLAN.md — DB partitioning for bookings, notifications, audit_logs (HARD-01, HARD-02)
 
 ## Progress
 
@@ -354,7 +360,7 @@ Plans:
 | 47. Notifications & Super-Admin | 5/5 | Complete    | 2026-03-18 | - |
 | 48. Marketplace & UX | 5/5 | Complete    | 2026-03-18 | - |
 | 49. Observability & Verticals | 2/3 | In Progress|  | - |
-| 50. Testing & Hardening | v3.0 | TBD | Not started | - |
+| 50. Testing & Hardening | v3.0 | 0/5 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*

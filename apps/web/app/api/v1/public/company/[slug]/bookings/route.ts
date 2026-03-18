@@ -38,6 +38,7 @@ import { lt, gt, or, sql } from 'drizzle-orm';
 import { encrypt, hmacIndex } from '@/lib/security/encryption';
 import { triggerWebhooks } from '@/lib/webhooks/trigger';
 import { logRouteComplete, getRequestId } from '@/lib/logger/route-logger';
+import { bookingMetadataSchema } from '@/lib/industry/industry-fields';
 
 // ============================================================================
 // SCHEMAS
@@ -62,6 +63,7 @@ const publicBookingCreateSchema = z.object({
   customer_phone: z.string().max(50).optional(),
   notes: z.string().max(1000).optional(),
   reward_id: z.number().int().positive().optional(),
+  metadata: bookingMetadataSchema,
 });
 
 type PublicBookingCreate = z.infer<typeof publicBookingCreateSchema>;
@@ -136,6 +138,7 @@ async function _handlePublicBookingCreate({
       uuid: true,
       name: true,
       timezone: true,
+      industryType: true,
     },
   });
 
@@ -144,6 +147,14 @@ async function _handlePublicBookingCreate({
   }
 
   const companyId = company.id;
+
+  // Validate metadata industry_type matches company's actual industry_type (prevent spoofing)
+  if (body.metadata && body.metadata !== null) {
+    const metaIndustryType = (body.metadata as { industry_type?: string }).industry_type;
+    if (metaIndustryType && metaIndustryType !== company.industryType) {
+      throw new ValidationError('Metadata industry_type does not match company industry');
+    }
+  }
 
   // Check booking limit for company's plan tier
   await checkBookingLimit(companyId);
@@ -505,6 +516,7 @@ async function _handlePublicBookingCreate({
         price: service.price,
         currency: service.currency,
         discountAmount,
+        bookingMetadata: body.metadata ?? null,
       })
       .returning();
 

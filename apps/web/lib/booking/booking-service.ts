@@ -67,6 +67,7 @@ export interface BookingWithRelations {
   cancelledBy: 'customer' | 'employee' | 'admin' | 'system' | null;
   createdAt: string;
   updatedAt: string;
+  bookingMetadata?: Record<string, unknown> | null;
 }
 
 // ============================================================================
@@ -526,6 +527,7 @@ export async function listBookings(
       cancelledBy: bookings.cancelledBy,
       createdAt: bookings.createdAt,
       updatedAt: bookings.updatedAt,
+      bookingMetadata: bookings.bookingMetadata,
       // Customer fields
       customerUuid: customers.uuid,
       customerName: customers.name,
@@ -596,6 +598,7 @@ export async function listBookings(
     cancelledBy: row.cancelledBy,
     createdAt: row.createdAt?.toISOString() ?? new Date().toISOString(),
     updatedAt: row.updatedAt?.toISOString() ?? new Date().toISOString(),
+    bookingMetadata: (row.bookingMetadata as Record<string, unknown> | null) ?? null,
   }));
 
   return {
@@ -644,6 +647,7 @@ export async function getBooking(
       cancelledBy: bookings.cancelledBy,
       createdAt: bookings.createdAt,
       updatedAt: bookings.updatedAt,
+      bookingMetadata: bookings.bookingMetadata,
       // Customer fields
       customerUuid: customers.uuid,
       customerName: customers.name,
@@ -712,6 +716,7 @@ export async function getBooking(
     cancelledBy: booking.cancelledBy,
     createdAt: booking.createdAt?.toISOString() ?? new Date().toISOString(),
     updatedAt: booking.updatedAt?.toISOString() ?? new Date().toISOString(),
+    bookingMetadata: (booking.bookingMetadata as Record<string, unknown> | null) ?? null,
   };
 }
 

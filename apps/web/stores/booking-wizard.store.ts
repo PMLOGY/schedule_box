@@ -23,6 +23,7 @@ interface BookingWizardData {
   customerEmail?: string;
   customerPhone?: string;
   notes?: string;
+  bookingMetadata?: Record<string, string> | null;
 }
 
 interface BookingWizardState {

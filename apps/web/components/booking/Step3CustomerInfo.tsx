@@ -9,6 +9,9 @@ import { z } from 'zod';
 import { Search, X } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { useBookingWizard } from '@/stores/booking-wizard.store';
+import { useIndustryLabels } from '@/hooks/use-industry-labels';
+import { VERTICAL_FIELDS } from '@/lib/industry/industry-fields';
+import { useCompanySettingsQuery } from '@/hooks/use-settings-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -42,6 +45,7 @@ const customerSchema = z.object({
     .optional()
     .or(z.literal('')),
   notes: z.string().max(1000).optional(),
+  metadata: z.record(z.string()).optional(),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -52,14 +56,19 @@ function CustomerForm({
   disabled,
   onSubmit,
   onBack,
+  industryType,
 }: {
   defaultValues: CustomerFormValues;
   disabled: boolean;
   onSubmit: (values: CustomerFormValues) => void;
   onBack: () => void;
+  industryType: string | null;
 }) {
   const t = useTranslations('booking.wizard.step3');
   const tCommon = useTranslations('common');
+  const labels = useIndustryLabels();
+
+  const verticalFields = VERTICAL_FIELDS[industryType ?? ''] ?? [];
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -125,6 +134,37 @@ function CustomerForm({
           )}
         />
 
+        {/* Vertical-specific fields — shown only when industry_type has fields */}
+        {verticalFields.length > 0 && (
+          <div className="space-y-4 pt-4 border-t border-border/50">
+            <h4 className="text-sm font-medium text-muted-foreground">
+              {labels.customer} — doplňkové údaje
+            </h4>
+            {verticalFields.map((vField) => (
+              <FormField
+                key={vField.key}
+                control={form.control}
+                name={`metadata.${vField.key}` as keyof CustomerFormValues}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{vField.label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={typeof field.value === 'string' ? field.value : ''}
+                        placeholder={vField.placeholder}
+                        maxLength={vField.maxLength}
+                        disabled={disabled}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </div>
+        )}
+
         <div className="flex justify-between">
           <Button type="button" variant="outline" onClick={onBack}>
             {tCommon('back')}
@@ -139,6 +179,9 @@ function CustomerForm({
 export function Step3CustomerInfo() {
   const t = useTranslations('booking.wizard.step3');
   const { data, updateData, nextStep, prevStep } = useBookingWizard();
+  const labels = useIndustryLabels();
+  const { data: companySettings } = useCompanySettingsQuery();
+  const industryType = companySettings?.industry_type ?? null;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -210,6 +253,7 @@ export function Step3CustomerInfo() {
       customerEmail: values.customerEmail || undefined,
       customerPhone: values.customerPhone || undefined,
       notes: values.notes || undefined,
+      bookingMetadata: buildMetadata(values.metadata, industryType),
     });
     nextStep();
   };
@@ -221,12 +265,14 @@ export function Step3CustomerInfo() {
     customerEmail: selectedCustomer?.email ?? data.customerEmail ?? '',
     customerPhone: selectedCustomer?.phone ?? data.customerPhone ?? '',
     notes: data.notes ?? '',
+    metadata: {},
   };
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-semibold">{t('title')}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{labels.customer}</p>
       </div>
 
       <div className="space-y-4">
@@ -317,8 +363,29 @@ export function Step3CustomerInfo() {
           disabled={isExistingCustomer}
           onSubmit={handleSubmit}
           onBack={prevStep}
+          industryType={industryType}
         />
       </div>
     </div>
   );
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Build booking_metadata payload from form metadata values.
+ * Strips empty strings. Returns null when no values are present.
+ */
+function buildMetadata(
+  metadata: Record<string, string> | undefined,
+  industryType: string | null,
+): Record<string, string> | null {
+  if (!metadata || !industryType) return null;
+  const filtered = Object.fromEntries(
+    Object.entries(metadata).filter(([, v]) => v && v.trim() !== ''),
+  );
+  if (Object.keys(filtered).length === 0) return null;
+  return { industry_type: industryType, ...filtered };
 }
