@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 export const priceRangeEnum = z.enum(['$', '$$', '$$$', '$$$$']);
 
-export const sortByEnum = z.enum(['rating', 'distance', 'name']);
+export const sortByEnum = z.enum(['rating', 'distance', 'name', 'featured']);
 
 // ============================================================================
 // MARKETPLACE LISTING SCHEMAS

@@ -4,7 +4,7 @@
  */
 
 import { eq, and, ilike, or, sql } from 'drizzle-orm';
-import { db, marketplaceListings } from '@schedulebox/database';
+import { db, marketplaceListings, companies } from '@schedulebox/database';
 import { createRouteHandler } from '@/lib/middleware/route-handler';
 import { validateQuery } from '@/lib/middleware/validate';
 import { paginatedResponse } from '@/lib/utils/response';
@@ -66,6 +66,8 @@ export const GET = createRouteHandler({
         orderByClause = distanceFormula;
       } else if (sort_by === 'rating') {
         orderByClause = sql`${marketplaceListings.averageRating} DESC`;
+      } else if (sort_by === 'featured') {
+        orderByClause = sql`${marketplaceListings.featured} DESC, ${marketplaceListings.averageRating} DESC`;
       } else {
         orderByClause = sql`${marketplaceListings.title} ASC`;
       }
@@ -95,8 +97,10 @@ export const GET = createRouteHandler({
           created_at: marketplaceListings.createdAt,
           updated_at: marketplaceListings.updatedAt,
           distance_km: distanceFormula.as('distance_km'),
+          company_slug: companies.slug,
         })
         .from(marketplaceListings)
+        .leftJoin(companies, eq(marketplaceListings.companyId, companies.id))
         .where(and(...baseConditions))
         .orderBy(orderByClause)
         .limit(limit)
@@ -132,6 +136,7 @@ export const GET = createRouteHandler({
         created_at: listing.created_at?.toISOString(),
         updated_at: listing.updated_at?.toISOString(),
         distance: listing.distance_km, // Include distance field when lat/lng provided
+        company_slug: listing.company_slug,
       }));
 
       const totalPages = Math.ceil(totalCount / limit);
@@ -150,14 +155,39 @@ export const GET = createRouteHandler({
       orderByClause = sql`${marketplaceListings.averageRating} DESC`;
     } else if (sort_by === 'name') {
       orderByClause = sql`${marketplaceListings.title} ASC`;
+    } else if (sort_by === 'featured') {
+      orderByClause = sql`${marketplaceListings.featured} DESC, ${marketplaceListings.averageRating} DESC`;
     } else {
       // Default: rating
       orderByClause = sql`${marketplaceListings.averageRating} DESC`;
     }
 
     const data = await db
-      .select()
+      .select({
+        id: marketplaceListings.id,
+        uuid: marketplaceListings.uuid,
+        title: marketplaceListings.title,
+        description: marketplaceListings.description,
+        category: marketplaceListings.category,
+        subcategory: marketplaceListings.subcategory,
+        addressStreet: marketplaceListings.addressStreet,
+        addressCity: marketplaceListings.addressCity,
+        addressZip: marketplaceListings.addressZip,
+        latitude: marketplaceListings.latitude,
+        longitude: marketplaceListings.longitude,
+        images: marketplaceListings.images,
+        averageRating: marketplaceListings.averageRating,
+        reviewCount: marketplaceListings.reviewCount,
+        priceRange: marketplaceListings.priceRange,
+        featured: marketplaceListings.featured,
+        verified: marketplaceListings.verified,
+        isActive: marketplaceListings.isActive,
+        createdAt: marketplaceListings.createdAt,
+        updatedAt: marketplaceListings.updatedAt,
+        company_slug: companies.slug,
+      })
       .from(marketplaceListings)
+      .leftJoin(companies, eq(marketplaceListings.companyId, companies.id))
       .where(and(...baseConditions))
       .orderBy(orderByClause)
       .limit(limit)
@@ -192,6 +222,7 @@ export const GET = createRouteHandler({
       is_active: listing.isActive,
       created_at: listing.createdAt?.toISOString(),
       updated_at: listing.updatedAt?.toISOString(),
+      company_slug: listing.company_slug,
     }));
 
     const totalPages = Math.ceil(totalCount / limit);

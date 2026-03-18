@@ -14,18 +14,33 @@ import { apiClient } from '@/lib/api-client';
 
 export interface MarketplaceListing {
   id: string;
-  company_name: string;
   title: string;
   description: string | null;
   category: string | null;
-  rating: number | null;
+  subcategory: string | null;
+  address_street: string | null;
+  address_city: string | null;
+  address_zip: string | null;
+  latitude: string | null;
+  longitude: string | null;
+  images: string[] | null;
+  average_rating: string | null;
   review_count: number;
-  is_visible: boolean;
-  contact_email: string | null;
-  contact_phone: string | null;
-  slug: string | null;
-  created_at: string;
+  price_range: string | null;
+  featured: boolean | null;
+  verified: boolean | null;
+  is_active: boolean;
+  created_at: string | null;
   updated_at: string | null;
+  distance: number | null;
+  company_slug: string | null;
+  // Legacy fields kept for backward compatibility with MyListing tab
+  company_name?: string;
+  rating?: number | null;
+  is_visible?: boolean;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  slug?: string | null;
 }
 
 export interface MarketplaceListingsParams {
@@ -33,6 +48,11 @@ export interface MarketplaceListingsParams {
   limit?: number;
   category?: string;
   search?: string;
+  city?: string;
+  lat?: number;
+  lng?: number;
+  radius_km?: number;
+  sort_by?: 'rating' | 'distance' | 'name' | 'featured';
 }
 
 export interface MyListingData {
