@@ -47,6 +47,13 @@ async function seed() {
   const schema = await import('../schema/index');
 
   try {
+    // Skip seed if data already exists (idempotent for repeated deploys)
+    const existingRoles = await db.select().from(schema.roles);
+    if (existingRoles.length > 0) {
+      console.log('Database already seeded (roles exist). Skipping.');
+      return;
+    }
+
     // ========================================================================
     // 1. ROLES AND PERMISSIONS
     // ========================================================================

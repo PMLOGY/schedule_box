@@ -3,7 +3,10 @@ import { drizzle as drizzleHttp } from 'drizzle-orm/neon-http';
 import { drizzle as drizzleWs } from 'drizzle-orm/neon-serverless';
 import { drizzle as drizzlePostgres } from 'drizzle-orm/postgres-js';
 import type { Sql as PostgresSql } from 'postgres';
+import { createRequire } from 'node:module';
 import * as schema from './schema/index';
+
+const _require = createRequire(import.meta.url);
 
 // Use postgres.js drizzle type as the canonical type — all drivers are compatible at query level
 type DrizzleDb = ReturnType<typeof drizzlePostgres<typeof schema>>;
@@ -22,6 +25,13 @@ function isNeonUrl(): boolean {
   return !!process.env.VERCEL || getConnectionUrl().includes('neon.tech');
 }
 
+function getSslConfig(): Record<string, unknown> {
+  const url = getConnectionUrl();
+  if (url.includes('sslmode=')) return {}; // explicit in URL — let postgres.js handle it
+  if (isNeonUrl()) return { ssl: 'require' };
+  return { ssl: false }; // self-hosted (Coolify, Docker) — no TLS
+}
+
 /**
  * Standard query client
  * - Vercel/Neon: HTTP transport (stateless, zero connection overhead)
@@ -36,12 +46,16 @@ export const db = new Proxy({} as DrizzleDb, {
         _db = drizzleHttp(sql, { schema }) as unknown as DrizzleDb;
       } else {
         // Local PostgreSQL — use postgres.js (devDependency)
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const postgres = require('postgres') as (
+        const postgres = _require('postgres') as (
           url: string,
           opts: Record<string, unknown>,
         ) => PostgresSql;
-        const queryClient = postgres(url, { max: 10, idle_timeout: 20, connect_timeout: 10 });
+        const queryClient = postgres(url, {
+          max: 10,
+          idle_timeout: 20,
+          connect_timeout: 10,
+          ...getSslConfig(),
+        });
         _db = drizzlePostgres(queryClient, { schema });
       }
     }
@@ -64,12 +78,16 @@ export const dbTx = new Proxy({} as DrizzleDb, {
         _dbTx = drizzleWs({ client: pool, schema }) as unknown as DrizzleDb;
       } else {
         // Local PostgreSQL — use postgres.js (same driver, transactions work natively)
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const postgres = require('postgres') as (
+        const postgres = _require('postgres') as (
           url: string,
           opts: Record<string, unknown>,
         ) => PostgresSql;
-        const txClient = postgres(url, { max: 5, idle_timeout: 20, connect_timeout: 10 });
+        const txClient = postgres(url, {
+          max: 5,
+          idle_timeout: 20,
+          connect_timeout: 10,
+          ...getSslConfig(),
+        });
         _dbTx = drizzlePostgres(txClient, { schema });
       }
     }
@@ -88,7 +106,6 @@ export type Database = typeof db;
  * @internal Dev scripts only
  */
 export function getMigrationClient(): PostgresSql {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const factory = require('postgres') as (url: string, opts: { max: number }) => PostgresSql;
-  return factory(getConnectionUrl(), { max: 1 });
+  const factory = _require('postgres') as (url: string, opts: { max: number }) => PostgresSql;
+  return factory(getConnectionUrl(), { max: 1, ...getSslConfig() });
 }

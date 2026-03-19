@@ -19,7 +19,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "db:deploy": "pnpm --filter @schedulebox/database db:migrate && pnpm --filter @schedulebox/database db:apply-sql",
+    "db:deploy": "pnpm --filter @schedulebox/database db:migrate && pnpm --filter @schedulebox/database db:apply-sql && pnpm --filter @schedulebox/database db:seed",
     "docker:up": "docker compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "docker:logs": "docker compose -f docker/docker-compose.yml logs -f",

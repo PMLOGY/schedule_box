@@ -17,8 +17,15 @@ if (!DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
 
+// Detect whether SSL is needed (Neon requires it, self-hosted typically doesn't)
+const isNeon = DATABASE_URL.includes('neon.tech');
+const sslConfig = isNeon ? 'require' : DATABASE_URL.includes('sslmode=') ? undefined : false;
+
 // Create single-connection client for migrations
-const migrationClient = postgres(DATABASE_URL, { max: 1 });
+const migrationClient = postgres(DATABASE_URL, {
+  max: 1,
+  ...(sslConfig !== undefined && { ssl: sslConfig }),
+});
 const db = drizzle(migrationClient);
 
 async function runMigrations() {
