@@ -77,6 +77,8 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+# i18n message files loaded at runtime by next-intl
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/messages ./apps/web/messages
 
 USER nextjs
 
