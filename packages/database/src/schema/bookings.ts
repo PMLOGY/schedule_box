@@ -95,7 +95,7 @@ export const bookings = pgTable(
     // CHECK constraints
     statusCheck: check(
       'bookings_status_check',
-      sql`${table.status} IN ('pending', 'confirmed', 'cancelled', 'completed', 'no_show')`,
+      sql`${table.status} IN ('pending', 'confirmed', 'cancelled', 'completed', 'no_show', 'expired')`,
     ),
     sourceCheck: check(
       'bookings_source_check',

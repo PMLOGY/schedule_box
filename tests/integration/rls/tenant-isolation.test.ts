@@ -382,31 +382,17 @@ describe.skipIf(process.env.SKIP_DOCKER === 'true')('RLS — cross-table isolati
   it('RLS prevents inserting data for another company', async () => {
     // Attempt to INSERT a customer with company_id = companyBId while
     // the RLS context is set to companyAId.
-    //
-    // Policy type: USING only (no WITH CHECK in policies.sql).
-    // With USING-only policies, the INSERT may succeed at the DB level
-    // but the row will be invisible to the inserting company.
-    // We document this behavior by checking visibility after insert.
-    const insertedId = await withRlsContext(companyAId, async (tx) => {
-      const ts = Date.now();
-      const result = await tx.unsafe<{ id: number }[]>(
-        `INSERT INTO customers (company_id, name, email)
-         VALUES ($1, 'Cross-Tenant Attempt', $2)
-         RETURNING id`,
-        [companyBId, `cross-tenant-${ts}@example.com`],
-      );
-      return result[0]?.id ?? null;
-    });
-
-    // Whether the insert was silently rejected or succeeded:
-    // Company A must NOT be able to see any record with company_id = companyBId
-    const visible = await withRlsContext(companyAId, async (tx) => {
-      if (insertedId === null) return [];
-      return tx.unsafe<{ id: number }[]>(`SELECT id FROM customers WHERE id = $1`, [insertedId]);
-    });
-
-    // The inserted row (if it succeeded) is invisible to company A
-    // because its company_id = companyBId which doesn't match the RLS context
-    expect(visible).toHaveLength(0);
+    // RLS policy blocks cross-tenant inserts with a policy violation error.
+    await expect(
+      withRlsContext(companyAId, async (tx) => {
+        const ts = Date.now();
+        await tx.unsafe(
+          `INSERT INTO customers (company_id, name, email)
+           VALUES ($1, 'Cross-Tenant Attempt', $2)
+           RETURNING id`,
+          [companyBId, `cross-tenant-${ts}@example.com`],
+        );
+      }),
+    ).rejects.toThrow(/row-level security/i);
   });
 });

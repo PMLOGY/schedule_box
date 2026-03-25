@@ -316,10 +316,10 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
+        run: pnpm --filter @schedulebox/web exec playwright install --with-deps chromium firefox webkit
 
       - name: Run E2E tests
-        run: npx playwright test --config apps/web/e2e/playwright.config.ts
+        run: pnpm --filter @schedulebox/web exec playwright test --config e2e/playwright.config.ts
         env:
           DATABASE_URL: postgresql://schedulebox:schedulebox@localhost:5432/schedulebox
           REDIS_URL: redis://localhost:6379

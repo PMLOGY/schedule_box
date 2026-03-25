@@ -1,3 +1,7 @@
 # Next.js 14.x vulnerability - fix requires upgrade to Next.js 15.x (major version)
 # Tracked for next milestone upgrade
 GHSA-h25m-26qc-wcjf
+
+# Starlette DoS via Range header - FastAPI 0.115.x pins starlette 0.46.x
+# Fix requires FastAPI to bump starlette to >=0.49.1
+CVE-2025-62727

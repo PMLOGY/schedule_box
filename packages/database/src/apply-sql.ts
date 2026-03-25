@@ -85,6 +85,11 @@ const SQL_FILES: SqlFile[] = [
     description:
       'Rename old plan names (starter→essential, professional→growth, enterprise→ai_powered) and create invoice sequence',
   },
+  {
+    name: 'Booking Status Expired Constraint',
+    path: join(__dirname, 'sql', 'booking-status-expired.sql'),
+    description: 'Add expired to bookings_status_check constraint',
+  },
 
   // 4. Composite indexes for query performance
   {
