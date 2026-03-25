@@ -1,7 +1,21 @@
 # Next.js 14.x vulnerability - fix requires upgrade to Next.js 15.x (major version)
-# Tracked for next milestone upgrade
 GHSA-h25m-26qc-wcjf
 
 # Starlette DoS via Range header - FastAPI 0.115.x pins starlette 0.46.x
-# Fix requires FastAPI to bump starlette to >=0.49.1
 CVE-2025-62727
+
+# zlib buffer overflow in untgz utility - Alpine base image, awaiting 3.23.4
+CVE-2026-22184
+
+# undici WebSocket DoS vulnerabilities - bundled with Node.js 20, awaiting upstream update
+CVE-2026-1526
+CVE-2026-1528
+CVE-2026-2229
+
+# esbuild bundles Go stdlib - not exploitable at runtime (build-time only binary)
+CVE-2025-68121
+CVE-2025-58183
+CVE-2025-61726
+CVE-2025-61728
+CVE-2025-61729
+CVE-2026-25679
