@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Unit tests for Payment SAGA Handlers
  *
@@ -86,18 +87,18 @@ function makeMockTx(booking: Record<string, unknown> | null) {
 const completedPayload = {
   bookingUuid: 'booking-uuid-001',
   paymentUuid: 'payment-uuid-001',
-};
+} as any;
 
 const failedPayload = {
   bookingUuid: 'booking-uuid-002',
   paymentUuid: 'payment-uuid-002',
   reason: 'Card declined',
-};
+} as any;
 
 const expiredPayload = {
   bookingUuid: 'booking-uuid-003',
   paymentUuid: 'payment-uuid-003',
-};
+} as any;
 
 // ---------------------------------------------------------------------------
 // handlePaymentCompleted

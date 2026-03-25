@@ -118,7 +118,7 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('throws NotFoundError when service not found (returns null)', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(undefined as any);
 
     await expect(calculateAvailability(BASE_PARAMS)).rejects.toThrow('Service not found');
   });
@@ -127,7 +127,7 @@ describe('calculateAvailability', () => {
     vi.mocked(db.query.services.findFirst).mockResolvedValueOnce({
       ...MOCK_SERVICE,
       isActive: false,
-    });
+    } as any);
 
     await expect(calculateAvailability(BASE_PARAMS)).rejects.toThrow('Service not found');
   });
@@ -136,7 +136,7 @@ describe('calculateAvailability', () => {
     vi.mocked(db.query.services.findFirst).mockResolvedValueOnce({
       ...MOCK_SERVICE,
       deletedAt: new Date('2026-01-01'),
-    });
+    } as any);
 
     await expect(calculateAvailability(BASE_PARAMS)).rejects.toThrow('Service not found');
   });
@@ -146,7 +146,7 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('returns empty array when no employees are assigned to the service', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
 
     // Employee join returns empty array
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
@@ -160,19 +160,19 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('applies employeeId filter in query when param is provided', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
 
     // Employee join returns the specific employee
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // No override
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
     // Employee-specific working hours found
-    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(MOCK_WORKING_HOURS);
+    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(MOCK_WORKING_HOURS as any);
     // No existing bookings
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
     // Employee name
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability({ ...BASE_PARAMS, employeeId: 5 });
 
@@ -186,7 +186,7 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('returns empty array when override marks the day as day-off', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // Override: day off
@@ -194,7 +194,7 @@ describe('calculateAvailability', () => {
       isDayOff: true,
       startTime: null,
       endTime: null,
-    });
+    } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
     expect(result).toEqual([]);
@@ -205,7 +205,7 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('skips day when override exists with isDayOff=false but no start/end times', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // Override: not a day off, but missing times (invalid override)
@@ -213,7 +213,7 @@ describe('calculateAvailability', () => {
       isDayOff: false,
       startTime: null,
       endTime: null,
-    });
+    } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
     expect(result).toEqual([]);
@@ -224,7 +224,7 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('generates slots within modified hours from override (not full-day schedule)', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // Override: modified hours 13:00-15:00 (only 2 hours)
@@ -232,11 +232,11 @@ describe('calculateAvailability', () => {
       isDayOff: false,
       startTime: '13:00',
       endTime: '15:00',
-    });
+    } as any);
 
     // No existing bookings
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -253,15 +253,15 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('returns empty array when no working hours defined for the day', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // No override
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
     // No employee-specific hours
-    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null as any);
     // No company-level default hours either
-    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
     expect(result).toEqual([]);
@@ -272,23 +272,23 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('falls back to company-level working hours when employee-specific hours absent', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // No override
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
     // First call: no employee-specific hours
-    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(null as any);
     // Second call: company-level hours
     vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
       startTime: '10:00',
       endTime: '12:00',
       isActive: true,
-    });
+    } as any);
 
     // No existing bookings
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -303,13 +303,13 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('generates correct 15-min interval slots for 9:00-17:00 with 60-min service', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
-    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(MOCK_WORKING_HOURS);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
+    vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce(MOCK_WORKING_HOURS as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -331,15 +331,15 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('filters out slots that conflict with existing confirmed bookings', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
     vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
       startTime: '09:00',
       endTime: '11:00',
       isActive: true,
-    });
+    } as any);
 
     // Existing booking: 09:00-10:00 (exactly the first slot)
     const existingBookingStart = new Date('2026-04-07T09:00:00');
@@ -359,9 +359,9 @@ describe('calculateAvailability', () => {
     vi.mocked(db.query.services.findFirst).mockResolvedValueOnce({
       bufferBeforeMinutes: 0,
       bufferAfterMinutes: 0,
-    });
+    } as any);
 
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -378,16 +378,16 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('filters slots within buffer time of existing booking', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
     // Working hours: 09:00-11:00
     vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
       startTime: '09:00',
       endTime: '11:00',
       isActive: true,
-    });
+    } as any);
 
     // Existing booking: 09:00-09:30
     const existingBookingStart = new Date('2026-04-07T09:00:00');
@@ -407,9 +407,9 @@ describe('calculateAvailability', () => {
     vi.mocked(db.query.services.findFirst).mockResolvedValueOnce({
       bufferBeforeMinutes: 0,
       bufferAfterMinutes: 30,
-    });
+    } as any);
 
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -434,20 +434,20 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('handles multi-day date range spanning 3 days', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
     // 3 days: 2026-04-07, 2026-04-08, 2026-04-09
     // Each day: no override, employee hours 09:00-10:00, no bookings
     for (let i = 0; i < 3; i++) {
-      vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+      vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null as any);
       vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
         startTime: '09:00',
         endTime: '10:00',
         isActive: true,
-      });
+      } as any);
       vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-      vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+      vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
     }
 
     const result = await calculateAvailability({
@@ -469,21 +469,21 @@ describe('calculateAvailability', () => {
   // -------------------------------------------------------------------------
 
   it('returns correct employeeUuid and employeeName from serviceEmployees join', async () => {
-    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE);
+    vi.mocked(db.query.services.findFirst).mockResolvedValueOnce(MOCK_SERVICE as any);
     vi.mocked(db.select).mockReturnValueOnce(
       makeSelectChain([
         { employeeId: 7, employeeUuid: 'special-uuid-7', employeeName: 'Petra Novotna' },
       ]) as any,
     );
 
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(undefined as any);
     vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
       startTime: '09:00',
       endTime: '10:00',
       isActive: true,
-    });
+    } as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Petra Novotna' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Petra Novotna' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 
@@ -502,17 +502,17 @@ describe('calculateAvailability', () => {
       ...MOCK_SERVICE,
       bufferBeforeMinutes: null,
       bufferAfterMinutes: null,
-    });
+    } as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([MOCK_EMPLOYEE_ROW]) as any);
 
-    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(null);
+    vi.mocked(db.query.workingHoursOverrides.findFirst).mockResolvedValueOnce(undefined as any);
     vi.mocked(db.query.workingHours.findFirst).mockResolvedValueOnce({
       startTime: '09:00',
       endTime: '10:00',
       isActive: true,
-    });
+    } as any);
     vi.mocked(db.select).mockReturnValueOnce(makeSelectChain([]) as any);
-    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' });
+    vi.mocked(db.query.employees.findFirst).mockResolvedValueOnce({ name: 'Jan Novak' } as any);
 
     const result = await calculateAvailability(BASE_PARAMS);
 

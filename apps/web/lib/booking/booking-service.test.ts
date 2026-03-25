@@ -221,7 +221,7 @@ describe('booking-service', () => {
       customer_id: 20,
       employee_id: 5,
       start_time: '2026-04-10T09:00:00Z',
-      notes: null,
+      notes: undefined,
       source: 'online' as const,
       resource_ids: undefined,
     };
@@ -328,7 +328,7 @@ describe('booking-service', () => {
     });
 
     it('auto-assigns employee when employee_id not provided', async () => {
-      const inputNoEmployee = { ...input, employee_id: undefined };
+      const inputNoEmployee = { ...input, employee_id: undefined, notes: undefined };
 
       (dbTx.transaction as any).mockImplementation(async (cb: any) => {
         const tx = {
@@ -411,7 +411,7 @@ describe('booking-service', () => {
 
       (db.select as any).mockReturnValueOnce(dataChain).mockReturnValueOnce(countChain);
 
-      const result = await listBookings({ status: 'confirmed' }, 1);
+      const result = await listBookings({ status: 'confirmed', page: 1, limit: 20 }, 1);
 
       expect(result.data).toHaveLength(0);
       expect(result.meta.total).toBe(0);
@@ -434,7 +434,10 @@ describe('booking-service', () => {
 
       (db.select as any).mockReturnValueOnce(dataChain).mockReturnValueOnce(countChain);
 
-      const result = await listBookings({ date_from: '2026-04-01', date_to: '2026-04-30' }, 1);
+      const result = await listBookings(
+        { date_from: '2026-04-01', date_to: '2026-04-30', page: 1, limit: 20 },
+        1,
+      );
 
       expect(result.data).toHaveLength(1);
     });
@@ -456,7 +459,7 @@ describe('booking-service', () => {
 
       (db.select as any).mockReturnValueOnce(dataChain).mockReturnValueOnce(countChain);
 
-      await listBookings({ employee_id: 5 }, 1);
+      await listBookings({ employee_id: 5, page: 1, limit: 20 }, 1);
 
       // Both select chains should have been called
       expect(db.select).toHaveBeenCalledTimes(2);
