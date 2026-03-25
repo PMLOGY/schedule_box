@@ -49,6 +49,7 @@ WORKDIR /app
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_OUTPUT_STANDALONE=1
 
 # Build the Next.js app
 RUN pnpm --filter @schedulebox/web build
@@ -59,6 +60,9 @@ RUN pnpm --filter @schedulebox/web build
 FROM node:20-alpine AS production
 
 WORKDIR /app
+
+# Install wget for health checks (curl not available in alpine minimal)
+RUN apk add --no-cache wget
 
 # Remove unused package managers to reduce attack surface
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
@@ -81,5 +85,8 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 CMD ["node", "apps/web/server.js"]

@@ -168,7 +168,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (production)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -180,6 +180,19 @@ jobs:
             ${{ steps.image.outputs.name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Build and push Docker image (migrate)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: builder
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}-migrate:${{ github.sha }}
+            ${{ steps.image.outputs.name }}-migrate:latest
+          cache-from: type=gha,scope=migrate
+          cache-to: type=gha,mode=max,scope=migrate
 
       - name: Run Trivy vulnerability scanner (web)
         uses: aquasecurity/trivy-action@master

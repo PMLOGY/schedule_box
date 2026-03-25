@@ -11,9 +11,10 @@ const envSchema = z.object({
     .refine((val) => val.startsWith('postgresql://'), {
       message: 'DATABASE_URL must start with postgresql://',
     }),
-  REDIS_URL: z
-    .string({ required_error: 'REDIS_URL is required' })
-    .min(1, 'REDIS_URL cannot be empty'),
+  // Redis: either Upstash HTTP (UPSTASH_REDIS_REST_URL) or standard TCP (REDIS_URL)
+  REDIS_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   JWT_ACCESS_SECRET: isProduction
     ? z
         .string({ required_error: 'JWT_ACCESS_SECRET is required' })
