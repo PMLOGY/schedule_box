@@ -49,9 +49,11 @@ const SQL_FILES = [
   resolve(__dirname, '../../packages/database/src/functions/soft-delete.sql'),
   resolve(__dirname, '../../packages/database/src/functions/deferred-fks.sql'),
   resolve(__dirname, '../../packages/database/src/functions/audit-trail.sql'),
-  // 3. Composite indexes for query performance
+  // 3. Data migrations (idempotent)
+  resolve(__dirname, '../../packages/database/src/sql/booking-status-expired.sql'),
+  // 4. Composite indexes for query performance
   resolve(__dirname, '../../packages/database/src/functions/composite-indexes.sql'),
-  // 4. RLS policies (must come after helper functions)
+  // 5. RLS policies (must come after helper functions)
   resolve(__dirname, '../../packages/database/src/rls/policies.sql'),
 ];
 
