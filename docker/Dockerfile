@@ -50,6 +50,10 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_OUTPUT_STANDALONE=1
+# Limit Node.js heap to prevent OOM on low-memory servers
+ENV NODE_OPTIONS="--max-old-space-size=1536"
+# Skip Sentry source map upload during Docker build
+ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 
 # Build the Next.js app
 RUN pnpm --filter @schedulebox/web build
