@@ -12,6 +12,10 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 const nextConfig = {
   // Standalone output for Docker/Coolify — disabled on Windows dev (symlink permission issues)
   ...(process.env.NEXT_OUTPUT_STANDALONE === '1' && { output: 'standalone' }),
+  // Include files that dynamic imports or runtime reads need in standalone output
+  outputFileTracingIncludes: {
+    '/*': ['./messages/**/*', '../../security/**/*'],
+  },
   transpilePackages: [
     '@schedulebox/ui',
     '@schedulebox/shared',
