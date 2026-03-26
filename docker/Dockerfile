@@ -50,8 +50,8 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_OUTPUT_STANDALONE=1
-# Limit Node.js heap to prevent OOM on low-memory servers
-ENV NODE_OPTIONS="--max-old-space-size=1536"
+# Limit Node.js heap — 2GB needed for build with 60+ pages and monorepo tracing
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 # Skip Sentry source map upload during Docker build
 ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 

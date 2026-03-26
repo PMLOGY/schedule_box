@@ -23,6 +23,9 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/*': ['./messages/**/*', '../../security/**/*'],
   },
+  // Skip lint & typecheck in Docker builds — CI handles these; saves ~500MB RAM during build
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   transpilePackages: [
     '@schedulebox/ui',
     '@schedulebox/shared',
