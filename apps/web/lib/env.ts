@@ -80,6 +80,13 @@ export function validateEnv(): Env {
     throw new Error(`Missing or invalid environment variables: ${missing.join(', ')}`);
   }
 
+  // Warn if no Redis is configured in production
+  if (isProduction && !result.data.REDIS_URL && !result.data.UPSTASH_REDIS_REST_URL) {
+    console.warn(
+      '[env] WARNING: No Redis configured (REDIS_URL or UPSTASH_REDIS_REST_URL). Rate limiting and caching will fail.',
+    );
+  }
+
   console.log('[env] Environment validated successfully');
   _env = result.data;
   return result.data;

@@ -22,7 +22,7 @@ function getConnectionUrl(): string {
 }
 
 function isNeonUrl(): boolean {
-  return !!process.env.VERCEL || getConnectionUrl().includes('neon.tech');
+  return getConnectionUrl().includes('neon.tech');
 }
 
 function getSslConfig(): Record<string, unknown> {

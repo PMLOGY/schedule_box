@@ -43,6 +43,7 @@ function buildCSP() {
       "'self'",
       'https://*.schedulebox.cz', // API endpoints
       'wss://*.schedulebox.cz', // WebSocket connections for real-time features
+      'https://*.ingest.sentry.io', // Sentry error/perf reporting (fallback if tunnel fails)
     ],
     'frame-src': [
       "'self'",

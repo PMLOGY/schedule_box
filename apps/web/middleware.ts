@@ -15,8 +15,10 @@ export default async function middleware(req: NextRequest) {
   const isAdminPath = pathname.includes('/admin');
 
   if (!isMaintenancePage && !isAdminPath) {
-    // Check maintenance mode via Upstash Redis HTTP fetch.
-    // Direct fetch to Upstash REST API to avoid importing the heavy redis client in middleware.
+    // Check maintenance mode via Redis.
+    // Middleware runs on Edge — we can only use HTTP-based Redis here.
+    // Upstash HTTP: direct REST API call
+    // Standard Redis: check via internal API route (avoids importing ioredis in Edge)
     const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
     const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -24,15 +26,12 @@ export default async function middleware(req: NextRequest) {
       try {
         const res = await fetch(`${upstashUrl}/get/maintenance:enabled`, {
           headers: { Authorization: `Bearer ${upstashToken}` },
-          // Cache for 5s to reduce Redis calls per request
           next: { revalidate: 5 },
         });
         const data = (await res.json()) as { result?: string | null };
         if (data.result === 'true') {
-          // Check bypass cookie — allows admins to access during maintenance
           const bypassCookie = req.cookies.get('maintenance_bypass')?.value;
           if (bypassCookie !== process.env.MAINTENANCE_BYPASS_SECRET) {
-            // Extract locale from path (first segment) for redirect
             const segments = pathname.split('/').filter(Boolean);
             const locale = segments[0] || 'cs';
             const redirectResponse = NextResponse.redirect(
@@ -41,6 +40,33 @@ export default async function middleware(req: NextRequest) {
             redirectResponse.headers.set('X-Request-Id', requestId);
             redirectResponse.headers.set('x-request-id', requestId);
             return redirectResponse;
+          }
+        }
+      } catch {
+        // Redis unavailable — fail open (do not block users)
+      }
+    } else if (process.env.REDIS_URL) {
+      // Standard Redis — check maintenance via internal API (Edge can't use TCP)
+      try {
+        const origin = req.nextUrl.origin;
+        const res = await fetch(`${origin}/api/v1/admin/maintenance/status`, {
+          headers: { 'x-internal-check': '1' },
+          next: { revalidate: 5 },
+        });
+        if (res.ok) {
+          const data = (await res.json()) as { enabled?: boolean };
+          if (data.enabled) {
+            const bypassCookie = req.cookies.get('maintenance_bypass')?.value;
+            if (bypassCookie !== process.env.MAINTENANCE_BYPASS_SECRET) {
+              const segments = pathname.split('/').filter(Boolean);
+              const locale = segments[0] || 'cs';
+              const redirectResponse = NextResponse.redirect(
+                new URL(`/${locale}/maintenance`, req.url),
+              );
+              redirectResponse.headers.set('X-Request-Id', requestId);
+              redirectResponse.headers.set('x-request-id', requestId);
+              return redirectResponse;
+            }
           }
         }
       } catch {

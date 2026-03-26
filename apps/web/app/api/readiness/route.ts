@@ -28,14 +28,16 @@ export async function GET() {
   checks.push(pgCheck);
   if (pgCheck.status === 'error') allHealthy = false;
 
-  // Check Upstash Redis
-  const redisCheck = await checkService('Redis (Upstash)', async () => {
-    if (!process.env.UPSTASH_REDIS_REST_URL) {
-      throw new Error('UPSTASH_REDIS_REST_URL not configured');
+  // Check Redis (Upstash HTTP or standard TCP)
+  const redisCheck = await checkService('Redis', async () => {
+    const hasUpstash = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+    const hasStandard = !!process.env.REDIS_URL;
+    if (!hasUpstash && !hasStandard) {
+      throw new Error('No Redis configured (set REDIS_URL or UPSTASH_REDIS_REST_URL + TOKEN)');
     }
-    if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
-      throw new Error('UPSTASH_REDIS_REST_TOKEN not configured');
-    }
+    // Lazy-import to avoid loading ioredis at module level
+    const { redis } = await import('@/lib/redis/client');
+    await redis.get('health:ping');
     return true;
   });
   checks.push(redisCheck);

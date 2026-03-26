@@ -1,17 +1,21 @@
-import { registerOTel } from '@vercel/otel';
 import { captureRequestError } from '@sentry/nextjs';
 
 export async function register() {
-  // Register OpenTelemetry BEFORE any runtime-specific setup.
-  // @vercel/otel handles both nodejs and edge internally — no runtime guard needed.
-  // Env vars OTEL_TRACES_SAMPLER=parentbased_traceidratio and OTEL_TRACES_SAMPLER_ARG=0.1
-  // configure 10% sampling at the platform level. The attributes below attach version metadata.
-  registerOTel({
-    serviceName: 'schedulebox',
-    attributes: {
-      'service.version': process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev',
-    },
-  });
+  // OpenTelemetry: only register if an OTLP endpoint is explicitly configured.
+  // @vercel/otel was removed — it requires Vercel infrastructure and crashes on Coolify.
+  if (process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+    try {
+      const { registerOTel } = await import('@vercel/otel');
+      registerOTel({
+        serviceName: 'schedulebox',
+        attributes: {
+          'service.version': process.env.SOURCE_COMMIT ?? 'dev',
+        },
+      });
+    } catch {
+      console.warn('[otel] OpenTelemetry registration failed — continuing without tracing');
+    }
+  }
 
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     await import('./sentry.server.config');

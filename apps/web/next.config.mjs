@@ -1,4 +1,6 @@
 /* global process */
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
 import {
@@ -6,12 +8,17 @@ import {
   embedSecurityHeaders,
 } from '../../security/headers/security-headers.mjs';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Standalone output for Docker/Coolify — disabled on Windows dev (symlink permission issues)
-  ...(process.env.NEXT_OUTPUT_STANDALONE === '1' && { output: 'standalone' }),
+  ...(process.env.NEXT_OUTPUT_STANDALONE === '1' && {
+    output: 'standalone',
+    // Monorepo root must be explicit so standalone traces files from packages/* and security/*
+    outputFileTracingRoot: resolve(__dirname, '../../'),
+  }),
   // Include files that dynamic imports or runtime reads need in standalone output
   outputFileTracingIncludes: {
     '/*': ['./messages/**/*', '../../security/**/*'],
@@ -52,6 +59,7 @@ const nextConfig = {
     // Must be external to prevent webpack from bundling it with incorrect __dirname resolution
     'isomorphic-dompurify',
     'jsdom',
+    'ioredis',
   ],
   async headers() {
     return [
@@ -69,14 +77,20 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(withNextIntl(nextConfig), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  tunnelRoute: '/monitoring',
-  hideSourceMaps: true,
-  disableLogger: true,
-  silent: !process.env.SENTRY_AUTH_TOKEN,
-  autoInstrumentServerFunctions: false,
-  autoInstrumentMiddleware: false,
-  autoInstrumentAppDirectory: false,
-});
+// Only enable Sentry wrapping if DSN is configured; otherwise skip entirely
+// to avoid tunnel route errors and unnecessary overhead on Coolify
+const hasSentry = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+export default hasSentry
+  ? withSentryConfig(withNextIntl(nextConfig), {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      tunnelRoute: '/monitoring',
+      hideSourceMaps: true,
+      disableLogger: true,
+      silent: !process.env.SENTRY_AUTH_TOKEN,
+      autoInstrumentServerFunctions: false,
+      autoInstrumentMiddleware: false,
+      autoInstrumentAppDirectory: false,
+    })
+  : withNextIntl(nextConfig);

@@ -55,6 +55,10 @@ ENV NODE_OPTIONS="--max-old-space-size=1536"
 # Skip Sentry source map upload during Docker build
 ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 
+# NEXT_PUBLIC_* vars are inlined at build time — pass via Coolify build args
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_SENTRY_DSN
+
 # Build the Next.js app
 RUN pnpm --filter @schedulebox/web build
 
