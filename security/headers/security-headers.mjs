@@ -38,7 +38,7 @@ function buildCSP() {
       'blob:', // Allow blob URLs for generated content
       'https:', // Allow HTTPS images (avatars, company logos from external sources)
     ],
-    'font-src': ["'self'"], // Inter font loaded locally
+    'font-src': ["'self'", 'data:'], // Self-hosted fonts + data URIs
     'connect-src': [
       "'self'",
       'https://*.schedulebox.cz', // API endpoints
@@ -53,7 +53,8 @@ function buildCSP() {
     'object-src': ["'none'"], // Disable plugins
     'base-uri': ["'self'"], // Prevent base tag injection
     'form-action': ["'self'"], // Restrict form submissions
-    'upgrade-insecure-requests': [], // Upgrade HTTP to HTTPS
+    // NOTE: upgrade-insecure-requests removed — it breaks asset loading behind
+    // Coolify/Traefik reverse proxy (app serves HTTP internally, proxy terminates HTTPS)
   };
 
   return Object.entries(csp)
