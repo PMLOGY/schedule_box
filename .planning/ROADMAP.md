@@ -125,7 +125,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Coolify (self-hosted PaaS), businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
 
-- [ ] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04)
+- [x] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04) (completed 2026-03-27)
 - [ ] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08)
 - [ ] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
 
@@ -328,7 +328,7 @@ Plans:
   2. When a customer completes a booking with payment, the Comgate payment is initiated via the business's own merchant credentials, not the platform account — the payment appears in the business owner's Comgate dashboard
   3. The `payment_providers` table exists in the database with a provider-agnostic schema (provider field, credentials JSONB, company_id) — adding a second provider (e.g., Stripe) requires no DDL changes beyond inserting a new row
   4. Platform subscription charges still route through the platform Comgate account (merchant 498621), not the business's Comgate account — the two payment paths are independently verifiable in test
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 51-01-PLAN.md — Provider-agnostic payment_providers schema, credential API, and Comgate client overrides (PAY-03, PAY-04)
 - [ ] 51-02-PLAN.md — Settings > Payments UI, wire booking payments and webhooks to per-company credentials (PAY-01, PAY-02)
@@ -422,7 +422,7 @@ Plans:
 | 48. Marketplace & UX | v3.0 | 5/5 | Complete | 2026-03-18 |
 | 49. Observability & Verticals | v3.0 | 3/3 | Complete | 2026-03-18 |
 | 50. Testing & Hardening | v3.0 | 5/5 | Complete | 2026-03-18 |
-| 51. Per-Company Payments | 1/2 | In Progress|  | - |
+| 51. Per-Company Payments | 2/2 | Complete   | 2026-03-27 | - |
 | 52. Verification & Bug Fixing | v3.1 | 0/TBD | Not started | - |
 | 53. Deployment & Go Live | v3.1 | 0/TBD | Not started | - |
 
