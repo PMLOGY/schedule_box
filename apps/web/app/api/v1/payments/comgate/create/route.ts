@@ -12,6 +12,7 @@ import { PERMISSIONS } from '@/lib/middleware/rbac';
 import { successResponse } from '@/lib/utils/response';
 import { createPaymentRecord } from '@/app/api/v1/payments/service';
 import { initComgatePayment } from '@/app/api/v1/payments/comgate/client';
+import { resolveComgateCredentials } from '@/lib/payment-provider/resolve';
 import { publishEvent } from '@schedulebox/events';
 import { createPaymentInitiatedEvent } from '@schedulebox/events';
 
@@ -99,16 +100,25 @@ export const POST = createRouteHandler({
       throw new AppError('Customer email is required', 'VALIDATION_ERROR', 400);
     }
 
+    // Resolve per-company Comgate credentials (falls back to platform if not configured)
+    const creds = await resolveComgateCredentials(companyId);
+    console.log(
+      `[Payment Create] Using ${creds.source} Comgate credentials for company ${companyId}`,
+    );
+
     // Call Comgate API to create payment
-    const { transactionId, redirectUrl: comgateRedirectUrl } = await initComgatePayment({
-      price: parseFloat(booking.price),
-      currency,
-      label: `ScheduleBox #${booking.uuid.slice(0, 8)}`,
-      refId: booking.uuid,
-      email,
-      redirectUrl,
-      callbackUrl,
-    });
+    const { transactionId, redirectUrl: comgateRedirectUrl } = await initComgatePayment(
+      {
+        price: parseFloat(booking.price),
+        currency,
+        label: `ScheduleBox #${booking.uuid.slice(0, 8)}`,
+        refId: booking.uuid,
+        email,
+        redirectUrl,
+        callbackUrl,
+      },
+      { merchantId: creds.merchantId, secret: creds.secret, testMode: creds.testMode },
+    );
 
     // Create payment record in database
     const payment = await createPaymentRecord({

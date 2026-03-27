@@ -21,6 +21,8 @@ import {
   verifyComgateWebhookSecret,
   getComgatePaymentStatus,
 } from '@/app/api/v1/payments/comgate/client';
+import { resolveComgateCredentials } from '@/lib/payment-provider/resolve';
+import { getPlatformComgateCredentials } from '@/lib/payment-provider/resolve';
 import { publishEvent } from '@schedulebox/events';
 import { createPaymentCompletedEvent, createPaymentFailedEvent } from '@schedulebox/events';
 import {
@@ -49,15 +51,8 @@ export async function POST(req: NextRequest) {
     // Must parse before verification since Comgate sends secret in POST body, not headers
     const parsedBody = new URLSearchParams(rawBody);
 
-    // 3. Verify POST body secret
-    // Comgate echoes the merchant secret in the "secret" POST body parameter.
-    // This is NOT an HMAC signature — it's a shared secret comparison.
+    // 3. Extract basic fields (secret verification moved after payment lookup for per-company support)
     const receivedSecret = parsedBody.get('secret') || '';
-    if (!verifyComgateWebhookSecret(receivedSecret)) {
-      console.error('Comgate webhook secret verification failed');
-      return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
-    }
-
     const transId = parsedBody.get('transId');
     webhookTransId = transId;
     let status = parsedBody.get('status');
@@ -84,8 +79,25 @@ export async function POST(req: NextRequest) {
     // 6. Find payment by gateway transaction ID
     const payment = await findPaymentByGatewayTx('comgate', transId);
 
-    if (!payment) {
-      // Log warning but return 200 (Comgate might send webhook before our payment record exists)
+    // 7. Verify webhook secret using per-company or platform credentials
+    // Secret verification is done AFTER payment lookup so we can resolve the correct
+    // merchant's secret. If payment not found, fall back to platform secret.
+    if (payment) {
+      const creds = await resolveComgateCredentials(payment.companyId);
+      if (!verifyComgateWebhookSecret(receivedSecret, creds.secret)) {
+        console.error(
+          `Comgate webhook secret verification failed for company ${payment.companyId}`,
+        );
+        return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
+      }
+    } else {
+      // Unknown transaction — verify against platform secret as fallback
+      const platformCreds = getPlatformComgateCredentials();
+      if (!verifyComgateWebhookSecret(receivedSecret, platformCreds.secret)) {
+        console.error('Comgate webhook secret verification failed (platform fallback)');
+        return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
+      }
+      // Payment not found after verification — return 200 (Comgate might send before our record)
       console.warn(`Payment not found for Comgate transaction ${transId}`);
       await markWebhookCompleted(transId);
       return NextResponse.json({ message: 'Payment not found' }, { status: 200 });
@@ -94,8 +106,12 @@ export async function POST(req: NextRequest) {
     // 8. Defense-in-depth: verify payment status via Comgate API
     // The webhook POST body is authoritative, but we cross-check against the API
     // to detect tampering or race conditions. API response wins on disagreement.
+    const creds = await resolveComgateCredentials(payment.companyId);
     try {
-      const apiStatus = await getComgatePaymentStatus(transId);
+      const apiStatus = await getComgatePaymentStatus(transId, {
+        merchantId: creds.merchantId,
+        secret: creds.secret,
+      });
       if (apiStatus.status && apiStatus.status !== status) {
         console.warn(
           `[Comgate Webhook] Status mismatch for ${transId}: webhook="${status}", API="${apiStatus.status}". Trusting API response.`,

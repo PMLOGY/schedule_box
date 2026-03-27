@@ -1,3 +1,6 @@
+// NOTE: Subscription billing intentionally uses platform Comgate credentials (PAY-04).
+// Do NOT pass per-company credentials here.
+
 /**
  * POST /api/v1/billing/subscribe
  * Initiate a new subscription with Comgate recurring payment.
