@@ -8,8 +8,8 @@ const envSchema = z.object({
   // ===================
   DATABASE_URL: z
     .string({ required_error: 'DATABASE_URL is required' })
-    .refine((val) => val.startsWith('postgresql://'), {
-      message: 'DATABASE_URL must start with postgresql://',
+    .refine((val) => val.startsWith('postgresql://') || val.startsWith('postgres://'), {
+      message: 'DATABASE_URL must start with postgresql:// or postgres://',
     }),
   // Redis: either Upstash HTTP (UPSTASH_REDIS_REST_URL) or standard TCP (REDIS_URL)
   REDIS_URL: z.string().optional(),
