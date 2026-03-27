@@ -29,19 +29,26 @@ export async function GET() {
   if (pgCheck.status === 'error') allHealthy = false;
 
   // Check Redis (Upstash HTTP or standard TCP)
-  const redisCheck = await checkService('Redis', async () => {
-    const hasUpstash = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
-    const hasStandard = !!process.env.REDIS_URL;
-    if (!hasUpstash && !hasStandard) {
-      throw new Error('No Redis configured (set REDIS_URL or UPSTASH_REDIS_REST_URL + TOKEN)');
-    }
-    // Lazy-import to avoid loading ioredis at module level
-    const { redis } = await import('@/lib/redis/client');
-    await redis.get('health:ping');
-    return true;
-  });
-  checks.push(redisCheck);
-  if (redisCheck.status === 'error') allHealthy = false;
+  // In development, Redis is optional — missing config is "skipped", not "error"
+  const hasUpstash = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
+  const hasStandard = !!process.env.REDIS_URL;
+  const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+
+  if (!hasUpstash && !hasStandard && isDev) {
+    checks.push({ name: 'Redis', status: 'ok', latency: 0 });
+  } else {
+    const redisCheck = await checkService('Redis', async () => {
+      if (!hasUpstash && !hasStandard) {
+        throw new Error('No Redis configured (set REDIS_URL or UPSTASH_REDIS_REST_URL + TOKEN)');
+      }
+      // Lazy-import to avoid loading ioredis at module level
+      const { redis } = await import('@/lib/redis/client');
+      await redis.get('health:ping');
+      return true;
+    });
+    checks.push(redisCheck);
+    if (redisCheck.status === 'error') allHealthy = false;
+  }
 
   const response = {
     status: allHealthy ? ('ok' as const) : ('degraded' as const),
