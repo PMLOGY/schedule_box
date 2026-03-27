@@ -345,7 +345,12 @@ Plans:
   5. The marketplace search returns results, a firm detail page loads with services and reviews, and "Book Now" navigates to the correct public booking wizard
   6. Booking confirmation emails send within 60 seconds of booking creation, and status-change emails send on confirm/cancel/complete — verified by checking the notification log in the admin panel
   7. All bugs identified during manual walkthrough of flows 1-6 above are fixed and re-verified — no known P1 or P2 bugs remain open
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 52-01-PLAN.md — Dev server boot + smoke test (VER-01)
+- [ ] 52-02-PLAN.md — Owner signup, onboarding, service + employee CRUD (VER-02)
+- [ ] 52-03-PLAN.md — Customer booking flow + notification pipeline (VER-03, VER-06)
+- [ ] 52-04-PLAN.md — Admin panel + marketplace + final bug sweep (VER-04, VER-05, VER-08)
 
 ### Phase 53: Deployment & Go Live
 **Goal**: ScheduleBox is live on Coolify with a custom domain, SSL, production environment variables, a seeded demo company, and Comgate recurring billing verified — Playwright E2E passes green as the final gate
