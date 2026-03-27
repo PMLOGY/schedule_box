@@ -133,7 +133,9 @@
     "adminAnalytics": "Admin analytika",
     "portal": "Portál",
     "onboarding": "Průvodce nastavením",
-    "videoMeetings": "Video schůzky"
+    "videoMeetings": "Video schůzky",
+    "aiSettings": "Nastavení AI",
+    "paymentSettings": "Nastavení plateb"
   },
   "dashboard": {
     "title": "Přehled",
@@ -886,6 +888,25 @@
       "copied": "Zkopírováno!",
       "preview": "Náhled",
       "noCompany": "Nastavení společnosti ještě není načteno."
+    },
+    "payments": {
+      "title": "Platby",
+      "description": "Nastavte platební bránu pro příjem plateb od zákazníků",
+      "comgate": {
+        "title": "Comgate",
+        "merchantId": "Merchant ID",
+        "merchantIdPlaceholder": "Zadejte váš Comgate Merchant ID",
+        "secret": "Secret",
+        "secretPlaceholder": "Zadejte váš Comgate secret",
+        "testMode": "Testovací režim",
+        "testModeDescription": "V testovacím režimu nebudou účtovány skutečné platby",
+        "save": "Uložit",
+        "active": "Aktivní",
+        "inactive": "Nenastaveno",
+        "saved": "Platební brána byla úspěšně nastavena",
+        "error": "Nepodařilo se uložit nastavení platební brány",
+        "info": "Pro příjem plateb od zákazníků potřebujete vlastní Comgate účet. Merchant ID a Secret najdete ve svém Comgate dashboardu."
+      }
     }
   },
   "profile": {

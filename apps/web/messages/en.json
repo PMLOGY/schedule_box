@@ -133,7 +133,9 @@
     "adminAnalytics": "Admin Analytics",
     "portal": "Portal",
     "onboarding": "Setup Wizard",
-    "videoMeetings": "Video Meetings"
+    "videoMeetings": "Video Meetings",
+    "aiSettings": "AI Settings",
+    "paymentSettings": "Payment Settings"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -886,6 +888,25 @@
       "copied": "Copied!",
       "preview": "Preview",
       "noCompany": "Company settings not loaded yet."
+    },
+    "payments": {
+      "title": "Payments",
+      "description": "Configure your payment gateway to accept customer payments",
+      "comgate": {
+        "title": "Comgate",
+        "merchantId": "Merchant ID",
+        "merchantIdPlaceholder": "Enter your Comgate Merchant ID",
+        "secret": "Secret",
+        "secretPlaceholder": "Enter your Comgate secret",
+        "testMode": "Test mode",
+        "testModeDescription": "In test mode, no real charges will be made",
+        "save": "Save",
+        "active": "Active",
+        "inactive": "Not configured",
+        "saved": "Payment gateway configured successfully",
+        "error": "Failed to save payment gateway settings",
+        "info": "To accept customer payments, you need your own Comgate account. Find your Merchant ID and Secret in your Comgate dashboard."
+      }
     }
   },
   "profile": {

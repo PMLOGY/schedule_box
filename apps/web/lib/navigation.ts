@@ -179,6 +179,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Sparkles,
     roles: ['owner'],
   },
+  {
+    key: 'paymentSettings',
+    href: '/settings/payments',
+    icon: Wallet,
+    roles: ['owner'],
+  },
 ];
 
 const PLAN_HIERARCHY: SubscriptionPlan[] = ['free', 'essential', 'growth', 'ai_powered'];
