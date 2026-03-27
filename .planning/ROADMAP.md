@@ -123,11 +123,11 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 ### v3.1 Go Live & Revenue (In Progress)
 
-**Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Vercel, businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
+**Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Coolify (self-hosted PaaS), businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
 
 - [ ] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04)
-- [ ] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Vercel-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08)
-- [ ] **Phase 53: Deployment & Go Live** - App deployed to Vercel with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
+- [ ] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08)
+- [ ] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
 
 ## Phase Details
 
@@ -328,10 +328,13 @@ Plans:
   2. When a customer completes a booking with payment, the Comgate payment is initiated via the business's own merchant credentials, not the platform account — the payment appears in the business owner's Comgate dashboard
   3. The `payment_providers` table exists in the database with a provider-agnostic schema (provider field, credentials JSONB, company_id) — adding a second provider (e.g., Stripe) requires no DDL changes beyond inserting a new row
   4. Platform subscription charges still route through the platform Comgate account (merchant 498621), not the business's Comgate account — the two payment paths are independently verifiable in test
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 51-01-PLAN.md — Provider-agnostic payment_providers schema, credential API, and Comgate client overrides (PAY-03, PAY-04)
+- [ ] 51-02-PLAN.md — Settings > Payments UI, wire booking payments and webhooks to per-company credentials (PAY-01, PAY-02)
 
 ### Phase 52: Verification & Bug Fixing
-**Goal**: Every major user flow runs without errors on the Vercel-compatible stack, all bugs introduced or discovered from v3.0 agent-written code are fixed, and the platform is safe to deploy
+**Goal**: Every major user flow runs without errors on the Coolify-deployed stack, all bugs introduced or discovered from v3.0 agent-written code are fixed, and the platform is safe to deploy
 **Depends on**: Phase 51 (per-company payments must be working to verify the payment flow end-to-end)
 **Requirements**: VER-01, VER-02, VER-03, VER-04, VER-05, VER-06, VER-08
 **Success Criteria** (what must be TRUE):
@@ -345,13 +348,13 @@ Plans:
 **Plans**: TBD
 
 ### Phase 53: Deployment & Go Live
-**Goal**: ScheduleBox is live on Vercel with a custom domain, SSL, production environment variables, a seeded demo company, and Comgate recurring billing verified — Playwright E2E passes green as the final gate
+**Goal**: ScheduleBox is live on Coolify with a custom domain, SSL, production environment variables, a seeded demo company, and Comgate recurring billing verified — Playwright E2E passes green as the final gate
 **Depends on**: Phase 52 (all bugs fixed before deploying to production)
 **Requirements**: VER-07, DEP-01, DEP-02, DEP-03, DEP-04
 **Success Criteria** (what must be TRUE):
   1. The full Playwright E2E suite (all 7 existing specs plus the new per-company payment spec) passes green in CI against the Neon production database — zero flaky tests, zero skipped tests
-  2. The app is reachable at the production Vercel URL with HTTPS — all API routes return expected responses, no 500 errors on the health check or homepage
-  3. A custom domain (when provided) resolves to the Vercel deployment with a valid SSL certificate — HTTP redirects to HTTPS automatically
+  2. The app is reachable at the production Coolify URL with HTTPS — all API routes return expected responses, no 500 errors on the health check or homepage
+  3. A custom domain (when provided) resolves to the Coolify deployment with a valid SSL certificate — HTTP redirects to HTTPS automatically via Traefik
   4. The Neon production database contains a seeded demo company with services, employees, and sample bookings — logging in as the demo owner shows a populated dashboard
   5. A test subscription upgrade on production successfully triggers Comgate recurring billing on merchant 498621 — the subscription state transitions from trial/free to the paid plan and the invoice PDF is generated
 **Plans**: TBD
