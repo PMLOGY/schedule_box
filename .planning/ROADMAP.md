@@ -362,7 +362,11 @@ Plans:
   3. A custom domain (when provided) resolves to the Coolify deployment with a valid SSL certificate — HTTP redirects to HTTPS automatically via Traefik
   4. The Neon production database contains a seeded demo company with services, employees, and sample bookings — logging in as the demo owner shows a populated dashboard
   5. A test subscription upgrade on production successfully triggers Comgate recurring billing on merchant 498621 — the subscription state transitions from trial/free to the paid plan and the invoice PDF is generated
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 53-01-PLAN.md — Production env hardening + demo company seed (DEP-01, DEP-03)
+- [ ] 53-02-PLAN.md — E2E suite green gate in CI (VER-07)
+- [ ] 53-03-PLAN.md — Custom domain + Comgate billing verification (DEP-02, DEP-04)
 
 ## Progress
 
