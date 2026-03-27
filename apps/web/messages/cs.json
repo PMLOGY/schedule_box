@@ -869,13 +869,13 @@
         "pending": "Čeká"
       },
       "events": {
-        "booking.created": "Rezervace vytvořena",
-        "booking.confirmed": "Rezervace potvrzena",
-        "booking.cancelled": "Rezervace zrušena",
-        "booking.completed": "Rezervace dokončena",
-        "booking.no_show": "Nedostavení",
-        "payment.received": "Platba přijata",
-        "payment.refunded": "Platba vrácena"
+        "booking_created": "Rezervace vytvořena",
+        "booking_confirmed": "Rezervace potvrzena",
+        "booking_cancelled": "Rezervace zrušena",
+        "booking_completed": "Rezervace dokončena",
+        "booking_no_show": "Nedostavení",
+        "payment_received": "Platba přijata",
+        "payment_refunded": "Platba vrácena"
       }
     },
     "widgetEmbed": {

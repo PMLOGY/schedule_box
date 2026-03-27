@@ -869,13 +869,13 @@
         "pending": "Pending"
       },
       "events": {
-        "booking.created": "Booking Created",
-        "booking.confirmed": "Booking Confirmed",
-        "booking.cancelled": "Booking Cancelled",
-        "booking.completed": "Booking Completed",
-        "booking.no_show": "No Show",
-        "payment.received": "Payment Received",
-        "payment.refunded": "Payment Refunded"
+        "booking_created": "Booking Created",
+        "booking_confirmed": "Booking Confirmed",
+        "booking_cancelled": "Booking Cancelled",
+        "booking_completed": "Booking Completed",
+        "booking_no_show": "No Show",
+        "payment_received": "Payment Received",
+        "payment_refunded": "Payment Refunded"
       }
     },
     "widgetEmbed": {
