@@ -29,3 +29,4 @@ export * from './views';
 export * from './relations';
 export * from './platform';
 export * from './webhook-config';
+export * from './payment-providers';
