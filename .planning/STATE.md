@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
 status: executing
-stopped_at: Completed 51-02-PLAN.md (Settings Payments UI, per-company payment routing)
-last_updated: "2026-03-27T15:34:00.000Z"
-last_activity: 2026-03-27 — Plan 51-02 complete (Settings Payments UI, per-company payment routing)
+stopped_at: Completed 52-01-PLAN.md (Dev server boot and smoke test)
+last_updated: "2026-03-27T21:47:00.000Z"
+last_activity: 2026-03-27 — Plan 52-01 complete (Dev server boot and smoke test)
 progress:
   total_phases: 15
   completed_phases: 13
   total_plans: 44
-  completed_plans: 37
-  percent: 95
+  completed_plans: 38
+  percent: 86
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Milestone v3.1 — Phase 51: Per-Company Payments
+**Current focus:** Milestone v3.1 — Phase 52: Verification & Bug Fixing
 
 ## Current Position
 
-Phase: 51 of 53 (Per-Company Payments)
-Plan: 2 of 4 complete
-Status: Executing phase 51
-Last activity: 2026-03-27 — Plan 51-02 complete (Settings Payments UI, per-company payment routing)
+Phase: 52 of 53 (Verification & Bug Fixing)
+Plan: 1 of 4 complete
+Status: Executing phase 52
+Last activity: 2026-03-27 — Plan 52-01 complete (Dev server boot and smoke test)
 
 Progress: [██████████] 95%
 
@@ -56,6 +56,8 @@ Recent decisions affecting v3.1:
 - [Phase 51-01]: GET endpoint returns masked merchant_id (last 4 chars) — never exposes full secret
 - [Phase 51-02]: Webhook secret verification moved after payment lookup for per-company secret resolution
 - [Phase 51-02]: Subscription billing route annotated with PAY-04 comment to prevent accidental per-company credential injection
+- [Phase 52-01]: Accept both postgres:// and postgresql:// in DATABASE_URL validation for Coolify compatibility
+- [Phase 52-01]: Readiness probe skips Redis check in dev/test when no Redis configured
 
 ## Blockers
 
@@ -78,5 +80,5 @@ Recent decisions affecting v3.1:
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Completed 51-02-PLAN.md (Settings Payments UI, per-company payment routing)
+Stopped at: Completed 52-01-PLAN.md (Dev server boot and smoke test)
 Resume file: None
