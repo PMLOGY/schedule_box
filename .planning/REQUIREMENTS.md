@@ -12,8 +12,8 @@ Source: v3.0 completion review + production readiness assessment.
 
 - [ ] **PAY-01**: Business owner can enter their Comgate merchant credentials in Settings > Payments
 - [ ] **PAY-02**: Customer booking payments route through the business's Comgate account (not platform account)
-- [ ] **PAY-03**: Payment provider config stored in provider-agnostic DB schema (payment_providers table, ready for future Stripe)
-- [ ] **PAY-04**: Platform subscription billing still uses platform Comgate account (separation verified)
+- [x] **PAY-03**: Payment provider config stored in provider-agnostic DB schema (payment_providers table, ready for future Stripe)
+- [x] **PAY-04**: Platform subscription billing still uses platform Comgate account (separation verified)
 
 ### Verification
 
@@ -65,8 +65,8 @@ Source: v3.0 completion review + production readiness assessment.
 |-------------|-------|--------|
 | PAY-01 | Phase 51 | Pending |
 | PAY-02 | Phase 51 | Pending |
-| PAY-03 | Phase 51 | Pending |
-| PAY-04 | Phase 51 | Pending |
+| PAY-03 | Phase 51 | Complete |
+| PAY-04 | Phase 51 | Complete |
 | VER-01 | Phase 52 | Pending |
 | VER-02 | Phase 52 | Pending |
 | VER-03 | Phase 52 | Pending |

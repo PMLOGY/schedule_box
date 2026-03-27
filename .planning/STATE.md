@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 51 of 53 (Per-Company Payments)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-03-18 — v3.1 roadmap created, 3 phases defined, 16 requirements mapped
+Plan: 1 of 4 complete
+Status: Executing phase 51
+Last activity: 2026-03-27 — Plan 51-01 complete (payment_providers schema, credential resolver, Comgate client overrides)
 
-Progress: [░░░░░░░░░░] 0% (v3.1)
+Progress: [██░░░░░░░░] ~10% (v3.1)
 
 ## What's Done
 
@@ -35,6 +35,9 @@ Recent decisions affecting v3.1:
 - [Phase 28]: Comgate recurring live but requires manual activation — contact support for merchant 498621
 - [Phase 46]: PII expand-contract migration pending contract phase (drop plaintext columns after backfill verified)
 - Per-company payments: provider-agnostic `payment_providers` table — PAY-03 drives schema design so Stripe can be added without DDL changes
+- [Phase 51-01]: Credentials stored as AES-256-GCM encrypted text (not JSONB) — encrypted blob is opaque
+- [Phase 51-01]: chargeRecurringPayment unchanged — platform subscription billing always uses platform credentials (PAY-04)
+- [Phase 51-01]: GET endpoint returns masked merchant_id (last 4 chars) — never exposes full secret
 
 ## Blockers
 
@@ -56,6 +59,6 @@ Recent decisions affecting v3.1:
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: v3.1 roadmap created — Phase 51 ready to plan
+Last session: 2026-03-27
+Stopped at: Completed 51-01-PLAN.md (payment_providers schema & credential resolver)
 Resume file: None

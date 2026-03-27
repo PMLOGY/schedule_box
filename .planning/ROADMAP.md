@@ -328,7 +328,7 @@ Plans:
   2. When a customer completes a booking with payment, the Comgate payment is initiated via the business's own merchant credentials, not the platform account — the payment appears in the business owner's Comgate dashboard
   3. The `payment_providers` table exists in the database with a provider-agnostic schema (provider field, credentials JSONB, company_id) — adding a second provider (e.g., Stripe) requires no DDL changes beyond inserting a new row
   4. Platform subscription charges still route through the platform Comgate account (merchant 498621), not the business's Comgate account — the two payment paths are independently verifiable in test
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 51-01-PLAN.md — Provider-agnostic payment_providers schema, credential API, and Comgate client overrides (PAY-03, PAY-04)
 - [ ] 51-02-PLAN.md — Settings > Payments UI, wire booking payments and webhooks to per-company credentials (PAY-01, PAY-02)
@@ -422,7 +422,7 @@ Plans:
 | 48. Marketplace & UX | v3.0 | 5/5 | Complete | 2026-03-18 |
 | 49. Observability & Verticals | v3.0 | 3/3 | Complete | 2026-03-18 |
 | 50. Testing & Hardening | v3.0 | 5/5 | Complete | 2026-03-18 |
-| 51. Per-Company Payments | v3.1 | 0/TBD | Not started | - |
+| 51. Per-Company Payments | 1/2 | In Progress|  | - |
 | 52. Verification & Bug Fixing | v3.1 | 0/TBD | Not started | - |
 | 53. Deployment & Go Live | v3.1 | 0/TBD | Not started | - |
 
