@@ -1,6 +1,11 @@
 /**
  * Comgate Payment Gateway HTTP Client
  * Handles all HTTP communication with Comgate API
+ *
+ * Per-company credential overrides:
+ * - initComgatePayment, getComgatePaymentStatus, refundComgatePayment, verifyComgateWebhookSecret
+ *   all accept optional `credentials` parameter for per-company merchant accounts.
+ * - chargeRecurringPayment ALWAYS uses platform credentials (PAY-04 — subscription billing separation).
  */
 
 import crypto from 'crypto';
@@ -24,6 +29,13 @@ export interface InitComgatePaymentParams {
 export interface ComgatePaymentResponse {
   transactionId: string;
   redirectUrl: string;
+}
+
+/** Optional credential overrides for per-company merchant accounts */
+export interface ComgateCredentialOverrides {
+  merchantId: string;
+  secret: string;
+  testMode?: boolean;
 }
 
 // ============================================================================
@@ -84,23 +96,30 @@ async function fetchWithTimeout(
  * Create payment on Comgate and get redirect URL
  *
  * @param params Payment initialization parameters
+ * @param credentials Optional per-company credential overrides. If provided, uses these
+ *                    instead of platform env vars. Used for booking payments routed through
+ *                    the business's own Comgate merchant account.
  * @returns Transaction ID and redirect URL
  * @throws AppError with PAYMENT_GATEWAY_ERROR if Comgate returns error
  */
 export async function initComgatePayment(
   params: InitComgatePaymentParams,
+  credentials?: ComgateCredentialOverrides,
 ): Promise<ComgatePaymentResponse> {
   const { price, currency, label, refId, email, redirectUrl, callbackUrl } = params;
 
   // Convert price from CZK to hellers (1 CZK = 100 hellers)
   const priceInHellers = Math.round(price * 100);
 
+  // Use provided credentials or fall back to platform env vars
+  const { merchantId, secret } = credentials ?? getComgateCredentials();
+  const testMode = credentials?.testMode ?? COMGATE_TEST_MODE;
+
   // Build request body (application/x-www-form-urlencoded)
-  const { merchantId, secret } = getComgateCredentials();
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
   requestParams.set('secret', secret);
-  requestParams.set('test', COMGATE_TEST_MODE ? 'true' : 'false');
+  requestParams.set('test', testMode ? 'true' : 'false');
   requestParams.set('price', priceInHellers.toString());
   requestParams.set('curr', currency.toUpperCase());
   requestParams.set('label', label);
@@ -171,10 +190,14 @@ export async function initComgatePayment(
  * Check payment status on Comgate
  *
  * @param transId Comgate transaction ID
+ * @param credentials Optional per-company credential overrides
  * @returns Parsed status response
  */
-export async function getComgatePaymentStatus(transId: string): Promise<Record<string, string>> {
-  const { merchantId, secret } = getComgateCredentials();
+export async function getComgatePaymentStatus(
+  transId: string,
+  credentials?: ComgateCredentialOverrides,
+): Promise<Record<string, string>> {
+  const { merchantId, secret } = credentials ?? getComgateCredentials();
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
   requestParams.set('transId', transId);
@@ -209,13 +232,15 @@ export async function getComgatePaymentStatus(transId: string): Promise<Record<s
  *
  * @param transId Comgate transaction ID
  * @param amount Optional amount in hellers for partial refund (omit for full refund)
+ * @param credentials Optional per-company credential overrides
  * @returns Success/failure status
  */
 export async function refundComgatePayment(
   transId: string,
   amount?: number,
+  credentials?: ComgateCredentialOverrides,
 ): Promise<{ success: boolean; message?: string }> {
-  const { merchantId, secret } = getComgateCredentials();
+  const { merchantId, secret } = credentials ?? getComgateCredentials();
   const requestParams = new URLSearchParams();
   requestParams.set('merchant', merchantId);
   requestParams.set('transId', transId);
@@ -252,6 +277,11 @@ export async function refundComgatePayment(
 
 /**
  * Charge a recurring payment using a previously authorized card token.
+ *
+ * IMPORTANT: This function ALWAYS uses platform credentials (getComgateCredentials).
+ * This is intentional — recurring charges are for PLATFORM SUBSCRIPTION BILLING only,
+ * which must always route through the platform merchant account (PAY-04).
+ * Do NOT add a credentials parameter here.
  *
  * Comgate recurring works in two phases:
  * 1. Initial payment with initRecurring=true (user-facing redirect)
@@ -316,11 +346,16 @@ export async function chargeRecurringPayment(params: {
  * merchant code is expected to verify it matches the configured secret.
  *
  * @param receivedSecret The "secret" field value from the POST body
- * @returns True if the secret matches the configured COMGATE_SECRET
+ * @param expectedSecret Optional expected secret for per-company webhook verification.
+ *                       If provided, compares against this instead of platform env var.
+ * @returns True if the secret matches
  */
-export function verifyComgateWebhookSecret(receivedSecret: string): boolean {
+export function verifyComgateWebhookSecret(
+  receivedSecret: string,
+  expectedSecret?: string,
+): boolean {
   try {
-    const { secret } = getComgateCredentials();
+    const secret = expectedSecret ?? getComgateCredentials().secret;
 
     // Length mismatch: reject immediately (timingSafeEqual requires same-length buffers)
     if (receivedSecret.length !== secret.length) {
