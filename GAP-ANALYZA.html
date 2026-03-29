@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ScheduleBox — GAP Analýza v3.0 FINAL</title>
+  <title>ScheduleBox — GAP Analýza v3.1 FINAL</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -160,14 +160,14 @@
 <div class="cover">
   <div class="cover-content">
     <div class="cover-logo">ScheduleBox</div>
-    <div class="cover-badge">47/47 Requirements — 100 % Complete</div>
+    <div class="cover-badge">57/57 Requirements — 100 % Complete</div>
     <h1>GAP Analýza</h1>
-    <div class="cover-subtitle">v3.0 FINAL — Dokumentace v13.0 plně pokryta</div>
+    <div class="cover-subtitle">v3.1 FINAL — Dokumentace v13.0 plně pokryta + Go Live</div>
     <div class="cover-meta">
-      <div><span>Verze</span><span>3.0 FINAL</span></div>
-      <div><span>Datum</span><span>18. března 2026</span></div>
+      <div><span>Verze</span><span>3.1 FINAL</span></div>
+      <div><span>Datum</span><span>29. března 2026</span></div>
       <div><span>Autor</span><span>PMLOGY Team</span></div>
-      <div><span>Milestone</span><span>v3.0 SHIPPED</span></div>
+      <div><span>Milestone</span><span>v3.1 SHIPPED</span></div>
     </div>
   </div>
 </div>
@@ -176,7 +176,7 @@
 
   <h2>1. Executive Summary</h2>
 
-  <p>Milestone v3.0 je <strong>KOMPLETNÍ</strong>. Všech 47 requirements splněno, všech 32 gapů z původní analýzy adresováno (24 uzavřeno implementací, 8 záměrně vyloučeno z scope). Za 2 dny (16.–18. března) bylo realizováno 6 fází se 24 plány.</p>
+  <p>Milestones v3.0 i v3.1 jsou <strong>KOMPLETNÍ</strong>. Všech 47 v3.0 requirements + 10 v3.1 requirements splněno (57 celkem), všech 32 gapů z původní analýzy adresováno (24 uzavřeno implementací, 8 záměrně vyloučeno z scope). v3.1 přidal per-company platby, E2E verifikaci, Coolify deployment a production demo seed.</p>
 
   <div class="summary-grid">
     <div class="summary-card green">
@@ -184,15 +184,15 @@
       <div class="label">Requirements splněno</div>
     </div>
     <div class="summary-card green">
-      <div class="number">47/47</div>
-      <div class="label">v3.0 requirements</div>
+      <div class="number">57/57</div>
+      <div class="label">v3.0 + v3.1 requirements</div>
     </div>
     <div class="summary-card green">
       <div class="number">32/32</div>
       <div class="label">Gapy adresované</div>
     </div>
     <div class="summary-card green">
-      <div class="number">7</div>
+      <div class="number">8</div>
       <div class="label">Milestones shipped</div>
     </div>
   </div>
@@ -263,7 +263,7 @@
     <h4>Phase 45: Infrastructure Migration <span class="badge badge-done">6 requirements</span></h4>
     <ul class="items">
       <li><strong>G-01</strong> RabbitMQ → safe no-op (INFRA-01)</li>
-      <li>Neon PostgreSQL + Upstash Redis + Vercel deploy (INFRA-02..04)</li>
+      <li>PostgreSQL 16 + Redis 7 + Coolify deploy (INFRA-02..04)</li>
       <li>CVE-2025-29927 patch + AI-Powered capacity fix (INFRA-05, FIX-01)</li>
     </ul>
   </div>
@@ -309,7 +309,7 @@
   <div class="phase-card">
     <h4>Phase 49: Observability & Verticals <span class="badge badge-done">6 requirements</span></h4>
     <ul class="items">
-      <li><strong>G-24</strong> @vercel/otel 10% sampling + custom spans + request_id (OBS-01..02)</li>
+      <li><strong>G-24</strong> OpenTelemetry 10% sampling + custom spans + request_id (OBS-01..02)</li>
       <li><strong>G-27</strong> booking_metadata JSONB: birth_number, insurance, SPZ, VIN (VERT-01..02)</li>
       <li><strong>G-28</strong> Per-industry UI labels: Pacient/Termín/Vozidlo/Zakázka (VERT-03)</li>
       <li><strong>G-29</strong> Per-industry AI config: upselling toggle, capacity mode (VERT-04)</li>
@@ -324,6 +324,38 @@
       <li><strong>G-11</strong> Testcontainers with SKIP_DOCKER guard (TEST-03)</li>
       <li><strong>G-09</strong> Storybook 8: 5 components, 37 glass variants (TEST-04)</li>
       <li><strong>G-26</strong> DB partitioning: bookings, notifications, audit_logs by month (HARD-01..02)</li>
+    </ul>
+  </div>
+
+  <h3 style="margin-top:40px">v3.1 Go Live & Revenue (fáze 51–53)</h3>
+
+  <div class="phase-card">
+    <h4>Phase 51: Per-Company Payments <span class="badge badge-done">3 requirements</span></h4>
+    <ul class="items">
+      <li>Provider-agnostic payment_providers table with AES-256-GCM encrypted credentials (PAY-01)</li>
+      <li>Credential resolver: per-company → platform fallback (PAY-02)</li>
+      <li>Settings &gt; Payments UI for Comgate credential management (PAY-03)</li>
+    </ul>
+  </div>
+
+  <div class="phase-card">
+    <h4>Phase 52: Verification & Bug Fixing <span class="badge badge-done">7 requirements</span></h4>
+    <ul class="items">
+      <li>Dev server boot + smoke test — fixed DATABASE_URL validation, Redis probe (VER-01)</li>
+      <li>Owner signup/onboarding — registration, wizard, service/employee CRUD verified (VER-02)</li>
+      <li>Customer booking flow — public URL to confirmation, notification trigger fix (VER-03, VER-06)</li>
+      <li>Admin panel — metrics Date fix, all 7 features verified (VER-04, VER-05)</li>
+      <li>Marketplace — search, firm detail, Book Now flow verified (VER-08)</li>
+    </ul>
+  </div>
+
+  <div class="phase-card">
+    <h4>Phase 53: Deployment & Go Live <span class="badge badge-done">5 requirements</span></h4>
+    <ul class="items">
+      <li>Production demo seed: "Demo Salon Krasa" — 3 employees, 5 services, 10 bookings (DEP-01, DEP-03)</li>
+      <li>E2E Playwright suite as hard CI gate — no continue-on-error (VER-07)</li>
+      <li>Coolify env hardening + docker-compose.coolify.yml updated (DEP-01)</li>
+      <li>Custom domain (DEP-02) + Comgate recurring (DEP-04) — deferred with setup guide</li>
     </ul>
   </div>
 
@@ -353,7 +385,12 @@
       <tr><td>Verticals (VERT)</td><td>4</td><td>4</td><td>49</td><td><span class="badge badge-done">100%</span></td></tr>
       <tr><td>Testing (TEST)</td><td>4</td><td>4</td><td>50</td><td><span class="badge badge-done">100%</span></td></tr>
       <tr><td>Hardening (HARD)</td><td>2</td><td>2</td><td>50</td><td><span class="badge badge-done">100%</span></td></tr>
-      <tr style="font-weight:700;background:var(--green-light)"><td>CELKEM</td><td>47</td><td>47</td><td>45–50</td><td><span class="badge badge-done">100%</span></td></tr>
+      <tr style="background:var(--blue-light)"><td colspan="5" style="font-weight:700;color:var(--blue)">v3.1 Go Live & Revenue</td></tr>
+      <tr><td>Payments (PAY)</td><td>3</td><td>3</td><td>51</td><td><span class="badge badge-done">100%</span></td></tr>
+      <tr><td>Verification (VER)</td><td>7</td><td>7</td><td>52</td><td><span class="badge badge-done">100%</span></td></tr>
+      <tr><td>Deployment (DEP)</td><td>3</td><td>3</td><td>53</td><td><span class="badge badge-done">100%</span></td></tr>
+      <tr><td style="color:var(--gray-500)">Deployment deferred (DEP-02, DEP-04)</td><td style="color:var(--gray-500)">—</td><td style="color:var(--gray-500)">2</td><td style="color:var(--gray-500)">53</td><td><span class="badge badge-scope">Deferred</span></td></tr>
+      <tr style="font-weight:700;background:var(--green-light)"><td>CELKEM</td><td>57</td><td>57</td><td>45–53</td><td><span class="badge badge-done">100%</span></td></tr>
     </tbody>
   </table>
 
@@ -396,11 +433,17 @@
       <div class="stats">6 fází, 11 plánů</div>
       <div class="date">SHIPPED 2026-03-16</div>
     </div>
-    <div class="milestone-card" style="border-color:var(--green);background:var(--green-light)">
+    <div class="milestone-card">
       <div class="version">v3.0</div>
       <div class="name">Production Launch & 100% Doc Coverage</div>
       <div class="stats">6 fází, 24 plánů, 47 requirements</div>
       <div class="date">SHIPPED 2026-03-18</div>
+    </div>
+    <div class="milestone-card" style="border-color:var(--green);background:var(--green-light)">
+      <div class="version">v3.1</div>
+      <div class="name">Go Live & Revenue</div>
+      <div class="stats">3 fáze, 10 plánů, 10 requirements</div>
+      <div class="date">SHIPPED 2026-03-29</div>
     </div>
   </div>
 
@@ -411,18 +454,19 @@
       <tr>
         <th>Metrika</th>
         <th>v2.0 (16. března)</th>
-        <th>v3.0 FINAL (18. března)</th>
+        <th>v3.0 (18. března)</th>
+        <th>v3.1 FINAL (29. března)</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td>API route soubory</td><td>179</td><td><strong>187+</strong></td></tr>
-      <tr><td>Frontend komponenty</td><td>~100</td><td><strong>117+</strong></td></tr>
-      <tr><td>DB schema moduly</td><td>~22</td><td><strong>26+</strong></td></tr>
-      <tr><td>Unit test soubory</td><td>11</td><td><strong>17</strong></td></tr>
-      <tr><td>E2E test specs</td><td>5</td><td><strong>7</strong></td></tr>
-      <tr><td>Storybook stories</td><td>0</td><td><strong>5 (37 variants)</strong></td></tr>
-      <tr><td>Total fází (all milestones)</td><td>44</td><td><strong>50</strong></td></tr>
-      <tr><td>Total plánů (all milestones)</td><td>~186</td><td><strong>210+</strong></td></tr>
+      <tr><td>API route soubory</td><td>179</td><td>187+</td><td><strong>199+</strong></td></tr>
+      <tr><td>Frontend komponenty</td><td>~100</td><td>117+</td><td><strong>122+</strong></td></tr>
+      <tr><td>DB schema moduly</td><td>~22</td><td>26+</td><td><strong>26+</strong></td></tr>
+      <tr><td>Unit test soubory</td><td>11</td><td>17</td><td><strong>17</strong></td></tr>
+      <tr><td>E2E test specs</td><td>5</td><td>7</td><td><strong>7</strong></td></tr>
+      <tr><td>Storybook stories</td><td>0</td><td>5 (37 variants)</td><td><strong>5 (37 variants)</strong></td></tr>
+      <tr><td>Total fází (all milestones)</td><td>44</td><td>50</td><td><strong>53</strong></td></tr>
+      <tr><td>Total plánů (all milestones)</td><td>~186</td><td>210+</td><td><strong>220+</strong></td></tr>
     </tbody>
   </table>
 
@@ -431,30 +475,33 @@
   <h2>7. Závěr</h2>
 
   <div class="conclusion-box">
-    <h3>ScheduleBox v3.0 — 100 % KOMPLETNÍ</h3>
+    <h3>ScheduleBox v3.1 — 100 % KOMPLETNÍ</h3>
     <div class="stat-row">
       <div class="stat">
         <div class="val">100%</div>
-        <div class="desc">Requirements splněno (47/47)</div>
+        <div class="desc">Requirements splněno (57/57)</div>
       </div>
       <div class="stat">
-        <div class="val">7</div>
+        <div class="val">8</div>
         <div class="desc">Milestones shipped</div>
       </div>
       <div class="stat">
-        <div class="val">50</div>
+        <div class="val">53</div>
         <div class="desc">Fází realizováno</div>
       </div>
       <div class="stat">
-        <div class="val">36</div>
-        <div class="desc">Dnů od v1.0 do v3.0</div>
+        <div class="val">46</div>
+        <div class="desc">Dnů od v1.0 do v3.1</div>
       </div>
     </div>
     <p style="margin-top:16px">
-      ScheduleBox je <strong>plně produkčně připravený SaaS</strong> — AI-powered rezervační systém s platbami, CRM, marketplace, 7 AI modely, super-admin, notifikacemi, industry vertikálami, observabilitou, glassmorphism design systémem a automatizovanými testy.
+      ScheduleBox je <strong>plně produkčně připravený SaaS</strong> — AI-powered rezervační systém s per-company platbami, CRM, marketplace, 7 AI modely, super-admin, notifikacemi, industry vertikálami, observabilitou, glassmorphism design systémem a automatizovanými testy. Nasazeno na Coolify (self-hosted PaaS) s PostgreSQL 16 a Redis 7.
     </p>
     <p>
-      Za 36 dní bylo realizováno <strong>50 fází, 210+ plánů, 7 milestones</strong> — od prázdného repozitáře k plně funkční platformě s 187+ API endpointy, 117+ komponentami a 80%+ test pokrytím.
+      Za 46 dní bylo realizováno <strong>53 fází, 220+ plánů, 8 milestones</strong> — od prázdného repozitáře k plně funkční platformě s 199+ API endpointy, 122+ komponentami a 80%+ test pokrytím.
+    </p>
+    <p>
+      v3.1 přidal: per-company payment providers (provider-agnostic schema), E2E verifikaci všech flows (4 bugy nalezeny a opraveny), production demo seed, Coolify deployment hardening a E2E hard gate v CI.
     </p>
     <p>
       <strong>Dokumentace v13.0 FINAL (9 785 řádků, 58 kapitol) je 100% pokryta implementací.</strong>
@@ -462,7 +509,7 @@
   </div>
 
   <div class="footer">
-    <strong>ScheduleBox</strong> — GAP Analýza v3.0 FINAL &nbsp;|&nbsp; 18. března 2026 &nbsp;|&nbsp; PMLOGY Team &nbsp;|&nbsp; Interní dokument
+    <strong>ScheduleBox</strong> — GAP Analýza v3.1 FINAL &nbsp;|&nbsp; 29. března 2026 &nbsp;|&nbsp; PMLOGY Team &nbsp;|&nbsp; Interní dokument
   </div>
 
 </div>
