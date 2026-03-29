@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
 status: in-progress
-stopped_at: Completed 53-01-PLAN.md
-last_updated: "2026-03-29T11:27:15Z"
-last_activity: 2026-03-29 — Plan 53-01 complete (Production demo seed and Coolify env hardening)
+stopped_at: Completed 53-02-PLAN.md
+last_updated: "2026-03-29T11:34:04Z"
+last_activity: 2026-03-29 — Plan 53-02 complete (E2E hard gate in CI)
 progress:
   total_phases: 15
   completed_phases: 14
   total_plans: 44
-  completed_plans: 42
-  percent: 95
+  completed_plans: 43
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 53 of 53 (Deployment & Go Live)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-03-29 — Plan 53-01 complete (Production demo seed and Coolify env hardening)
+Last activity: 2026-03-29 — Plan 53-02 complete (E2E hard gate in CI)
 
-Progress: [█████████░] 95%
+Progress: [█████████░] 97%
 
 ## What's Done
 
@@ -66,6 +66,7 @@ Recent decisions affecting v3.1:
 - [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql template literals
 - [Phase 53-01]: Demo seed checks company slug for idempotency; roles created on-demand if missing
 - [Phase 53-01]: Coolify docker-compose DATABASE_URL supports Neon override via env var substitution; migrate uses DATABASE_URL_UNPOOLED
+- [Phase 53-02]: Marketplace E2E tests mock API responses instead of depending on seed data; artifact upload steps keep continue-on-error
 
 ## Blockers
 
@@ -86,9 +87,10 @@ Recent decisions affecting v3.1:
 | v3.0 | 6 | 26 | 2 days |
 | Phase 52 P04 | 7min | 3 tasks | 2 files |
 | Phase 53 P01 | 3min | 2 tasks | 3 files |
+| Phase 53 P02 | 4min | 2 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-29T11:27:15Z
-Stopped at: Completed 53-01-PLAN.md
+Last session: 2026-03-29T11:34:04Z
+Stopped at: Completed 53-02-PLAN.md
 Resume file: None

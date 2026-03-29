@@ -23,7 +23,7 @@ Source: v3.0 completion review + production readiness assessment.
 - [x] **VER-04**: Admin panel verified: impersonation, feature flags, suspend, broadcast, metrics, audit log
 - [x] **VER-05**: Marketplace search, firm detail page, and "Book Now" link work end-to-end
 - [x] **VER-06**: Email notifications send correctly (booking confirmation, status change, reminders)
-- [ ] **VER-07**: Playwright E2E suite passes green (all 7 specs + new per-company payment spec)
+- [x] **VER-07**: Playwright E2E suite passes green (all 7 specs + new per-company payment spec)
 - [x] **VER-08**: All v3.0 bugs found during manual testing are fixed
 
 ### Deployment
@@ -73,7 +73,7 @@ Source: v3.0 completion review + production readiness assessment.
 | VER-04 | Phase 52 | Complete |
 | VER-05 | Phase 52 | Complete |
 | VER-06 | Phase 52 | Complete |
-| VER-07 | Phase 53 | Pending |
+| VER-07 | Phase 53 | Complete |
 | VER-08 | Phase 52 | Complete |
 | DEP-01 | Phase 53 | Complete |
 | DEP-02 | Phase 53 | Pending |
