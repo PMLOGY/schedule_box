@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
 status: executing
-stopped_at: Completed 52-02-PLAN.md
-last_updated: "2026-03-29T10:41:08.181Z"
-last_activity: 2026-03-29 — Plan 52-02 complete (Owner setup flow verification)
+stopped_at: Completed 52-03-PLAN.md
+last_updated: "2026-03-29T10:41:00Z"
+last_activity: 2026-03-29 — Plan 52-03 complete (Booking flow and notification pipeline)
 progress:
   total_phases: 15
   completed_phases: 13
   total_plans: 44
-  completed_plans: 39
+  completed_plans: 41
   percent: 96
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 52 of 53 (Verification & Bug Fixing)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: Executing phase 52
-Last activity: 2026-03-29 — Plan 52-02 complete (Owner setup flow verification)
+Last activity: 2026-03-29 — Plan 52-03 complete (Booking flow and notification pipeline verification)
 
 Progress: [██████████] 96%
 
@@ -59,6 +59,8 @@ Recent decisions affecting v3.1:
 - [Phase 52-01]: Accept both postgres:// and postgresql:// in DATABASE_URL validation for Coolify compatibility
 - [Phase 52-01]: Readiness probe skips Redis check in dev/test when no Redis configured
 - [Phase 52]: No code changes needed for owner setup flow -- registration, onboarding, service CRUD, employee CRUD all verified working
+- [Phase 52-03]: Public booking notification uses same fireBookingCreatedNotifications as internal booking service
+- [Phase 52-03]: Email failures recorded as notification status=failed with error message, never block booking response
 
 ## Blockers
 
@@ -80,6 +82,6 @@ Recent decisions affecting v3.1:
 
 ## Session Continuity
 
-Last session: 2026-03-29T10:41:08.175Z
-Stopped at: Completed 52-02-PLAN.md
+Last session: 2026-03-29
+Stopped at: Completed 52-03-PLAN.md (Booking flow and notification pipeline)
 Resume file: None
