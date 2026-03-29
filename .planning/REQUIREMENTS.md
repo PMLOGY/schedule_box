@@ -18,7 +18,7 @@ Source: v3.0 completion review + production readiness assessment.
 ### Verification
 
 - [x] **VER-01**: Dev server boots with zero errors on Vercel-compatible config (Neon + Upstash)
-- [ ] **VER-02**: Full sign-up → onboarding → create service → create employee flow works end-to-end
+- [x] **VER-02**: Full sign-up → onboarding → create service → create employee flow works end-to-end
 - [ ] **VER-03**: Customer booking flow works: select service → pick slot → enter info → pay → confirmation
 - [ ] **VER-04**: Admin panel verified: impersonation, feature flags, suspend, broadcast, metrics, audit log
 - [ ] **VER-05**: Marketplace search, firm detail page, and "Book Now" link work end-to-end
@@ -68,7 +68,7 @@ Source: v3.0 completion review + production readiness assessment.
 | PAY-03 | Phase 51 | Complete |
 | PAY-04 | Phase 51 | Complete |
 | VER-01 | Phase 52 | Complete |
-| VER-02 | Phase 52 | Pending |
+| VER-02 | Phase 52 | Complete |
 | VER-03 | Phase 52 | Pending |
 | VER-04 | Phase 52 | Pending |
 | VER-05 | Phase 52 | Pending |

@@ -39,6 +39,7 @@ import { encrypt, hmacIndex } from '@/lib/security/encryption';
 import { triggerWebhooks } from '@/lib/webhooks/trigger';
 import { logRouteComplete, getRequestId } from '@/lib/logger/route-logger';
 import { bookingMetadataSchema } from '@/lib/industry/industry-fields';
+import { fireBookingCreatedNotifications } from '@/lib/booking/booking-service';
 
 // ============================================================================
 // SCHEMAS
@@ -543,6 +544,9 @@ async function _handlePublicBookingCreate({
   } catch (error) {
     console.error('[Public Booking] Failed to publish booking.created event:', error);
   }
+
+  // 7b. Fire booking confirmation notifications (email + SMS reminder, fire-and-forget)
+  void fireBookingCreatedNotifications(booking.id, companyId, startTime);
 
   // 8. Increment booking counter (fire-and-forget)
   incrementBookingCounter(companyId).catch((err) => {

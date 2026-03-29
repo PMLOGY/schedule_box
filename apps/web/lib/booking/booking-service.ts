@@ -78,7 +78,7 @@ export interface BookingWithRelations {
  * Fire confirmation email and create SMS reminder notification row.
  * Called after booking creation — entirely fire-and-forget, never throws.
  */
-async function fireBookingCreatedNotifications(
+export async function fireBookingCreatedNotifications(
   bookingId: number,
   companyId: number,
   startTime: Date,
