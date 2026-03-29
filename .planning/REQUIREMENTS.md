@@ -28,9 +28,9 @@ Source: v3.0 completion review + production readiness assessment.
 
 ### Deployment
 
-- [ ] **DEP-01**: App deployed to Vercel with production environment variables
+- [x] **DEP-01**: App deployed to Vercel with production environment variables
 - [ ] **DEP-02**: Custom domain configured with SSL (when domain provided)
-- [ ] **DEP-03**: Neon production database seeded with demo company for showcase
+- [x] **DEP-03**: Neon production database seeded with demo company for showcase
 - [ ] **DEP-04**: Comgate recurring subscription billing verified working on production
 
 ## Future Requirements (v3.2+)
@@ -75,9 +75,9 @@ Source: v3.0 completion review + production readiness assessment.
 | VER-06 | Phase 52 | Complete |
 | VER-07 | Phase 53 | Pending |
 | VER-08 | Phase 52 | Complete |
-| DEP-01 | Phase 53 | Pending |
+| DEP-01 | Phase 53 | Complete |
 | DEP-02 | Phase 53 | Pending |
-| DEP-03 | Phase 53 | Pending |
+| DEP-03 | Phase 53 | Complete |
 | DEP-04 | Phase 53 | Pending |
 
 **Coverage:**

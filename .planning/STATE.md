@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
-status: completed
-stopped_at: Completed 52-04-PLAN.md
-last_updated: "2026-03-29T11:01:38.349Z"
-last_activity: 2026-03-29 — Plan 52-04 complete (Admin panel, marketplace, and final bug sweep)
+status: in-progress
+stopped_at: Completed 53-01-PLAN.md
+last_updated: "2026-03-29T11:27:15Z"
+last_activity: 2026-03-29 — Plan 53-01 complete (Production demo seed and Coolify env hardening)
 progress:
   total_phases: 15
   completed_phases: 14
   total_plans: 44
-  completed_plans: 41
-  percent: 97
+  completed_plans: 42
+  percent: 95
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Milestone v3.1 — Phase 52: Verification & Bug Fixing
+**Current focus:** Milestone v3.1 — Phase 53: Deployment & Go Live
 
 ## Current Position
 
-Phase: 52 of 53 (Verification & Bug Fixing)
-Plan: 4 of 4 complete
-Status: Phase 52 complete
-Last activity: 2026-03-29 — Plan 52-04 complete (Admin panel, marketplace, and final bug sweep)
+Phase: 53 of 53 (Deployment & Go Live)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-03-29 — Plan 53-01 complete (Production demo seed and Coolify env hardening)
 
-Progress: [██████████] 97%
+Progress: [█████████░] 95%
 
 ## What's Done
 
@@ -64,6 +64,8 @@ Recent decisions affecting v3.1:
 - [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql`` template literals
 - [Phase 52-04]: Marketplace listings empty by default -- companies create via my-listing endpoint (not a bug)
 - [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql template literals
+- [Phase 53-01]: Demo seed checks company slug for idempotency; roles created on-demand if missing
+- [Phase 53-01]: Coolify docker-compose DATABASE_URL supports Neon override via env var substitution; migrate uses DATABASE_URL_UNPOOLED
 
 ## Blockers
 
@@ -83,9 +85,10 @@ Recent decisions affecting v3.1:
 | v2.0 | 6 | 11 | 3 days |
 | v3.0 | 6 | 26 | 2 days |
 | Phase 52 P04 | 7min | 3 tasks | 2 files |
+| Phase 53 P01 | 3min | 2 tasks | 3 files |
 
 ## Session Continuity
 
-Last session: 2026-03-29T10:54:35.805Z
-Stopped at: Completed 52-04-PLAN.md
+Last session: 2026-03-29T11:27:15Z
+Stopped at: Completed 53-01-PLAN.md
 Resume file: None
