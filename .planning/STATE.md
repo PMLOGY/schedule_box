@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
-status: executing
-stopped_at: Completed 52-03-PLAN.md
-last_updated: "2026-03-29T10:41:00Z"
-last_activity: 2026-03-29 — Plan 52-03 complete (Booking flow and notification pipeline)
+status: completed
+stopped_at: Completed 52-04-PLAN.md
+last_updated: "2026-03-29T10:54:35.963Z"
+last_activity: 2026-03-29 — Plan 52-04 complete (Admin panel, marketplace, and final bug sweep)
 progress:
   total_phases: 15
-  completed_phases: 13
+  completed_phases: 14
   total_plans: 44
   completed_plans: 41
-  percent: 96
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 52 of 53 (Verification & Bug Fixing)
-Plan: 3 of 4 complete
-Status: Executing phase 52
-Last activity: 2026-03-29 — Plan 52-03 complete (Booking flow and notification pipeline verification)
+Plan: 4 of 4 complete
+Status: Phase 52 complete
+Last activity: 2026-03-29 — Plan 52-04 complete (Admin panel, marketplace, and final bug sweep)
 
-Progress: [██████████] 96%
+Progress: [██████████] 97%
 
 ## What's Done
 
@@ -61,6 +61,9 @@ Recent decisions affecting v3.1:
 - [Phase 52]: No code changes needed for owner setup flow -- registration, onboarding, service CRUD, employee CRUD all verified working
 - [Phase 52-03]: Public booking notification uses same fireBookingCreatedNotifications as internal booking service
 - [Phase 52-03]: Email failures recorded as notification status=failed with error message, never block booking response
+- [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql`` template literals
+- [Phase 52-04]: Marketplace listings empty by default -- companies create via my-listing endpoint (not a bug)
+- [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql template literals
 
 ## Blockers
 
@@ -79,9 +82,10 @@ Recent decisions affecting v3.1:
 | v1.4 | 6 | 11 | 16 days |
 | v2.0 | 6 | 11 | 3 days |
 | v3.0 | 6 | 26 | 2 days |
+| Phase 52 P04 | 7min | 3 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-29
-Stopped at: Completed 52-03-PLAN.md (Booking flow and notification pipeline)
+Last session: 2026-03-29T10:54:35.805Z
+Stopped at: Completed 52-04-PLAN.md
 Resume file: None

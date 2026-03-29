@@ -20,11 +20,11 @@ Source: v3.0 completion review + production readiness assessment.
 - [x] **VER-01**: Dev server boots with zero errors on Vercel-compatible config (Neon + Upstash)
 - [x] **VER-02**: Full sign-up → onboarding → create service → create employee flow works end-to-end
 - [x] **VER-03**: Customer booking flow works: select service → pick slot → enter info → pay → confirmation
-- [ ] **VER-04**: Admin panel verified: impersonation, feature flags, suspend, broadcast, metrics, audit log
-- [ ] **VER-05**: Marketplace search, firm detail page, and "Book Now" link work end-to-end
+- [x] **VER-04**: Admin panel verified: impersonation, feature flags, suspend, broadcast, metrics, audit log
+- [x] **VER-05**: Marketplace search, firm detail page, and "Book Now" link work end-to-end
 - [x] **VER-06**: Email notifications send correctly (booking confirmation, status change, reminders)
 - [ ] **VER-07**: Playwright E2E suite passes green (all 7 specs + new per-company payment spec)
-- [ ] **VER-08**: All v3.0 bugs found during manual testing are fixed
+- [x] **VER-08**: All v3.0 bugs found during manual testing are fixed
 
 ### Deployment
 
@@ -70,11 +70,11 @@ Source: v3.0 completion review + production readiness assessment.
 | VER-01 | Phase 52 | Complete |
 | VER-02 | Phase 52 | Complete |
 | VER-03 | Phase 52 | Complete |
-| VER-04 | Phase 52 | Pending |
-| VER-05 | Phase 52 | Pending |
+| VER-04 | Phase 52 | Complete |
+| VER-05 | Phase 52 | Complete |
 | VER-06 | Phase 52 | Complete |
 | VER-07 | Phase 53 | Pending |
-| VER-08 | Phase 52 | Pending |
+| VER-08 | Phase 52 | Complete |
 | DEP-01 | Phase 53 | Pending |
 | DEP-02 | Phase 53 | Pending |
 | DEP-03 | Phase 53 | Pending |

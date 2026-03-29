@@ -126,7 +126,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 **Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Coolify (self-hosted PaaS), businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
 
 - [x] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04) (completed 2026-03-27)
-- [ ] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08)
+- [x] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08) (completed 2026-03-29)
 - [ ] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
 
 ## Phase Details
@@ -423,7 +423,7 @@ Plans:
 | 49. Observability & Verticals | v3.0 | 3/3 | Complete | 2026-03-18 |
 | 50. Testing & Hardening | v3.0 | 5/5 | Complete | 2026-03-18 |
 | 51. Per-Company Payments | 2/2 | Complete   | 2026-03-27 | - |
-| 52. Verification & Bug Fixing | 3/4 | In Progress|  | - |
+| 52. Verification & Bug Fixing | 4/4 | Complete   | 2026-03-29 | - |
 | 53. Deployment & Go Live | v3.1 | 0/TBD | Not started | - |
 
 ---
