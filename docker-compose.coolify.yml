@@ -51,7 +51,8 @@ services:
   migrate:
     image: ghcr.io/pmlogy/schedule_box-migrate:latest
     environment:
-      DATABASE_URL: postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox
+      # For Neon production: override DATABASE_URL in Coolify UI with unpooled Neon connection
+      DATABASE_URL: ${DATABASE_URL_UNPOOLED:-postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox}
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,11 +75,20 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox
+      # For Neon production: set DATABASE_URL to pooled Neon connection in Coolify UI
+      # For local docker-compose: uses the postgres container below
+      DATABASE_URL: ${DATABASE_URL:-postgresql://schedulebox:${POSTGRES_PASSWORD}@postgres:5432/schedulebox}
+      # Neon direct (unpooled) connection for migrations — set in Coolify UI for Neon
+      DATABASE_URL_UNPOOLED: ${DATABASE_URL_UNPOOLED:-}
+      # Upstash Redis HTTP (the app uses @upstash/redis HTTP client, not raw redis://)
+      # Set these in Coolify UI — the local redis:// container is for fallback only
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-}
       REDIS_URL: redis://redis:6379
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      APP_VERSION: ${APP_VERSION:-1.0.0}
       TZ: Europe/Prague
       COMGATE_MERCHANT_ID: ${COMGATE_MERCHANT_ID:-}
       COMGATE_SECRET: ${COMGATE_SECRET:-}
