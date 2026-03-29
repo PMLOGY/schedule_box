@@ -9,7 +9,7 @@
 - ✅ **v1.4 Design Overhaul** — Phases 33-38 (shipped 2026-03-12)
 - ✅ **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (shipped 2026-03-16)
 - ✅ **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (shipped 2026-03-18)
-- 🚧 **v3.1 Go Live & Revenue** — Phases 51-53 (in progress)
+- ✅ **v3.1 Go Live & Revenue** — Phases 51-53 (shipped 2026-03-29)
 
 ## Phases
 
@@ -127,7 +127,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 - [x] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04) (completed 2026-03-27)
 - [x] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08) (completed 2026-03-29)
-- [ ] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars, custom domain, SSL; Playwright E2E suite passes green; Neon seeded with demo company; Comgate recurring verified on production (VER-07, DEP-01..04)
+- [x] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars; Playwright E2E suite passes green; Neon seeded with demo company; custom domain and Comgate recurring deferred with setup guides (VER-07, DEP-01, DEP-03 complete; DEP-02, DEP-04 deferred) (completed 2026-03-29)
 
 ## Phase Details
 
@@ -364,9 +364,9 @@ Plans:
   5. A test subscription upgrade on production successfully triggers Comgate recurring billing on merchant 498621 — the subscription state transitions from trial/free to the paid plan and the invoice PDF is generated
 **Plans**: 3 plans
 Plans:
-- [ ] 53-01-PLAN.md — Production env hardening + demo company seed (DEP-01, DEP-03)
-- [ ] 53-02-PLAN.md — E2E suite green gate in CI (VER-07)
-- [ ] 53-03-PLAN.md — Custom domain + Comgate billing verification (DEP-02, DEP-04)
+- [x] 53-01-PLAN.md — Production env hardening + demo company seed (DEP-01, DEP-03) (completed 2026-03-29)
+- [x] 53-02-PLAN.md — E2E suite green gate in CI (VER-07) (completed 2026-03-29)
+- [x] 53-03-PLAN.md — Custom domain + Comgate billing verification (DEP-02 deferred, DEP-04 deferred) (completed 2026-03-29)
 
 ## Progress
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: Go Live & Revenue
-status: in-progress
-stopped_at: Completed 53-02-PLAN.md
-last_updated: "2026-03-29T11:34:04Z"
-last_activity: 2026-03-29 — Plan 53-02 complete (E2E hard gate in CI)
+status: complete
+stopped_at: Completed 53-03-PLAN.md (v3.1 milestone complete)
+last_updated: "2026-03-29T11:45:50Z"
+last_activity: 2026-03-29 — Plan 53-03 complete (DEP-02 + DEP-04 deferred with setup guides)
 progress:
   total_phases: 15
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 44
-  completed_plans: 43
-  percent: 97
+  completed_plans: 44
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 53 of 53 (Deployment & Go Live)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-03-29 — Plan 53-02 complete (E2E hard gate in CI)
+Plan: 3 of 3 complete
+Status: Complete (v3.1 milestone delivered)
+Last activity: 2026-03-29 — Plan 53-03 complete (DEP-02 + DEP-04 deferred with setup guides)
 
-Progress: [█████████░] 97%
+Progress: [██████████] 100%
 
 ## What's Done
 
@@ -67,11 +67,13 @@ Recent decisions affecting v3.1:
 - [Phase 53-01]: Demo seed checks company slug for idempotency; roles created on-demand if missing
 - [Phase 53-01]: Coolify docker-compose DATABASE_URL supports Neon override via env var substitution; migrate uses DATABASE_URL_UNPOOLED
 - [Phase 53-02]: Marketplace E2E tests mock API responses instead of depending on seed data; artifact upload steps keep continue-on-error
+- [Phase 53-03]: Custom domain (DEP-02) deferred -- app runs on Coolify URL until domain chosen; setup guide in 53-03-DEFERRED-SETUP.md
+- [Phase 53-03]: Comgate recurring billing (DEP-04) deferred -- blocked on Comgate activation for merchant 498621; verification guide documented
 
 ## Blockers
 
-- **[ACTIVE]** Comgate recurring activation requires contacting Comgate support for merchant 498621 — needed for DEP-04 verification
-- **[PENDING]** Custom domain not yet provided — DEP-02 gated on user providing domain name
+- **[DEFERRED]** Comgate recurring activation requires contacting Comgate support for merchant 498621 — DEP-04 verification deferred, setup guide in 53-03-DEFERRED-SETUP.md
+- **[DEFERRED]** Custom domain not yet provided — DEP-02 deferred, ready-to-configure guide in 53-03-DEFERRED-SETUP.md
 - Real testimonials needed for landing page — placeholder content still in place
 
 ## Performance Metrics
@@ -88,9 +90,10 @@ Recent decisions affecting v3.1:
 | Phase 52 P04 | 7min | 3 tasks | 2 files |
 | Phase 53 P01 | 3min | 2 tasks | 3 files |
 | Phase 53 P02 | 4min | 2 tasks | 2 files |
+| Phase 53 P03 | 2min | 3 tasks | 2 files |
 
 ## Session Continuity
 
-Last session: 2026-03-29T11:34:04Z
-Stopped at: Completed 53-02-PLAN.md
+Last session: 2026-03-29T11:45:50Z
+Stopped at: Completed 53-03-PLAN.md (v3.1 milestone complete)
 Resume file: None
