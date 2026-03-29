@@ -52,6 +52,12 @@ export const GET = createRouteHandler({
     // Start-of-month for churn calculation
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+    // Convert to ISO strings for safe SQL interpolation (Drizzle sql`` requires string/number, not Date)
+    const todayStartISO = todayStart.toISOString();
+    const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+    const twentyFourHoursAgoISO = twentyFourHoursAgo.toISOString();
+    const monthStartISO = monthStart.toISOString();
+
     // ---------------------------------------------------------------------------
     // Business KPIs
     // ---------------------------------------------------------------------------
@@ -59,12 +65,12 @@ export const GET = createRouteHandler({
     const [newSignupsTodayRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(companies)
-      .where(sql`${companies.createdAt} >= ${todayStart}`);
+      .where(sql`${companies.createdAt} >= ${todayStartISO}`);
 
     const [newSignupsWeekRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(companies)
-      .where(sql`${companies.createdAt} >= ${sevenDaysAgo}`);
+      .where(sql`${companies.createdAt} >= ${sevenDaysAgoISO}`);
 
     const [activeCompaniesRow] = await db
       .select({ count: sql<number>`count(*)::int` })
@@ -74,7 +80,7 @@ export const GET = createRouteHandler({
     const [bookingsWeekRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(bookings)
-      .where(sql`${bookings.createdAt} >= ${sevenDaysAgo}`);
+      .where(sql`${bookings.createdAt} >= ${sevenDaysAgoISO}`);
 
     // MRR: sum of priceAmount for active subscriptions (monthly basis)
     // Annual subscriptions are divided by 12 for monthly equivalent
@@ -100,12 +106,12 @@ export const GET = createRouteHandler({
     const [churnsThisMonthRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(companies)
-      .where(sql`${companies.suspendedAt} >= ${monthStart}`);
+      .where(sql`${companies.suspendedAt} >= ${monthStartISO}`);
 
     const [totalAtMonthStartRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(companies)
-      .where(sql`${companies.createdAt} < ${monthStart}`);
+      .where(sql`${companies.createdAt} < ${monthStartISO}`);
 
     const churns = churnsThisMonthRow?.count ?? 0;
     const totalAtMonthStart = totalAtMonthStartRow?.count ?? 1; // avoid /0
@@ -119,13 +125,13 @@ export const GET = createRouteHandler({
     const [notifTotalRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(notifications)
-      .where(sql`${notifications.createdAt} >= ${twentyFourHoursAgo}`);
+      .where(sql`${notifications.createdAt} >= ${twentyFourHoursAgoISO}`);
 
     const [notifSentRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(notifications)
       .where(
-        sql`${notifications.createdAt} >= ${twentyFourHoursAgo} AND ${notifications.status} = 'sent'`,
+        sql`${notifications.createdAt} >= ${twentyFourHoursAgoISO} AND ${notifications.status} = 'sent'`,
       );
 
     const notifTotal = notifTotalRow?.count ?? 0;
@@ -138,14 +144,14 @@ export const GET = createRouteHandler({
       .select({ count: sql<number>`count(*)::int` })
       .from(notifications)
       .where(
-        sql`${notifications.createdAt} >= ${twentyFourHoursAgo} AND ${notifications.channel} = 'sms'`,
+        sql`${notifications.createdAt} >= ${twentyFourHoursAgoISO} AND ${notifications.channel} = 'sms'`,
       );
 
     const [smsSentRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(notifications)
       .where(
-        sql`${notifications.createdAt} >= ${twentyFourHoursAgo} AND ${notifications.channel} = 'sms' AND ${notifications.status} = 'sent'`,
+        sql`${notifications.createdAt} >= ${twentyFourHoursAgoISO} AND ${notifications.channel} = 'sms' AND ${notifications.status} = 'sent'`,
       );
 
     const smsTotal = smsTotalRow?.count ?? 0;
@@ -156,7 +162,7 @@ export const GET = createRouteHandler({
     const [failedPaymentsRow] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(payments)
-      .where(sql`${payments.createdAt} >= ${todayStart} AND ${payments.status} = 'failed'`);
+      .where(sql`${payments.createdAt} >= ${todayStartISO} AND ${payments.status} = 'failed'`);
 
     const kpis = {
       newSignupsToday: newSignupsTodayRow?.count ?? 0,
