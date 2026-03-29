@@ -132,7 +132,9 @@
     "adminAnalytics": "Admin analytika",
     "portal": "Portál",
     "onboarding": "Sprievodca nastavením",
-    "videoMeetings": "Video stretnutia"
+    "videoMeetings": "Video stretnutia",
+    "webhooks": "Webhooky",
+    "aiSettings": "Nastavenia AI"
   },
   "dashboard": {
     "title": "Prehľad",

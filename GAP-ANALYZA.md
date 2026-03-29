@@ -1,22 +1,23 @@
 # ScheduleBox — GAP Analýza
 
-**Verze:** 3.0 FINAL
-**Datum:** 18. března 2026
+**Verze:** 3.1 FINAL
+**Datum:** 29. března 2026
 **Autor:** PMLOGY Team
-**Zdroj:** Audit dokumentace v13.0 FINAL vs. aktuální stav kódu po v3.0 fázích 45–50
+**Zdroj:** Audit dokumentace v13.0 FINAL vs. aktuální stav kódu po v3.0 fázích 45–50 a v3.1 fázích 51–53
 
 ---
 
 ## 1. Executive Summary
 
-Dokumentace specifikuje kompletní vizi platformy (9 785 řádků, 58 kapitol). Milestone v3.0 je **KOMPLETNÍ** — všech **47/47 requirements splněno**, všech **32 gapů z původní analýzy adresováno** (24 uzavřeno, 8 záměrně vyloučeno z scope).
+Dokumentace specifikuje kompletní vizi platformy (9 785 řádků, 58 kapitol). Milestone v3.0 je **KOMPLETNÍ** — všech **47/47 requirements splněno**, všech **32 gapů z původní analýzy adresováno** (24 uzavřeno, 8 záměrně vyloučeno z scope). Milestone v3.1 přidává **per-company platby, E2E hard gate, produkční demo seed a Coolify deployment** — 10 dalších plánů ve 3 fázích.
 
-| Kategorie                        | v2.0 (16. března) | v3.0 FINAL (18. března) | Změna |
-| -------------------------------- | ----------------- | ----------------------- | ----- |
-| Dokumentace pokrytí (58 kapitol) | ~78 %             | **~100 %**              | +22 % |
-| Kritické pro launch              | 95 %              | **100 %**               | +5 %  |
-| v3.0 requirements splněno        | 0/47              | **47/47 (100 %)**       | +47   |
-| Gapy uzavřené / adresované       | 0/32              | **32/32 (100 %)**       | +32   |
+| Kategorie                        | v2.0 (16. března) | v3.0 FINAL (18. března) | v3.1 FINAL (29. března) |
+| -------------------------------- | ----------------- | ----------------------- | ----------------------- |
+| Dokumentace pokrytí (58 kapitol) | ~78 %             | ~100 %                  | **~100 %**              |
+| Kritické pro launch              | 95 %              | 100 %                   | **100 %**               |
+| v3.0 requirements splněno        | 0/47              | 47/47 (100 %)           | **47/47 (100 %)**       |
+| v3.1 requirements splněno        | —                 | —                       | **10/10 (100 %)**       |
+| Gapy uzavřené / adresované       | 0/32              | 32/32 (100 %)           | **32/32 (100 %)**       |
 
 ---
 
@@ -25,14 +26,14 @@ Dokumentace specifikuje kompletní vizi platformy (9 785 řádků, 58 kapitol). 
 | #    | Část dokumentace        | Stav v2.0          | Stav v3.0 FINAL                                                                      | v3.0 Scope |
 | ---- | ----------------------- | ------------------ | ------------------------------------------------------------------------------------ | ---------- |
 | I    | Business & Strategie    | Kompletní          | Kompletní                                                                            | ✅ 100 %   |
-| II   | Architektura            | Monolith (záměrně) | Monolith + Vercel + @vercel/otel                                                     | ✅ 100 %   |
+| II   | Architektura            | Monolith (záměrně) | Monolith + Coolify (self-hosted PaaS) + Docker                                       | ✅ 100 %   |
 | III  | Databáze                | 47 tabulek + RLS   | +webhook_config, platform tabulky, **DB partitioning** (bookings, notif, audit_logs) | ✅ 100 %   |
 | IV   | API                     | 179 route souborů  | **187+ route souborů** (marketplace geo, webhooks mgmt, admin tools, verticals)      | ✅ 100 %   |
 | V    | Frontend                | Chybí WebSocket    | 30s polling + **per-industry UI labels** + Storybook glass catalog                   | ✅ 100 %   |
 | VI   | Bezpečnost              | 65 %               | PII AES-256-GCM + DOMPurify + HIBP + SSRF + CSRF + Sentry                            | ✅ 100 %   |
 | VII  | Integrace               | 80 %               | +video mgmt UI, webhooks mgmt UI, marketplace, **industry verticals**                | ✅ 100 %   |
 | VIII | AI/ML                   | 90 %               | +**per-industry AI config** (upselling toggle, capacity mode)                        | ✅ 100 %   |
-| IX   | DevOps                  | 85 %               | Vercel deploy, Neon, Upstash, **@vercel/otel + structured logging**                  | ✅ 100 %   |
+| IX   | DevOps                  | 85 %               | Coolify deploy, PostgreSQL 16, Redis 7, **structured logging**                       | ✅ 100 %   |
 | X    | Testování               | 35 %               | **80%+ Vitest coverage, 7 E2E specs, Testcontainers, Storybook**                     | ✅ 100 %   |
 | XI   | Business Docs           | 80 %               | +Cookie Policy stránka                                                               | ✅ 100 %   |
 | XIII | Produktová spec         | 88 %               | +marketplace, booking modal, settings pages, **vertical fields**                     | ✅ 100 %   |
@@ -49,9 +50,9 @@ _v3.0 Scope = všechny v3.0 requirements pro danou část jsou splněny. Out-of-
 | #    | Gap                     | Řešení                                       | Requirement |
 | ---- | ----------------------- | -------------------------------------------- | ----------- |
 | G-01 | ~~RabbitMQ závislost~~  | publishEvent = safe no-op, amqplib odstraněn | INFRA-01    |
-| —    | Neon PostgreSQL         | @neondatabase/serverless + Drizzle ORM       | INFRA-02    |
-| —    | Upstash Redis           | @upstash/redis HTTP transport, 9 call sites  | INFRA-03    |
-| —    | Vercel deploy           | Auto-deploy z GitHub, preview deploys        | INFRA-04    |
+| —    | PostgreSQL              | PostgreSQL 16 (Coolify) + Drizzle ORM        | INFRA-02    |
+| —    | Redis                   | Redis 7 (Coolify), 9 call sites              | INFRA-03    |
+| —    | Coolify deploy          | Auto-deploy z GitHub, Docker containers      | INFRA-04    |
 | —    | CVE-2025-29927          | Next.js >=14.2.25                            | INFRA-05    |
 | —    | AI-Powered capacity bug | `formatFeatureValue()` → "Unlimited"         | FIX-01      |
 
@@ -69,18 +70,18 @@ _v3.0 Scope = všechny v3.0 requirements pro danou část jsou splněny. Out-of-
 
 ### ✅ Phase 47: Notifications & Super-Admin (uzavřeno 18. března)
 
-| #    | Gap                          | Řešení                                                                  | Requirement        |
-| ---- | ---------------------------- | ----------------------------------------------------------------------- | ------------------ |
-| —    | Booking email notifications  | SMTP email on booking create + status change                            | NOTIF-01, NOTIF-03 |
-| —    | SMS reminder                 | Twilio SMS 24h before appointment                                       | NOTIF-02           |
-| —    | Notification delivery status | Sent/failed/pending v owner notification list                           | NOTIF-04           |
-| G-12 | ~~Impersonace~~              | Red banner, 15min timeout, audit log, all roles                         | ADMIN-01           |
-| G-13 | ~~Feature flags~~            | DB tabulka + Redis cache (60s TTL) + admin UI + per-company override    | ADMIN-02           |
-| G-14 | ~~Suspend/Unsuspend~~        | Suspend with reason, 403 on login, billing access kept                  | ADMIN-03           |
-| G-15 | ~~Broadcast zprávy~~         | In-app banner + email, scheduled delivery, audience targeting           | ADMIN-04           |
-| G-16 | ~~Maintenance mode~~         | Upstash Redis flag, middleware check, admin bypass cookie, branded page | ADMIN-05           |
-| G-17 | ~~Platform daily metrics~~   | Dashboard: signups, MRR, churn, bookings, error rate, delivery rates    | ADMIN-06           |
-| G-18 | ~~Platform audit logs~~      | Before/after JSONB, IP, request_id, searchable admin UI                 | ADMIN-07           |
+| #    | Gap                          | Řešení                                                               | Requirement        |
+| ---- | ---------------------------- | -------------------------------------------------------------------- | ------------------ |
+| —    | Booking email notifications  | SMTP email on booking create + status change                         | NOTIF-01, NOTIF-03 |
+| —    | SMS reminder                 | Twilio SMS 24h before appointment                                    | NOTIF-02           |
+| —    | Notification delivery status | Sent/failed/pending v owner notification list                        | NOTIF-04           |
+| G-12 | ~~Impersonace~~              | Red banner, 15min timeout, audit log, all roles                      | ADMIN-01           |
+| G-13 | ~~Feature flags~~            | DB tabulka + Redis cache (60s TTL) + admin UI + per-company override | ADMIN-02           |
+| G-14 | ~~Suspend/Unsuspend~~        | Suspend with reason, 403 on login, billing access kept               | ADMIN-03           |
+| G-15 | ~~Broadcast zprávy~~         | In-app banner + email, scheduled delivery, audience targeting        | ADMIN-04           |
+| G-16 | ~~Maintenance mode~~         | Redis flag, middleware check, admin bypass cookie, branded page      | ADMIN-05           |
+| G-17 | ~~Platform daily metrics~~   | Dashboard: signups, MRR, churn, bookings, error rate, delivery rates | ADMIN-06           |
+| G-18 | ~~Platform audit logs~~      | Before/after JSONB, IP, request_id, searchable admin UI              | ADMIN-07           |
 
 ### ✅ Phase 48: Marketplace & UX (uzavřeno 18. března)
 
@@ -99,13 +100,13 @@ _v3.0 Scope = všechny v3.0 requirements pro danou část jsou splněny. Out-of-
 
 ### ✅ Phase 49: Observability & Verticals (uzavřeno 18. března)
 
-| #    | Gap                    | Řešení                                                                    | Requirement      |
-| ---- | ---------------------- | ------------------------------------------------------------------------- | ---------------- |
-| G-24 | ~~OpenTelemetry~~      | @vercel/otel, 10% sampling, custom spans on critical paths, request_id MW | OBS-01           |
-| —    | ~~Structured logging~~ | Winston JSON adapted for Vercel log drain (level, message, route, ms)     | OBS-02           |
-| G-27 | ~~Oborové DB pole~~    | booking_metadata JSONB — birth_number/insurance + SPZ/VIN                 | VERT-01, VERT-02 |
-| G-28 | ~~Oborové UI labely~~  | Per-industry labels (Pacient/Termín/Vozidlo/Zakázka) everywhere           | VERT-03          |
-| G-29 | ~~Oborová AI config~~  | industry_config JSONB: upselling toggle + capacity mode; auto-set         | VERT-04          |
+| #    | Gap                    | Řešení                                                                         | Requirement      |
+| ---- | ---------------------- | ------------------------------------------------------------------------------ | ---------------- |
+| G-24 | ~~OpenTelemetry~~      | OpenTelemetry SDK, 10% sampling, custom spans on critical paths, request_id MW | OBS-01           |
+| —    | ~~Structured logging~~ | Winston JSON structured logging (level, message, route, ms)                    | OBS-02           |
+| G-27 | ~~Oborové DB pole~~    | booking_metadata JSONB — birth_number/insurance + SPZ/VIN                      | VERT-01, VERT-02 |
+| G-28 | ~~Oborové UI labely~~  | Per-industry labels (Pacient/Termín/Vozidlo/Zakázka) everywhere                | VERT-03          |
+| G-29 | ~~Oborová AI config~~  | industry_config JSONB: upselling toggle + capacity mode; auto-set              | VERT-04          |
 
 ### ✅ Phase 50: Testing & Hardening (uzavřeno 18. března)
 
@@ -126,8 +127,8 @@ _v3.0 Scope = všechny v3.0 requirements pro danou část jsou splněny. Out-of-
 | G-07 | White-label mobilní app    | 200+ hod, web-first přístup funguje, separate milestone |
 | G-10 | Contract testy (Pact)      | TypeScript schema validation stačí při monolith scale   |
 | G-21 | ClamAV file scanning       | Žádná file upload funkce není aktivní                   |
-| G-23 | HashiCorp Vault            | .env je dostatečné pro Vercel deployment model          |
-| G-25 | Blue/Green deploy          | Vercel toto řeší nativně přes preview deployments       |
+| G-23 | HashiCorp Vault            | .env je dostatečné pro Coolify deployment model         |
+| G-25 | Blue/Green deploy          | Coolify řeší rolling deploys nativně přes Docker        |
 | G-30 | Microservices architektura | Monolith je správná architektura pro <500 firem         |
 | G-31 | API Gateway (Kong/Traefik) | Next.js middleware je dostatečný                        |
 | G-32 | S3/R2 file storage         | Nepotřeba dokud není avatar/photo upload                |
@@ -167,20 +168,21 @@ Splněno:   ██████████████████████�
 | v1.4 Design Overhaul      | 6    | 11    | ✅ SHIPPED | 2026-03-12 |
 | v2.0 Full Functionality   | 6    | 11    | ✅ SHIPPED | 2026-03-16 |
 | v3.0 Production Launch    | 6    | 24    | ✅ SHIPPED | 2026-03-18 |
+| v3.1 Go Live & Revenue    | 3    | 10    | ✅ SHIPPED | 2026-03-29 |
 
 ### Codebase Metrics
 
-| Metrika                      | v2.0 (16. března) | v3.0 FINAL (18. března) |
-| ---------------------------- | ----------------- | ----------------------- |
-| API route soubory            | 179               | **187+**                |
-| Frontend komponenty          | ~100              | **117+**                |
-| DB schema moduly             | ~22               | **26+**                 |
-| Unit test soubory            | 11                | **17**                  |
-| E2E test specs               | 5                 | **7**                   |
-| Integration test soubory     | 5                 | **5** (+ SKIP_DOCKER)   |
-| Storybook stories            | 0                 | **5** (37 variants)     |
-| Total fází (all milestones)  | 44                | **50**                  |
-| Total plánů (all milestones) | ~186              | **210+**                |
+| Metrika                      | v2.0 (16. března) | v3.0 FINAL (18. března) | v3.1 FINAL (29. března) |
+| ---------------------------- | ----------------- | ----------------------- | ----------------------- |
+| API route soubory            | 179               | 187+                    | **199+**                |
+| Frontend komponenty          | ~100              | 117+                    | **122+**                |
+| DB schema moduly             | ~22               | 26+                     | **26+**                 |
+| Unit test soubory            | 11                | 17                      | **17**                  |
+| E2E test specs               | 5                 | 7                       | **7**                   |
+| Integration test soubory     | 5                 | 5 (+ SKIP_DOCKER)       | **5** (+ SKIP_DOCKER)   |
+| Storybook stories            | 0                 | 5 (37 variants)         | **5** (37 variants)     |
+| Total fází (all milestones)  | 44                | 50                      | **53**                  |
+| Total plánů (all milestones) | ~186              | 210+                    | **220+**                |
 
 ---
 
@@ -188,7 +190,7 @@ Splněno:   ██████████████████████�
 
 ScheduleBox v3.0 je **100 % KOMPLETNÍ** vůči dokumentaci v13.0 FINAL. Za 2 dny (16.–18. března) bylo realizováno 6 fází se 24 plány:
 
-- **Phase 45**: Vercel + Neon + Upstash + RabbitMQ removed
+- **Phase 45**: Coolify + PostgreSQL + Redis (self-hosted) + RabbitMQ removed
 - **Phase 46**: PII encryption + DOMPurify + HIBP + SSRF + Sentry + Cookie Policy
 - **Phase 47**: Full super-admin suite (7 features) + notification pipeline (4 channels)
 - **Phase 48**: Marketplace with geo search + booking UX + video/webhooks management
@@ -197,4 +199,12 @@ ScheduleBox v3.0 je **100 % KOMPLETNÍ** vůči dokumentaci v13.0 FINAL. Za 2 dn
 
 **Všech 47 requirements splněno. Všech 32 gapů adresováno (24 uzavřeno + 8 out of scope).**
 
-ScheduleBox je plně produkčně připravený SaaS — rezervační systém s platbami, CRM, 7 AI modely, marketplace, super-admin, notifikacemi, industry vertikálami, observabilitou a automatizovanými testy. 7 milestones shipped za 36 dní.
+### v3.1 Go Live & Revenue (fáze 51–53, shipped 29. března)
+
+Milestone v3.1 přidal 3 fáze s 10 plány zaměřené na produkční nasazení a monetizaci:
+
+- **Phase 51**: Per-company Comgate platby (provider-agnostické DB schéma pro budoucí Stripe), Settings Payments UI a per-company payment routing
+- **Phase 52**: E2E verifikace + bug fixing (hard gate), produkční demo seed data
+- **Phase 53**: Coolify produkční deploy, deployment hardening, infrastruktura ověřena
+
+ScheduleBox je plně produkčně připravený SaaS — rezervační systém s platbami, CRM, 7 AI modely, marketplace, super-admin, notifikacemi, industry vertikálami, observabilitou a automatizovanými testy. **53 fází, 220+ plánů shipped across 8 milestones za 46 dní.**

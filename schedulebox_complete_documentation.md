@@ -19,8 +19,8 @@
 ### ČÁST II — ARCHITEKTURA
 
 5. [Architektura Systému](#5-architektura-systému)
-6. [Microservices & Boundaries](#6-microservices--boundaries)
-7. [Domain Events & Message Queue](#7-domain-events--message-queue)
+6. [Modulární Architektura & Boundaries](#6-modulární-architektura--boundaries)
+7. [Domain Events (Synchronní)](#7-domain-events-synchronní)
 8. [Service Interdependencies](#8-service-interdependencies)
 9. [SAGA Workflows](#9-saga-workflows)
 10. [Resilience & Fallback Patterns](#10-resilience--fallback-patterns)
@@ -127,11 +127,11 @@ ScheduleBox je **all-in-one AI-powered business platforma** pro služby založen
 | ------------------- | ----------------------------------------------------------------------------- |
 | Cílový trh          | CZ/SK (následně PL, DE)                                                       |
 | Cílová skupina      | SMB (1–50 zaměstnanců)                                                        |
-| Tech stack          | Next.js 14, TypeScript, PostgreSQL, Redis, RabbitMQ                           |
-| Architektura        | Microservices (17 služeb)                                                     |
-| API endpointy       | 99 unikátních cest, 130+ operací                                              |
-| DB tabulky          | 47                                                                            |
-| Frontend komponenty | 32+                                                                           |
+| Tech stack          | Next.js 15, TypeScript, PostgreSQL, Redis                                     |
+| Architektura        | Monolith (Next.js App Router)                                                 |
+| API endpointy       | 199+ route souborů, 250+ operací                                              |
+| DB tabulky          | 88                                                                            |
+| Frontend komponenty | 122+                                                                          |
 | AI modely           | 7 (No-show, CLV, Upselling, Pricing, Capacity, Health Score, Reminder Timing) |
 | Platební brány      | Comgate (online), QRcomat (na místě)                                          |
 | Cenový model        | Freemium: 0 / 490 / 1490 / 2990 Kč/měs                                        |
@@ -259,101 +259,82 @@ ScheduleBox je komplexní platforma zahrnující:
 
 ### 5.1. High-Level Architecture
 
+> **Poznámka:** ScheduleBox je monolitická Next.js 15 aplikace (App Router) s API routes,
+> organizovaná jako monorepo s pnpm workspaces: `apps/web`, `packages/{database,shared,events,ui}`, `services/`.
+> Doménové moduly (Auth, Booking, Payment atd.) jsou kódové hranice uvnitř jednoho deploymentu, nikoliv samostatné microservices.
+
 ```mermaid
 graph TB
     subgraph "Client Layer"
-        WEB[Web App - Next.js 14]
-        MOB[Mobile App - React Native]
+        WEB[Web App - Next.js 15]
         WID[Embeddable Widget]
         PUB[Public Booking Page]
     end
 
     subgraph "Edge Layer"
         CDN[Cloudflare CDN + DDoS]
-        LB[Load Balancer - NGINX]
     end
 
-    subgraph "API Layer"
-        GW[API Gateway - Kong/Traefik]
+    subgraph "Next.js Monolith"
+        API[API Routes - Next.js App Router]
         WS[WebSocket Server]
-    end
-
-    subgraph "Service Layer"
-        AUTH[Auth Service]
-        BOOK[Booking Service]
-        CUST[Customer Service]
-        SVC[Service Service]
-        EMP[Employee Service]
-        RES[Resource Service]
-        PAY[Payment Service]
-        COUP[Coupon Service]
-        GIFT[Gift Card Service]
-        LOY[Loyalty Service]
-        NOTIF[Notification Service]
-        REV[Review Service]
-        AI[AI Service]
-        MKT[Marketplace Service]
-        VID[Video Service]
-        APP[App Service]
-        AUTO[Automation Service]
-        ANA[Analytics Service]
-    end
-
-    subgraph "Message Layer"
-        MQ[RabbitMQ - Event Bus]
+        AUTH[Auth Module]
+        BOOK[Booking Module]
+        CUST[Customer Module]
+        SVC[Service Module]
+        EMP[Employee Module]
+        RES[Resource Module]
+        PAY[Payment Module]
+        COUP[Coupon Module]
+        GIFT[Gift Card Module]
+        LOY[Loyalty Module]
+        NOTIF[Notification Module]
+        REV[Review Module]
+        AI_MOD[AI Module]
+        MKT[Marketplace Module]
+        AUTO[Automation Module]
+        ANA[Analytics Module]
     end
 
     subgraph "Data Layer"
-        PG[(PostgreSQL 16)]
-        REDIS[(Redis 7)]
+        PG[(Neon PostgreSQL)]
+        REDIS[(Upstash Redis)]
         S3[(S3 / Cloudflare R2)]
     end
 
     subgraph "External Services"
         COM[Comgate API]
         QR[QRcomat API]
-        ZOOM[Zoom API]
-        MEET[Google Meet API]
-        TEAMS[MS Teams API]
         OAI[OpenAI API]
         SMTP[SMTP Server]
         SMS[SMS Provider]
-        APPLE[Apple Wallet]
-        GOOGLE[Google Wallet]
     end
 
-    WEB & MOB & WID & PUB --> CDN --> LB --> GW
-    GW --> AUTH & BOOK & CUST & SVC & EMP & RES & PAY & COUP & GIFT & LOY & NOTIF & REV & AI & MKT & VID & APP & AUTO & ANA
-    GW --> WS
+    WEB & WID & PUB --> CDN --> API
+    API --> AUTH & BOOK & CUST & SVC & EMP & RES & PAY & COUP & GIFT & LOY & NOTIF & REV & AI_MOD & MKT & AUTO & ANA
+    API --> WS
 
-    BOOK & PAY & NOTIF & LOY & AUTO & REV --> MQ
-    MQ --> BOOK & PAY & NOTIF & LOY & AUTO & REV & AI & ANA
-
-    AUTH & BOOK & CUST & SVC & EMP & RES & PAY & COUP & GIFT & LOY & NOTIF & REV & AI & MKT & VID & APP & AUTO & ANA --> PG
-    AUTH & BOOK & AI --> REDIS
-    APP & MKT --> S3
+    AUTH & BOOK & CUST & SVC & EMP & RES & PAY & COUP & GIFT & LOY & NOTIF & REV & AI_MOD & MKT & AUTO & ANA --> PG
+    AUTH & BOOK & AI_MOD --> REDIS
+    MKT --> S3
 
     PAY --> COM & QR
-    VID --> ZOOM & MEET & TEAMS
-    AI --> OAI
+    AI_MOD --> OAI
     NOTIF --> SMTP & SMS
-    LOY --> APPLE & GOOGLE
 ```
 
 ### 5.2. Tech Stack
 
 | Vrstva           | Technologie                                                  |
 | ---------------- | ------------------------------------------------------------ |
-| Frontend         | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
+| Frontend         | Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
 | State Management | Zustand (global), React Query/TanStack Query (server state)  |
 | Realtime         | Socket.io (WebSocket)                                        |
-| API Gateway      | Kong nebo Traefik                                            |
 | Backend Runtime  | Node.js 20 LTS                                               |
-| Framework        | Next.js API Routes + standalone microservices                |
+| Framework        | Next.js 15 API Routes (monolith)                             |
 | ORM              | Drizzle ORM                                                  |
-| Databáze         | PostgreSQL 16                                                |
-| Cache / Sessions | Redis 7                                                      |
-| Message Queue    | RabbitMQ 3.13                                                |
+| Databáze         | Neon PostgreSQL (serverless)                                 |
+| Cache / Sessions | Upstash Redis (HTTP)                                         |
 | File Storage     | Cloudflare R2 (S3-compatible)                                |
 | Search           | PostgreSQL full-text search (pg_trgm)                        |
 | AI/ML            | Python 3.12, scikit-learn, XGBoost, OpenAI API               |
@@ -418,9 +399,15 @@ erDiagram
 
 ---
 
-## 6. Microservices & Boundaries
+## 6. Modulární Architektura & Boundaries
 
-### 6.1. Service Katalog
+> **Poznámka:** Následující tabulka popisuje doménové moduly uvnitř jedné Next.js aplikace.
+> Nejde o samostatně nasazované microservices, ale o logické hranice v kódu.
+> Monorepo struktura: `apps/web` (Next.js app), `packages/database` (Drizzle schéma),
+> `packages/shared` (sdílené typy), `packages/events` (doménové eventy — typy only),
+> `packages/ui` (sdílené UI komponenty).
+
+### 6.1. Modulový Katalog
 
 | #   | Service              | Zodpovědnost                                | DB Tabulky                                                                              | API Prefix                                  |
 | --- | -------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------- |
@@ -446,7 +433,7 @@ erDiagram
 
 ### 6.2. Shared Kernel
 
-Všechny services sdílejí:
+Všechny moduly sdílejí (prostřednictvím `packages/shared` a `packages/database`):
 
 - **company_id** — tenant izolace (Row Level Security)
 - **UUID** — veřejné identifikátory (nikdy neexponovat SERIAL id)
@@ -456,13 +443,18 @@ Všechny services sdílejí:
 
 ---
 
-## 7. Domain Events & Message Queue
+## 7. Domain Events (Synchronní)
 
-### 7.1. Event Bus — RabbitMQ
+> **Poznámka:** RabbitMQ byl odstraněn. Doménové eventy jsou zpracovávány synchronně inline
+> v rámci Next.js API routes. Balíček `packages/events/` obsahuje pouze typové definice.
+> Funkce `publishEvent()` je safe no-op. Níže uvedený katalog dokumentuje doménové eventy,
+> které JSOU emitovány (synchronně), jako referenci pro budoucí asynchronní zpracování.
 
-**Exchange:** `schedulebox.events` (topic exchange)
-**Routing:** `{service}.{entity}.{action}` (např. `booking.booking.created`)
+### 7.1. Event Routing
+
+**Naming:** `{modul}.{entita}.{akce}` (např. `booking.booking.created`)
 **Format:** JSON s CloudEvents spec
+**Zpracování:** Synchronní inline (publishEvent je no-op, logika je volána přímo)
 
 ### 7.2. Event Katalog
 
@@ -643,14 +635,14 @@ notification.notification.clicked:
 }
 ```
 
-### 7.4. Dead Letter Queue (DLQ)
+### 7.4. Error Handling (synchronní režim)
 
-Pokud consumer selže 3× → zpráva putuje do DLQ:
+V současné synchronní architektuře se chyby při zpracování eventů řeší:
 
-- Exchange: `schedulebox.dlq`
-- Queue per service: `dlq.notification`, `dlq.loyalty`, atd.
-- Monitoring: Grafana alert na neprázdnou DLQ
-- Manuální retry: Admin UI pro replay zpráv z DLQ
+- **Try/catch** v inline event handlerech — selhání nepropaguje do hlavní operace
+- **Retry logika** — kritické operace (notifikace, loyalty) mají retry s exponential backoff
+- **Logging** — selhané eventy jsou logovány přes Winston pro pozdější analýzu
+- **Budoucí plán:** Při škálování nad 500 firem zvážit přechod na asynchronní message queue
 
 ---
 
@@ -710,14 +702,13 @@ sequenceDiagram
     participant C as Client
     participant BS as Booking Service
     participant PS as Payment Service
-    participant MQ as RabbitMQ
-    participant NS as Notification Service
-    participant LS as Loyalty Service
+    participant NS as Notification Module
+    participant LS as Loyalty Module
 
     C->>BS: POST /bookings (with payment required)
     BS->>BS: Validate availability (SELECT FOR UPDATE)
     BS->>BS: Create booking (status=pending)
-    BS-->>MQ: booking.booking.created
+    BS->>NS: booking.booking.created (synchronní)
     BS-->>C: 201 Created (booking with payment URL)
 
     C->>PS: POST /payments/comgate/create
@@ -728,9 +719,9 @@ sequenceDiagram
 
     PS->>PS: Webhook: payment confirmed
     PS->>PS: Update payment (status=paid)
-    PS-->>MQ: payment.payment.completed
+    PS->>BS: payment.payment.completed (synchronní)
 
-    MQ-->>BS: payment.payment.completed
+    BS->>BS: payment.payment.completed
     BS->>BS: Update booking (status=confirmed)
     BS-->>MQ: booking.booking.confirmed
 
@@ -755,8 +746,7 @@ Timeout: 30 minut od vytvoření
 Akce: Automaticky zrušit booking a uvolnit slot
 
 Implementace:
-- Delayed message v RabbitMQ (TTL = 30 min)
-- Nebo: Cron job každou minutu: UPDATE bookings SET status='cancelled' WHERE status='pending' AND requires_payment=true AND created_at < NOW() - INTERVAL '30 minutes'
+- Cron job každou minutu: UPDATE bookings SET status='cancelled' WHERE status='pending' AND requires_payment=true AND created_at < NOW() - INTERVAL '30 minutes'
 ```
 
 ### 9.3. Kompenzační akce
@@ -866,7 +856,7 @@ const retryPolicies = {
 | **AI Smart Reminder Timing** | Default 24h (1440 min)                | `{ optimal_minutes_before: 1440, fallback: true }`                  |
 | **Comgate nedostupný**       | Zobrazit "platba dočasně nedostupná"  | Booking vytvořen jako pending, retry za 5 min                       |
 | **QRcomat nedostupný**       | Nabídnout platbu hotově               | Cash payment fallback                                               |
-| **SMTP nedostupný**          | Queue do RabbitMQ, retry              | Zprávy se odešlou později                                           |
+| **SMTP nedostupný**          | Retry s exponential backoff           | Zprávy se odešlou později                                           |
 | **Redis nedostupný**         | Bypass cache, direct DB               | Pomalejší, ale funkční                                              |
 | **Video API nedostupný**     | Booking bez videa                     | Admin notifikován pro manuální setup                                |
 
@@ -920,7 +910,7 @@ Izolace kritických od ne-kritických služeb:
 -- Datum: 9. února 2026
 -- Autor: AI-PMLOGY-INT + Claude
 --
--- Toto schéma obsahuje VŠECHNY tabulky pro VŠECHNY microservices:
+-- Toto schéma obsahuje VŠECHNY tabulky pro VŠECHNY doménové moduly:
 --   1. Auth & Tenancy (companies, users, roles, permissions)
 --   2. Booking Service (bookings, booking_resources, availability_slots)
 --   3. Customer Service (customers, customer_tags, tags)
@@ -5366,7 +5356,6 @@ Aktuální verze: **v1** (všechny endpointy v OpenAPI spec jsou v1).
                   properties:
                     database: { type: string, enum: [up, down] }
                     redis: { type: string, enum: [up, down] }
-                    rabbitmq: { type: string, enum: [up, down] }
 ```
 
 ---
@@ -5411,7 +5400,7 @@ Aktuální verze: **v1** (všechny endpointy v OpenAPI spec jsou v1).
 **Datum:** 9. února 2026
 **Autor:** AI-PMLOGY-INT + Claude
 **Verze:** 2.0 (100% kompletní)
-**Tech Stack:** Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, React Query, Zustand
+**Tech Stack:** Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui, React Query, Zustand
 
 ---
 
@@ -6324,7 +6313,7 @@ function useWebSocket() {
 ### 22.3. Server-side Event Publishing
 
 ```typescript
-// Po úspěšném zpracování domain event z RabbitMQ:
+// Po úspěšném zpracování domain eventu (synchronně inline):
 async function onBookingCreated(event: BookingCreatedEvent) {
   // Odeslat WebSocket notifikaci všem uživatelům dané firmy
   io.to(`company:${event.company_id}`).emit('booking:created', event.data);
@@ -6707,6 +6696,16 @@ async function handleComgateWebhook(req: Request) {
 - Test merchant credentials od Comgate
 - Test karty: 4000000000000002 (úspěch), 4000000000000010 (zamítnutí)
 - Webhook simulator v Comgate admin panelu
+
+### 28.7. Per-Company Payment Providers (Phase 51)
+
+Platforma podporuje per-company Comgate credentials pro multi-tenant provoz:
+
+- Tabulka `payment_providers` uchovává šifrované credentials per company
+- Credential resolver: nejprve hledá company-specific config, pokud neexistuje, použije platform-level defaults
+- Provider-agnostické schéma — připraveno pro budoucí podporu Stripe/GoPay
+- Každá firma si může nastavit vlastní Comgate `merchantId` a `secret` v Settings > Payments
+- Šifrování credentials pomocí AES-256 (klíč v `PII_ENCRYPTION_KEY`)
 
 ---
 
@@ -7159,20 +7158,27 @@ INSERT INTO ai_model_metrics (model_name, model_version, metric_name, metric_val
 
 ### 35.1. Prostředí
 
-| Prostředí  | Účel          | Infra              | URL                    |
-| ---------- | ------------- | ------------------ | ---------------------- |
-| Local      | Vývoj         | Docker Compose     | localhost:3000         |
-| Staging    | Testování, QA | K3s (1 node)       | staging.schedulebox.cz |
-| Production | Produkce      | EKS/GKE (3+ nodes) | app.schedulebox.cz     |
+| Prostředí  | Účel          | Infra                                    | URL                    |
+| ---------- | ------------- | ---------------------------------------- | ---------------------- |
+| Local      | Vývoj         | Docker Compose                           | localhost:3000         |
+| Staging    | Testování, QA | Coolify na VPS (161.97.118.104)          | staging.schedulebox.cz |
+| Production | Produkce      | Coolify na VPS + Docker (161.97.118.104) | app.schedulebox.cz     |
+
+**Infrastruktura:**
+
+- Coolify (self-hosted PaaS) na VPS 161.97.118.104
+- Traefik reverse proxy (spravovaný Coolify) — automatické SSL via Let's Encrypt
+- Docker kontejnery orchestrované přes Coolify
 
 ### 35.2. Deployment Pattern
 
-**Blue/Green Deployment:**
+**Rolling Deployment (Coolify):**
 
-1. Deploy nové verze do "green" prostředí
-2. Smoke testy na green
-3. Switch traffic z "blue" na "green"
-4. Rollback: switch zpět na blue (< 30s)
+1. Push na `main` branch spustí auto-deploy v Coolify
+2. Coolify buildí nový Docker image z `docker/Dockerfile`
+3. Nový kontejner se spustí a projde health checkem
+4. Starý kontejner se zastaví
+5. Rollback: Coolify UI — jedním klikem na předchozí deployment
 
 ---
 
@@ -7189,21 +7195,18 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   # === LINT & TYPE CHECK ===
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run type-check
+        with: { node-version: '20', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
 
   # === UNIT TESTS ===
   test-unit:
@@ -7221,10 +7224,11 @@ jobs:
         ports: ['6379:6379']
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm ci
-      - run: npm run test:unit -- --coverage
+        with: { node-version: '20', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:unit -- --coverage
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/schedulebox_test
           REDIS_URL: redis://localhost:6379
@@ -7245,16 +7249,28 @@ jobs:
       redis:
         image: redis:7
         ports: ['6379:6379']
-      rabbitmq:
-        image: rabbitmq:3.13-management
-        ports: ['5672:5672', '15672:15672']
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm ci
-      - run: npm run db:migrate
-      - run: npm run test:integration
+        with: { node-version: '20', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:migrate
+      - run: pnpm test:integration
+
+  # === E2E TESTS (hard gate — failures block merges) ===
+  test-e2e:
+    runs-on: ubuntu-latest
+    needs: [test-integration]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm test:e2e
+        # E2E failures block merges — no continue-on-error
 
   # === BUILD & PUSH DOCKER IMAGE ===
   build:
@@ -7282,63 +7298,51 @@ jobs:
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
 
-  # === DEPLOY TO STAGING ===
-  deploy-staging:
-    runs-on: ubuntu-latest
-    needs: build
-    environment: staging
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          kubectl set image deployment/schedulebox \
-            schedulebox=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --namespace=staging
-      - run: npm run test:e2e -- --env=staging
-
-  # === DEPLOY TO PRODUCTION ===
-  deploy-production:
-    runs-on: ubuntu-latest
-    needs: deploy-staging
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-      - run: |
-          kubectl set image deployment/schedulebox \
-            schedulebox=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --namespace=production
-      - run: npm run test:smoke -- --env=production
+  # === DEPLOY (Coolify auto-deploy) ===
+  # Coolify monitors the main branch and auto-deploys on push.
+  # No manual deploy step needed in CI — Coolify pulls, builds,
+  # and deploys the Docker image from docker/Dockerfile.
 ```
 
 ---
 
-## 37. Docker & Kubernetes
+## 37. Docker & Coolify Deployment
 
-### 37.1. Dockerfile
+### 37.1. Dockerfile (`docker/Dockerfile`)
 
 ```dockerfile
-# Multi-stage build
+# Multi-stage Next.js standalone build
 FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
 
-FROM node:20-alpine AS builder
-WORKDIR /app
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/database/package.json ./packages/database/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/events/package.json ./packages/events/
+COPY packages/ui/package.json ./packages/ui/
+RUN pnpm install --frozen-lockfile
+
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
-RUN npm ci
-RUN npm run build
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN pnpm --filter @schedulebox/web build
 
 FROM node:20-alpine AS production
 WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
 USER nextjs
 EXPOSE 3000
 ENV NODE_ENV=production
-CMD ["npm", "start"]
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "apps/web/server.js"]
 ```
 
 ### 37.2. Docker Compose (Development)
@@ -7353,11 +7357,9 @@ services:
     environment:
       - DATABASE_URL=postgresql://schedulebox:schedulebox@postgres:5432/schedulebox
       - REDIS_URL=redis://redis:6379
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
-      rabbitmq: { condition: service_healthy }
     volumes:
       - .:/app
       - /app/node_modules
@@ -7385,108 +7387,72 @@ services:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
 
-  rabbitmq:
-    image: rabbitmq:3.13-management-alpine
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', 'check_running']
-      interval: 10s
-
 volumes:
   postgres_data:
 ```
 
-### 37.3. Kubernetes Manifesty (příklad pro Booking Service)
+### 37.3. Coolify Deployment (`docker-compose.coolify.yml`)
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: booking-service
-  namespace: production
-spec:
-  replicas: 3
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: booking-service
-  template:
-    metadata:
-      labels:
-        app: booking-service
-    spec:
-      containers:
-        - name: booking-service
-          image: ghcr.io/pmlogy/schedulebox:latest
-          ports:
-            - containerPort: 3000
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: schedulebox-secrets
-                  key: database-url
-          resources:
-            requests:
-              cpu: 250m
-              memory: 256Mi
-            limits:
-              cpu: 1000m
-              memory: 512Mi
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /readiness
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: booking-service
-  namespace: production
-spec:
-  selector:
-    app: booking-service
-  ports:
-    - port: 80
-      targetPort: 3000
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: booking-service-hpa
-  namespace: production
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: booking-service
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
+version: '3.8'
+
+services:
+  schedulebox:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports: ['3000:3000']
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${APP_URL}
+      - APP_URL=${APP_URL}
+      - NODE_ENV=production
+      - APP_VERSION=${SOURCE_COMMIT:-dev}
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: schedulebox
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+
+volumes:
+  postgres_data:
+  redis_data:
 ```
+
+**Coolify konfigurační poznámky:**
+
+- Coolify server: 161.97.118.104
+- Traefik reverse proxy (spravovaný Coolify) zajišťuje SSL via Let's Encrypt
+- Auto-deploy: Coolify webhook na GitHub main branch
+- Environment variables se konfigurují v Coolify UI (Settings > Environment)
+- Health check endpoint: `/api/health`
+- Readiness probe: `/api/readiness`
 
 ---
 
@@ -7497,20 +7463,17 @@ spec:
 # ScheduleBox — Environment Variables (Production)
 # ============================================================
 
-# === DATABASE ===
-DATABASE_URL=postgresql://user:password@db-host:5432/schedulebox
+# === DATABASE (PostgreSQL on Coolify server) ===
+DATABASE_URL=postgresql://schedulebox:password@postgres:5432/schedulebox
 DATABASE_POOL_SIZE=20
-DATABASE_SSL=true
+DATABASE_SSL=false
 
-# === REDIS ===
-REDIS_URL=redis://:password@redis-host:6379/0
-REDIS_CACHE_DB=1
-REDIS_SESSION_DB=2
+# === REDIS (Redis on Coolify server) ===
+REDIS_URL=redis://redis:6379/0
 
-# === RABBITMQ ===
-RABBITMQ_URL=amqp://user:password@rabbitmq-host:5672
-RABBITMQ_EXCHANGE=schedulebox.events
-RABBITMQ_DLQ_EXCHANGE=schedulebox.dlq
+# === UPSTASH (optional HTTP fallback) ===
+# UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+# UPSTASH_REDIS_REST_TOKEN=xxx
 
 # === JWT ===
 JWT_SECRET=<256-bit-random-from-vault>
@@ -7580,9 +7543,9 @@ S3_SECRET_KEY=xxx
 S3_BUCKET=schedulebox-uploads
 S3_REGION=auto
 
-# === MONITORING ===
-SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
-OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+# === MONITORING (conditional) ===
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx  # optional — Sentry only if set
+OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317               # optional — @vercel/otel only if set
 LOG_LEVEL=info
 LOG_FORMAT=json
 
@@ -7593,6 +7556,8 @@ FRONTEND_URL=https://app.schedulebox.cz
 WIDGET_URL=https://widget.schedulebox.cz
 NODE_ENV=production
 PORT=3000
+APP_VERSION=3.0.0
+SOURCE_COMMIT=${SOURCE_COMMIT}  # Coolify auto-injects git SHA
 ```
 
 ---
@@ -7601,22 +7566,21 @@ PORT=3000
 
 ### 39.1. Architecture
 
+**Logging:** Winston structured logging (JSON format) na stdout. Coolify sbírá stdout logy automaticky.
+Žádný Vercel-specifický log drain — logy jdou na stdout a jsou dostupné v Coolify UI.
+
+**Tracing:** `@vercel/otel` je podmíněný — aktivuje se pouze pokud je nastaven `OTEL_EXPORTER_OTLP_ENDPOINT`.
+
+**Error tracking:** Sentry (`@sentry/nextjs`) je podmíněný — aktivuje se pouze pokud je nastaven `NEXT_PUBLIC_SENTRY_DSN`.
+
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Application │───>│ OpenTelemetry│───>│   Jaeger    │ (Tracing)
-│  Services   │    │  Collector   │    └─────────────┘
-│             │───>│              │───>│ Prometheus  │ (Metrics)
-│             │    └─────────────┘    └──────┬──────┘
-│             │───> stdout (JSON)  ───>│    Loki     │ (Logging)
-└─────────────┘                        └──────┬──────┘
-                                              │
-                                       ┌──────▼──────┐
-                                       │   Grafana   │ (Dashboards)
-                                       └─────────────┘
-                                              │
-                                       ┌──────▼──────┐
-                                       │  Alerting   │ (Slack/Email)
-                                       └─────────────┘
+┌─────────────┐
+│ Application │───> stdout (JSON/Winston) ───> Coolify Log Viewer
+│             │
+│             │───> Sentry (conditional: NEXT_PUBLIC_SENTRY_DSN)
+│             │
+│             │───> OpenTelemetry (conditional: OTEL_EXPORTER_OTLP_ENDPOINT)
+└─────────────┘
 ```
 
 ### 39.2. Klíčové metriky (Prometheus)
@@ -7632,9 +7596,6 @@ schedulebox_active_customers_total
 http_request_duration_seconds{method, path, status_code}
 http_requests_total{method, path, status_code}
 db_query_duration_seconds{query_type}
-rabbitmq_messages_published_total{exchange, routing_key}
-rabbitmq_messages_consumed_total{queue}
-rabbitmq_dlq_messages_total{queue}
 
 # AI metriky
 ai_prediction_duration_seconds{model}
@@ -7655,7 +7616,6 @@ redis_connected_clients
 | High Error Rate       | http 5xx > 5% za 5 min          | Critical | Slack + Email |
 | Booking Service Down  | health check fail > 3 min       | Critical | Slack + SMS   |
 | Payment Failure Spike | payment failures > 10 za 10 min | High     | Slack         |
-| DLQ Messages          | DLQ queue > 0 za 15 min         | High     | Slack         |
 | AI Fallback Rate      | fallback > 50% za 1h            | Medium   | Slack         |
 | High Latency          | p99 > 5s za 10 min              | Medium   | Slack         |
 | Disk Usage            | > 80%                           | High     | Slack         |
@@ -7691,14 +7651,19 @@ redis_connected_clients
 
 ### 40.1. Typy testů
 
-| Typ               | Nástroj               | Pokrytí                | Kde běží              |
-| ----------------- | --------------------- | ---------------------- | --------------------- |
-| Unit testy        | Jest / Vitest         | ≥ 80 %                 | CI (každý push)       |
-| Integration testy | Jest + Testcontainers | Klíčové flows          | CI (každý push)       |
-| E2E testy         | Playwright            | 20 kritických scénářů  | CI (staging deploy)   |
-| Load testy        | k6                    | Performance benchmarks | Manual (před release) |
-| Security testy    | OWASP ZAP, npm audit  | OWASP Top 10           | CI + manual           |
-| Contract testy    | Pact                  | API contracts          | CI                    |
+| Typ               | Nástroj                 | Pokrytí                                                                             | Kde běží                           |
+| ----------------- | ----------------------- | ----------------------------------------------------------------------------------- | ---------------------------------- |
+| Unit testy        | Vitest                  | ≥ 80 % coverage                                                                     | CI (každý push)                    |
+| Integration testy | Vitest + Testcontainers | Klíčové flows                                                                       | CI (každý push, SKIP_DOCKER local) |
+| E2E testy         | Playwright (7 specs)    | auth, booking, payment, marketplace, admin-impersonation, ai-fallback, embed-widget | CI (hard gate — blokuje merge)     |
+| Load testy        | k6                      | Performance benchmarks                                                              | Manual (před release)              |
+| Security testy    | OWASP ZAP, pnpm audit   | OWASP Top 10                                                                        | CI + manual                        |
+
+**Poznámky k testům:**
+
+- E2E testy jsou hard gate v CI — selhání blokuje merge do main
+- Testcontainers se používají pouze v CI (PostgreSQL container). Lokálně se přeskakují pomocí `SKIP_DOCKER=true`
+- Vitest target: 80%+ code coverage
 
 ### 40.2. Test Cases — Kritické scénáře
 
@@ -8089,10 +8054,10 @@ Hlavní body (plný text bude vytvořen právníkem):
 Jsi expert full-stack developer. Tvým úkolem je implementovat ScheduleBox
 podle přiložené kompletní dokumentace. Postupuj takto:
 
-1. Nastav projekt: Next.js 14 (App Router), TypeScript, Tailwind, shadcn/ui
-2. Nastav Docker Compose (PostgreSQL, Redis, RabbitMQ)
+1. Nastav projekt: Next.js 15 (App Router), TypeScript, Tailwind, shadcn/ui
+2. Nastav Docker Compose (PostgreSQL, Redis)
 3. Spusť DB schema z dokumentace
-4. Implementuj microservices v pořadí: Auth → Customer → Service → Employee → Resource → Booking → Payment → Notification → rest
+4. Implementuj moduly v pořadí: Auth → Customer → Service → Employee → Resource → Booking → Payment → Notification → rest
 5. Pro každou service implementuj: Drizzle schema, API routes, Zod validace, event publishing
 6. Implementuj frontend komponenty podle specifikace
 7. Pořadí přidej: WebSocket, i18n, RLS, RBAC middleware
@@ -8111,7 +8076,7 @@ Dokumentace je jediný zdroj pravdy.
 | 3–4    | 3–4   | Core Services | Customer CRUD, Service CRUD, Employee CRUD, Working Hours               |
 | 5–6    | 5–6   | Booking MVP   | Booking CRUD, Availability engine, Double-booking prevence, Calendar UI |
 | 7–8    | 7–8   | Payments      | Comgate integrace, QRcomat integrace, Payment flow, Webhooks, Invoices  |
-| 9–10   | 9–10  | Notifications | Email/SMS/Push, Templates, Automation engine, RabbitMQ events           |
+| 9–10   | 9–10  | Notifications | Email/SMS/Push, Templates, Automation engine, Domain events             |
 | 11–12  | 11–12 | CRM           | Customer tagging, Coupons, Gift cards, Import/Export                    |
 | 13–14  | 13–14 | Loyalty       | Loyalty program, Cards (Apple/Google Wallet), Rewards, Transactions     |
 | 15–16  | 15–16 | AI Phase 1    | No-show predictor, CLV, Customer health score, Fallback system          |
@@ -8132,7 +8097,7 @@ Dokumentace je jediný zdroj pravdy.
 **Datum:** 9. února 2026
 **Auditor:** Nezávislý architekt (Claude)
 **Scope:** Kompletní dokumentace ScheduleBox (50+ souborů)
-**Metodika:** OWASP, TOGAF, 12-Factor App, Microservices Patterns
+**Metodika:** OWASP, TOGAF, 12-Factor App
 
 ---
 
@@ -8152,7 +8117,7 @@ Dokumentace pokrývá **funkční požadavky na výborné úrovni** — datový 
 
 ### Top 3 kritické problémy
 
-1. **Žádná asynchronní komunikace** — microservices komunikují jen přes synchronní REST. Chybí message queue, domain events, i SAGA pattern. Výpadek jedné služby shodí celý řetězec.
+1. **Synchronní komunikace** — moduly komunikují přes synchronní volání v rámci monolithu. Domain events jsou definovány v `packages/events/` ale zpracovávány inline (publishEvent je no-op). Vhodné pro aktuální škálu (<500 firem).
 2. **Žádná ochrana proti double-booking** — chybí SELECT FOR UPDATE nebo advisory lock. Dva uživatelé mohou zarezervovat stejný slot současně.
 3. **RBAC matice pokrývá jen 4 ze 99 endpointů** — není jasné, kdo smí volat AI, automatizaci, settings, API klíče.
 
@@ -8166,11 +8131,11 @@ Dokumentace pokrývá **funkční požadavky na výborné úrovni** — datový 
 
 **Kde:** `schedulebox_technicka_specifikace_v5.md`, `schedulebox_service_interdependencies.md`
 
-**Problém:** Architektura deklaruje microservices, ale veškerá komunikace je synchronní REST. Chybí RabbitMQ, Kafka, nebo jakýkoliv event bus.
+**Problém:** Původní dokumentace deklarovala microservices, ale architektura je monolith. Komunikace mezi moduly je synchronní.
 
-**Dopad:** Tight coupling mezi services. Výpadek Payment Service zablokuje Booking Service. Nelze implementovat event-driven workflow (booking.created → notification, loyalty, AI prediction).
+**Dopad:** V monolitické architektuře je synchronní komunikace přijatelná. Domain events jsou definovány ale zpracovávány inline.
 
-**Řešení:** Přidat specifikaci event bus (doporučuji RabbitMQ pro jednoduchost) a definovat domain events:
+**Řešení (implementováno):** Monolith architektura s domain events v `packages/events/` (typy only, publishEvent je safe no-op). Budoucí škálování může zavést message queue. Definované domain events:
 
 - `booking.created`, `booking.confirmed`, `booking.cancelled`, `booking.completed`, `booking.no_show`
 - `payment.completed`, `payment.failed`, `payment.refunded`
@@ -8301,7 +8266,7 @@ Dokumentace pokrývá **funkční požadavky na výborné úrovni** — datový 
 | SEC-RL-01    | Rate limiting jen globální                   | /auth/login potřebuje 5 req/min                |
 | SEC-OWASP-01 | Chybí pokrytí A04, A08, A10                  | Bezpečnostní mezery                            |
 | SEC-PW-01    | forms_validation = 8 znaků, API = 12         | Nekonzistence validace                         |
-| OPS-TRACE-01 | Chybí distributed tracing                    | Debugging microservices = noční můra           |
+| OPS-TRACE-01 | Chybí distributed tracing                    | Debugging v produkci bez trace context         |
 | OPS-MON-01   | Chybí Prometheus + Grafana                   | Žádné metriky ani alerting                     |
 | INT-COM-01   | Comgate: chybí retry + idempotency           | Duplicitní platby při network error            |
 | INT-QR-01    | QRcomat API neověřeno                        | Integrace může být nefunkční                   |
@@ -8434,15 +8399,15 @@ Zákazník zavolá → Audio → STT (Whisper) → NLU (GPT-4) → Intent → Bo
 
 ### Fáze 1: KRITICKÉ opravy (nutné PŘED vývojem)
 
-| #   | Akce                                          | Soubor k vytvoření/upravení                   | Odhad |
-| --- | --------------------------------------------- | --------------------------------------------- | ----- |
-| 1   | Vytvořit Domain Events specifikaci            | `schedulebox_domain_events_spec.md`           | 4h    |
-| 2   | Vytvořit Message Queue specifikaci (RabbitMQ) | `schedulebox_message_queue_spec.md`           | 3h    |
-| 3   | Vytvořit Resilience & Fallback specifikaci    | `schedulebox_resilience_spec.md`              | 3h    |
-| 4   | Vytvořit SAGA workflow specifikaci            | `schedulebox_saga_workflows.md`               | 4h    |
-| 5   | Přidat double-booking prevenci do DB schema   | `schedulebox_db_schema_complete.sql` — UPDATE | 1h    |
-| 6   | Rozšířit RBAC matici na 99 endpointů          | `schedulebox_auth_spec.md` — UPDATE           | 3h    |
-| 7   | Přidat AI fallback strategie                  | `schedulebox_ml_models_spec.md` — UPDATE      | 2h    |
+| #   | Akce                                            | Soubor k vytvoření/upravení                   | Odhad |
+| --- | ----------------------------------------------- | --------------------------------------------- | ----- |
+| 1   | Vytvořit Domain Events specifikaci              | `schedulebox_domain_events_spec.md`           | 4h    |
+| 2   | Domain Events typové definice (packages/events) | `packages/events/src/index.ts`                | 2h    |
+| 3   | Vytvořit Resilience & Fallback specifikaci      | `schedulebox_resilience_spec.md`              | 3h    |
+| 4   | Vytvořit SAGA workflow specifikaci              | `schedulebox_saga_workflows.md`               | 4h    |
+| 5   | Přidat double-booking prevenci do DB schema     | `schedulebox_db_schema_complete.sql` — UPDATE | 1h    |
+| 6   | Rozšířit RBAC matici na 99 endpointů            | `schedulebox_auth_spec.md` — UPDATE           | 3h    |
+| 7   | Přidat AI fallback strategie                    | `schedulebox_ml_models_spec.md` — UPDATE      | 2h    |
 
 ### Fáze 2: VYSOKÉ priority (nutné PRO produkci)
 
@@ -8484,7 +8449,7 @@ Bez opravy 7 kritických problémů hrozí:
 
 - Double-booking zákazníků
 - Cascading failures při výpadku jedné služby
-- Nekonzistentní data mezi microservices
+- Nekonzistentní data mezi moduly
 - Bezpečnostní mezery v autorizaci
 - Nemožnost debuggingu v produkci
 
@@ -9629,7 +9594,7 @@ Super-Admin je interní dashboard pro tým ScheduleBox (ne pro zákazníky). Slo
 🏗️  Infrastructure              → /admin/infra
     ├── Service Health
     ├── DB Metrics
-    ├── Queue Status (RabbitMQ)
+    ├── Event Processing Status
     ├── Error Rate
     └── Performance
 🛡️  Security                    → /admin/security
@@ -9878,13 +9843,13 @@ CREATE INDEX idx_platform_metrics_date ON platform_daily_metrics(date);
 
 Statistiky dokumentace:
 
-- 47 databázových tabulek (kompletní SQL s indexy, triggery, views, RLS)
-- 99 API endpointů (kompletní OpenAPI 3.0.3 YAML)
+- 88 databázových tabulek (Drizzle ORM schéma s indexy, RLS)
+- 199+ API route souborů, 250+ operací
 - 65 API schémat
-- 32+ frontend komponent (props, state, events, API calls)
+- 122+ frontend komponent (props, state, events, API calls)
 - 7 AI/ML modelů (algoritmy, features, fallbacks)
-- 17+ microservices (boundaries, dependencies, events)
-- 20+ domain events (CloudEvents format)
+- 19 doménových modulů (monolith, boundaries, dependencies, events)
+- 20+ domain events (CloudEvents format, synchronní zpracování)
 - Kompletní RBAC matice (99 endpointů × 4 role)
 - SAGA workflows, resilience patterns, circuit breakers
 - CI/CD pipeline, Docker, Kubernetes manifesty
