@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
     // Set HttpOnly cookie with the impersonation token
     response.cookies.set('imp_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
       sameSite: 'strict',
       path: '/',
       maxAge: 900, // 15 minutes
@@ -202,7 +202,7 @@ export async function DELETE(req: NextRequest) {
     // Clear the impersonation cookie
     response.cookies.set('imp_token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
       sameSite: 'strict',
       path: '/',
       maxAge: 0,

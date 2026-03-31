@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     // Update refresh token cookie
     response.cookies.set('refresh_token', newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/api/v1/auth',

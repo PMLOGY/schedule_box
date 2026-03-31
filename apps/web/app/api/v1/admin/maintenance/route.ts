@@ -112,7 +112,7 @@ export const PUT = createRouteHandler({
         const res = NextResponse.json(jsonBody);
         res.cookies.set('maintenance_bypass', bypassSecret, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
           sameSite: 'strict',
           maxAge: 86400, // 24 hours
           path: '/',

@@ -80,7 +80,7 @@ export const POST = createRouteHandler({
     // Set refresh token as httpOnly cookie (same pattern as login route)
     response.cookies.set('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NEXT_PUBLIC_APP_URL?.startsWith('https') ?? false,
       sameSite: 'strict',
       maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
       path: '/api/v1/auth/refresh',

@@ -24,7 +24,18 @@ export function BookingLinkCard() {
   const handleCopy = async () => {
     if (!bookingUrl) return;
     try {
-      await navigator.clipboard.writeText(bookingUrl);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(bookingUrl);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = bookingUrl;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
       toast.success(t('copied'));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
