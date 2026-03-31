@@ -87,7 +87,7 @@ export const POST = createRouteHandler({
             },
           });
 
-          executionResult = pushResult as Record<string, unknown>;
+          executionResult = pushResult as unknown as Record<string, unknown>;
           executionStatus = pushResult.success ? 'executed' : 'failed';
           if (!pushResult.success) {
             errorMessage = 'Push notification delivery failed or no target user found';
