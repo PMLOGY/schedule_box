@@ -457,7 +457,10 @@ Plans:
   2. Super-admin can toggle maintenance mode on/off — when enabled, all non-admin users see a branded maintenance page; admin users with the bypass cookie can still access the full application; disabling restores access immediately
   3. The admin cohort analysis page shows user retention grouped by signup month — each cohort row shows the percentage of users still active in subsequent months
   4. A GDPR auto-deletion cron endpoint anonymizes customer PII (name, email, phone) for records older than 3 years — the endpoint is protected by a CRON_SECRET header and returns 401 without it
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 58-01-PLAN.md — Broadcast messaging, maintenance mode verification, cohort analysis (ADM-01, ADM-02, ADM-03)
+- [ ] 58-02-PLAN.md — GDPR auto-deletion cron with CRON_SECRET auth (CRON-01, CRON-02)
 
 ## Progress
 
