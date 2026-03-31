@@ -189,7 +189,12 @@ export default function TemplateEditPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/templates')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/templates')}
+            aria-label="Zpet na sablony"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>

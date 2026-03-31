@@ -360,6 +360,7 @@ function LocationsSection({ orgUuid, maxLocations }: { orgUuid: string; maxLocat
                       size="icon"
                       onClick={() => openEditDialog(location)}
                       title={t('editLocation')}
+                      aria-label={t('editLocation')}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -369,6 +370,7 @@ function LocationsSection({ orgUuid, maxLocations }: { orgUuid: string; maxLocat
                         size="icon"
                         onClick={() => openDeactivateDialog(location)}
                         title={t('deactivateLocation')}
+                        aria-label={t('deactivateLocation')}
                       >
                         <XCircle className="h-4 w-4 text-destructive" />
                       </Button>
@@ -734,6 +736,7 @@ function MembersSection({ orgUuid, locations }: { orgUuid: string; locations: Or
                     size="icon"
                     onClick={() => openRemoveDialog(member)}
                     title={t('removeMember')}
+                    aria-label={t('removeMember')}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>

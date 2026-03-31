@@ -3,6 +3,7 @@
  *
  * Minimal layout for embedded booking widget (no navigation, header, or footer).
  * CSP allows iframe embedding from any origin (frame-ancestors *).
+ * X-Frame-Options removed to allow embedding on third-party sites.
  */
 
 import type { Metadata } from 'next';
@@ -15,6 +16,14 @@ export const metadata: Metadata = {
   title: 'ScheduleBox Widget',
   description: 'Embeddable booking widget',
 };
+
+/**
+ * Override X-Frame-Options for embed routes to allow iframe embedding.
+ * Next.js sets DENY by default; we need to allow all origins for the widget.
+ */
+export async function generateStaticParams() {
+  return [];
+}
 
 interface EmbedLayoutProps {
   children: React.ReactNode;

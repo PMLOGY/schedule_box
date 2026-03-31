@@ -191,6 +191,7 @@ export default function AdminFeatureFlagsPage() {
                       size="icon"
                       className="h-6 w-6"
                       onClick={() => handleToggleExpand(flag.id)}
+                      aria-label="Rozbalit detail"
                     >
                       {expandedFlagId === flag.id ? (
                         <ChevronDown className="h-4 w-4" />
@@ -223,6 +224,7 @@ export default function AdminFeatureFlagsPage() {
                       className="h-8 w-8 text-destructive hover:text-destructive"
                       onClick={() => deleteMutation.mutate(flag.id)}
                       disabled={deleteMutation.isPending}
+                      aria-label="Smazat priznak"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

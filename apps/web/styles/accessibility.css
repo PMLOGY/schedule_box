@@ -1,0 +1,100 @@
+/**
+ * WCAG 2.1 AA Accessibility Styles
+ *
+ * - Focus-visible indicators for all interactive elements
+ * - Skip-to-content link styling
+ * - Color contrast fixes for the glass theme
+ */
+
+/* ============================================================
+   Focus-visible indicators (A11Y-03)
+   ============================================================ */
+
+/* Global focus-visible ring for all focusable elements */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove default outline for mouse users (focus without focus-visible) */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure buttons, links, inputs in shadcn components get visible focus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible,
+[role='link']:focus-visible,
+[role='tab']:focus-visible,
+[role='menuitem']:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Skip-to-content link (A11Y-05)
+   ============================================================ */
+
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.skip-to-content:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  padding: 1rem 2rem;
+  background: hsl(221.2 83.2% 53.3%);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 9999;
+}
+
+/* ============================================================
+   Color contrast fixes for glass theme (A11Y-04)
+   ============================================================ */
+
+/*
+ * Light mode --muted-foreground is hsl(215.4 16.3% 46.9%) = ~#6b7280
+ * On --background hsl(224 20% 94%) = ~#ebeef3 the ratio is ~4.1:1
+ * which is below WCAG AA 4.5:1. Darken to hsl(215 16% 40%) = ~#566070
+ * Ratio against #ebeef3: ~5.2:1 -- passes AA.
+ */
+:root {
+  --muted-foreground: 215 16% 40%;
+}
+
+/*
+ * Dark mode --muted-foreground is hsl(215 20.2% 65.1%) = ~#94a3b8
+ * On --background hsl(222.2 84% 4.9%) = ~#020617 the ratio is ~7.3:1
+ * Already passes AA. No change needed.
+ */
+
+/* Placeholder text contrast fix */
+input::placeholder,
+textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+  opacity: 1;
+}
+
+/* Disabled button contrast -- ensure minimum 3:1 for large text (WCAG AA) */
+button:disabled,
+[role='button'][aria-disabled='true'] {
+  opacity: 0.6;
+}

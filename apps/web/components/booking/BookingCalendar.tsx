@@ -36,6 +36,7 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { useCalendarStore } from '@/stores/calendar.store';
 import { useRescheduleBooking } from '@/hooks/use-reschedule-booking';
+import { useResizeBooking } from '@/hooks/use-resize-booking';
 import { useAuthStore } from '@/stores/auth.store';
 import { apiClient } from '@/lib/api-client';
 import type { Booking, PaginatedResponse } from '@schedulebox/shared/types';
@@ -124,6 +125,7 @@ export default function BookingCalendar() {
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
   const rescheduleMutation = useRescheduleBooking();
+  const resizeMutation = useResizeBooking();
 
   // Compute visible date range based on view
   const { dateFrom, dateTo } = useMemo(
@@ -183,6 +185,20 @@ export default function BookingCalendar() {
       });
     },
     [rescheduleMutation],
+  );
+
+  // Handle drag-to-resize (change end time / duration)
+  const handleEventResize = useCallback(
+    ({ event, end }: { event: CalendarEvent; end: string | Date }) => {
+      if (!event.isDraggable) return;
+
+      const newEnd = end instanceof Date ? end : new Date(end);
+      resizeMutation.mutate({
+        bookingId: event.id,
+        endTime: newEnd.toISOString(),
+      });
+    },
+    [resizeMutation],
   );
 
   // Handle event click to open detail panel
@@ -255,7 +271,11 @@ export default function BookingCalendar() {
 
   return (
     <>
-      <div className="relative rounded-lg border bg-card p-4 space-y-3">
+      <div
+        className="relative rounded-lg border bg-card p-4 space-y-3"
+        role="application"
+        aria-label="Kalendar rezervaci"
+      >
         {/* Status legend */}
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pb-2 border-b">
           {Object.entries(STATUS_COLORS).map(([status, color]) => (
@@ -276,7 +296,9 @@ export default function BookingCalendar() {
           onView={(newView) => useCalendarStore.getState().setView(newView as typeof view)}
           onNavigate={(date) => useCalendarStore.getState().setSelectedDate(date)}
           onEventDrop={handleEventDrop}
+          onEventResize={handleEventResize}
           onSelectEvent={handleSelectEvent}
+          resizable
           eventPropGetter={eventPropGetter}
           components={{
             event: EventComponent as never,

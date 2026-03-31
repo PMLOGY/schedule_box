@@ -526,7 +526,11 @@
     "deleteConfirmTitle": "Delete Service",
     "deleteConfirmMessage": "Are you sure? This action cannot be undone.",
     "deleteSuccess": "Service deleted",
-    "deleteError": "Failed to delete service"
+    "deleteError": "Failed to delete service",
+    "reorder": {
+      "success": "Service order saved",
+      "error": "Failed to save service order"
+    }
   },
   "resources": {
     "title": "Resources",
@@ -2300,7 +2304,15 @@
     "categoriesEducation": "Education",
     "categoriesFitness": "Fitness",
     "categoriesRestaurant": "Restaurant",
-    "categoriesOther": "Other"
+    "categoriesOther": "Other",
+    "premium": {
+      "title": "Boost your profile",
+      "active": "Premium active",
+      "benefitPosition": "Highlighted position in results",
+      "benefitBadge": "Premium badge",
+      "benefitPriority": "Priority display",
+      "upgradeButton": "Upgrade to Premium"
+    }
   },
   "admin": {
     "nav": {

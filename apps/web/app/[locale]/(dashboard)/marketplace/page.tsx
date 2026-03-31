@@ -574,6 +574,7 @@ export default function MarketplacePage() {
                 className="h-9 w-9 rounded-none border-0"
                 onClick={() => setViewMode('grid')}
                 title={t('viewGrid')}
+                aria-label={t('viewGrid')}
               >
                 <LayoutGrid className="h-4 w-4" />
               </Button>
@@ -583,6 +584,7 @@ export default function MarketplacePage() {
                 className="h-9 w-9 rounded-none border-0"
                 onClick={() => setViewMode('list')}
                 title={t('viewList')}
+                aria-label={t('viewList')}
               >
                 <List className="h-4 w-4" />
               </Button>

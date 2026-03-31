@@ -120,6 +120,7 @@ export function DemoDataCard() {
             size="icon"
             className="absolute top-1 right-1 h-7 w-7 text-amber-600 hover:text-amber-900"
             onClick={handleDismiss}
+            aria-label="Zavrít"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -132,6 +133,7 @@ export function DemoDataCard() {
             size="icon"
             className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:text-foreground z-10"
             onClick={handleDismiss}
+            aria-label="Zavrít"
           >
             <X className="h-4 w-4" />
           </Button>

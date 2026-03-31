@@ -250,7 +250,12 @@ export default function CustomerDetailPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/customers')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/customers')}
+            aria-label="Zpet na zakazniky"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>

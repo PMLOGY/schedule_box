@@ -244,6 +244,7 @@ export function VehicleRecords({ metadata, onSave, isLoading, customerId }: Vehi
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => openEditDialog(vehicle)}
+                        aria-label="Upravit vozidlo"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
@@ -253,6 +254,7 @@ export function VehicleRecords({ metadata, onSave, isLoading, customerId }: Vehi
                         className="h-8 w-8 text-destructive hover:text-destructive"
                         onClick={() => handleRemoveVehicle(vehicle.id)}
                         disabled={isLoading}
+                        aria-label="Odebrat vozidlo"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

@@ -343,7 +343,12 @@ export default function AutomationBuilderPage() {
     <div className="flex h-[calc(100vh-120px)] flex-col">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/automation')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/automation')}
+            aria-label="Zpet na automatizace"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Input

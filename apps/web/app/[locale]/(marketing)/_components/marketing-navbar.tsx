@@ -30,7 +30,7 @@ function MobileNav({
         <SheetHeader>
           <SheetTitle className="text-primary">ScheduleBox</SheetTitle>
         </SheetHeader>
-        <nav className="mt-6 flex flex-col gap-4">
+        <nav aria-label="Mobilni navigace" className="mt-6 flex flex-col gap-4">
           <Link
             href="/#features"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -70,7 +70,7 @@ export function MarketingNavbar() {
           ScheduleBox
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav aria-label="Hlavni navigace" className="hidden items-center gap-6 md:flex">
           <Link
             href="/#features"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

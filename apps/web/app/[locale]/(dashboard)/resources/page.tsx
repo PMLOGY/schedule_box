@@ -362,6 +362,7 @@ export default function ResourcesPage() {
                               e.stopPropagation();
                               handleRowClick(resource);
                             }}
+                            aria-label="Upravit zdroj"
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -370,6 +371,7 @@ export default function ResourcesPage() {
                             size="icon"
                             className="h-8 w-8 text-destructive hover:text-destructive"
                             onClick={(e) => handleDeleteClick(e, resource)}
+                            aria-label="Smazat zdroj"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

@@ -526,7 +526,11 @@
     "deleteConfirmTitle": "Smazat službu",
     "deleteConfirmMessage": "Jste si jisti? Tuto akci nelze vrátit.",
     "deleteSuccess": "Služba smazána",
-    "deleteError": "Nepodařilo se smazat službu"
+    "deleteError": "Nepodařilo se smazat službu",
+    "reorder": {
+      "success": "Pořadí služeb bylo uloženo",
+      "error": "Nepodařilo se uložit pořadí služeb"
+    }
   },
   "resources": {
     "title": "Zdroje",
@@ -2300,7 +2304,15 @@
     "categoriesEducation": "Vzdělání",
     "categoriesFitness": "Fitness",
     "categoriesRestaurant": "Restaurace",
-    "categoriesOther": "Ostatní"
+    "categoriesOther": "Ostatní",
+    "premium": {
+      "title": "Zvýrazněte svůj profil",
+      "active": "Premium aktivní",
+      "benefitPosition": "Zvýrazněná pozice ve výsledcích",
+      "benefitBadge": "Odznak Premium",
+      "benefitPriority": "Prioritní zobrazení",
+      "upgradeButton": "Upgradovat na Premium"
+    }
   },
   "admin": {
     "nav": {

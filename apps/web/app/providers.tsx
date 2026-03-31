@@ -7,6 +7,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createQueryClient } from '@/lib/query-client';
 import { useAuthStore } from '@/stores/auth.store';
+import { OfflineBanner } from '@/components/ui/offline-banner';
 
 /**
  * Clears React Query cache when user identity changes (logout or switch user).
@@ -45,6 +46,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <OfflineBanner />
       <QueryClientProvider client={queryClient}>
         {children}
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}

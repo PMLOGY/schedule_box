@@ -525,7 +525,11 @@
     "deleteConfirmTitle": "Zmazať službu",
     "deleteConfirmMessage": "Ste si istí? Túto akciu nemožno vrátiť.",
     "deleteSuccess": "Služba zmazaná",
-    "deleteError": "Nepodarilo sa zmazať službu"
+    "deleteError": "Nepodarilo sa zmazať službu",
+    "reorder": {
+      "success": "Poradie služieb bolo uložené",
+      "error": "Nepodarilo sa uložiť poradie služieb"
+    }
   },
   "resources": {
     "title": "Zdroje",
@@ -2142,7 +2146,15 @@
     "viewList": "Zoznam",
     "featuredSection": "Odporúčané firmy",
     "featuredBadge": "Odporúčané",
-    "verifiedBadge": "Overené"
+    "verifiedBadge": "Overené",
+    "premium": {
+      "title": "Zvýraznite svoj profil",
+      "active": "Premium aktívne",
+      "benefitPosition": "Zvýraznená pozícia vo výsledkoch",
+      "benefitBadge": "Odznak Premium",
+      "benefitPriority": "Prioritné zobrazenie",
+      "upgradeButton": "Upgradovať na Premium"
+    }
   },
   "admin": {
     "nav": {

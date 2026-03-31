@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { PageHeader } from '@/components/shared/page-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
@@ -23,14 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import {
   useServicesQuery,
   useServiceCategoriesQuery,
@@ -40,8 +32,8 @@ import {
   useDeleteService,
   type Service,
 } from '@/hooks/use-services-query';
-import { useCurrencyFormat } from '@/hooks/use-currency-format';
 import { ServicesEmptyState } from '@/components/onboarding/empty-states/services-empty';
+import { ServiceListSortable } from '@/components/services/service-list-sortable';
 
 interface ServiceFormData {
   name: string;
@@ -93,8 +85,6 @@ export default function ServicesPage() {
   const updateMutation = useUpdateService();
   const deleteMutation = useDeleteService();
   const createCategoryMutation = useCreateServiceCategory();
-
-  const { formatCurrency: formatPrice } = useCurrencyFormat();
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;
@@ -211,6 +201,7 @@ export default function ServicesPage() {
           variant="outline"
           size="icon"
           onClick={() => openNewCategoryDialog(target)}
+          aria-label="Pridat kategorii"
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -245,73 +236,34 @@ export default function ServicesPage() {
         </Select>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('columns.name')}</TableHead>
-              <TableHead>{t('columns.category')}</TableHead>
-              <TableHead>{t('columns.duration')}</TableHead>
-              <TableHead className="text-right">{t('columns.price')}</TableHead>
-              <TableHead className="text-right">{t('columns.capacity')}</TableHead>
-              <TableHead>{t('columns.onlineBooking')}</TableHead>
-              <TableHead>{t('columns.status')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+      {/* Service List (sortable via drag-and-drop) */}
+      {isLoading ? (
+        <div className="rounded-lg border bg-card">
+          <Table>
+            <TableBody>
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   {tCommon('loading')}
                 </TableCell>
               </TableRow>
-            ) : !data || data.length === 0 ? (
+            </TableBody>
+          </Table>
+        </div>
+      ) : !data || data.length === 0 ? (
+        <div className="rounded-lg border bg-card">
+          <Table>
+            <TableBody>
               <TableRow>
-                <TableCell colSpan={7} className="p-0">
+                <TableCell colSpan={8} className="p-0">
                   <ServicesEmptyState onAddService={() => setDialogOpen(true)} />
                 </TableCell>
               </TableRow>
-            ) : (
-              data.map((service) => (
-                <TableRow
-                  key={service.uuid}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleRowClick(service)}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-3 w-3 rounded-full shrink-0"
-                        style={{ backgroundColor: service.color }}
-                      />
-                      <span className="font-medium">{service.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {service.category_name || t('uncategorized')}
-                  </TableCell>
-                  <TableCell>
-                    {service.duration_minutes} {t('minutes')}
-                  </TableCell>
-                  <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
-                  <TableCell className="text-right">{service.max_capacity}</TableCell>
-                  <TableCell>
-                    <Badge variant={service.online_booking_enabled ? 'default' : 'outline'}>
-                      {service.online_booking_enabled ? t('yes') : t('no')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={service.is_active ? 'default' : 'secondary'}>
-                      {service.is_active ? t('active') : t('inactive')}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <ServiceListSortable services={data} onRowClick={handleRowClick} />
+      )}
 
       {/* Add Service Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -512,6 +464,7 @@ export default function ServicesPage() {
               onClick={() => setDeleteConfirmOpen(true)}
               disabled={deleteMutation.isPending}
               title={tCommon('delete')}
+              aria-label={tCommon('delete')}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

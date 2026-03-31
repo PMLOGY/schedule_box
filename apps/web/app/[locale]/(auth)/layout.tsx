@@ -3,18 +3,20 @@
 import { motion } from 'motion/react';
 import { GradientMesh } from '@/components/glass/gradient-mesh';
 import { GlassPanel } from '@/components/glass/glass-panel';
+import { SkipLink } from '@/components/accessibility/skip-link';
 import { LocaleSwitcher } from '@/components/i18n/locale-switcher';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex items-center justify-center relative">
+      <SkipLink />
       <GradientMesh preset="auth" />
       <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
         <LocaleSwitcher />
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-md px-4">
+      <main id="main-content" tabIndex={-1} className="w-full max-w-md px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -29,7 +31,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             {children}
           </GlassPanel>
         </motion.div>
-      </div>
+      </main>
     </div>
   );
 }
