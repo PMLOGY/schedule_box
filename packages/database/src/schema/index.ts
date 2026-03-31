@@ -31,3 +31,6 @@ export * from './platform';
 export * from './webhook-config';
 export * from './payment-providers';
 export * from './push-subscriptions';
+export * from './recurring';
+export * from './memberships';
+export * from './waitlist';

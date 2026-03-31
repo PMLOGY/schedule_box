@@ -34,6 +34,7 @@ import { resources } from './resources';
 import { coupons } from './coupons';
 import { giftCards } from './gift-cards';
 import { videoMeetings } from './video';
+import { recurringSeries } from './recurring';
 
 // ============================================================================
 // BOOKINGS TABLE
@@ -77,6 +78,10 @@ export const bookings = pgTable(
     videoMeetingId: integer('video_meeting_id').references(() => videoMeetings.id, {
       onDelete: 'set null',
     }),
+    // Recurring
+    recurringSeriesId: integer('recurring_series_id').references(() => recurringSeries.id, {
+      onDelete: 'set null',
+    }),
     // AI
     noShowProbability: real('no_show_probability'),
     // Cancellation
@@ -118,6 +123,7 @@ export const bookings = pgTable(
       table.startTime,
       table.endTime,
     ),
+    recurringSeriesIdx: index('idx_bookings_recurring_series').on(table.recurringSeriesId),
   }),
 );
 

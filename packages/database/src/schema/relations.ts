@@ -42,6 +42,9 @@ import { automationRules, automationLogs } from './automation';
 import { auditLogs, analyticsEvents, competitorData, competitorMonitors } from './analytics';
 import { processedWebhooks } from './webhooks';
 import { organizations, organizationMembers } from './organizations';
+import { recurringSeries } from './recurring';
+import { membershipTypes, customerMemberships } from './memberships';
+import { bookingWaitlist } from './waitlist';
 
 // ============================================================================
 // COMPANIES RELATIONS
@@ -84,6 +87,10 @@ export const companiesRelations = relations(companies, ({ one, many }) => ({
   workingHoursOverrides: many(workingHoursOverrides),
   subscriptions: many(subscriptions),
   subscriptionInvoices: many(subscriptionInvoices),
+  recurringSeries: many(recurringSeries),
+  membershipTypes: many(membershipTypes),
+  customerMemberships: many(customerMemberships),
+  bookingWaitlist: many(bookingWaitlist),
 }));
 
 // ============================================================================
@@ -176,6 +183,9 @@ export const customersRelations = relations(customers, ({ one, many }) => ({
   giftCards: many(giftCards),
   notifications: many(notifications),
   couponUsage: many(couponUsage),
+  memberships: many(customerMemberships),
+  waitlistEntries: many(bookingWaitlist),
+  recurringSeries: many(recurringSeries),
 }));
 
 export const tagsRelations = relations(tags, ({ one, many }) => ({
@@ -346,6 +356,10 @@ export const bookingsRelations = relations(bookings, ({ one, many }) => ({
   videoMeeting: one(videoMeetings, {
     fields: [bookings.videoMeetingId],
     references: [videoMeetings.id],
+  }),
+  recurringSeries: one(recurringSeries, {
+    fields: [bookings.recurringSeriesId],
+    references: [recurringSeries.id],
   }),
   bookingResources: many(bookingResources),
   payments: many(payments),
@@ -753,6 +767,84 @@ export const organizationMembersRelations = relations(organizationMembers, ({ on
   company: one(companies, {
     fields: [organizationMembers.companyId],
     references: [companies.id],
+  }),
+}));
+
+// ============================================================================
+// RECURRING SERIES RELATIONS
+// ============================================================================
+
+export const recurringSeriesRelations = relations(recurringSeries, ({ one, many }) => ({
+  company: one(companies, {
+    fields: [recurringSeries.companyId],
+    references: [companies.id],
+  }),
+  service: one(services, {
+    fields: [recurringSeries.serviceId],
+    references: [services.id],
+  }),
+  employee: one(employees, {
+    fields: [recurringSeries.employeeId],
+    references: [employees.id],
+  }),
+  customer: one(customers, {
+    fields: [recurringSeries.customerId],
+    references: [customers.id],
+  }),
+  bookings: many(bookings),
+}));
+
+// ============================================================================
+// MEMBERSHIP RELATIONS
+// ============================================================================
+
+export const membershipTypesRelations = relations(membershipTypes, ({ one, many }) => ({
+  company: one(companies, {
+    fields: [membershipTypes.companyId],
+    references: [companies.id],
+  }),
+  customerMemberships: many(customerMemberships),
+}));
+
+export const customerMembershipsRelations = relations(customerMemberships, ({ one }) => ({
+  company: one(companies, {
+    fields: [customerMemberships.companyId],
+    references: [companies.id],
+  }),
+  customer: one(customers, {
+    fields: [customerMemberships.customerId],
+    references: [customers.id],
+  }),
+  membershipType: one(membershipTypes, {
+    fields: [customerMemberships.membershipTypeId],
+    references: [membershipTypes.id],
+  }),
+}));
+
+// ============================================================================
+// WAITLIST RELATIONS
+// ============================================================================
+
+export const bookingWaitlistRelations = relations(bookingWaitlist, ({ one }) => ({
+  company: one(companies, {
+    fields: [bookingWaitlist.companyId],
+    references: [companies.id],
+  }),
+  customer: one(customers, {
+    fields: [bookingWaitlist.customerId],
+    references: [customers.id],
+  }),
+  service: one(services, {
+    fields: [bookingWaitlist.serviceId],
+    references: [services.id],
+  }),
+  employee: one(employees, {
+    fields: [bookingWaitlist.employeeId],
+    references: [employees.id],
+  }),
+  promotedBooking: one(bookings, {
+    fields: [bookingWaitlist.promotedBookingId],
+    references: [bookings.id],
   }),
 }));
 
