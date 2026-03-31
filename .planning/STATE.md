@@ -1,36 +1,36 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.1
-milestone_name: Go Live & Revenue
-status: completed
-stopped_at: Completed 53-03-PLAN.md (v3.1 milestone complete)
-last_updated: "2026-03-29T11:57:37.652Z"
-last_activity: 2026-03-29 — Plan 53-03 complete (DEP-02 + DEP-04 deferred with setup guides)
+milestone: v4.0
+milestone_name: Feature Complete
+status: defining_requirements
+stopped_at: Defining requirements for v4.0
+last_updated: "2026-03-31T13:30:00.000Z"
+last_activity: 2026-03-31 — Milestone v4.0 started
 progress:
-  total_phases: 15
-  completed_phases: 15
-  total_plans: 44
-  completed_plans: 44
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-18)
+See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** SMB owners can accept online bookings 24/7 with integrated payments, reducing no-shows and increasing revenue through AI optimization
-**Current focus:** Milestone v3.1 — Phase 53: Deployment & Go Live
+**Current focus:** Milestone v4.0 — Defining requirements
 
 ## Current Position
 
-Phase: 53 of 53 (Deployment & Go Live)
-Plan: 3 of 3 complete
-Status: Complete (v3.1 milestone delivered)
-Last activity: 2026-03-29 — Plan 53-03 complete (DEP-02 + DEP-04 deferred with setup guides)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-31 — Milestone v4.0 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## What's Done
 
@@ -39,42 +39,22 @@ Progress: [██████████] 100%
 **v1.2 shipped** (5 phases, 20 plans — 2026-02-24)
 **v1.3 shipped** (5 phases, 21 plans — 2026-02-25)
 **v1.4 shipped** (6 phases, 11 plans — 2026-03-12): glassmorphism redesign
-**v2.0 shipped** (6 phases, 11 plans — 2026-03-16): full functionality, all 4 views working
-**v3.0 shipped** (6 phases, 26 plans — 2026-03-18): Vercel infra, security hardening, super-admin, marketplace, observability, testing
+**v2.0 shipped** (6 phases, 11 plans — 2026-03-16): full functionality
+**v3.0 shipped** (6 phases, 26 plans — 2026-03-18): security, super-admin, marketplace, testing
+**v3.1 shipped** (3 phases, 10 plans — 2026-03-29): per-company payments, E2E verification, Coolify deploy
 
-## Decisions
+## Accumulated Context
 
-See `.planning/PROJECT.md` Key Decisions section (decisions 1-20 logged there).
-
-Recent decisions affecting v3.1:
-- [Phase 50]: v3.0 complete — all 47 requirements delivered, 6 phases shipped
-- [Phase 28]: Comgate recurring live but requires manual activation — contact support for merchant 498621
-- [Phase 46]: PII expand-contract migration pending contract phase (drop plaintext columns after backfill verified)
-- Per-company payments: provider-agnostic `payment_providers` table — PAY-03 drives schema design so Stripe can be added without DDL changes
-- [Phase 51-01]: Credentials stored as AES-256-GCM encrypted text (not JSONB) — encrypted blob is opaque
-- [Phase 51-01]: chargeRecurringPayment unchanged — platform subscription billing always uses platform credentials (PAY-04)
-- [Phase 51-01]: GET endpoint returns masked merchant_id (last 4 chars) — never exposes full secret
-- [Phase 51-02]: Webhook secret verification moved after payment lookup for per-company secret resolution
-- [Phase 51-02]: Subscription billing route annotated with PAY-04 comment to prevent accidental per-company credential injection
-- [Phase 52-01]: Accept both postgres:// and postgresql:// in DATABASE_URL validation for Coolify compatibility
-- [Phase 52-01]: Readiness probe skips Redis check in dev/test when no Redis configured
-- [Phase 52]: No code changes needed for owner setup flow -- registration, onboarding, service CRUD, employee CRUD all verified working
-- [Phase 52-03]: Public booking notification uses same fireBookingCreatedNotifications as internal booking service
-- [Phase 52-03]: Email failures recorded as notification status=failed with error message, never block booking response
-- [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql`` template literals
-- [Phase 52-04]: Marketplace listings empty by default -- companies create via my-listing endpoint (not a bug)
-- [Phase 52-04]: Admin metrics Date objects must be converted to ISO strings for Drizzle sql template literals
-- [Phase 53-01]: Demo seed checks company slug for idempotency; roles created on-demand if missing
-- [Phase 53-01]: Coolify docker-compose DATABASE_URL supports Neon override via env var substitution; migrate uses DATABASE_URL_UNPOOLED
-- [Phase 53-02]: Marketplace E2E tests mock API responses instead of depending on seed data; artifact upload steps keep continue-on-error
-- [Phase 53-03]: Custom domain (DEP-02) deferred -- app runs on Coolify URL until domain chosen; setup guide in 53-03-DEFERRED-SETUP.md
-- [Phase 53-03]: Comgate recurring billing (DEP-04) deferred -- blocked on Comgate activation for merchant 498621; verification guide documented
+- Coolify replaces Vercel for hosting (all Vercel references removed)
+- User does NOT have Docker locally — Testcontainers CI-only
+- User does NOT have Twilio — SMS deferred, push notifications replace it
+- No external OAuth credentials yet — code-complete but credential-ready
+- AI models exist in Python service but need real data to train — fallback values work
+- v3.0 code (phases 45-50) was agent-written and partially verified in Phase 52
 
 ## Blockers
 
-- **[DEFERRED]** Comgate recurring activation requires contacting Comgate support for merchant 498621 — DEP-04 verification deferred, setup guide in 53-03-DEFERRED-SETUP.md
-- **[DEFERRED]** Custom domain not yet provided — DEP-02 deferred, ready-to-configure guide in 53-03-DEFERRED-SETUP.md
-- Real testimonials needed for landing page — placeholder content still in place
+- None for v4.0 scope (all external-dependency features are code-complete/credential-ready)
 
 ## Performance Metrics
 
@@ -87,13 +67,10 @@ Recent decisions affecting v3.1:
 | v1.4 | 6 | 11 | 16 days |
 | v2.0 | 6 | 11 | 3 days |
 | v3.0 | 6 | 26 | 2 days |
-| Phase 52 P04 | 7min | 3 tasks | 2 files |
-| Phase 53 P01 | 3min | 2 tasks | 3 files |
-| Phase 53 P02 | 4min | 2 tasks | 2 files |
-| Phase 53 P03 | 2min | 3 tasks | 2 files |
+| v3.1 | 3 | 10 | 11 days |
 
 ## Session Continuity
 
-Last session: 2026-03-29T11:45:50Z
-Stopped at: Completed 53-03-PLAN.md (v3.1 milestone complete)
+Last session: 2026-03-31T13:30:00Z
+Stopped at: Defining requirements for v4.0
 Resume file: None

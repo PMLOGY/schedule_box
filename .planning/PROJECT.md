@@ -26,17 +26,23 @@ Freemium with 4 tiers:
 - **16 shadcn/ui components** + booking wizard + calendar + automation builder + glass primitives (GlassPanel, GradientMesh, GlassShimmer)
 - **7 AI/ML models** (no-show, CLV, health, upselling, pricing, capacity, voice)
 
-## Current Milestone: v3.1 Go Live & Revenue
+## Current Milestone: v4.0 Feature Complete
 
-**Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Vercel, businesses can collect payments from customers via their own Comgate merchant account, and the full platform is verified through manual + automated testing.
+**Goal:** Reach 90% documentation coverage (76% → 90%). Implement all missing features that don't require external accounts or separate products. Every PARTIAL feature becomes DONE, every achievable TODO gets built.
 
 **Target features:**
-- Per-company payment gateway (Comgate, provider-agnostic design for future Stripe)
-- End-to-end verification: Playwright automated + manual walkthrough of every major flow
-- Bug fixing: find and fix everything broken from v3.0 agent-written code
-- Production Vercel deployment with real env vars, DNS, SSL
-- Subscription billing verification (Comgate recurring on merchant 498621)
-- Full platform working day one: booking, payments, emails, admin, marketplace, notifications, AI
+- Push notifications (VAPID/web-push, service worker, automation integration)
+- Recurring bookings (weekly/biweekly/monthly, series management)
+- Memberships & season passes (creation, assignment, validation at booking)
+- Waitlist for group bookings (auto-promotion when spot opens)
+- Industry vertical UI completion (medical, auto, cleaning, tutoring fields)
+- OAuth login (Google, Facebook — code-complete, credential-ready)
+- Google Calendar 2-way sync (code-complete, API-key-ready)
+- WCAG 2.1 AA accessibility audit + fixes
+- Super-admin broadcast messaging + maintenance mode
+- GDPR auto-deletion cron (3-year retention)
+- PDF invoice verification, Excel export, notification tracking
+- Cookie consent full implementation
 
 ## Current State
 
@@ -135,4 +141,4 @@ See `.planning/REQUIREMENTS.md` for v3.0 requirements (32 gaps from GAP analysis
 
 ---
 
-_Last updated: 2026-03-16 after v3.0 milestone started_
+_Last updated: 2026-03-31 after v4.0 milestone started_
