@@ -1457,7 +1457,8 @@
       "company": "Company",
       "service": "Service",
       "hours": "Working Hours",
-      "share": "Share"
+      "share": "Share",
+      "testBooking": "Test"
     },
     "companyDetails": {
       "title": "Company Details",
@@ -1510,6 +1511,15 @@
       "downloadQR": "Download QR code",
       "complete": "Complete setup",
       "qrCodeAlt": "QR code for booking link"
+    },
+    "testBooking": {
+      "title": "Try a test booking",
+      "subtitle": "Test your booking page as a customer.",
+      "instructions": "Open your public booking page and create a test booking as a customer. This will verify everything works correctly.",
+      "openBookingPage": "Open booking page",
+      "confirmDone": "Done — test booking created",
+      "optional": "This step is optional. You can skip it and complete setup.",
+      "complete": "Complete setup"
     },
     "industryTypes": {
       "beauty_salon": "Hair / Beauty Salon",

@@ -1643,7 +1643,8 @@
       "company": "Firma",
       "service": "Služba",
       "hours": "Pracovná doba",
-      "share": "Zdieľanie"
+      "share": "Zdieľanie",
+      "testBooking": "Test"
     },
     "companyDetails": {
       "title": "Základné údaje o firme",
@@ -1696,6 +1697,15 @@
       "downloadQR": "Stiahnuť QR kód",
       "complete": "Dokončiť nastavenie",
       "qrCodeAlt": "QR kód rezervačného odkazu"
+    },
+    "testBooking": {
+      "title": "Vyskúšajte si rezerváciu",
+      "subtitle": "Otestujte svoju rezervačnú stránku ako zákazník.",
+      "instructions": "Otvorte svoju verejnú rezervačnú stránku a vytvorte testovaciu rezerváciu ako zákazník. Tým overíte, že všetko funguje správne.",
+      "openBookingPage": "Otvoriť rezervačnú stránku",
+      "confirmDone": "Hotovo — testovacia rezervácia vytvorená",
+      "optional": "Tento krok je voliteľný. Môžete ho preskočiť a dokončiť nastavenie.",
+      "complete": "Dokončiť nastavenie"
     },
     "industryTypes": {
       "beauty_salon": "Kaderníctvo / Kozmetika",

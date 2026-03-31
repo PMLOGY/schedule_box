@@ -5,7 +5,7 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WizardStepIndicatorProps {
-  currentStep: 1 | 2 | 3 | 4;
+  currentStep: 1 | 2 | 3 | 4 | 5;
   completedSteps: Set<number>;
 }
 
@@ -14,6 +14,7 @@ const steps = [
   { key: 'service', labelKey: 'onboarding.steps.service' },
   { key: 'hours', labelKey: 'onboarding.steps.hours' },
   { key: 'share', labelKey: 'onboarding.steps.share' },
+  { key: 'testBooking', labelKey: 'onboarding.steps.testBooking' },
 ] as const;
 
 export function WizardStepIndicator({ currentStep, completedSteps }: WizardStepIndicatorProps) {
@@ -25,12 +26,12 @@ export function WizardStepIndicator({ currentStep, completedSteps }: WizardStepI
       role="progressbar"
       aria-valuenow={currentStep}
       aria-valuemin={1}
-      aria-valuemax={4}
-      aria-label={`Step ${currentStep} of 4`}
+      aria-valuemax={5}
+      aria-label={`Step ${currentStep} of 5`}
     >
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
-          const stepNumber = (index + 1) as 1 | 2 | 3 | 4;
+          const stepNumber = (index + 1) as 1 | 2 | 3 | 4 | 5;
           const isCompleted = completedSteps.has(stepNumber);
           const isCurrent = stepNumber === currentStep;
 

@@ -2,17 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/lib/i18n/navigation';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button';
-import { Loader2, Copy, Check, Download, PartyPopper } from 'lucide-react';
+import { Copy, Check, Download, PartyPopper } from 'lucide-react';
 import { useOnboardingWizard } from '@/stores/onboarding-wizard.store';
 import { apiClient } from '@/lib/api-client';
 
 export function ShareLinkStep() {
   const t = useTranslations();
-  const router = useRouter();
-  const { data, prevStep, setSubmitting, setError, isSubmitting } = useOnboardingWizard();
+  const { data, prevStep, nextStep, markStepCompleted } = useOnboardingWizard();
 
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -69,18 +67,9 @@ export function ShareLinkStep() {
     document.body.removeChild(link);
   };
 
-  const handleComplete = async () => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      await apiClient.put('/settings/company', { onboarding_completed: true });
-
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nastala chyba. Zkuste to znovu.');
-    } finally {
-      setSubmitting(false);
-    }
+  const handleContinue = () => {
+    markStepCompleted(4);
+    nextStep();
   };
 
   return (
@@ -142,15 +131,8 @@ export function ShareLinkStep() {
 
       {/* Actions */}
       <div className="flex flex-col gap-3 pt-4">
-        <Button onClick={handleComplete} disabled={isSubmitting} className="w-full" size="lg">
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t('onboarding.saving')}
-            </>
-          ) : (
-            t('onboarding.shareLink.complete')
-          )}
+        <Button onClick={handleContinue} className="w-full" size="lg">
+          {t('onboarding.next')}
         </Button>
         <Button type="button" variant="ghost" onClick={prevStep} className="w-full">
           {t('onboarding.back')}

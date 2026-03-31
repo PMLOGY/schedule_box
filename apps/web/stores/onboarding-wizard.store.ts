@@ -4,7 +4,7 @@ import { create } from 'zustand';
 // TYPES
 // ============================================================================
 
-export type OnboardingStep = 1 | 2 | 3 | 4;
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
 export interface WorkingHourEntry {
   dayOfWeek: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
@@ -68,7 +68,7 @@ export const useOnboardingWizard = create<OnboardingWizardState>((set, get) => (
 
   nextStep: () => {
     const currentStep = get().step;
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       set({ step: (currentStep + 1) as OnboardingStep, error: null });
     }
   },

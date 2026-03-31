@@ -1,4 +1,9 @@
 /**
+ * PII Encryption: AES-256-GCM verified working (FIX-08)
+ * Encrypts: customer name, email, phone
+ * Key source: ENCRYPTION_KEY env var
+ * Format: base64(iv[12] + authTag[16] + ciphertext)
+ *
  * AES-256-GCM encryption module for PII at rest
  *
  * Provides:

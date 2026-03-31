@@ -6,6 +6,7 @@ import { CompanyDetailsStep } from './steps/company-details-step';
 import { FirstServiceStep } from './steps/first-service-step';
 import { WorkingHoursStep } from './steps/working-hours-step';
 import { ShareLinkStep } from './steps/share-link-step';
+import { TestBookingStep } from './steps/test-booking-step';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -30,6 +31,7 @@ export function SetupWizard() {
           {step === 2 && <FirstServiceStep />}
           {step === 3 && <WorkingHoursStep />}
           {step === 4 && <ShareLinkStep />}
+          {step === 5 && <TestBookingStep />}
         </CardContent>
       </Card>
     </div>
