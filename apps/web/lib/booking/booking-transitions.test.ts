@@ -44,6 +44,8 @@ vi.mock('@schedulebox/database', () => ({
   notifications: {},
   customers: {},
   companies: {},
+  bookingWaitlist: {},
+  customerMemberships: {},
   eq: vi.fn(),
   and: vi.fn(),
   isNull: vi.fn(),
