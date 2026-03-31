@@ -130,10 +130,7 @@ async function sendAndLog(params: {
  * Notifies both the customer (if they have a user account) and the assigned employee.
  * Fire-and-forget: never throws.
  */
-export async function sendBookingCreatedPush(
-  bookingId: number,
-  companyId: number,
-): Promise<void> {
+export async function sendBookingCreatedPush(bookingId: number, companyId: number): Promise<void> {
   try {
     const row = await fetchBookingData(bookingId, companyId);
     if (!row) return;
