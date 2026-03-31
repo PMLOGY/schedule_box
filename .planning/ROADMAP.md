@@ -424,7 +424,10 @@ Plans:
   3. A cleaning-vertical business sees an address field on the booking form — the address is stored with the booking and visible in the booking detail view
   4. A tutoring-vertical business sees lesson notes and homework fields on the booking detail — instructors can update these after the session and the student/parent can view them
   5. The calendar slot size, labels (e.g., "Patient" vs "Customer", "Appointment" vs "Booking"), and capacity display adapt based on the company's industry setting — switching industry in company settings updates the UI across all pages
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 56-01-PLAN.md — Customer-level vertical fields (medical health records/insurance/birth number, auto vehicle records, industry UI config wiring)
+- [ ] 56-02-PLAN.md — Booking-level vertical fields (cleaning address, tutoring notes/homework, per-vehicle service history)
 
 ### Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility
 **Goal**: Every feature currently marked PARTIAL in the documentation audit becomes fully functional, and the entire application meets WCAG 2.1 AA accessibility standards
@@ -510,7 +513,7 @@ Plans:
 | 53. Deployment & Go Live | v3.1 | 3/3 | Complete | 2026-03-29 |
 | 54. Push Notifications | v4.0 | 0/TBD | Not started | - |
 | 55. Recurring, Memberships & Waitlist | v4.0 | 0/TBD | Not started | - |
-| 56. Industry Verticals UI | v4.0 | 0/TBD | Not started | - |
+| 56. Industry Verticals UI | v4.0 | 0/2 | Not started | - |
 | 57. Fixes & WCAG | v4.0 | 0/TBD | Not started | - |
 | 58. Admin & Cron | v4.0 | 0/TBD | Not started | - |
 
