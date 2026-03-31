@@ -66,6 +66,24 @@ export const INDUSTRY_LABEL_MAP: Record<string, Partial<IndustryLabels>> = {
     bookingDetail: 'Detail zakázky',
     serviceList: 'Seznam servisu',
   },
+  cleaning_service: {
+    customer: 'Klient',
+    booking: 'Objednávka',
+    service: 'Úklid',
+    newBooking: 'Nová objednávka',
+    customerSearch: 'Hledat klienta',
+    bookingDetail: 'Detail objednávky',
+    serviceList: 'Seznam úklidů',
+  },
+  tutoring: {
+    customer: 'Student',
+    booking: 'Lekce',
+    service: 'Předmět',
+    newBooking: 'Nová lekce',
+    customerSearch: 'Hledat studenta',
+    bookingDetail: 'Detail lekce',
+    serviceList: 'Seznam předmětů',
+  },
 };
 
 // ============================================================================

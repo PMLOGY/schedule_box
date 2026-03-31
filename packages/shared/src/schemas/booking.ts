@@ -64,6 +64,7 @@ export const bookingUpdateSchema = z.object({
   notes: z.string().max(1000).optional(),
   internal_notes: z.string().max(2000).optional(),
   status: bookingStatusEnum.optional(),
+  booking_metadata: z.record(z.unknown()).nullable().optional(),
 });
 
 // ============================================================================

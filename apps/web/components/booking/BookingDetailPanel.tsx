@@ -7,6 +7,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations, useLocale } from 'next-intl';
 import { format } from 'date-fns';
@@ -20,6 +21,9 @@ import {
   Coins,
   FileText,
   ClipboardList,
+  Pencil,
+  Save,
+  XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useBookingDetail } from '@/hooks/use-bookings-query';
@@ -35,6 +39,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import type { BookingStatus } from '@schedulebox/shared/types';
 import BookingStatusBadge from './BookingStatusBadge';
 import { NoShowRiskDetail } from '@/components/ai/NoShowRiskDetail';
@@ -88,6 +93,52 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
   };
 
   const dateLocale = LOCALE_MAP[locale] || cs;
+
+  // Editable tutoring notes state
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [lessonNotes, setLessonNotes] = useState('');
+  const [homework, setHomework] = useState('');
+
+  // Sync tutoring fields when booking data loads or changes
+  useEffect(() => {
+    if (booking?.bookingMetadata) {
+      setLessonNotes(String(booking.bookingMetadata.lesson_notes ?? ''));
+      setHomework(String(booking.bookingMetadata.homework ?? ''));
+    }
+  }, [booking?.bookingMetadata]);
+
+  // Reset editing state when panel closes
+  useEffect(() => {
+    if (!open) setEditingNotes(false);
+  }, [open]);
+
+  const isTutoring = booking?.bookingMetadata?.industry_type === 'tutoring';
+
+  // Mutation for saving tutoring notes/homework via PUT
+  const metadataMutation = useMutation({
+    mutationFn: async () => {
+      if (!bookingId) throw new Error('No booking ID');
+      const updatedMetadata = {
+        ...(booking?.bookingMetadata as Record<string, unknown>),
+        lesson_notes: lessonNotes,
+        homework: homework,
+      };
+      return await apiClient.put(`/bookings/${bookingId}`, {
+        booking_metadata: updatedMetadata,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Poznámky uloženy');
+      setEditingNotes(false);
+      queryClient.invalidateQueries({ queryKey: ['bookings', bookingId] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    },
+    onError: (error: { message?: string }) => {
+      toast.error('Nepodařilo se uložit poznámky', {
+        description: typeof error.message === 'string' ? error.message : undefined,
+      });
+    },
+  });
 
   // Map API action names to translation keys (no-show → noShow)
   const actionToKey = (action: string) => action.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
@@ -280,32 +331,105 @@ export default function BookingDetailPanel({ bookingId, open, onClose }: Booking
                 </div>
               </div>
 
-              {/* Vertical Metadata (medical/auto specific fields) */}
+              {/* Vertical Metadata (industry-specific fields) */}
               {booking.bookingMetadata && Object.keys(booking.bookingMetadata).length > 1 && (
                 <>
                   <Separator />
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <ClipboardList className="h-4 w-4" />
-                      {labels.customer} — doplňkové údaje
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <ClipboardList className="h-4 w-4" />
+                        {labels.customer} — doplňkové údaje
+                      </div>
+                      {isTutoring && !editingNotes && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingNotes(true)}
+                          className="h-7 gap-1 text-xs"
+                        >
+                          <Pencil className="h-3 w-3" />
+                          Upravit poznámky
+                        </Button>
+                      )}
                     </div>
-                    <div className="pl-6 space-y-1 text-sm">
-                      {Object.entries(booking.bookingMetadata)
-                        .filter(([key]) => key !== 'industry_type')
-                        .map(([key, value]) => {
-                          const industryType = (booking.bookingMetadata as Record<string, unknown>)
-                            ?.industry_type;
-                          const fields = VERTICAL_FIELDS[String(industryType ?? '')] ?? [];
-                          const fieldDef = fields.find((f) => f.key === key);
-                          const label = fieldDef?.label ?? key;
-                          return (
-                            <div key={key} className="flex justify-between">
-                              <span className="text-muted-foreground">{label}</span>
-                              <span className="font-medium">{String(value)}</span>
-                            </div>
-                          );
-                        })}
-                    </div>
+
+                    {/* Editable tutoring notes */}
+                    {isTutoring && editingNotes ? (
+                      <div className="pl-6 space-y-3">
+                        <div className="space-y-1.5">
+                          <label className="text-sm text-muted-foreground font-medium">
+                            Poznámky z lekce
+                          </label>
+                          <Textarea
+                            value={lessonNotes}
+                            onChange={(e) => setLessonNotes(e.target.value)}
+                            placeholder="Co se probíralo, postřehy..."
+                            maxLength={2000}
+                            rows={3}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-sm text-muted-foreground font-medium">
+                            Domácí úkol
+                          </label>
+                          <Textarea
+                            value={homework}
+                            onChange={(e) => setHomework(e.target.value)}
+                            placeholder="Zadání pro studenta..."
+                            maxLength={1000}
+                            rows={2}
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => metadataMutation.mutate()}
+                            disabled={metadataMutation.isPending}
+                            className="gap-1"
+                          >
+                            {metadataMutation.isPending ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Save className="h-3 w-3" />
+                            )}
+                            Uložit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setEditingNotes(false);
+                              setLessonNotes(String(booking.bookingMetadata?.lesson_notes ?? ''));
+                              setHomework(String(booking.bookingMetadata?.homework ?? ''));
+                            }}
+                            className="gap-1"
+                          >
+                            <XCircle className="h-3 w-3" />
+                            Zrušit
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="pl-6 space-y-1 text-sm">
+                        {Object.entries(booking.bookingMetadata)
+                          .filter(([key]) => key !== 'industry_type')
+                          .map(([key, value]) => {
+                            const industryType = (
+                              booking.bookingMetadata as Record<string, unknown>
+                            )?.industry_type;
+                            const fields = VERTICAL_FIELDS[String(industryType ?? '')] ?? [];
+                            const fieldDef = fields.find((f) => f.key === key);
+                            const label = fieldDef?.label ?? key;
+                            return (
+                              <div key={key} className="flex justify-between">
+                                <span className="text-muted-foreground">{label}</span>
+                                <span className="font-medium">{String(value)}</span>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
                   </div>
                 </>
               )}

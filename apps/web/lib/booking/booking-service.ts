@@ -848,30 +848,35 @@ export async function updateBooking(
       }
 
       // Update booking
-      await tx
-        .update(bookings)
-        .set({
-          startTime: newStartTime,
-          endTime: newEndTime,
-          employeeId: input.employee_id ?? bookingData.employeeId,
-          notes: input.notes,
-          internalNotes: input.internal_notes,
-          status: input.status,
-          updatedAt: new Date(),
-        })
-        .where(eq(bookings.id, bookingData.id));
-    });
-  } else {
-    // No time change, just update fields
-    await db
-      .update(bookings)
-      .set({
-        employeeId: input.employee_id,
+      const txUpdateSet: Record<string, unknown> = {
+        startTime: newStartTime,
+        endTime: newEndTime,
+        employeeId: input.employee_id ?? bookingData.employeeId,
         notes: input.notes,
         internalNotes: input.internal_notes,
         status: input.status,
         updatedAt: new Date(),
-      })
+      };
+      if (input.booking_metadata !== undefined) {
+        txUpdateSet.bookingMetadata = input.booking_metadata;
+      }
+      await tx.update(bookings).set(txUpdateSet).where(eq(bookings.id, bookingData.id));
+    });
+  } else {
+    // No time change, just update fields
+    const updateSet: Record<string, unknown> = {
+      employeeId: input.employee_id,
+      notes: input.notes,
+      internalNotes: input.internal_notes,
+      status: input.status,
+      updatedAt: new Date(),
+    };
+    if (input.booking_metadata !== undefined) {
+      updateSet.bookingMetadata = input.booking_metadata;
+    }
+    await db
+      .update(bookings)
+      .set(updateSet)
       .where(and(eq(bookings.uuid, existingBooking.id), eq(bookings.companyId, companyId)));
   }
 
