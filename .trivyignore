@@ -19,3 +19,9 @@ CVE-2025-61726
 CVE-2025-61728
 CVE-2025-61729
 CVE-2026-25679
+
+# ncurses buffer overflow - Debian base image, no fix available upstream
+CVE-2025-69720
+
+# systemd IPC arbitrary code execution - Debian base image, no fix available upstream
+CVE-2026-29111
