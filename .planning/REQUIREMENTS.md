@@ -46,14 +46,6 @@ Requirements for 90% documentation coverage. Source: 454-feature audit against s
 - [ ] **VERT-06**: Tutoring: lesson notes / homework field on booking detail
 - [ ] **VERT-07**: Industry-specific UI config fully wired (calendar slot size, labels, capacity display)
 
-### OAuth & Calendar Sync
-
-- [ ] **OAUTH-01**: User can login via Google OAuth (full PKCE flow, not 501 stub)
-- [ ] **OAUTH-02**: User can login via Facebook OAuth (full flow, not 501 stub)
-- [ ] **OAUTH-03**: User can connect Google Calendar in settings
-- [ ] **OAUTH-04**: Bookings export to connected Google Calendar as events
-- [ ] **OAUTH-05**: External Google Calendar events shown as blocked time in availability
-
 ### Admin Features
 
 - [ ] **ADM-01**: Super-admin can send broadcast message to all companies (email + in-app banner)
@@ -103,6 +95,9 @@ Requirements for 90% documentation coverage. Source: 454-feature audit against s
 | Prometheus/Grafana | Infrastructure monitoring, separate setup |
 | Polish/German languages | Outside CZ/SK market scope for v4.0 |
 | Apple OAuth | Needs Apple Developer account ($99/yr) |
+| Google OAuth login | Needs Google Cloud Console OAuth app + client ID |
+| Facebook OAuth login | Needs Facebook Developer app + review process |
+| Google Calendar sync | Needs Google Cloud project + Calendar API credentials |
 
 ## Traceability
 
@@ -153,16 +148,10 @@ Requirements for 90% documentation coverage. Source: 454-feature audit against s
 | ADM-03 | Phase 58 | Pending |
 | CRON-01 | Phase 58 | Pending |
 | CRON-02 | Phase 58 | Pending |
-| OAUTH-01 | Phase 59 | Pending |
-| OAUTH-02 | Phase 59 | Pending |
-| OAUTH-03 | Phase 59 | Pending |
-| OAUTH-04 | Phase 59 | Pending |
-| OAUTH-05 | Phase 59 | Pending |
-
 **Coverage:**
 
-- v4.0 requirements: 50 total
-- Mapped to phases: 50
+- v4.0 requirements: 45 total
+- Mapped to phases: 45
 - Unmapped: 0
 
 ---

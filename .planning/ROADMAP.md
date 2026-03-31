@@ -142,7 +142,6 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 - [ ] **Phase 56: Industry Verticals UI** - Medical, auto service, cleaning, and tutoring vertical-specific fields wired into customer detail and booking forms (VERT-01..07)
 - [ ] **Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility** - PDF invoices, Excel export, notification tracking, calendar resize, drag reorder, onboarding test booking, cookie consent, PII encryption, marketplace billing, web component widget, offline banner, plus WCAG 2.1 AA audit (FIX-01..11, A11Y-01..05)
 - [ ] **Phase 58: Admin Features & Cron** - Super-admin broadcast messaging, maintenance mode, cohort analysis, GDPR auto-deletion cron with authenticated endpoint (ADM-01..03, CRON-01..02)
-- [ ] **Phase 59: OAuth & Calendar Sync** - Google and Facebook OAuth login (PKCE), Google Calendar connect, 2-way sync with blocked-time display (OAUTH-01..05)
 
 ## Phase Details
 
@@ -443,18 +442,6 @@ Plans:
   4. A GDPR auto-deletion cron endpoint anonymizes customer PII (name, email, phone) for records older than 3 years — the endpoint is protected by a CRON_SECRET header and returns 401 without it
 **Plans**: TBD
 
-### Phase 59: OAuth & Calendar Sync
-**Goal**: Users can log in with Google or Facebook accounts and connect their Google Calendar for 2-way booking sync — code-complete and credential-ready (works immediately once OAuth app credentials are configured)
-**Depends on**: Phase 57 (accessibility audit complete before adding new auth flows)
-**Requirements**: OAUTH-01, OAUTH-02, OAUTH-03, OAUTH-04, OAUTH-05
-**Success Criteria** (what must be TRUE):
-  1. Clicking "Login with Google" initiates a full PKCE OAuth flow — the user is redirected to Google consent, and upon approval, an account is created or linked and the user lands on their dashboard (not a 501 stub)
-  2. Clicking "Login with Facebook" initiates a full OAuth flow — the user is redirected to Facebook consent, and upon approval, an account is created or linked and the user lands on their dashboard (not a 501 stub)
-  3. A user can connect their Google Calendar from account settings — the OAuth consent flow requests calendar read/write scopes, and the connection status shows as "Connected" with the calendar email
-  4. When a booking is confirmed, a corresponding Google Calendar event is created in the connected user's calendar with the correct time, service name, and location — editing the booking updates the calendar event
-  5. External events from the connected Google Calendar appear as blocked (unavailable) time slots in the employee's availability — customers cannot book during those blocked times
-**Plans**: TBD
-
 ## Progress
 
 | Phase | Milestone | Plans | Status | Completed |
@@ -517,7 +504,6 @@ Plans:
 | 56. Industry Verticals UI | v4.0 | 0/TBD | Not started | - |
 | 57. Fixes & WCAG | v4.0 | 0/TBD | Not started | - |
 | 58. Admin & Cron | v4.0 | 0/TBD | Not started | - |
-| 59. OAuth & Calendar Sync | v4.0 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
