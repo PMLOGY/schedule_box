@@ -20,6 +20,7 @@ import { z } from 'zod';
 const bookingsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
+  vehicle_spz: z.string().max(20).optional(),
 });
 
 /**
@@ -57,6 +58,20 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
     const limit = query.limit ?? 20;
     const offset = (page - 1) * limit;
 
+    // Build where conditions for bookings query
+    const whereConditions = [
+      eq(bookings.customerId, customer.id),
+      eq(bookings.companyId, companyId),
+      isNull(bookings.deletedAt),
+    ];
+
+    // Filter by vehicle SPZ (license plate stored in booking_metadata JSONB)
+    if (query.vehicle_spz) {
+      whereConditions.push(
+        sql`${bookings.bookingMetadata}->>'license_plate' = ${query.vehicle_spz}`,
+      );
+    }
+
     // Query bookings for this customer (scoped to company and not deleted)
     const data = await db
       .select({
@@ -72,17 +87,12 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
         currency: bookings.currency,
         discount_amount: bookings.discountAmount,
         no_show_probability: bookings.noShowProbability,
+        booking_metadata: bookings.bookingMetadata,
         created_at: bookings.createdAt,
         updated_at: bookings.updatedAt,
       })
       .from(bookings)
-      .where(
-        and(
-          eq(bookings.customerId, customer.id),
-          eq(bookings.companyId, companyId),
-          isNull(bookings.deletedAt),
-        ),
-      )
+      .where(and(...whereConditions))
       .orderBy(bookings.startTime)
       .limit(limit)
       .offset(offset);
@@ -91,13 +101,7 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
     const [countResult] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(bookings)
-      .where(
-        and(
-          eq(bookings.customerId, customer.id),
-          eq(bookings.companyId, companyId),
-          isNull(bookings.deletedAt),
-        ),
-      );
+      .where(and(...whereConditions));
 
     const totalCount = countResult.count;
     const totalPages = Math.ceil(totalCount / limit);
