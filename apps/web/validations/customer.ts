@@ -15,6 +15,7 @@ export const customerCreateSchema = z.object({
   phone: z.string().max(50).optional(),
   date_of_birth: z.string().date('Invalid date format').optional(),
   notes: z.string().optional(),
+  customer_metadata: z.record(z.unknown()).optional(),
   tag_ids: z.array(z.number().int('Tag IDs must be integers')).optional(),
   marketing_consent: z.boolean().default(false),
 });
@@ -32,6 +33,7 @@ export const customerUpdateSchema = z.object({
   phone: z.string().max(50).optional(),
   date_of_birth: z.string().date('Invalid date format').optional(),
   notes: z.string().optional(),
+  customer_metadata: z.record(z.unknown()).optional(),
   marketing_consent: z.boolean().optional(),
 });
 

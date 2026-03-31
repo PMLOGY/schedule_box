@@ -25,6 +25,7 @@ export interface CustomerDetail {
   date_of_birth: string | null;
   gender: string | null;
   notes: string | null;
+  customer_metadata: Record<string, unknown> | null;
   source: string | null;
   health_score: number | null;
   clv_predicted: string | null;
@@ -108,6 +109,7 @@ export function useUpdateCustomer() {
       email?: string;
       phone?: string;
       notes?: string;
+      customer_metadata?: Record<string, unknown>;
     }) => {
       return apiClient.put(`/customers/${uuid}`, data);
     },

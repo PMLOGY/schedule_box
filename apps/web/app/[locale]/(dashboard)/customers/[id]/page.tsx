@@ -50,7 +50,10 @@ import {
   type CustomerTag,
 } from '@/hooks/use-customers-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
+import { useCompanySettingsQuery } from '@/hooks/use-settings-query';
 import { CustomerMemberships } from '@/components/customers/customer-memberships';
+import { MedicalFields } from '@/components/customers/medical-fields';
+import { VehicleRecords } from '@/components/customers/vehicle-records';
 
 function getHealthBadgeVariant(
   score: number | null,
@@ -78,6 +81,8 @@ export default function CustomerDetailPage() {
   const locale = useLocale();
   const dateLocale = { cs, sk, en: enUS }[locale] || cs;
   const { formatCurrency } = useCurrencyFormat();
+  const { data: companySettings } = useCompanySettingsQuery();
+  const industryType = companySettings?.industry_type ?? 'general';
 
   // Data fetching
   const { data: customerData, isLoading: customerLoading } = useCustomerDetail(uuid);
@@ -175,6 +180,20 @@ export default function CustomerDetailPage() {
       await tagsMutation.mutateAsync({
         uuid: customer.id,
         tagIds: selectedTagIds,
+      });
+      toast.success(tCustomers('updateSuccess'));
+    } catch (error) {
+      const apiError = error as { message?: string };
+      toast.error(apiError.message || tCustomers('updateError'));
+    }
+  };
+
+  const handleSaveMetadata = async (newMetadata: Record<string, unknown>) => {
+    if (!customer) return;
+    try {
+      await updateMutation.mutateAsync({
+        uuid: customer.id,
+        customer_metadata: newMetadata,
       });
       toast.success(tCustomers('updateSuccess'));
     } catch (error) {
@@ -322,6 +341,10 @@ export default function CustomerDetailPage() {
           <TabsTrigger value="bookings">{t('tabs.bookings')}</TabsTrigger>
           <TabsTrigger value="notes">{t('tabs.notes')}</TabsTrigger>
           <TabsTrigger value="tags">{t('tabs.tags')}</TabsTrigger>
+          {industryType === 'medical_clinic' && (
+            <TabsTrigger value="medical">Zdravotní záznam</TabsTrigger>
+          )}
+          {industryType === 'auto_service' && <TabsTrigger value="vehicles">Vozidla</TabsTrigger>}
         </TabsList>
 
         {/* Booking History Tab */}
@@ -479,6 +502,29 @@ export default function CustomerDetailPage() {
             </div>
           </Card>
         </TabsContent>
+
+        {/* Medical Fields Tab */}
+        {industryType === 'medical_clinic' && (
+          <TabsContent value="medical">
+            <MedicalFields
+              metadata={customer.customer_metadata}
+              onSave={handleSaveMetadata}
+              isLoading={updateMutation.isPending}
+            />
+          </TabsContent>
+        )}
+
+        {/* Vehicle Records Tab */}
+        {industryType === 'auto_service' && (
+          <TabsContent value="vehicles">
+            <VehicleRecords
+              metadata={customer.customer_metadata}
+              onSave={handleSaveMetadata}
+              isLoading={updateMutation.isPending}
+              customerId={uuid}
+            />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Membership Section */}

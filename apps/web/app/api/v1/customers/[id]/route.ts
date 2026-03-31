@@ -68,6 +68,7 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
       date_of_birth: customer.dateOfBirth,
       gender: customer.gender,
       notes: customer.notes,
+      customer_metadata: customer.customerMetadata,
       source: customer.source,
       health_score: customer.healthScore,
       clv_predicted: customer.clvPredicted,
@@ -145,6 +146,7 @@ export const PUT = createRouteHandler<CustomerUpdate, CustomerIdParam>({
         ...(body.phone !== undefined && { phone: body.phone }),
         ...(body.date_of_birth !== undefined && { dateOfBirth: body.date_of_birth }),
         ...(body.notes !== undefined && { notes: body.notes }),
+        ...(body.customer_metadata !== undefined && { customerMetadata: body.customer_metadata }),
         ...(body.marketing_consent !== undefined && { marketingConsent: body.marketing_consent }),
       })
       .where(
@@ -169,6 +171,7 @@ export const PUT = createRouteHandler<CustomerUpdate, CustomerIdParam>({
       date_of_birth: updated.dateOfBirth,
       gender: updated.gender,
       notes: updated.notes,
+      customer_metadata: updated.customerMetadata,
       source: updated.source,
       health_score: updated.healthScore,
       clv_predicted: updated.clvPredicted,

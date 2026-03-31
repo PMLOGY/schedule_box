@@ -19,6 +19,7 @@ import {
   smallint,
   numeric,
   date,
+  jsonb,
   primaryKey,
   index,
   check,
@@ -46,6 +47,7 @@ export const customers = pgTable(
     dateOfBirth: date('date_of_birth'),
     gender: varchar('gender', { length: 10 }),
     notes: text('notes'),
+    customerMetadata: jsonb('customer_metadata'),
     source: varchar('source', { length: 50 }).default('manual'),
     // AI-computed fields
     healthScore: smallint('health_score'),
