@@ -9,6 +9,8 @@ import { db, companies, marketplaceListings, services } from '@schedulebox/datab
 import { eq, and, isNull } from 'drizzle-orm';
 import { WidgetContent } from './widget-content';
 
+export const dynamic = 'force-dynamic';
+
 interface EmbedPageProps {
   params: Promise<{ company_slug: string }>;
   searchParams: Promise<{ theme?: string; locale?: string; parent_origin?: string }>;
@@ -16,7 +18,7 @@ interface EmbedPageProps {
 
 export default async function EmbedPage({ params, searchParams }: EmbedPageProps) {
   const { company_slug } = await params;
-  const resolvedSearchParams = await searchParams;
+  const resolvedSearchParams = (await searchParams) || {};
   const theme = resolvedSearchParams.theme || 'light';
   const locale = resolvedSearchParams.locale || 'cs';
   const parentOrigin = resolvedSearchParams.parent_origin || null;
