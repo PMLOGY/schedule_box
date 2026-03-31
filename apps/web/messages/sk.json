@@ -2337,6 +2337,13 @@
         "confirmCount": "Pre potvrdenie zadajte počet cieľových firiem ({count})"
       }
     },
+    "cohort": {
+      "title": "Kohorty firiem",
+      "signupMonth": "Mesiac registrácie",
+      "signups": "Registrácie",
+      "retention": "Retencia",
+      "noData": "Žiadne dáta"
+    },
     "metrics": {
       "title": "Metriky platformy",
       "subtitle": "Obchodné KPI a prevádzkové zdravie",

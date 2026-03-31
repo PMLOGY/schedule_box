@@ -2,20 +2,34 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/shared/page-header';
 import { PeriodSelector } from '@/components/analytics/period-selector';
 import { AdminDashboard } from '@/components/analytics/admin-dashboard';
+import {
+  CohortAnalysisPanel,
+  type CohortAnalysisData,
+} from '@/components/analytics/cohort-analysis-panel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ShieldAlert } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useAdminAnalytics } from '@/hooks/use-admin-analytics';
+import { apiClient } from '@/lib/api-client';
 
 export default function AdminAnalyticsPage() {
   const user = useAuthStore((s) => s.user);
   const [days, setDays] = useState(30);
   const { data, isLoading } = useAdminAnalytics(days);
+
+  // Cohort analysis data (separate query, not tied to period selector)
+  const { data: cohortData, isLoading: cohortLoading } = useQuery({
+    queryKey: ['admin', 'cohort'],
+    queryFn: () => apiClient.get<CohortAnalysisData>('/admin/cohort'),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: user?.role === 'admin',
+  });
 
   // Guard: admin-only access
   if (user?.role !== 'admin') {
@@ -78,6 +92,17 @@ export default function AdminAnalyticsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Cohort Analysis */}
+      {cohortLoading ? (
+        <Card>
+          <CardContent className="pt-6">
+            <Skeleton className="h-[200px] w-full" />
+          </CardContent>
+        </Card>
+      ) : cohortData ? (
+        <CohortAnalysisPanel data={cohortData} />
+      ) : null}
     </div>
   );
 }

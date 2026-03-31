@@ -2495,6 +2495,13 @@
         "confirmCount": "Type the target count ({count}) to confirm"
       }
     },
+    "cohort": {
+      "title": "Cohort Analysis",
+      "signupMonth": "Signup Month",
+      "signups": "Signups",
+      "retention": "Retention",
+      "noData": "No data available"
+    },
     "metrics": {
       "title": "Platform Metrics",
       "subtitle": "Business KPIs and operational health",

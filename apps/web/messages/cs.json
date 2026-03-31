@@ -2495,6 +2495,13 @@
         "confirmCount": "Pro potvrzení zadejte počet cílových firem ({count})"
       }
     },
+    "cohort": {
+      "title": "Kohorty firem",
+      "signupMonth": "Měsíc registrace",
+      "signups": "Registrace",
+      "retention": "Retence",
+      "noData": "Žádná data"
+    },
     "metrics": {
       "title": "Metriky platformy",
       "subtitle": "Obchodní KPI a provozní zdraví",
