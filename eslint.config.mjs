@@ -52,9 +52,24 @@ export default tseslint.config(
   // Prettier must be last to override conflicting rules
   prettierConfig,
 
-  // Browser globals for widget embed script
+  // Service worker globals
   {
-    files: ['apps/web/public/widget/**/*.js'],
+    files: ['apps/web/public/sw.js'],
+    languageOptions: {
+      globals: {
+        self: 'readonly',
+        clients: 'readonly',
+        caches: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+
+  // Browser globals for widget embed scripts
+  {
+    files: ['apps/web/public/widget/**/*.js', 'apps/web/public/schedulebox-widget.js'],
     languageOptions: {
       globals: {
         document: 'readonly',
@@ -64,6 +79,9 @@ export default tseslint.config(
         MutationObserver: 'readonly',
         fetch: 'readonly',
       },
+    },
+    rules: {
+      '@typescript-eslint/no-this-alias': 'off',
     },
   },
 
