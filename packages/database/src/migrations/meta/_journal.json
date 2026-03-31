@@ -43,6 +43,13 @@
       "when": 1774624069504,
       "tag": "0005_faithful_eternity",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774992356908,
+      "tag": "0006_dusty_professor_monster",
+      "breakpoints": true
     }
   ]
 }
