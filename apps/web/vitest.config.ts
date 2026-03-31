@@ -21,10 +21,9 @@ export default mergeConfig(
           '**/mocks/**',
           '**/__tests__/setup.*',
           // Services pulled in transitively by tested modules but not directly under test
-          'lib/waitlist/waitlist-service.ts',
-          'lib/membership/membership-service.ts',
-          'lib/push/push-service.ts',
-          'lib/push/push-notifications.ts',
+          '**/waitlist/**',
+          '**/membership/**',
+          '**/push/**',
         ],
       },
     },
