@@ -48,9 +48,9 @@ Requirements for 90% documentation coverage. Source: 454-feature audit against s
 
 ### Admin Features
 
-- [ ] **ADM-01**: Super-admin can send broadcast message to all companies (email + in-app banner)
-- [ ] **ADM-02**: Super-admin can toggle maintenance mode (Redis flag, middleware check, branded page)
-- [ ] **ADM-03**: Super-admin cohort analysis shows retention by signup month
+- [x] **ADM-01**: Super-admin can send broadcast message to all companies (email + in-app banner)
+- [x] **ADM-02**: Super-admin can toggle maintenance mode (Redis flag, middleware check, branded page)
+- [x] **ADM-03**: Super-admin cohort analysis shows retention by signup month
 
 ### Accessibility (WCAG 2.1 AA)
 
@@ -143,9 +143,9 @@ Requirements for 90% documentation coverage. Source: 454-feature audit against s
 | A11Y-03 | Phase 57 | Pending |
 | A11Y-04 | Phase 57 | Pending |
 | A11Y-05 | Phase 57 | Pending |
-| ADM-01 | Phase 58 | Pending |
-| ADM-02 | Phase 58 | Pending |
-| ADM-03 | Phase 58 | Pending |
+| ADM-01 | Phase 58 | Complete |
+| ADM-02 | Phase 58 | Complete |
+| ADM-03 | Phase 58 | Complete |
 | CRON-01 | Phase 58 | Pending |
 | CRON-02 | Phase 58 | Pending |
 **Coverage:**

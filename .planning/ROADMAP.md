@@ -141,7 +141,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 - [ ] **Phase 55: Recurring Bookings, Memberships & Waitlist** - Recurring series CRUD with availability checks, membership types with booking-time validation, waitlist with auto-promotion (RECUR-01..05, MEMB-01..04, WAIT-01..03)
 - [ ] **Phase 56: Industry Verticals UI** - Medical, auto service, cleaning, and tutoring vertical-specific fields wired into customer detail and booking forms (VERT-01..07)
 - [ ] **Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility** - PDF invoices, Excel export, notification tracking, calendar resize, drag reorder, onboarding test booking, cookie consent, PII encryption, marketplace billing, web component widget, offline banner, plus WCAG 2.1 AA audit (FIX-01..11, A11Y-01..05)
-- [ ] **Phase 58: Admin Features & Cron** - Super-admin broadcast messaging, maintenance mode, cohort analysis, GDPR auto-deletion cron with authenticated endpoint (ADM-01..03, CRON-01..02)
+- [x] **Phase 58: Admin Features & Cron** - Super-admin broadcast messaging, maintenance mode, cohort analysis, GDPR auto-deletion cron with authenticated endpoint (ADM-01..03, CRON-01..02) (completed 2026-03-31)
 
 ## Phase Details
 
@@ -523,7 +523,7 @@ Plans:
 | 55. Recurring, Memberships & Waitlist | v4.0 | 0/TBD | Not started | - |
 | 56. Industry Verticals UI | v4.0 | 0/2 | Not started | - |
 | 57. Fixes & WCAG | v4.0 | 0/TBD | Not started | - |
-| 58. Admin & Cron | v4.0 | 0/TBD | Not started | - |
+| 58. Admin & Cron | 2/2 | Complete   | 2026-03-31 | - |
 
 ---
 *Roadmap created: 2026-02-10*
