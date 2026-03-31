@@ -42,6 +42,7 @@ import {
   sendBookingConfirmedPush,
   sendBookingCancelledPush,
 } from '@/lib/push/booking-push-notifications';
+import { promoteFromWaitlist } from '@/lib/waitlist/waitlist-service';
 
 // ============================================================================
 // EMAIL NOTIFICATION HELPER
@@ -345,6 +346,44 @@ export async function cancelBooking(
   sendBookingCancelledPush(bookingId, companyId).catch((err) => {
     console.error('[Push] Failed to send booking cancelled push:', err);
   });
+
+  // Waitlist auto-promotion: if this was a group class, promote the first waitlisted customer
+  // Fire-and-forget — waitlist promotion failure must never prevent cancellation
+  void (async () => {
+    try {
+      // Get booking's service details to check if it's a group class
+      const [bookingServiceData] = await db
+        .select({
+          serviceId: bookings.serviceId,
+          employeeId: bookings.employeeId,
+          startTime: bookings.startTime,
+          maxCapacity: services.maxCapacity,
+        })
+        .from(bookings)
+        .innerJoin(services, eq(bookings.serviceId, services.id))
+        .where(and(eq(bookings.id, bookingId), eq(bookings.companyId, companyId)))
+        .limit(1);
+
+      if (bookingServiceData && (bookingServiceData.maxCapacity ?? 1) > 1) {
+        const result = await promoteFromWaitlist(
+          bookingServiceData.serviceId,
+          bookingServiceData.employeeId,
+          bookingServiceData.startTime,
+          companyId,
+        );
+
+        if (result) {
+          console.log(
+            `[Waitlist] Auto-promoted customer "${result.customerName}" from waitlist for booking ${bookingId}`,
+          );
+        } else {
+          console.log(`[Waitlist] No one on waitlist for cancelled booking ${bookingId}`);
+        }
+      }
+    } catch (err) {
+      console.error('[Waitlist] Auto-promotion after cancellation failed:', err);
+    }
+  })();
 
   // Return updated booking
   const updated = await getBooking(bookingId, companyId);
