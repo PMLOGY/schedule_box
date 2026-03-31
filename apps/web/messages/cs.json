@@ -24,7 +24,11 @@
     "of": "z",
     "page": "Stránka",
     "entries": "záznamů",
-    "actions": "Akce"
+    "actions": "Akce",
+    "offline": {
+      "message": "Jste offline. Některá funkcionalita nemusí být dostupná.",
+      "restored": "Připojení obnoveno."
+    }
   },
   "auth": {
     "login": {
@@ -645,6 +649,9 @@
       "bookingsPDF": "Rezervace PDF",
       "customerCSV": "Zákazníci CSV",
       "customerPDF": "Zákazníci PDF",
+      "revenueXLSX": "Tržby XLSX",
+      "bookingsXLSX": "Rezervace XLSX",
+      "customerXLSX": "Zákazníci XLSX",
       "downloading": "Stahování...",
       "success": "Export byl úspěšně stažen",
       "error": "Chyba při exportu dat",
@@ -1757,9 +1764,20 @@
       "statNoShowReductionLabel": "Snížení absencí díky AI"
     },
     "cookie": {
+      "title": "Nastavení cookies",
       "message": "Tento web používá cookies pro zajištění nejlepšího zážitku. Více informací najdete v našich",
+      "categoryDescription": "Tento web používá cookies. Vyberte si, které kategorie chcete povolit.",
+      "necessary": "Nezbytné cookies",
+      "necessaryDesc": "Nutné pro základní funkčnost webu. Nelze je vypnout.",
+      "analytics": "Analytické cookies",
+      "analyticsDesc": "Pomáhají nám pochopit, jak web používáte, a zlepšovat ho.",
+      "marketing": "Marketingové cookies",
+      "marketingDesc": "Používají se pro personalizovanou reklamu a sledování kampaní.",
       "accept": "Přijmout",
       "reject": "Odmítnout",
+      "acceptAll": "Přijmout vše",
+      "saveSelection": "Uložit výběr",
+      "rejectAll": "Odmítnout vše",
       "privacyLink": "zásadách ochrany osobních údajů"
     },
     "privacy": {

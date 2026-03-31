@@ -24,7 +24,11 @@
     "of": "of",
     "page": "Page",
     "entries": "entries",
-    "actions": "Actions"
+    "actions": "Actions",
+    "offline": {
+      "message": "You are offline. Some features may be unavailable.",
+      "restored": "Connection restored."
+    }
   },
   "auth": {
     "login": {
@@ -645,6 +649,9 @@
       "bookingsPDF": "Bookings PDF",
       "customerCSV": "Customers CSV",
       "customerPDF": "Customers PDF",
+      "revenueXLSX": "Revenue XLSX",
+      "bookingsXLSX": "Bookings XLSX",
+      "customerXLSX": "Customers XLSX",
       "downloading": "Downloading...",
       "success": "Export downloaded successfully",
       "error": "Error exporting data",
@@ -1757,9 +1764,20 @@
       "statNoShowReductionLabel": "No-show reduction with AI"
     },
     "cookie": {
+      "title": "Cookie Settings",
       "message": "This website uses cookies to ensure the best experience. Learn more in our",
+      "categoryDescription": "This website uses cookies. Choose which categories you want to allow.",
+      "necessary": "Necessary cookies",
+      "necessaryDesc": "Required for basic website functionality. Cannot be disabled.",
+      "analytics": "Analytics cookies",
+      "analyticsDesc": "Help us understand how you use the website and improve it.",
+      "marketing": "Marketing cookies",
+      "marketingDesc": "Used for personalized advertising and campaign tracking.",
       "accept": "Accept",
       "reject": "Reject",
+      "acceptAll": "Accept all",
+      "saveSelection": "Save selection",
+      "rejectAll": "Reject all",
       "privacyLink": "privacy policy"
     },
     "privacy": {

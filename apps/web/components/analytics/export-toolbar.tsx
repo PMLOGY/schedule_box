@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api-client';
 import { downloadCSV, downloadBlob, formatCSVDate } from '@/lib/export/csv-exporter';
+import { downloadXLSX } from '@/lib/export/xlsx-exporter';
 
 interface CustomerRetentionData {
   repeatRate: number;
@@ -144,6 +145,98 @@ export function ExportToolbar({
     }
   };
 
+  const handleRevenueXLSX = () => {
+    try {
+      if (!revenueData || revenueData.length === 0) {
+        toast.error(t('error'));
+        return;
+      }
+
+      const xlsxData = revenueData.map((row) => ({
+        [t('csvColumns.date')]: formatCSVDate(row.date),
+        [t('csvColumns.revenue')]: row.revenue,
+        [t('csvColumns.bookings')]: row.bookings,
+      }));
+
+      const filename = `revenue-${new Date().toISOString().split('T')[0]}`;
+      downloadXLSX(xlsxData, filename, locale === 'cs' ? 'Trzby' : 'Revenue');
+      toast.success(t('success'));
+    } catch (error) {
+      console.error('XLSX export error:', error);
+      toast.error(t('error'));
+    }
+  };
+
+  const handleBookingsXLSX = () => {
+    try {
+      if (!bookingData || bookingData.length === 0) {
+        toast.error(t('error'));
+        return;
+      }
+
+      const xlsxData = bookingData.map((row) => ({
+        [t('csvColumns.date')]: formatCSVDate(row.date),
+        [t('csvColumns.completed')]: row.completed,
+        [t('csvColumns.cancelled')]: row.cancelled,
+        [t('csvColumns.noShows')]: row.noShows,
+        [t('csvColumns.total')]: row.total,
+      }));
+
+      const filename = `bookings-${new Date().toISOString().split('T')[0]}`;
+      downloadXLSX(xlsxData, filename, locale === 'cs' ? 'Rezervace' : 'Bookings');
+      toast.success(t('success'));
+    } catch (error) {
+      console.error('XLSX export error:', error);
+      toast.error(t('error'));
+    }
+  };
+
+  const handleCustomerXLSX = () => {
+    try {
+      if (!customerRetentionData) {
+        toast.error(t('error'));
+        return;
+      }
+
+      const metricLabel = locale === 'en' ? 'Metric' : 'Metrika';
+      const valueLabel = locale === 'en' ? 'Value' : 'Hodnota';
+
+      const xlsxData = [
+        {
+          [metricLabel]: locale === 'en' ? 'Repeat Booking Rate' : 'Mira opakovanosti',
+          [valueLabel]: `${(customerRetentionData.repeatRate * 100).toFixed(1)}%`,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Total Customers' : 'Celkem zakazniku',
+          [valueLabel]: customerRetentionData.totalCustomers,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Repeat Customers' : 'Opakujici zakaznici',
+          [valueLabel]: customerRetentionData.repeatCustomers,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Active' : 'Aktivni',
+          [valueLabel]: customerRetentionData.active,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'At Risk' : 'Ohrozeni',
+          [valueLabel]: customerRetentionData.atRisk,
+        },
+        {
+          [metricLabel]: locale === 'en' ? 'Churned' : 'Odchozeni',
+          [valueLabel]: customerRetentionData.churned,
+        },
+      ];
+
+      const filename = `customers-${new Date().toISOString().split('T')[0]}`;
+      downloadXLSX(xlsxData, filename, locale === 'cs' ? 'Zakaznici' : 'Customers');
+      toast.success(t('success'));
+    } catch (error) {
+      console.error('XLSX export error:', error);
+      toast.error(t('error'));
+    }
+  };
+
   const handleRevenuePDF = async () => {
     try {
       setIsExportingRevenuePdf(true);
@@ -207,11 +300,31 @@ export function ExportToolbar({
       <Button
         variant="outline"
         size="sm"
+        onClick={handleRevenueXLSX}
+        disabled={isLoading || !revenueData || revenueData.length === 0}
+      >
+        <FileSpreadsheet className="mr-2 h-4 w-4" />
+        {t('revenueXLSX')}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
         onClick={handleBookingsCSV}
         disabled={isLoading || !bookingData || bookingData.length === 0}
       >
         <Download className="mr-2 h-4 w-4" />
         {t('bookingsCSV')}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleBookingsXLSX}
+        disabled={isLoading || !bookingData || bookingData.length === 0}
+      >
+        <FileSpreadsheet className="mr-2 h-4 w-4" />
+        {t('bookingsXLSX')}
       </Button>
 
       <Button
@@ -242,6 +355,16 @@ export function ExportToolbar({
       >
         <Download className="mr-2 h-4 w-4" />
         {t('customerCSV')}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleCustomerXLSX}
+        disabled={isLoading || !customerRetentionData}
+      >
+        <FileSpreadsheet className="mr-2 h-4 w-4" />
+        {t('customerXLSX')}
       </Button>
 
       <Button
