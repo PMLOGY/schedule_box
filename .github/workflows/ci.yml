@@ -171,6 +171,8 @@ jobs:
 
       - name: Build and push Docker image (production)
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: .
           file: docker/Dockerfile
@@ -184,6 +186,8 @@ jobs:
 
       - name: Build and push Docker image (migrate)
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: .
           file: docker/Dockerfile
@@ -235,6 +239,8 @@ jobs:
 
       - name: Build and push AI service Docker image
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: ./services/ai
           file: services/ai/Dockerfile
