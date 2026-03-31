@@ -391,7 +391,11 @@ Plans:
   2. User can toggle push notification subscription on/off in their account settings â€” subscribing stores the PushSubscription endpoint in the database; unsubscribing removes it and no further pushes are delivered
   3. When a booking is created, confirmed, or cancelled, the affected customer and employee receive a browser push notification within 30 seconds â€” the notification text matches the booking event type
   4. An automation rule with action type "send_push" delivers a push notification to the target user when the rule triggers â€” the push appears in the notification log alongside email notifications
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 54-01-PLAN.md -- Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API— Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API
+- [ ] 54-02-PLAN.md -- Settings UI: push notification toggle and test button— Settings UI: push notification toggle and test button
+- [ ] 54-03-PLAN.md -- Booking event triggers and automation send_push handler— Booking event triggers and automation send_push handler
 
 ### Phase 55: Recurring Bookings, Memberships & Waitlist
 **Goal**: Businesses can schedule repeating appointments, sell membership passes, and manage waitlists for full group classes â€” three booking-adjacent capabilities that complete the scheduling feature set
