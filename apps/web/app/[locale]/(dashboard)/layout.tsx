@@ -5,6 +5,7 @@ import { SkipLink } from '@/components/accessibility/skip-link';
 import { NavigationProgress } from '@/components/layout/navigation-progress';
 import { DashboardTour } from '@/components/onboarding/driver-tour';
 import { GradientMesh } from '@/components/glass/gradient-mesh';
+import { PushRegistration } from '@/components/push/push-registration';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -26,6 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Dashboard tour — driver.js contextual tooltips on first visit after onboarding.
           Renders nothing visually; only triggers the driver.js overlay. */}
       <DashboardTour />
+      <PushRegistration />
     </AuthGuard>
   );
 }
