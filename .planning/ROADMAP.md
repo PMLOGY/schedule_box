@@ -10,6 +10,7 @@
 - ✅ **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (shipped 2026-03-16)
 - ✅ **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (shipped 2026-03-18)
 - ✅ **v3.1 Go Live & Revenue** — Phases 51-53 (shipped 2026-03-29)
+- **v4.0 Feature Complete** — Phases 54-59 (in progress)
 
 ## Phases
 
@@ -121,13 +122,27 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### v3.1 Go Live & Revenue (In Progress)
+<details>
+<summary>✅ v3.1 Go Live & Revenue (Phases 51-53) — SHIPPED 2026-03-29</summary>
 
 **Milestone Goal:** Make ScheduleBox production-ready and revenue-generating. Every feature works end-to-end on Coolify (self-hosted PaaS), businesses can collect payments via their own Comgate merchant account, the full platform is verified through manual and automated testing, and the app is live on a custom domain.
 
 - [x] **Phase 51: Per-Company Payments** - Business owners configure their own Comgate credentials; customer payments route through the business's account; provider-agnostic DB schema ready for future Stripe (PAY-01..04) (completed 2026-03-27)
 - [x] **Phase 52: Verification & Bug Fixing** - Dev server boots clean on Coolify-compatible config; all major user flows verified end-to-end; all bugs found during manual testing fixed (VER-01..06, VER-08) (completed 2026-03-29)
 - [x] **Phase 53: Deployment & Go Live** - App deployed to Coolify with production env vars; Playwright E2E suite passes green; Neon seeded with demo company; custom domain and Comgate recurring deferred with setup guides (VER-07, DEP-01, DEP-03 complete; DEP-02, DEP-04 deferred) (completed 2026-03-29)
+
+</details>
+
+### v4.0 Feature Complete (In Progress)
+
+**Milestone Goal:** Reach 90% documentation coverage (76% to 90%). Implement all missing features that do not require external accounts or separate products. Every PARTIAL feature becomes DONE, every achievable TODO gets built. 50 requirements across 10 categories.
+
+- [ ] **Phase 54: Push Notifications** - VAPID web-push with service worker, subscribe/unsubscribe UI, booking event triggers, automation integration (PUSH-01..05)
+- [ ] **Phase 55: Recurring Bookings, Memberships & Waitlist** - Recurring series CRUD with availability checks, membership types with booking-time validation, waitlist with auto-promotion (RECUR-01..05, MEMB-01..04, WAIT-01..03)
+- [ ] **Phase 56: Industry Verticals UI** - Medical, auto service, cleaning, and tutoring vertical-specific fields wired into customer detail and booking forms (VERT-01..07)
+- [ ] **Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility** - PDF invoices, Excel export, notification tracking, calendar resize, drag reorder, onboarding test booking, cookie consent, PII encryption, marketplace billing, web component widget, offline banner, plus WCAG 2.1 AA audit (FIX-01..11, A11Y-01..05)
+- [ ] **Phase 58: Admin Features & Cron** - Super-admin broadcast messaging, maintenance mode, cohort analysis, GDPR auto-deletion cron with authenticated endpoint (ADM-01..03, CRON-01..02)
+- [ ] **Phase 59: OAuth & Calendar Sync** - Google and Facebook OAuth login (PKCE), Google Calendar connect, 2-way sync with blocked-time display (OAUTH-01..05)
 
 ## Phase Details
 
@@ -330,8 +345,8 @@ Plans:
   4. Platform subscription charges still route through the platform Comgate account (merchant 498621), not the business's Comgate account — the two payment paths are independently verifiable in test
 **Plans:** 2/2 plans complete
 Plans:
-- [ ] 51-01-PLAN.md — Provider-agnostic payment_providers schema, credential API, and Comgate client overrides (PAY-03, PAY-04)
-- [ ] 51-02-PLAN.md — Settings > Payments UI, wire booking payments and webhooks to per-company credentials (PAY-01, PAY-02)
+- [x] 51-01-PLAN.md — Provider-agnostic payment_providers schema, credential API, and Comgate client overrides (PAY-03, PAY-04)
+- [x] 51-02-PLAN.md — Settings > Payments UI, wire booking payments and webhooks to per-company credentials (PAY-01, PAY-02)
 
 ### Phase 52: Verification & Bug Fixing
 **Goal**: Every major user flow runs without errors on the Coolify-deployed stack, all bugs introduced or discovered from v3.0 agent-written code are fixed, and the platform is safe to deploy
@@ -347,10 +362,10 @@ Plans:
   7. All bugs identified during manual walkthrough of flows 1-6 above are fixed and re-verified — no known P1 or P2 bugs remain open
 **Plans**: 4 plans
 Plans:
-- [ ] 52-01-PLAN.md — Dev server boot + smoke test (VER-01)
-- [ ] 52-02-PLAN.md — Owner signup, onboarding, service + employee CRUD (VER-02)
-- [ ] 52-03-PLAN.md — Customer booking flow + notification pipeline (VER-03, VER-06)
-- [ ] 52-04-PLAN.md — Admin panel + marketplace + final bug sweep (VER-04, VER-05, VER-08)
+- [x] 52-01-PLAN.md — Dev server boot + smoke test (VER-01)
+- [x] 52-02-PLAN.md — Owner signup, onboarding, service + employee CRUD (VER-02)
+- [x] 52-03-PLAN.md — Customer booking flow + notification pipeline (VER-03, VER-06)
+- [x] 52-04-PLAN.md — Admin panel + marketplace + final bug sweep (VER-04, VER-05, VER-08)
 
 ### Phase 53: Deployment & Go Live
 **Goal**: ScheduleBox is live on Coolify with a custom domain, SSL, production environment variables, a seeded demo company, and Comgate recurring billing verified — Playwright E2E passes green as the final gate
@@ -367,6 +382,78 @@ Plans:
 - [x] 53-01-PLAN.md — Production env hardening + demo company seed (DEP-01, DEP-03) (completed 2026-03-29)
 - [x] 53-02-PLAN.md — E2E suite green gate in CI (VER-07) (completed 2026-03-29)
 - [x] 53-03-PLAN.md — Custom domain + Comgate billing verification (DEP-02 deferred, DEP-04 deferred) (completed 2026-03-29)
+
+### Phase 54: Push Notifications
+**Goal**: Users receive real-time browser push notifications for booking events, and can manage their subscription preferences — automation rules can trigger pushes alongside email
+**Depends on**: Phase 53 (v3.1 shipped, stable platform)
+**Requirements**: PUSH-01, PUSH-02, PUSH-03, PUSH-04, PUSH-05
+**Success Criteria** (what must be TRUE):
+  1. A service worker is registered on page load and intercepts push events — the browser shows a native push notification with the correct title and body when a test push is sent from the server
+  2. User can toggle push notification subscription on/off in their account settings — subscribing stores the PushSubscription endpoint in the database; unsubscribing removes it and no further pushes are delivered
+  3. When a booking is created, confirmed, or cancelled, the affected customer and employee receive a browser push notification within 30 seconds — the notification text matches the booking event type
+  4. An automation rule with action type "send_push" delivers a push notification to the target user when the rule triggers — the push appears in the notification log alongside email notifications
+**Plans**: TBD
+
+### Phase 55: Recurring Bookings, Memberships & Waitlist
+**Goal**: Businesses can schedule repeating appointments, sell membership passes, and manage waitlists for full group classes — three booking-adjacent capabilities that complete the scheduling feature set
+**Depends on**: Phase 54 (push notifications available for waitlist promotion alerts)
+**Requirements**: RECUR-01, RECUR-02, RECUR-03, RECUR-04, RECUR-05, MEMB-01, MEMB-02, MEMB-03, MEMB-04, WAIT-01, WAIT-02, WAIT-03
+**Success Criteria** (what must be TRUE):
+  1. Admin can create a recurring booking by selecting a repeat pattern (weekly, biweekly, monthly) — the system generates individual occurrence records visible on the calendar, and each occurrence respects employee availability without double-booking
+  2. Admin can edit a single occurrence (change time or employee) without affecting other occurrences in the series, and can also edit the entire series (change time for all future occurrences) — both actions persist correctly
+  3. Admin can cancel a single occurrence or the entire remaining series — cancelled occurrences disappear from the calendar and trigger cancellation notifications
+  4. Admin can create membership types (monthly, annual, punch card), assign a membership to a customer, and the system validates membership status at booking time — expired or exhausted memberships are rejected with a clear message; membership status is visible on the customer detail page
+  5. When a group class reaches capacity, additional customers can join a waitlist — when a spot opens (cancellation), the first waitlisted customer is auto-promoted and receives a notification (push and/or email) confirming their booking
+**Plans**: TBD
+
+### Phase 56: Industry Verticals UI
+**Goal**: Businesses in medical, auto service, cleaning, and tutoring verticals see industry-specific fields in their customer detail pages and booking forms — the platform adapts its UI vocabulary and data capture to each industry
+**Depends on**: Phase 55 (recurring bookings needed for tutoring lesson series use case)
+**Requirements**: VERT-01, VERT-02, VERT-03, VERT-04, VERT-05, VERT-06, VERT-07
+**Success Criteria** (what must be TRUE):
+  1. A medical-vertical business can view and edit health records and medical notes on a customer detail page, and can capture insurance company and birth number fields — all data persists and is visible on reload
+  2. An auto-service-vertical business can add vehicle records (SPZ, VIN, make, model) to a customer profile and view per-vehicle service history — each vehicle links to its past bookings
+  3. A cleaning-vertical business sees an address field on the booking form — the address is stored with the booking and visible in the booking detail view
+  4. A tutoring-vertical business sees lesson notes and homework fields on the booking detail — instructors can update these after the session and the student/parent can view them
+  5. The calendar slot size, labels (e.g., "Patient" vs "Customer", "Appointment" vs "Booking"), and capacity display adapt based on the company's industry setting — switching industry in company settings updates the UI across all pages
+**Plans**: TBD
+
+### Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility
+**Goal**: Every feature currently marked PARTIAL in the documentation audit becomes fully functional, and the entire application meets WCAG 2.1 AA accessibility standards
+**Depends on**: Phase 56 (vertical UI must be complete before accessibility audit covers those pages)
+**Requirements**: FIX-01, FIX-02, FIX-03, FIX-04, FIX-05, FIX-06, FIX-07, FIX-08, FIX-09, FIX-10, FIX-11, A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05
+**Success Criteria** (what must be TRUE):
+  1. The PDF invoice endpoint generates a real, downloadable PDF with line items, company details, and Czech VAT formatting — not a stub or placeholder response
+  2. Analytics export offers both CSV and XLSX format options — the Excel file opens correctly in Excel/LibreOffice with proper column headers and Czech diacritics
+  3. Notification open/click tracking records when a user opens an email (tracking pixel) or clicks a link (redirect tracking) — the notification log shows open/click counts per message
+  4. Calendar events can be resized by dragging the bottom edge to change duration, and the service list supports drag-and-drop reordering — both interactions persist the change to the database
+  5. The cookie consent banner appears on first visit with category toggles (necessary, analytics, marketing) — user preferences are stored and respected; the banner does not reappear after accepting
+  6. The embeddable booking widget works as a Web Component (`<schedulebox-widget>` tag) in addition to iframe mode — it renders correctly on a third-party HTML page
+  7. A skip-to-content link is present on every page, all interactive elements have aria-labels, focus-visible indicators appear on all focusable elements, keyboard navigation works across all pages, and text/UI color contrast meets WCAG AA ratios (4.5:1 text, 3:1 large text)
+**Plans**: TBD
+
+### Phase 58: Admin Features & Cron
+**Goal**: Super-admins can communicate with all tenants and manage platform availability, and automated data lifecycle processes run on schedule with proper authentication
+**Depends on**: Phase 54 (push notifications needed for broadcast delivery channel)
+**Requirements**: ADM-01, ADM-02, ADM-03, CRON-01, CRON-02
+**Success Criteria** (what must be TRUE):
+  1. Super-admin can compose and send a broadcast message that is delivered to all companies via email and displayed as an in-app banner — the banner is dismissible per-user and the email includes the broadcast content
+  2. Super-admin can toggle maintenance mode on/off — when enabled, all non-admin users see a branded maintenance page; admin users with the bypass cookie can still access the full application; disabling restores access immediately
+  3. The admin cohort analysis page shows user retention grouped by signup month — each cohort row shows the percentage of users still active in subsequent months
+  4. A GDPR auto-deletion cron endpoint anonymizes customer PII (name, email, phone) for records older than 3 years — the endpoint is protected by a CRON_SECRET header and returns 401 without it
+**Plans**: TBD
+
+### Phase 59: OAuth & Calendar Sync
+**Goal**: Users can log in with Google or Facebook accounts and connect their Google Calendar for 2-way booking sync — code-complete and credential-ready (works immediately once OAuth app credentials are configured)
+**Depends on**: Phase 57 (accessibility audit complete before adding new auth flows)
+**Requirements**: OAUTH-01, OAUTH-02, OAUTH-03, OAUTH-04, OAUTH-05
+**Success Criteria** (what must be TRUE):
+  1. Clicking "Login with Google" initiates a full PKCE OAuth flow — the user is redirected to Google consent, and upon approval, an account is created or linked and the user lands on their dashboard (not a 501 stub)
+  2. Clicking "Login with Facebook" initiates a full OAuth flow — the user is redirected to Facebook consent, and upon approval, an account is created or linked and the user lands on their dashboard (not a 501 stub)
+  3. A user can connect their Google Calendar from account settings — the OAuth consent flow requests calendar read/write scopes, and the connection status shows as "Connected" with the calendar email
+  4. When a booking is confirmed, a corresponding Google Calendar event is created in the connected user's calendar with the correct time, service name, and location — editing the booking updates the calendar event
+  5. External events from the connected Google Calendar appear as blocked (unavailable) time slots in the employee's availability — customers cannot book during those blocked times
+**Plans**: TBD
 
 ## Progress
 
@@ -422,9 +509,15 @@ Plans:
 | 48. Marketplace & UX | v3.0 | 5/5 | Complete | 2026-03-18 |
 | 49. Observability & Verticals | v3.0 | 3/3 | Complete | 2026-03-18 |
 | 50. Testing & Hardening | v3.0 | 5/5 | Complete | 2026-03-18 |
-| 51. Per-Company Payments | 2/2 | Complete   | 2026-03-27 | - |
-| 52. Verification & Bug Fixing | 4/4 | Complete    | 2026-03-29 | - |
-| 53. Deployment & Go Live | 2/3 | Complete    | 2026-03-29 | - |
+| 51. Per-Company Payments | v3.1 | 2/2 | Complete | 2026-03-27 |
+| 52. Verification & Bug Fixing | v3.1 | 4/4 | Complete | 2026-03-29 |
+| 53. Deployment & Go Live | v3.1 | 3/3 | Complete | 2026-03-29 |
+| 54. Push Notifications | v4.0 | 0/TBD | Not started | - |
+| 55. Recurring, Memberships & Waitlist | v4.0 | 0/TBD | Not started | - |
+| 56. Industry Verticals UI | v4.0 | 0/TBD | Not started | - |
+| 57. Fixes & WCAG | v4.0 | 0/TBD | Not started | - |
+| 58. Admin & Cron | v4.0 | 0/TBD | Not started | - |
+| 59. OAuth & Calendar Sync | v4.0 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -435,4 +528,5 @@ Plans:
 *v1.4 shipped: 2026-03-12*
 *v2.0 shipped: 2026-03-16*
 *v3.0 shipped: 2026-03-18*
-*v3.1 roadmap created: 2026-03-18*
+*v3.1 shipped: 2026-03-29*
+*v4.0 roadmap created: 2026-03-31*
