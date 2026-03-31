@@ -26,6 +26,10 @@ import { publishEvent, createBookingCreatedEvent } from '@schedulebox/events';
 import type { BookingCreate, BookingUpdate, BookingListQuery } from '@schedulebox/shared';
 import { sendBookingConfirmationEmail } from '@/lib/email/booking-emails';
 import { sendBookingCreatedPush } from '@/lib/push/booking-push-notifications';
+import {
+  validateMembershipForBooking,
+  decrementPunchCardByUuid,
+} from '@/lib/membership/membership-service';
 
 // ============================================================================
 // TYPES
@@ -433,13 +437,33 @@ export async function createBooking(
     console.error('[Booking Service] Failed to publish booking.created event:', error);
   }
 
-  // 9. Return booking with joined data
+  // 9. Membership validation — check if customer has an active membership covering this service
+  // Memberships are optional perks: we validate and decrement punch cards if applicable,
+  // but do NOT block booking creation if the customer has no membership.
+  try {
+    const membershipResult = await validateMembershipForBooking(
+      input.customer_id,
+      input.service_id,
+      companyId,
+    );
+    if (membershipResult.valid && membershipResult.membership) {
+      // If punch_card type, decrement remaining uses after booking creation
+      if (membershipResult.membership.membershipType.type === 'punch_card') {
+        await decrementPunchCardByUuid(membershipResult.membership.id, companyId);
+      }
+    }
+  } catch (error) {
+    // Membership validation is non-critical — log and continue
+    console.error('[Booking Service] Membership validation error:', error);
+  }
+
+  // 10. Return booking with joined data
   const createdBooking = await getBooking(booking.id, companyId);
   if (!createdBooking) {
     throw new NotFoundError('Failed to retrieve created booking');
   }
 
-  // 10. Fire confirmation email + create SMS reminder row (fire-and-forget, non-blocking)
+  // 11. Fire confirmation email + create SMS reminder row (fire-and-forget, non-blocking)
   void fireBookingCreatedNotifications(booking.id, companyId, booking.startTime);
 
   return createdBooking;

@@ -50,6 +50,7 @@ import {
   type CustomerTag,
 } from '@/hooks/use-customers-query';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
+import { CustomerMemberships } from '@/components/customers/customer-memberships';
 
 function getHealthBadgeVariant(
   score: number | null,
@@ -479,6 +480,9 @@ export default function CustomerDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Membership Section */}
+      <CustomerMemberships customerId={uuid} />
 
       {/* Edit Customer Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
