@@ -1290,6 +1290,24 @@ export default function SettingsPage() {
       <BookingSettingsCard />
       <NotificationPreferencesCard />
 
+      {/* Push notifications link */}
+      <Card variant="glass">
+        <CardContent className="flex items-center justify-between py-6">
+          <div className="flex items-center gap-3">
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="font-medium">Push notifikace</p>
+              <p className="text-sm text-muted-foreground">
+                Nastaveni push notifikaci v prohlizeci
+              </p>
+            </div>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/settings/notifications">Nastavit</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Billing link */}
       <Card variant="glass">
         <CardContent className="flex items-center justify-between py-6">

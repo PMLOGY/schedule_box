@@ -38,6 +38,10 @@ import type { BookingWithRelations } from './booking-service';
 import { getBooking } from './booking-service';
 import { awardPointsForBooking } from '@/lib/loyalty/points-engine';
 import { sendBookingStatusChangeEmail } from '@/lib/email/booking-emails';
+import {
+  sendBookingConfirmedPush,
+  sendBookingCancelledPush,
+} from '@/lib/push/booking-push-notifications';
 
 // ============================================================================
 // EMAIL NOTIFICATION HELPER
@@ -204,6 +208,11 @@ export async function confirmBooking(
   // Fire status change email (fire-and-forget — never throws)
   void fireStatusChangeEmail(bookingId, companyId, 'confirmed');
 
+  // Fire push notification (fire-and-forget)
+  sendBookingConfirmedPush(bookingId, companyId).catch((err) => {
+    console.error('[Push] Failed to send booking confirmed push:', err);
+  });
+
   // Return updated booking
   const updated = await getBooking(bookingId, companyId);
   if (!updated) {
@@ -331,6 +340,11 @@ export async function cancelBooking(
 
   // Fire status change email (fire-and-forget — never throws)
   void fireStatusChangeEmail(bookingId, companyId, 'cancelled');
+
+  // Fire push notification (fire-and-forget)
+  sendBookingCancelledPush(bookingId, companyId).catch((err) => {
+    console.error('[Push] Failed to send booking cancelled push:', err);
+  });
 
   // Return updated booking
   const updated = await getBooking(bookingId, companyId);

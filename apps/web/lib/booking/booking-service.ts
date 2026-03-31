@@ -25,6 +25,7 @@ import { AppError, NotFoundError, ValidationError, type PaginationMeta } from '@
 import { publishEvent, createBookingCreatedEvent } from '@schedulebox/events';
 import type { BookingCreate, BookingUpdate, BookingListQuery } from '@schedulebox/shared';
 import { sendBookingConfirmationEmail } from '@/lib/email/booking-emails';
+import { sendBookingCreatedPush } from '@/lib/push/booking-push-notifications';
 
 // ============================================================================
 // TYPES
@@ -166,6 +167,11 @@ export async function fireBookingCreatedNotifications(
         scheduledAt,
       });
     }
+
+    // --- Push notification (fire-and-forget) ---
+    sendBookingCreatedPush(bookingId, companyId).catch((err) => {
+      console.error('[Push] Failed to send booking created push:', err);
+    });
   } catch (err) {
     // Non-critical path — log and continue
     console.error('[BookingNotifications] fireBookingCreatedNotifications error:', err);
