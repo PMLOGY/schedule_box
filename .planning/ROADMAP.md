@@ -393,9 +393,9 @@ Plans:
   4. An automation rule with action type "send_push" delivers a push notification to the target user when the rule triggers — the push appears in the notification log alongside email notifications
 **Plans**: 3 plans
 Plans:
-- [ ] 54-01-PLAN.md -- Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API� Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API
-- [ ] 54-02-PLAN.md -- Settings UI: push notification toggle and test button� Settings UI: push notification toggle and test button
-- [ ] 54-03-PLAN.md -- Booking event triggers and automation send_push handler� Booking event triggers and automation send_push handler
+- [ ] 54-01-PLAN.md -- Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API— Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API
+- [ ] 54-02-PLAN.md -- Settings UI: push notification toggle and test button— Settings UI: push notification toggle and test button
+- [ ] 54-03-PLAN.md -- Booking event triggers and automation send_push handler— Booking event triggers and automation send_push handler
 
 ### Phase 55: Recurring Bookings, Memberships & Waitlist
 **Goal**: Businesses can schedule repeating appointments, sell membership passes, and manage waitlists for full group classes — three booking-adjacent capabilities that complete the scheduling feature set
@@ -441,7 +441,12 @@ Plans:
   5. The cookie consent banner appears on first visit with category toggles (necessary, analytics, marketing) — user preferences are stored and respected; the banner does not reappear after accepting
   6. The embeddable booking widget works as a Web Component (`<schedulebox-widget>` tag) in addition to iframe mode — it renders correctly on a third-party HTML page
   7. A skip-to-content link is present on every page, all interactive elements have aria-labels, focus-visible indicators appear on all focusable elements, keyboard navigation works across all pages, and text/UI color contrast meets WCAG AA ratios (4.5:1 text, 3:1 large text)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 57-01-PLAN.md — PDF invoice verify + XLSX analytics export + notification tracking (FIX-01, FIX-02, FIX-03)
+- [ ] 57-02-PLAN.md — Calendar resize + service reorder + onboarding test booking + PII verify (FIX-04, FIX-05, FIX-06, FIX-08)
+- [ ] 57-03-PLAN.md — Cookie consent categories + Web Component widget + offline banner + premium CTA (FIX-07, FIX-09, FIX-10, FIX-11)
+- [ ] 57-04-PLAN.md — WCAG accessibility: skip-to-content, aria-labels, focus-visible, keyboard nav, contrast (A11Y-01..05)
 
 ### Phase 58: Admin Features & Cron
 **Goal**: Super-admins can communicate with all tenants and manage platform availability, and automated data lifecycle processes run on schedule with proper authentication
