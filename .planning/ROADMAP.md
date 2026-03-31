@@ -393,9 +393,9 @@ Plans:
   4. An automation rule with action type "send_push" delivers a push notification to the target user when the rule triggers — the push appears in the notification log alongside email notifications
 **Plans**: 3 plans
 Plans:
-- [ ] 54-01-PLAN.md -- Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API� Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API
-- [ ] 54-02-PLAN.md -- Settings UI: push notification toggle and test button� Settings UI: push notification toggle and test button
-- [ ] 54-03-PLAN.md -- Booking event triggers and automation send_push handler� Booking event triggers and automation send_push handler
+- [ ] 54-01-PLAN.md -- Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API� Push foundation: DB schema, web-push service, service worker, subscribe/unsubscribe API
+- [ ] 54-02-PLAN.md -- Settings UI: push notification toggle and test button� Settings UI: push notification toggle and test button
+- [ ] 54-03-PLAN.md -- Booking event triggers and automation send_push handler� Booking event triggers and automation send_push handler
 
 ### Phase 55: Recurring Bookings, Memberships & Waitlist
 **Goal**: Businesses can schedule repeating appointments, sell membership passes, and manage waitlists for full group classes — three booking-adjacent capabilities that complete the scheduling feature set
@@ -407,7 +407,12 @@ Plans:
   3. Admin can cancel a single occurrence or the entire remaining series — cancelled occurrences disappear from the calendar and trigger cancellation notifications
   4. Admin can create membership types (monthly, annual, punch card), assign a membership to a customer, and the system validates membership status at booking time — expired or exhausted memberships are rejected with a clear message; membership status is visible on the customer detail page
   5. When a group class reaches capacity, additional customers can join a waitlist — when a spot opens (cancellation), the first waitlisted customer is auto-promoted and receives a notification (push and/or email) confirming their booking
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 55-01-PLAN.md — DB schema for recurring_series, membership_types, customer_memberships, booking_waitlist
+- [ ] 55-02-PLAN.md — Recurring bookings API + service logic
+- [ ] 55-03-PLAN.md — Memberships API + service logic + customer detail UI
+- [ ] 55-04-PLAN.md — Waitlist API + auto-promotion + UI badge
 
 ### Phase 56: Industry Verticals UI
 **Goal**: Businesses in medical, auto service, cleaning, and tutoring verticals see industry-specific fields in their customer detail pages and booking forms — the platform adapts its UI vocabulary and data capture to each industry
