@@ -10,7 +10,7 @@
 - ✅ **v2.0 Full Functionality & Production Readiness** — Phases 39-44 (shipped 2026-03-16)
 - ✅ **v3.0 Production Launch & 100% Documentation Coverage** — Phases 45-50 (shipped 2026-03-18)
 - ✅ **v3.1 Go Live & Revenue** — Phases 51-53 (shipped 2026-03-29)
-- **v4.0 Feature Complete** — Phases 54-59 (in progress)
+- ✅ **v4.0 Feature Complete** — Phases 54-58 (shipped 2026-03-31)
 
 ## Phases
 
@@ -133,14 +133,14 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-### v4.0 Feature Complete (In Progress)
+### v4.0 Feature Complete (SHIPPED 2026-03-31)
 
 **Milestone Goal:** Reach 90% documentation coverage (76% to 90%). Implement all missing features that do not require external accounts or separate products. Every PARTIAL feature becomes DONE, every achievable TODO gets built. 50 requirements across 10 categories.
 
-- [ ] **Phase 54: Push Notifications** - VAPID web-push with service worker, subscribe/unsubscribe UI, booking event triggers, automation integration (PUSH-01..05)
-- [ ] **Phase 55: Recurring Bookings, Memberships & Waitlist** - Recurring series CRUD with availability checks, membership types with booking-time validation, waitlist with auto-promotion (RECUR-01..05, MEMB-01..04, WAIT-01..03)
-- [ ] **Phase 56: Industry Verticals UI** - Medical, auto service, cleaning, and tutoring vertical-specific fields wired into customer detail and booking forms (VERT-01..07)
-- [ ] **Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility** - PDF invoices, Excel export, notification tracking, calendar resize, drag reorder, onboarding test booking, cookie consent, PII encryption, marketplace billing, web component widget, offline banner, plus WCAG 2.1 AA audit (FIX-01..11, A11Y-01..05)
+- [x] **Phase 54: Push Notifications** - VAPID web-push with service worker, subscribe/unsubscribe UI, booking event triggers, automation integration (PUSH-01..05) (completed 2026-03-31)
+- [x] **Phase 55: Recurring Bookings, Memberships & Waitlist** - Recurring series CRUD with availability checks, membership types with booking-time validation, waitlist with auto-promotion (RECUR-01..05, MEMB-01..04, WAIT-01..03) (completed 2026-03-31)
+- [x] **Phase 56: Industry Verticals UI** - Medical, auto service, cleaning, and tutoring vertical-specific fields wired into customer detail and booking forms (VERT-01..07) (completed 2026-03-31)
+- [x] **Phase 57: PARTIAL-to-DONE Fixes & WCAG Accessibility** - PDF invoices, Excel export, notification tracking, calendar resize, drag reorder, onboarding test booking, cookie consent, PII encryption, marketplace billing, web component widget, offline banner, plus WCAG 2.1 AA audit (FIX-01..11, A11Y-01..05) (completed 2026-03-31)
 - [x] **Phase 58: Admin Features & Cron** - Super-admin broadcast messaging, maintenance mode, cohort analysis, GDPR auto-deletion cron with authenticated endpoint (ADM-01..03, CRON-01..02) (completed 2026-03-31)
 
 ## Phase Details
@@ -519,11 +519,11 @@ Plans:
 | 51. Per-Company Payments | v3.1 | 2/2 | Complete | 2026-03-27 |
 | 52. Verification & Bug Fixing | v3.1 | 4/4 | Complete | 2026-03-29 |
 | 53. Deployment & Go Live | v3.1 | 3/3 | Complete | 2026-03-29 |
-| 54. Push Notifications | v4.0 | 0/TBD | Not started | - |
-| 55. Recurring, Memberships & Waitlist | v4.0 | 0/TBD | Not started | - |
-| 56. Industry Verticals UI | v4.0 | 0/2 | Not started | - |
-| 57. Fixes & WCAG | v4.0 | 0/TBD | Not started | - |
-| 58. Admin & Cron | 2/2 | Complete   | 2026-03-31 | - |
+| 54. Push Notifications | v4.0 | 3/3 | Complete | 2026-03-31 |
+| 55. Recurring, Memberships & Waitlist | v4.0 | 4/4 | Complete | 2026-03-31 |
+| 56. Industry Verticals UI | v4.0 | 2/2 | Complete | 2026-03-31 |
+| 57. Fixes & WCAG | v4.0 | 4/4 | Complete | 2026-03-31 |
+| 58. Admin & Cron | v4.0 | 2/2 | Complete | 2026-03-31 |
 
 ---
 *Roadmap created: 2026-02-10*
@@ -535,4 +535,4 @@ Plans:
 *v2.0 shipped: 2026-03-16*
 *v3.0 shipped: 2026-03-18*
 *v3.1 shipped: 2026-03-29*
-*v4.0 roadmap created: 2026-03-31*
+*v4.0 shipped: 2026-03-31*
