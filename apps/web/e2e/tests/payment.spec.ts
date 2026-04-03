@@ -170,14 +170,20 @@ test.describe('Bookings & Payments Pages', () => {
 
     await page.goto('/payments');
 
+    // Dismiss driver.js onboarding tour if present
+    const driverClose = page.locator('.driver-popover-close-btn');
+    if (await driverClose.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await driverClose.first().click();
+      await page.waitForTimeout(500);
+    }
+
     // The payments page should render without crashing
-    // Look for the page heading or table
     await expect(page.locator('body')).not.toContainText(/unhandled|unexpected error/i);
 
-    // Wait for content to load - either a table or the page heading containing "Platby"
-    const hasTable = page.locator('table');
-    const hasHeading = page.getByRole('heading').filter({ hasText: /platby|payments/i });
-    await expect(hasTable.or(hasHeading)).toBeVisible({ timeout: 15000 });
+    // Wait for the page heading "Platby" to be visible
+    await expect(page.getByRole('heading', { name: /platby|payments/i })).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test('comgate payment create API responds', async ({ authenticatedPage: page }) => {

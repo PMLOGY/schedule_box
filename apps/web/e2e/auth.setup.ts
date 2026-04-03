@@ -54,7 +54,7 @@ setup('authenticate as test owner', async ({ request }) => {
     origins: [
       {
         origin,
-        localStorage: [{ name: 'auth-storage', value: authStorage }],
+        localStorage: [{ name: 'schedulebox-auth', value: authStorage }],
       },
     ],
   };

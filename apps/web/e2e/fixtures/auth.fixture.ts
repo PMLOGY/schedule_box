@@ -37,9 +37,9 @@ export const test = base.extend<AuthFixtures>({
 
     const page = await context.newPage();
 
-    // Monkey-patch page.goto to handle the auth redirect race condition.
-    // The useAuth hook may redirect to /login before Zustand hydrates from localStorage.
-    // We detect this and retry after giving time for hydration.
+    // Monkey-patch page.goto to handle:
+    // 1. Zustand persist hydration race (redirect to /login before auth state loads)
+    // 2. Onboarding popover dialog that overlays the page with its own "Další" button
     const originalGoto = page.goto.bind(page);
     page.goto = async (url: string, options?: Parameters<Page['goto']>[1]) => {
       const response = await originalGoto(url, { waitUntil: 'networkidle', ...options });
@@ -49,11 +49,10 @@ export const test = base.extend<AuthFixtures>({
 
       // If we got redirected to login due to hydration race, retry
       if (page.url().includes('/login') && !url.includes('/login')) {
-        // localStorage data is already there from storageState — just wait for Zustand
         await page.waitForFunction(
           () => {
             try {
-              const stored = localStorage.getItem('auth-storage');
+              const stored = localStorage.getItem('schedulebox-auth');
               return !!JSON.parse(stored || '{}')?.state?.accessToken;
             } catch {
               return false;
@@ -62,16 +61,22 @@ export const test = base.extend<AuthFixtures>({
           { timeout: 5000 },
         );
 
-        // Second attempt: Zustand should hydrate faster since localStorage is warm
         const retryResponse = await originalGoto(url, { waitUntil: 'networkidle', ...options });
         await page.waitForTimeout(2000);
 
-        // If still on login, try one more time
         if (page.url().includes('/login') && !url.includes('/login')) {
           return await originalGoto(url, { waitUntil: 'networkidle', ...options });
         }
         return retryResponse;
       }
+
+      // Dismiss driver.js onboarding tour if present — its SVG overlay blocks all clicks
+      const driverClose = page.locator('.driver-popover-close-btn');
+      if (await driverClose.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await driverClose.first().click();
+        await page.waitForTimeout(500);
+      }
+
       return response;
     };
 

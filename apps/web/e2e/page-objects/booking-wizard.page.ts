@@ -28,7 +28,8 @@ export class BookingWizardPage {
     this.page = page;
     this.serviceCards = page.locator('[data-testid="service-card"], [role="button"][data-service]');
     // Czech: "Další" (common.next), English fallback: "Next"
-    this.nextButton = page.getByRole('button', {
+    // Scope to main content to avoid matching onboarding popover's "Další" button
+    this.nextButton = page.locator('main').getByRole('button', {
       name: /další|next|dalsi|pokračovat|pokracovat/i,
     });
     // Czech: "Zpět" (common.back), English fallback: "Back"
@@ -55,6 +56,16 @@ export class BookingWizardPage {
   async goto() {
     await this.page.goto('/bookings/new');
     await this.page.waitForLoadState('networkidle');
+
+    // Dismiss driver.js onboarding tour if present — its overlay blocks all clicks
+    // and its "Další" button conflicts with the wizard's Next button
+    const driverClose = this.page.locator(
+      '.driver-popover-close-btn, button.driver-popover-close-btn',
+    );
+    if (await driverClose.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await driverClose.first().click();
+      await this.page.waitForTimeout(500);
+    }
 
     // Wait for the step indicator to be visible (wizard loaded)
     await this.stepIndicator.waitFor({ state: 'visible', timeout: 15000 });

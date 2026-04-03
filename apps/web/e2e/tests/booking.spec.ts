@@ -357,8 +357,8 @@ test.describe('Booking Creation', () => {
 
     // Try to proceed without selecting a service
     // The "Další" (Next) button only appears after a service is selected (conditional render)
-    // So verify the Next button is NOT visible when no service is selected
-    const nextButton = page.getByRole('button', {
+    // Scope to main to avoid matching onboarding popover's "Další" button
+    const nextButton = page.locator('main').getByRole('button', {
       name: /další|next|dalsi|pokračovat|pokracovat/i,
     });
 

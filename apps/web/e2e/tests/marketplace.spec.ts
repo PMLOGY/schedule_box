@@ -117,9 +117,9 @@ test.describe('Marketplace discovery', () => {
     );
     await expect(searchInput.first()).toBeVisible({ timeout: 15_000 });
 
-    // Mocked firm cards should be rendered
-    await expect(page.getByText('E2E Test Salon')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('E2E Test Barber')).toBeVisible({ timeout: 10_000 });
+    // Mocked firm cards should be rendered (use .first() — card title may appear in multiple places)
+    await expect(page.getByText('E2E Test Salon').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('E2E Test Barber').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('marketplace search filters results', async ({ authenticatedPage: page }) => {
@@ -128,7 +128,7 @@ test.describe('Marketplace discovery', () => {
     await page.waitForLoadState('networkidle');
 
     // Wait for initial listings to render
-    await expect(page.getByText('E2E Test Salon')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('E2E Test Salon').first()).toBeVisible({ timeout: 10_000 });
 
     // Type a query that matches only one listing
     const searchInput = page.locator(
@@ -144,8 +144,8 @@ test.describe('Marketplace discovery', () => {
     await expect(page).toHaveURL(/marketplace/);
 
     // Only the Barber listing should be visible, Salon should be filtered out
-    await expect(page.getByText('E2E Test Barber')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('E2E Test Salon')).not.toBeVisible();
+    await expect(page.getByText('E2E Test Barber').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('E2E Test Salon')).toHaveCount(0);
   });
 
   test('clicking a firm card navigates to company detail page', async ({
@@ -156,7 +156,7 @@ test.describe('Marketplace discovery', () => {
     await page.waitForLoadState('networkidle');
 
     // Wait for mocked listings to render
-    await expect(page.getByText('E2E Test Salon')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('E2E Test Salon').first()).toBeVisible({ timeout: 10_000 });
 
     // The firm cards are <div> elements with onClick (not <a> links).
     // They use router.push('/' + locale + '/' + company_slug).
@@ -164,47 +164,23 @@ test.describe('Marketplace discovery', () => {
     const firmCard = page.getByText('E2E Test Salon').first();
     await firmCard.click();
 
-    // Should navigate to /{locale}/{company_slug} pattern
-    // The locale is typically "cs" for Czech deployment
-    await expect(page).toHaveURL(/\/[a-z]{2}\/e2e-test-salon/, { timeout: 10_000 });
+    // Should navigate to company detail page — URL may or may not include locale prefix
+    // (next-intl localePrefix: 'as-needed' omits default locale 'cs')
+    await expect(page).toHaveURL(/e2e-test-salon/, { timeout: 10_000 });
   });
 
   test('company detail page renders from seed data', async ({ authenticatedPage: page }) => {
-    // This test navigates directly to a company detail page.
-    // The detail page is server-rendered from DB, so we use a real company
-    // slug from the seed data instead of mocking.
-    // The seed data includes a test company — try common seed slugs.
-
-    // Navigate to the marketplace first to discover actual listings
-    await page.goto('/marketplace');
+    // Navigate directly to the known seed company (Salon Krasa)
+    // This is server-rendered from DB — no mocking needed
+    await page.goto('/salon-krasa');
     await page.waitForLoadState('networkidle');
 
-    // Wait for the page to load and check if there are any listing cards
-    // If the real API returns listings, we can click one
-    const hasListings = await page
-      .locator('[class*="card"]')
-      .first()
-      .isVisible({ timeout: 15_000 })
-      .catch(() => false);
+    // The company detail page should render services with "Rezervovat" (Book) links
+    await expect(page.getByRole('link', { name: /rezervovat|book/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
 
-    if (!hasListings) {
-      // No listings in DB — skip gracefully
-      test.skip(true, 'No marketplace listings found in database — skipping detail page test');
-      return;
-    }
-
-    // Click the first card that has meaningful content
-    const firstCard = page.locator('[class*="cursor-pointer"]').first();
-    await firstCard.click();
-    await page.waitForLoadState('networkidle');
-
-    // Should have navigated away from /marketplace to a company detail page
-    // URL pattern: /{locale}/{company_slug}
-    await expect(page).not.toHaveURL(/marketplace/, { timeout: 10_000 });
-
-    // The company detail page should render the company name somewhere
-    // and contain either a "Book" button or service listing
-    const pageContent = page.locator('main, [role="main"], body');
-    await expect(pageContent).toBeVisible({ timeout: 10_000 });
+    // Verify at least one service name from the seed data is visible
+    await expect(page.getByRole('heading', { level: 3 }).first()).toBeVisible({ timeout: 10_000 });
   });
 });
