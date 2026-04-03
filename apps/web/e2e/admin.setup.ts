@@ -1,35 +1,54 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 
 const authFile = path.join(__dirname, 'playwright/.auth/admin.json');
 
 /**
  * Admin auth setup: authenticate as platform admin once, save storageState for reuse.
  *
- * Used by the admin-chromium project so that admin E2E specs (impersonation,
- * super-admin panel) do not repeat the login flow on every test.
- *
  * @see https://playwright.dev/docs/auth
  */
-setup('authenticate as admin', async ({ page }) => {
-  // Navigate to login page - handles locale redirect automatically
-  await page.goto('/login');
+setup('authenticate as admin', async ({ request }) => {
+  const baseURL = (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-  // Fill email using input type selector (reliable across locales)
-  await page.locator('input[type="email"]').fill('admin@schedulebox.cz');
+  const apiResponse = await request.post(`${baseURL}/api/v1/auth/login`, {
+    data: { email: 'admin@schedulebox.cz', password: 'password123' },
+  });
+  expect(apiResponse.ok(), `Admin login API failed: ${apiResponse.status()}`).toBeTruthy();
 
-  // Fill password
-  await page.locator('input[type="password"]').fill('password123');
+  const body = await apiResponse.json();
+  const { access_token, user } = body.data;
 
-  // Click submit button - matches Czech (Prihlasit), Slovak, and English (Sign in)
-  await page.getByRole('button', { name: /prihlasit|sign in|submit/i }).click();
+  const authStorage = JSON.stringify({
+    state: {
+      user: {
+        id: user.uuid,
+        email: user.email,
+        firstName: user.name?.split(' ')[0] || '',
+        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+        role: user.role,
+        companyId: user.company_id,
+        companyName: '',
+      },
+      accessToken: access_token,
+      isAuthenticated: true,
+      _hasHydrated: true,
+    },
+    version: 0,
+  });
 
-  // Wait for redirect away from login page
-  await page.waitForURL('**/');
+  const origin = new URL(baseURL).origin;
+  const storageState = {
+    cookies: [],
+    origins: [
+      {
+        origin,
+        localStorage: [{ name: 'auth-storage', value: authStorage }],
+      },
+    ],
+  };
 
-  // Verify we are no longer on the login page
-  await expect(page.locator('body')).not.toContainText('login');
-
-  // Persist authenticated state (cookies + localStorage + sessionStorage)
-  await page.context().storageState({ path: authFile });
+  fs.mkdirSync(path.dirname(authFile), { recursive: true });
+  fs.writeFileSync(authFile, JSON.stringify(storageState, null, 2));
 });

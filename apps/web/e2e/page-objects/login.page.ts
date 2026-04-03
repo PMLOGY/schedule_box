@@ -22,7 +22,7 @@ export class LoginPage {
     this.emailInput = page.locator('input[type="email"]');
     this.passwordInput = page.locator('input[type="password"]');
     this.submitButton = page.getByRole('button', {
-      name: /prihlasit|sign in|submit/i,
+      name: /přihlásit|prihlasit|sign in|submit/i,
     });
     this.errorMessage = page.locator('.text-destructive, [class*="text-destructive"]');
     this.registerLink = page.getByRole('link', { name: /registr/i });

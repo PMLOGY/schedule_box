@@ -1,38 +1,64 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 
 const authFile = path.join(__dirname, 'playwright/.auth/user.json');
 
 /**
  * Global auth setup: authenticate as test owner once, save storageState for reuse.
  *
- * All browser projects (chromium, firefox, webkit) depend on this setup project,
- * so login only runs once per test suite execution.
- *
- * The app uses next-intl with localePrefix: 'as-needed' and defaultLocale: 'cs',
- * so /login may or may not have a locale prefix. We use pattern matchers for URLs.
+ * Login rate limit is 10 req / 15 min, so we use API login + direct storageState
+ * construction instead of repeated browser form submissions.
  *
  * @see https://playwright.dev/docs/auth
  */
-setup('authenticate as test owner', async ({ page }) => {
-  // Navigate to login page - handles locale redirect automatically
-  await page.goto('/login');
+setup('authenticate as test owner', async ({ request }) => {
+  const baseURL = (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
 
-  // Fill email using input type selector (reliable across locales)
-  await page.locator('input[type="email"]').fill('test@example.com');
+  // Login via API to get tokens
+  const apiResponse = await request.post(`${baseURL}/api/v1/auth/login`, {
+    data: { email: 'test@example.com', password: 'password123' },
+  });
+  expect(apiResponse.ok(), `Login API failed: ${apiResponse.status()}`).toBeTruthy();
 
-  // Fill password
-  await page.locator('input[type="password"]').fill('password123');
+  const body = await apiResponse.json();
+  const { access_token, user } = body.data;
 
-  // Click submit button - matches Czech (Prihlasit), Slovak, and English (Sign in)
-  await page.getByRole('button', { name: /prihlasit|sign in|submit/i }).click();
+  // Build Zustand auth store state
+  const authStorage = JSON.stringify({
+    state: {
+      user: {
+        id: user.uuid,
+        email: user.email,
+        firstName: user.name?.split(' ')[0] || '',
+        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+        role: user.role,
+        companyId: user.company_id,
+        companyName: '',
+      },
+      accessToken: access_token,
+      isAuthenticated: true,
+      _hasHydrated: true,
+    },
+    version: 0,
+  });
 
-  // Wait for redirect away from login page
-  await page.waitForURL('**/');
+  // Extract origin for storageState
+  const origin = new URL(baseURL).origin;
 
-  // Verify we are no longer on the login page
-  await expect(page.locator('body')).not.toContainText('login');
+  // Write storageState file directly — no browser navigation needed
+  // This includes localStorage (for Zustand auth store) but no cookies
+  // (the app uses JWT tokens from localStorage, not cookies)
+  const storageState = {
+    cookies: [],
+    origins: [
+      {
+        origin,
+        localStorage: [{ name: 'auth-storage', value: authStorage }],
+      },
+    ],
+  };
 
-  // Persist authenticated state (cookies + localStorage + sessionStorage)
-  await page.context().storageState({ path: authFile });
+  fs.mkdirSync(path.dirname(authFile), { recursive: true });
+  fs.writeFileSync(authFile, JSON.stringify(storageState, null, 2));
 });

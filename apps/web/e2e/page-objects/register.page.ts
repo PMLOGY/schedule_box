@@ -35,12 +35,12 @@ export class RegisterPage {
     this.confirmPasswordInput = page.locator('input[type="password"]').nth(1);
 
     this.submitButton = page.getByRole('button', {
-      name: /registrovat|register|sign up|submit/i,
+      name: /zaregistrovat|registrovat|register|sign up|submit/i,
     });
     this.errorMessage = page.locator('.text-destructive, [class*="text-destructive"]');
     this.successMessage = page.locator('.text-green-700, [class*="text-green"]');
     this.loginLink = page.getByRole('link', {
-      name: /prihlasit|login|sign in/i,
+      name: /přihlásit|prihlasit|login|sign in/i,
     });
   }
 

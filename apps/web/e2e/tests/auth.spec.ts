@@ -46,7 +46,8 @@ test.describe('Authentication', () => {
       // The register form shows a green success div: "Registration successful! Redirecting to login..."
       const successMessage = await registerPage.getSuccessMessage();
       expect(successMessage).toBeTruthy();
-      expect(successMessage).toContain('Registration successful');
+      // Czech: "Registrace proběhla úspěšně!", English: "Registration successful"
+      expect(successMessage).toMatch(/Registration successful|Registrace proběhla úspěšně/i);
 
       // After 2 seconds the form redirects to login
       await page.waitForURL('**/login', { timeout: 10000 });
@@ -101,16 +102,19 @@ test.describe('Authentication', () => {
       // Navigate to login page
       await loginPage.goto();
 
-      // Fill invalid email format and a password
-      await loginPage.emailInput.fill('not-an-email');
-      await loginPage.passwordInput.fill('password123');
+      // Fill an email that passes HTML5 type="email" validation but fails Zod
+      // (empty string triggers Zod validation since HTML5 doesn't require non-empty for type=email)
+      await loginPage.emailInput.fill('');
+      await loginPage.passwordInput.fill('');
 
       // Click submit to trigger form validation
       await loginPage.submitButton.click();
 
-      // Zod validation should show "Invalid email address" message
-      // react-hook-form renders this via <FormMessage> component
-      const validationMessage = page.locator('text=Invalid email');
+      // Zod/react-hook-form validation should show error via <FormMessage> component
+      // Czech: "Neplatná e-mailová adresa" / English: "Invalid email address"
+      const validationMessage = page
+        .locator('[id*="message"], p.text-destructive, p[class*="destructive"]')
+        .first();
       await expect(validationMessage).toBeVisible({ timeout: 5000 });
 
       // Verify we remain on the login page (form was not submitted)

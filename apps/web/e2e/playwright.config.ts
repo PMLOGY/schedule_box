@@ -16,7 +16,7 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
     ? [['html', { open: 'never' }], ['github']]
@@ -30,7 +30,7 @@ export default defineConfig({
   },
 
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -40,13 +40,17 @@ export default defineConfig({
     // Setup project: authenticate once and save storageState (regular user)
     {
       name: 'setup',
+      testDir: '.', // auth.setup.ts is in e2e/ root, not e2e/tests/
       testMatch: /auth\.setup\.ts/,
     },
 
     // Admin setup project: authenticate as platform admin
+    // Depends on 'setup' to run sequentially (avoids login rate limiting)
     {
       name: 'admin-setup',
+      testDir: '.', // admin.setup.ts is in e2e/ root, not e2e/tests/
       testMatch: /admin\.setup\.ts/,
+      dependencies: ['setup'],
     },
 
     // Browser projects: all depend on setup for authenticated state
@@ -56,6 +60,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: path.join(__dirname, 'playwright/.auth/user.json'),
       },
+      testIgnore: [/.*visual.*\.spec\.ts/, /admin-.*\.spec\.ts/],
       dependencies: ['setup'],
     },
     {
@@ -64,6 +69,7 @@ export default defineConfig({
         ...devices['Desktop Firefox'],
         storageState: path.join(__dirname, 'playwright/.auth/user.json'),
       },
+      testIgnore: [/.*visual.*\.spec\.ts/, /admin-.*\.spec\.ts/],
       dependencies: ['setup'],
     },
     {
@@ -72,6 +78,7 @@ export default defineConfig({
         ...devices['Desktop Safari'],
         storageState: path.join(__dirname, 'playwright/.auth/user.json'),
       },
+      testIgnore: [/.*visual.*\.spec\.ts/, /admin-.*\.spec\.ts/],
       dependencies: ['setup'],
     },
 
@@ -107,13 +114,15 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'pnpm start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: {
-      NODE_ENV: 'test',
+  /* When BASE_URL is set (e.g. Coolify), skip launching a local server */
+  ...(!process.env.BASE_URL && {
+    webServer: {
+      command: process.env.CI ? 'pnpm start' : 'pnpm dev',
+      url: 'http://localhost:3000/api/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
-  },
+  }),
 });
