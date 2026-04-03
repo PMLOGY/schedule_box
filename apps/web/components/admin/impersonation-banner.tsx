@@ -100,6 +100,7 @@ export function ImpersonationBanner() {
       className="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white px-4 py-2 flex items-center justify-between shadow-lg"
       role="alert"
       aria-live="polite"
+      data-testid="impersonation-banner"
     >
       <div className="flex items-center gap-2 text-sm font-medium">
         <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />

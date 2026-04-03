@@ -48,12 +48,7 @@ test.use({ storageState: undefined });
 
 const EMBED_SLUG = process.env.EMBED_TEST_SLUG || 'salon-krasa';
 
-// Skip embed tests when the embed route returns 500 (production deployment issue)
 test.describe('Embed Widget Visual Regression', () => {
-  test.skip(
-    !!process.env.BASE_URL,
-    'Embed route returns 500 on Coolify — production bug to fix separately',
-  );
   test('light theme renders company services', async ({ page }) => {
     const response = await page.goto(`/embed/${EMBED_SLUG}?theme=light&locale=cs`, {
       waitUntil: 'networkidle',

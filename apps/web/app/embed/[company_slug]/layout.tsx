@@ -12,10 +12,12 @@ import '../../globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'ScheduleBox Widget',
-  description: 'Embeddable booking widget',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'ScheduleBox Widget | ScheduleBox',
+    description: 'Embeddable booking widget',
+  };
+}
 
 /**
  * Override X-Frame-Options for embed routes to allow iframe embedding.
