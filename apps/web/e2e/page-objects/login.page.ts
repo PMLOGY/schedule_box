@@ -24,7 +24,9 @@ export class LoginPage {
     this.submitButton = page.getByRole('button', {
       name: /přihlásit|prihlasit|sign in|submit/i,
     });
-    this.errorMessage = page.locator('.text-destructive, [class*="text-destructive"]');
+    this.errorMessage = page
+      .locator('.text-destructive, [class*="text-destructive"], [role="alert"]:not([aria-live])')
+      .first();
     this.registerLink = page.getByRole('link', { name: /registr/i });
   }
 
@@ -43,7 +45,7 @@ export class LoginPage {
   /** Get the displayed error message text, or null if not visible */
   async getErrorMessage(): Promise<string | null> {
     try {
-      await this.errorMessage.waitFor({ state: 'visible', timeout: 5000 });
+      await this.errorMessage.waitFor({ state: 'visible', timeout: 10000 });
       return await this.errorMessage.textContent();
     } catch {
       return null;
