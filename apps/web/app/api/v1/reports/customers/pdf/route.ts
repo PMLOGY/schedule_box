@@ -49,11 +49,14 @@ export const GET = createRouteHandler({
       totalCustomers > 0 ? Number((repeatCustomers / totalCustomers).toFixed(4)) : 0;
 
     // Customer Churn
+    const ninetyDaysAgoISO = ninetyDaysAgo.toISOString();
+    const oneEightyDaysAgoISO = oneEightyDaysAgo.toISOString();
+
     const [churnResult] = await db
       .select({
-        churned: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} IS NULL OR ${customers.lastVisitAt} <= ${oneEightyDaysAgo})::int`,
-        atRisk: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${oneEightyDaysAgo} AND ${customers.lastVisitAt} <= ${ninetyDaysAgo})::int`,
-        active: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${ninetyDaysAgo})::int`,
+        churned: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} IS NULL OR ${customers.lastVisitAt} <= ${oneEightyDaysAgoISO})::int`,
+        atRisk: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${oneEightyDaysAgoISO} AND ${customers.lastVisitAt} <= ${ninetyDaysAgoISO})::int`,
+        active: sql<number>`COUNT(*) FILTER (WHERE ${customers.lastVisitAt} > ${ninetyDaysAgoISO})::int`,
       })
       .from(customers)
       .where(and(eq(customers.companyId, companyId), isNull(customers.deletedAt)));
