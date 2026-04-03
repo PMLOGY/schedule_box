@@ -13,6 +13,8 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Remove X-Powered-By header to reduce server fingerprinting
+  poweredByHeader: false,
   // Standalone output for Docker/Coolify — disabled on Windows dev (symlink permission issues)
   ...(process.env.NEXT_OUTPUT_STANDALONE === '1' && {
     output: 'standalone',
