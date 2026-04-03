@@ -23,6 +23,20 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/*': ['./messages/**/*', '../../security/**/*'],
   },
+  // Exclude heavy directories from build traces to prevent Docker build timeout
+  outputFileTracingExcludes: {
+    '/*': [
+      '.git/**',
+      'e2e/**',
+      'playwright-report/**',
+      '**/*.stories.tsx',
+      '**/*.spec.ts',
+      '**/*.test.ts',
+      'services/**',
+      '.planning/**',
+      'docs/**',
+    ],
+  },
   // Skip lint & typecheck in Docker builds — CI handles these; saves ~500MB RAM during build
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
