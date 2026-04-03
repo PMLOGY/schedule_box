@@ -85,7 +85,7 @@ export default async function EmbedPage({ params, searchParams }: EmbedPageProps
   const settings = (company.settings as Record<string, unknown>) || {};
   const primaryColor = (settings.primaryColor as string) || '#3B82F6';
   const logo = listing?.images?.[0] || null;
-  const averageRating = listing?.averageRating ? parseFloat(listing.averageRating as string) : 0;
+  const averageRating = listing?.averageRating ? parseFloat(String(listing.averageRating)) : 0;
   const reviewCount = listing?.reviewCount || 0;
 
   return (
@@ -103,7 +103,7 @@ export default async function EmbedPage({ params, searchParams }: EmbedPageProps
         name: service.name,
         description: service.description || '',
         duration: service.duration,
-        price: service.price || '0',
+        price: String(service.price || '0'),
         currency: service.currency || 'CZK',
       }))}
       locale={locale}

@@ -76,10 +76,16 @@ function isRoleAllowedForPath(role: string, pathname: string): boolean {
 export function useAuth() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for Zustand persist middleware to hydrate from localStorage
+    // before making any auth decisions — prevents false redirects to /login
+    if (!_hasHydrated) {
+      return;
+    }
+
     if (isPublicRoute(pathname)) {
       setIsLoading(false);
       return;
@@ -98,7 +104,7 @@ export function useAuth() {
     }
 
     setIsLoading(false);
-  }, [isAuthenticated, user, pathname, router]);
+  }, [_hasHydrated, isAuthenticated, user, pathname, router]);
 
   return {
     user,
