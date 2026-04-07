@@ -69,8 +69,8 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install wget for health checks (curl not available in alpine minimal)
-RUN apk add --no-cache wget
+# Install wget for health checks — allow failure if Alpine repos are unreachable
+RUN apk update && apk add --no-cache wget || true
 
 # Remove unused package managers to reduce attack surface
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
@@ -97,6 +97,7 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>/dev/null || \
+      node -e "fetch('http://localhost:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"
 
 CMD ["node", "apps/web/server.js"]
