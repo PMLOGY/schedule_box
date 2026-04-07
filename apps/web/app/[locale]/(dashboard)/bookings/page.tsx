@@ -55,8 +55,9 @@ export default function BookingsPage() {
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
   // Employee sees only their own bookings; owner/manager sees all company bookings
-  const employeeQuery = useMyBookings({ page, limit: 20, status });
-  const ownerQuery = useBookingsQuery({ page, limit: 20, status });
+  // Each hook is only enabled for the relevant role to avoid spurious 404s
+  const employeeQuery = useMyBookings({ page, limit: 20, status }, { enabled: isEmployee });
+  const ownerQuery = useBookingsQuery({ page, limit: 20, status }, { enabled: !isEmployee });
   const { data, isLoading } = isEmployee ? employeeQuery : ownerQuery;
 
   // Last-updated indicator state

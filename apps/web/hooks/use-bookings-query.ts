@@ -19,7 +19,7 @@ import type { EventInput } from '@fullcalendar/core';
  * Hook for fetching paginated booking list with filters
  * Used in table view on /bookings page
  */
-export function useBookingsQuery(params: BookingListQuery) {
+export function useBookingsQuery(params: BookingListQuery, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['bookings', params],
     queryFn: async () => {
@@ -31,6 +31,7 @@ export function useBookingsQuery(params: BookingListQuery) {
     },
     staleTime: 30_000, // 30 seconds - bookings change frequently
     refetchInterval: 30_000, // auto-refresh every 30 seconds
+    enabled: options?.enabled ?? true,
   });
 }
 

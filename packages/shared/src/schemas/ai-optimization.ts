@@ -12,7 +12,7 @@ import { z } from 'zod';
 // ============================================================================
 
 export const upsellRequestSchema = z.object({
-  customer_id: z.coerce.number().int().positive(),
+  customer_id: z.coerce.number().int().nonnegative(),
   current_service_id: z.coerce.number().int().positive(),
   customer_history: z.array(z.coerce.number().int().positive()).optional(),
 });
