@@ -24,6 +24,13 @@ import {
 } from '@/validations/customer';
 import { encrypt, decrypt, hmacIndex, getEncryptionKey } from '@/lib/security/encryption';
 
+/** Safely convert a Date | null | undefined to ISO string or null */
+function toISO(d: Date | string | null | undefined): string | null {
+  if (!d) return null;
+  if (d instanceof Date) return d.toISOString();
+  return d;
+}
+
 // ============================================================================
 // HELPERS
 // ============================================================================
@@ -267,13 +274,13 @@ export const GET = createRouteHandler({
         no_show_count: customer.noShowCount,
         total_bookings: customer.totalBookings,
         total_spent: customer.totalSpent,
-        last_visit_at: customer.lastVisitAt,
+        last_visit_at: toISO(customer.lastVisitAt),
         marketing_consent: customer.marketingConsent,
         preferred_contact: customer.preferredContact,
         preferred_reminder_minutes: customer.preferredReminderMinutes,
         is_active: customer.isActive,
-        created_at: customer.createdAt,
-        updated_at: customer.updatedAt,
+        created_at: toISO(customer.createdAt),
+        updated_at: toISO(customer.updatedAt),
       };
     });
 
@@ -433,7 +440,7 @@ export const POST = createRouteHandler({
           )
         : { email: customer.email, phone: customer.phone };
 
-    // Return created customer
+    // Return created customer — convert Date objects to ISO strings
     return createdResponse({
       id: customer.id,
       uuid: customer.uuid,
@@ -449,13 +456,13 @@ export const POST = createRouteHandler({
       no_show_count: customer.noShowCount,
       total_bookings: customer.totalBookings,
       total_spent: customer.totalSpent,
-      last_visit_at: customer.lastVisitAt,
+      last_visit_at: toISO(customer.lastVisitAt),
       marketing_consent: customer.marketingConsent,
       preferred_contact: customer.preferredContact,
       preferred_reminder_minutes: customer.preferredReminderMinutes,
       is_active: customer.isActive,
-      created_at: customer.createdAt,
-      updated_at: customer.updatedAt,
+      created_at: toISO(customer.createdAt),
+      updated_at: toISO(customer.updatedAt),
     });
   },
 });

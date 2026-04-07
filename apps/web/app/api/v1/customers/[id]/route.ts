@@ -19,6 +19,13 @@ import {
   type CustomerIdParam,
 } from '@/validations/customer';
 
+/** Safely convert a Date | null | undefined to ISO string or null */
+function toISO(d: Date | string | null | undefined): string | null {
+  if (!d) return null;
+  if (d instanceof Date) return d.toISOString();
+  return d;
+}
+
 /**
  * GET /api/v1/customers/[id]
  * Get customer details with tags (tenant isolated, UUID lookup)
@@ -31,9 +38,33 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
     // Find user's company ID for tenant isolation
     const { companyId } = await findCompanyId(user!.sub);
 
-    // Query customer by UUID with tenant isolation
+    // Query customer by UUID with tenant isolation — explicit column selection
+    // to avoid referencing columns that may not exist in the DB yet
     const [customer] = await db
-      .select()
+      .select({
+        id: customers.id,
+        uuid: customers.uuid,
+        name: customers.name,
+        email: customers.email,
+        phone: customers.phone,
+        dateOfBirth: customers.dateOfBirth,
+        gender: customers.gender,
+        notes: customers.notes,
+        customerMetadata: customers.customerMetadata,
+        source: customers.source,
+        healthScore: customers.healthScore,
+        clvPredicted: customers.clvPredicted,
+        noShowCount: customers.noShowCount,
+        totalBookings: customers.totalBookings,
+        totalSpent: customers.totalSpent,
+        lastVisitAt: customers.lastVisitAt,
+        marketingConsent: customers.marketingConsent,
+        preferredContact: customers.preferredContact,
+        preferredReminderMinutes: customers.preferredReminderMinutes,
+        isActive: customers.isActive,
+        createdAt: customers.createdAt,
+        updatedAt: customers.updatedAt,
+      })
       .from(customers)
       .where(
         and(
@@ -59,7 +90,7 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
       .innerJoin(tags, eq(customerTags.tagId, tags.id))
       .where(eq(customerTags.customerId, customer.id));
 
-    // Return customer with tags
+    // Return customer with tags — convert Date objects to ISO strings
     return successResponse({
       id: customer.uuid,
       name: customer.name,
@@ -75,13 +106,13 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
       no_show_count: customer.noShowCount,
       total_bookings: customer.totalBookings,
       total_spent: customer.totalSpent,
-      last_visit_at: customer.lastVisitAt,
+      last_visit_at: toISO(customer.lastVisitAt),
       marketing_consent: customer.marketingConsent,
       preferred_contact: customer.preferredContact,
       preferred_reminder_minutes: customer.preferredReminderMinutes,
       is_active: customer.isActive,
-      created_at: customer.createdAt,
-      updated_at: customer.updatedAt,
+      created_at: toISO(customer.createdAt),
+      updated_at: toISO(customer.updatedAt),
       tags: customerTagsList,
     });
   },
@@ -162,7 +193,7 @@ export const PUT = createRouteHandler<CustomerUpdate, CustomerIdParam>({
       throw new NotFoundError('Customer not found');
     }
 
-    // Return updated customer
+    // Return updated customer — convert Date objects to ISO strings
     return successResponse({
       id: updated.uuid,
       name: updated.name,
@@ -178,13 +209,13 @@ export const PUT = createRouteHandler<CustomerUpdate, CustomerIdParam>({
       no_show_count: updated.noShowCount,
       total_bookings: updated.totalBookings,
       total_spent: updated.totalSpent,
-      last_visit_at: updated.lastVisitAt,
+      last_visit_at: toISO(updated.lastVisitAt),
       marketing_consent: updated.marketingConsent,
       preferred_contact: updated.preferredContact,
       preferred_reminder_minutes: updated.preferredReminderMinutes,
       is_active: updated.isActive,
-      created_at: updated.createdAt,
-      updated_at: updated.updatedAt,
+      created_at: toISO(updated.createdAt),
+      updated_at: toISO(updated.updatedAt),
     });
   },
 });
