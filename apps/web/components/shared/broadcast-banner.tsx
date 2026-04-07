@@ -47,9 +47,9 @@ export function BroadcastBanner() {
     setDismissed(dismissedIds);
   }, []);
 
-  // Fetch current broadcasts (sent within 7 days)
+  // Fetch current broadcasts (sent within 7 days) — admin-only endpoint
   useEffect(() => {
-    if (!user) return;
+    if (!user || user.role !== 'admin') return;
 
     async function fetchBroadcasts() {
       try {

@@ -226,6 +226,8 @@
   .glass-surface-subtle:not(.fixed, [data-radix-dialog-content]),
   .glass-surface-heavy:not(.fixed, [data-radix-dialog-content]) {
     position: relative;
+    /* Create stacking context so ::before (z-index: -1) stays behind content but above background */
+    isolation: isolate;
   }
 
   .glass-surface::before,
@@ -237,7 +239,7 @@
     border-radius: inherit;
     background: rgba(255, 255, 255, 0.04);
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
   }
 
   .dark .glass-surface::before,

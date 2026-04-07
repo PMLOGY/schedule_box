@@ -26,6 +26,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+      </head>
       <body className={`${plusJakartaSans.variable} font-sans`}>
         <Providers>
           {children}

@@ -54,6 +54,8 @@ export const db = new Proxy({} as DrizzleDb, {
           max: 10,
           idle_timeout: 20,
           connect_timeout: 10,
+          // Ensure UTF-8 encoding for Czech/Slovak diacritics (Windows may default to WIN1250)
+          connection: { client_encoding: 'UTF8' },
           ...getSslConfig(),
         });
         _db = drizzlePostgres(queryClient, { schema });
@@ -86,6 +88,8 @@ export const dbTx = new Proxy({} as DrizzleDb, {
           max: 5,
           idle_timeout: 20,
           connect_timeout: 10,
+          // Ensure UTF-8 encoding for Czech/Slovak diacritics (Windows may default to WIN1250)
+          connection: { client_encoding: 'UTF8' },
           ...getSslConfig(),
         });
         _dbTx = drizzlePostgres(txClient, { schema });
@@ -106,6 +110,14 @@ export type Database = typeof db;
  * @internal Dev scripts only
  */
 export function getMigrationClient(): PostgresSql {
-  const factory = _require('postgres') as (url: string, opts: { max: number }) => PostgresSql;
-  return factory(getConnectionUrl(), { max: 1, ...getSslConfig() });
+  const factory = _require('postgres') as (
+    url: string,
+    opts: Record<string, unknown>,
+  ) => PostgresSql;
+  return factory(getConnectionUrl(), {
+    max: 1,
+    // Ensure UTF-8 encoding for Czech/Slovak diacritics (Windows may default to WIN1250)
+    connection: { client_encoding: 'UTF8' },
+    ...getSslConfig(),
+  });
 }

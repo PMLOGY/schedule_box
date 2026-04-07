@@ -102,21 +102,55 @@ export const securityHeaders = [
 ];
 
 /**
+ * Build relaxed CSP for /embed/ widget routes
+ *
+ * Allows inline scripts/styles (Next.js hydration + Tailwind) and
+ * permits embedding from any domain (frame-ancestors *).
+ */
+function buildEmbedCSP(): string {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const csp = {
+    'default-src': ["'self'"],
+    'script-src': [
+      "'self'",
+      "'unsafe-inline'", // Required for Next.js inline scripts & hydration
+      ...(isDevelopment ? ["'unsafe-eval'"] : []),
+    ],
+    'style-src': [
+      "'self'",
+      "'unsafe-inline'", // Required for Tailwind CSS and shadcn/ui
+    ],
+    'img-src': ["'self'", 'data:', 'blob:', 'https:'],
+    'font-src': ["'self'"],
+    'connect-src': ["'self'", 'https://*.schedulebox.cz', 'wss://*.schedulebox.cz'],
+    'frame-src': ["'self'", 'https://pay.comgate.cz'],
+    'frame-ancestors': ['*'], // Widget must be embeddable from any domain
+    'object-src': ["'none'"],
+    'base-uri': ["'self'"],
+    'form-action': ["'self'"],
+  };
+
+  return Object.entries(csp)
+    .map(([directive, sources]) =>
+      sources.length === 0 ? directive : `${directive} ${sources.join(' ')}`,
+    )
+    .join('; ');
+}
+
+/**
  * Relaxed security headers for /embed/ widget routes
  *
  * Widget must be embeddable from any domain:
- * - X-Frame-Options: ALLOWALL
+ * - X-Frame-Options removed (CSP frame-ancestors takes precedence; ALLOWALL is non-standard)
  * - CSP frame-ancestors: *
+ * - Inline scripts and styles allowed
  */
 export const embedSecurityHeaders = securityHeaders
   .filter((h) => h.key !== 'Content-Security-Policy' && h.key !== 'X-Frame-Options')
   .concat([
     {
-      key: 'X-Frame-Options',
-      value: 'ALLOWALL', // Widget must be embeddable
-    },
-    {
       key: 'Content-Security-Policy',
-      value: "frame-ancestors *; default-src 'self'", // Allow embedding from any domain
+      value: buildEmbedCSP(),
     },
   ]);
