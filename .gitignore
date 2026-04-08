@@ -35,6 +35,19 @@ coverage/
 apps/web/e2e/playwright/.auth/
 apps/web/e2e/test-results/
 apps/web/e2e/playwright-report/
+apps/web/playwright-report/
+.playwright-mcp/
+test-screenshots/
+
+# Playwright MCP test artifacts
+PLAYWRIGHT-MCP-*.md
+run-playwright-mcp.sh
+
+# Coolify local env
+coolify.env
+
+# MCP config
+.mcp.json
 
 # Logs
 *.log

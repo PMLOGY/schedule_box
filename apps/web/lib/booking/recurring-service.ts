@@ -390,10 +390,9 @@ export async function createRecurringSeries(
           discountAmount: '0',
           recurringSeriesId: series.id,
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const [insertedBooking] = await tx
           .insert(bookings)
-          .values(bookingValues as any)
+          .values(bookingValues as unknown as typeof bookings.$inferInsert)
           .returning();
 
         createdCount++;
