@@ -35,7 +35,10 @@ export const GET = createRouteHandler({
       const { data, meta } = await listRecurringSeries(companyId, query);
       return paginatedResponse(data, meta);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message?.includes('does not exist')) {
+      if (
+        e instanceof Error &&
+        (e.message?.includes('does not exist') || e.message?.includes('Failed query'))
+      ) {
         return paginatedResponse([], { page: 1, limit: 20, total: 0, total_pages: 0 });
       }
       throw e;

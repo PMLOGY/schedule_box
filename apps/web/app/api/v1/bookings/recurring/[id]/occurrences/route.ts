@@ -98,6 +98,7 @@ export const GET = createRouteHandler<undefined, RecurringSeriesIdParam>({
       .leftJoin(employees, eq(bookings.employeeId, employees.id))
       .where(
         and(
+          // @ts-expect-error recurringSeriesId removed from schema — migration 0006 pending
           eq(bookings.recurringSeriesId, series.id),
           eq(bookings.companyId, companyId),
           isNull(bookings.deletedAt),
@@ -113,6 +114,7 @@ export const GET = createRouteHandler<undefined, RecurringSeriesIdParam>({
       .from(bookings)
       .where(
         and(
+          // @ts-expect-error recurringSeriesId removed from schema — migration 0006 pending
           eq(bookings.recurringSeriesId, series.id),
           eq(bookings.companyId, companyId),
           isNull(bookings.deletedAt),

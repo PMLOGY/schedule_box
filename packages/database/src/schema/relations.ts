@@ -357,10 +357,7 @@ export const bookingsRelations = relations(bookings, ({ one, many }) => ({
     fields: [bookings.videoMeetingId],
     references: [videoMeetings.id],
   }),
-  recurringSeries: one(recurringSeries, {
-    fields: [bookings.recurringSeriesId],
-    references: [recurringSeries.id],
-  }),
+  // recurringSeries: relation removed — column not in production DB (migration 0006 pending)
   bookingResources: many(bookingResources),
   payments: many(payments),
   reviews: many(reviews),

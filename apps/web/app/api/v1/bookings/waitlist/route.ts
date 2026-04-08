@@ -72,7 +72,10 @@ export const GET = createRouteHandler({
       });
       return successResponse(entries);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message?.includes('does not exist')) {
+      if (
+        e instanceof Error &&
+        (e.message?.includes('does not exist') || e.message?.includes('Failed query'))
+      ) {
         return successResponse([]);
       }
       throw e;

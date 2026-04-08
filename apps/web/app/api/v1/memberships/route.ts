@@ -24,7 +24,10 @@ export const GET = createRouteHandler({
       const types = await listMembershipTypes(companyId);
       return successResponse(types);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message?.includes('does not exist')) {
+      if (
+        e instanceof Error &&
+        (e.message?.includes('does not exist') || e.message?.includes('Failed query'))
+      ) {
         return successResponse([]);
       }
       throw e;

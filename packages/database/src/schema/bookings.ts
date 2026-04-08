@@ -34,7 +34,7 @@ import { resources } from './resources';
 import { coupons } from './coupons';
 import { giftCards } from './gift-cards';
 import { videoMeetings } from './video';
-import { recurringSeries } from './recurring';
+// import { recurringSeries } from './recurring'; // unused — migration 0006 pending
 
 // ============================================================================
 // BOOKINGS TABLE
@@ -78,10 +78,8 @@ export const bookings = pgTable(
     videoMeetingId: integer('video_meeting_id').references(() => videoMeetings.id, {
       onDelete: 'set null',
     }),
-    // Recurring — NOTE: column may not exist in production DB if migration 0006 not applied
-    recurringSeriesId: integer('recurring_series_id').references(() => recurringSeries.id, {
-      onDelete: 'set null',
-    }),
+    // recurringSeriesId: column removed from schema — not in production DB (migration 0006 pending)
+    // Re-add after running: pnpm --filter @schedulebox/database db:migrate
     // AI
     noShowProbability: real('no_show_probability'),
     // Cancellation
@@ -123,7 +121,7 @@ export const bookings = pgTable(
       table.startTime,
       table.endTime,
     ),
-    recurringSeriesIdx: index('idx_bookings_recurring_series').on(table.recurringSeriesId),
+    // recurringSeriesIdx: index('idx_bookings_recurring_series').on(table.recurringSeriesId),
   }),
 );
 
