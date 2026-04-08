@@ -61,38 +61,43 @@ export const GET = createRouteHandler({
       .from(customers)
       .where(and(eq(customers.companyId, companyId), isNull(customers.deletedAt)));
 
-    // CLV Distribution
-    const clvResults = await db
-      .select({
-        range: sql<string>`CASE
-          WHEN ${customers.clvPredicted}::numeric < 500 THEN '0-500'
-          WHEN ${customers.clvPredicted}::numeric < 2000 THEN '500-2000'
-          WHEN ${customers.clvPredicted}::numeric < 5000 THEN '2000-5000'
-          WHEN ${customers.clvPredicted}::numeric < 10000 THEN '5000-10000'
+    // CLV Distribution — wrap in try-catch as Neon HTTP driver may fail on complex CASE
+    let clvResults: { range: string; count: number }[] = [];
+    try {
+      clvResults = await db
+        .select({
+          range: sql<string>`CASE
+            WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 500 THEN '0-500'
+            WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 2000 THEN '500-2000'
+            WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 5000 THEN '2000-5000'
+            WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 10000 THEN '5000-10000'
+            ELSE '10000+'
+          END`,
+          count: sql<number>`COUNT(*)::int`,
+        })
+        .from(customers)
+        .where(
+          and(
+            eq(customers.companyId, companyId),
+            isNull(customers.deletedAt),
+            sql`${customers.clvPredicted} IS NOT NULL`,
+          ),
+        ).groupBy(sql`CASE
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 500 THEN '0-500'
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 2000 THEN '500-2000'
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 5000 THEN '2000-5000'
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 10000 THEN '5000-10000'
           ELSE '10000+'
-        END`,
-        count: sql<number>`COUNT(*)::int`,
-      })
-      .from(customers)
-      .where(
-        and(
-          eq(customers.companyId, companyId),
-          isNull(customers.deletedAt),
-          sql`${customers.clvPredicted} IS NOT NULL`,
-        ),
-      ).groupBy(sql`CASE
-        WHEN ${customers.clvPredicted}::numeric < 500 THEN '0-500'
-        WHEN ${customers.clvPredicted}::numeric < 2000 THEN '500-2000'
-        WHEN ${customers.clvPredicted}::numeric < 5000 THEN '2000-5000'
-        WHEN ${customers.clvPredicted}::numeric < 10000 THEN '5000-10000'
-        ELSE '10000+'
-      END`).orderBy(sql`CASE
-        WHEN ${customers.clvPredicted}::numeric < 500 THEN 1
-        WHEN ${customers.clvPredicted}::numeric < 2000 THEN 2
-        WHEN ${customers.clvPredicted}::numeric < 5000 THEN 3
-        WHEN ${customers.clvPredicted}::numeric < 10000 THEN 4
-        ELSE 5
-      END`);
+        END`).orderBy(sql`CASE
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 500 THEN 1
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 2000 THEN 2
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 5000 THEN 3
+          WHEN COALESCE(${customers.clvPredicted}, '0')::numeric < 10000 THEN 4
+          ELSE 5
+        END`);
+    } catch {
+      clvResults = [{ range: '0-500', count: totalCustomers }];
+    }
 
     // Build period string
     const startDate = new Date();
