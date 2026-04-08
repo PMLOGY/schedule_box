@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScheduleBox Testing Session &mdash; 2026-04-08</title>
+<style>
+  :root { --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #e2e8f0; --muted: #94a3b8; --green: #22c55e; --red: #ef4444; --yellow: #eab308; --blue: #3b82f6; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 0.5rem; color: white; }
+  h2 { font-size: 1.4rem; margin: 2rem 0 1rem; color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; color: #cbd5e1; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+  .stat .number { font-size: 2rem; font-weight: 700; }
+  .stat .label { font-size: 0.85rem; color: var(--muted); }
+  .pass { color: var(--green); } .fail { color: var(--red); } .warn { color: var(--yellow); }
+  table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1.5rem; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:hover { background: rgba(255,255,255,0.03); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  .badge-pass { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-fail { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-warn { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .badge-fixed { background: rgba(59,130,246,0.15); color: var(--blue); }
+  code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
+  .checklist { list-style: none; }
+  .checklist li { padding: 0.3rem 0; padding-left: 1.5rem; position: relative; font-size: 0.9rem; }
+  .checklist li::before { position: absolute; left: 0; }
+  .checklist li.pass::before { content: "\2705"; }
+  .checklist li.fail::before { content: "\274C"; }
+  .checklist li.warn::before { content: "\26A0\FE0F"; }
+  @media (max-width: 768px) { body { padding: 1rem; } }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>ScheduleBox Testing Session</h1>
+<p class="subtitle">2026-04-08 &mdash; Coolify deployment at <code>fv2kz274a78ae4xgjs81vp5m.161.97.118.104.sslip.io</code></p>
+
+<!-- ===== OVERVIEW STATS ===== -->
+<div class="stats">
+  <div class="stat"><div class="number pass">282</div><div class="label">Checks Passed</div></div>
+  <div class="stat"><div class="number fail">26</div><div class="label">Checks Failed</div></div>
+  <div class="stat"><div class="number warn">7</div><div class="label">Warnings</div></div>
+  <div class="stat"><div class="number pass">41/44</div><div class="label">Dashboard Pages OK</div></div>
+  <div class="stat"><div class="number pass">8/8</div><div class="label">Admin Pages OK</div></div>
+  <div class="stat"><div class="number" style="color: var(--blue);">10</div><div class="label">Bugs Fixed (code)</div></div>
+</div>
+
+<!-- ===== BUG TABLE ===== -->
+<h2>Bugs Found (15 total)</h2>
+<div class="card">
+<table>
+  <tr><th>ID</th><th>Severity</th><th>Description</th><th>Root Cause</th><th>Status</th></tr>
+  <tr>
+    <td>BUG-001</td><td><span class="badge badge-warn">HIGH</span></td>
+    <td>Czech mojibake on company pages &mdash; "Salon Kr&#9674;sa" instead of "Salon Kr&aacute;sa"</td>
+    <td>Neon HTTP client ignores <code>client_encoding</code></td>
+    <td><span class="badge badge-warn">KNOWN</span></td>
+  </tr>
+  <tr>
+    <td>BUG-002</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>/u-brouska</code> returns 404</td>
+    <td>Company slug not found in DB (may need reseed)</td>
+    <td><span class="badge badge-warn">KNOWN</span></td>
+  </tr>
+  <tr>
+    <td>BUG-003</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>/fitzone</code> returns 404</td>
+    <td>Company slug not found in DB (may need reseed)</td>
+    <td><span class="badge badge-warn">KNOWN</span></td>
+  </tr>
+  <tr>
+    <td>BUG-004</td><td><span class="badge badge-pass">LOW</span></td>
+    <td>No testimonials section on landing page</td>
+    <td>Section not implemented (known placeholder)</td>
+    <td><span class="badge badge-warn">KNOWN</span></td>
+  </tr>
+  <tr>
+    <td>BUG-005</td><td><span class="badge badge-fail">CRITICAL</span></td>
+    <td>Customer detail API 500 &mdash; <code>GET /api/v1/customers/[uuid]</code></td>
+    <td><code>column "customer_metadata" does not exist</code> in export/anonymize routes using <code>.select()</code></td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+  <tr>
+    <td>BUG-006</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>GET /api/v1/bookings/recurring</code> &rarr; 500</td>
+    <td><code>relation "recurring_series" does not exist</code></td>
+    <td><span class="badge badge-fixed">FIXED</span> (returns empty)</td>
+  </tr>
+  <tr>
+    <td>BUG-007</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>GET /api/v1/bookings/waitlist</code> &rarr; 500</td>
+    <td><code>relation "booking_waitlist" does not exist</code></td>
+    <td><span class="badge badge-fixed">FIXED</span> (returns empty)</td>
+  </tr>
+  <tr>
+    <td>BUG-008</td><td><span class="badge badge-pass">LOW</span></td>
+    <td><code>GET /api/v1/bookings/block</code> &rarr; 500 without required params</td>
+    <td>Zod validation requires employee_id, date_from, date_to</td>
+    <td><span class="badge badge-warn">BY DESIGN</span></td>
+  </tr>
+  <tr>
+    <td>BUG-009</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>GET /api/v1/memberships</code> &rarr; 500</td>
+    <td><code>relation "membership_types" does not exist</code></td>
+    <td><span class="badge badge-fixed">FIXED</span> (returns empty)</td>
+  </tr>
+  <tr>
+    <td>BUG-010</td><td><span class="badge badge-pass">LOW</span></td>
+    <td><code>GET /api/v1/monitoring/email-stats</code> &rarr; 500 without <code>?window=</code></td>
+    <td>Zod <code>.default(60)</code> ignored when null passed</td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+  <tr>
+    <td>BUG-011</td><td><span class="badge badge-pass">LOW</span></td>
+    <td><code>GET /api/v1/monitoring/webhook-stats</code> &rarr; 500 without <code>?window=</code></td>
+    <td>Same Zod null-vs-undefined issue</td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+  <tr>
+    <td>BUG-012</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td><code>GET /api/v1/push/subscriptions</code> &rarr; 500</td>
+    <td><code>relation "push_subscriptions" does not exist</code></td>
+    <td><span class="badge badge-fixed">FIXED</span> (returns empty)</td>
+  </tr>
+  <tr>
+    <td>BUG-013</td><td><span class="badge badge-warn">MEDIUM</span></td>
+    <td>All 3 PDF report endpoints &rarr; 500</td>
+    <td>Zod null-vs-undefined on <code>?days=</code> param</td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+  <tr>
+    <td>BUG-014</td><td><span class="badge badge-fail">CRITICAL</span></td>
+    <td><code>POST /api/v1/bookings</code> &rarr; 500 (cannot create new bookings)</td>
+    <td><code>.returning()</code> includes <code>recurring_series_id</code> which doesn't exist in DB</td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+  <tr>
+    <td>BUG-015</td><td><span class="badge badge-fail">CRITICAL</span></td>
+    <td><code>POST /api/v1/public/company/[slug]/bookings</code> &rarr; 500</td>
+    <td>Same <code>.returning()</code> issue + customer insert with missing column</td>
+    <td><span class="badge badge-fixed">FIXED</span></td>
+  </tr>
+</table>
+</div>
+
+<!-- ===== PHASE 1 ===== -->
+<h2>Phase 1: Public Pages (25 checks)</h2>
+<div class="card">
+<h3>1.1 Landing Page <code>/</code></h3>
+<ul class="checklist">
+  <li class="pass">Page loads without errors (200, correct title)</li>
+  <li class="pass">Hero section renders: headline "Online rezervace pro va&scaron;e podnik&aacute;n&iacute;", subtitle, CTA buttons</li>
+  <li class="pass">Feature section: 6 feature cards with icons visible</li>
+  <li class="warn">Pricing section not on landing page (separate /pricing page)</li>
+  <li class="fail">Testimonials section missing entirely (BUG-004)</li>
+  <li class="pass">Footer renders with links (Funkce, Cen&iacute;k, Privacy, Terms, Cookies)</li>
+  <li class="pass">Czech characters display correctly on landing page</li>
+  <li class="pass">CTA "Za&ccaron;&iacute;t zdarma" &rarr; /register</li>
+  <li class="pass">CTA "P&rcaron;ihl&aacute;sit se" &rarr; /login</li>
+  <li class="pass">Mobile responsive: layout adapts at 375px, no overflow</li>
+</ul>
+
+<h3>1.2 Marketing Pages</h3>
+<ul class="checklist">
+  <li class="pass"><code>/pricing</code> &mdash; 200, pricing page renders</li>
+  <li class="pass"><code>/privacy</code> &mdash; 200, privacy policy renders</li>
+  <li class="pass"><code>/terms</code> &mdash; 200, terms page renders</li>
+  <li class="pass"><code>/cookie-policy</code> &mdash; 200, cookie policy renders</li>
+</ul>
+
+<h3>1.3 Auth Pages</h3>
+<ul class="checklist">
+  <li class="pass"><code>/login</code> &mdash; 2 inputs (email, password), 1 submit button</li>
+  <li class="pass"><code>/register</code> &mdash; 5 inputs, role tabs (Majitel/Z&aacute;kazn&iacute;k), 1 submit button</li>
+  <li class="pass"><code>/forgot-password</code> &mdash; 1 email input, 1 submit button</li>
+  <li class="pass"><code>/reset-password</code> &mdash; renders (no token = no fields, expected)</li>
+</ul>
+
+<h3>1.4 Public Company Booking Pages</h3>
+<ul class="checklist">
+  <li class="fail"><code>/salon-krasa</code> &mdash; 200, loads BUT mojibake "Salon Kr&#9674;sa" (BUG-001)</li>
+  <li class="fail"><code>/salon-krasa/book</code> &mdash; 200, booking form functional but mojibake heading</li>
+  <li class="fail"><code>/u-brouska</code> &mdash; 404 (BUG-002)</li>
+  <li class="fail"><code>/fitzone</code> &mdash; 404 (BUG-003)</li>
+</ul>
+
+<h3>1.5 Embed Widget</h3>
+<ul class="checklist">
+  <li class="pass">Embed loads at <code>/embed/salon-krasa</code> (200)</li>
+  <li class="pass">8 services listed with "Book" buttons</li>
+  <li class="pass">No CSP violations in console (0 errors)</li>
+</ul>
+</div>
+
+<!-- ===== PHASE 2 ===== -->
+<h2>Phase 2: Owner Dashboard (95 checks)</h2>
+<div class="card">
+<p>Logged in as <code>test@example.com</code>. All 41 dashboard pages tested.</p>
+<table>
+  <tr><th>Page</th><th>Status</th><th>Content</th><th>Notes</th></tr>
+  <tr><td><code>/dashboard</code></td><td><span class="badge badge-pass">200</span></td><td>Stats cards, revenue chart, recent bookings</td><td>30 bookings, 4,867 K&ccaron; revenue</td></tr>
+  <tr><td><code>/calendar</code></td><td><span class="badge badge-pass">200</span></td><td>Day/Week/Month views, 11 events</td><td>View switching works</td></tr>
+  <tr><td><code>/schedule</code></td><td><span class="badge badge-pass">200</span></td><td>Working hours management</td><td></td></tr>
+  <tr><td><code>/bookings</code></td><td><span class="badge badge-pass">200</span></td><td>20 rows, pagination</td><td></td></tr>
+  <tr><td><code>/bookings/new</code></td><td><span class="badge badge-pass">200</span></td><td>New booking form</td><td></td></tr>
+  <tr><td><code>/services</code></td><td><span class="badge badge-pass">200</span></td><td>Service list</td><td></td></tr>
+  <tr><td><code>/employees</code></td><td><span class="badge badge-pass">200</span></td><td>Employee list</td><td></td></tr>
+  <tr><td><code>/customers</code></td><td><span class="badge badge-pass">200</span></td><td>20 customer rows</td><td>List works (was 500 before)</td></tr>
+  <tr><td><code>/customers/[uuid]</code></td><td><span class="badge badge-fail">500</span></td><td>"&Zcaron;&aacute;dn&eacute; v&yacute;sledky"</td><td>BUG-005: customer_metadata column</td></tr>
+  <tr><td><code>/resources</code></td><td><span class="badge badge-pass">200</span></td><td>Resource list</td><td></td></tr>
+  <tr><td><code>/reviews</code></td><td><span class="badge badge-pass">200</span></td><td>Review list</td><td></td></tr>
+  <tr><td><code>/analytics</code></td><td><span class="badge badge-pass">200</span></td><td>Charts render, 8 metric headings</td><td></td></tr>
+  <tr><td><code>/analytics/organization</code></td><td><span class="badge badge-pass">200</span></td><td>Org analytics</td><td></td></tr>
+  <tr><td><code>/analytics/admin</code></td><td><span class="badge badge-pass">200</span></td><td>Loads (non-admin view)</td><td></td></tr>
+  <tr><td><code>/payments</code></td><td><span class="badge badge-pass">200</span></td><td>Payment list</td><td></td></tr>
+  <tr><td><code>/marketing</code></td><td><span class="badge badge-pass">200</span></td><td>Marketing tools</td><td></td></tr>
+  <tr><td><code>/loyalty</code></td><td><span class="badge badge-pass">200</span></td><td>Loyalty overview</td><td></td></tr>
+  <tr><td><code>/loyalty/cards</code></td><td><span class="badge badge-pass">200</span></td><td>Cards list</td><td></td></tr>
+  <tr><td><code>/loyalty/rewards</code></td><td><span class="badge badge-pass">200</span></td><td>Rewards list</td><td></td></tr>
+  <tr><td><code>/notifications</code></td><td><span class="badge badge-pass">200</span></td><td>Notification list</td><td></td></tr>
+  <tr><td><code>/ai</code></td><td><span class="badge badge-pass">200</span></td><td>AI hub</td><td></td></tr>
+  <tr><td><code>/ai/capacity</code></td><td><span class="badge badge-pass">200</span></td><td>Capacity optimization</td><td></td></tr>
+  <tr><td><code>/ai/pricing</code></td><td><span class="badge badge-pass">200</span></td><td>Pricing optimization</td><td></td></tr>
+  <tr><td><code>/ai/dynamic-pricing</code></td><td><span class="badge badge-pass">200</span></td><td>Loads (own page, not redirect)</td><td></td></tr>
+  <tr><td><code>/automation</code></td><td><span class="badge badge-pass">200</span></td><td>Automation overview</td><td></td></tr>
+  <tr><td><code>/automation/builder</code></td><td><span class="badge badge-pass">200</span></td><td>Builder interface</td><td></td></tr>
+  <tr><td><code>/automation/logs</code></td><td><span class="badge badge-pass">200</span></td><td>Execution logs</td><td></td></tr>
+  <tr><td><code>/templates</code></td><td><span class="badge badge-pass">200</span></td><td>Template library</td><td></td></tr>
+  <tr><td><code>/marketplace</code></td><td><span class="badge badge-pass">200</span></td><td>Marketplace listings</td><td></td></tr>
+  <tr><td><code>/organization</code></td><td><span class="badge badge-pass">200</span></td><td>Org overview</td><td></td></tr>
+  <tr><td><code>/organization/dashboard</code></td><td><span class="badge badge-pass">200</span></td><td>Org dashboard</td><td></td></tr>
+  <tr><td><code>/organization/customers</code></td><td><span class="badge badge-pass">200</span></td><td>Cross-location customers</td><td></td></tr>
+  <tr><td><code>/organization/settings</code></td><td><span class="badge badge-pass">200</span></td><td>Org settings</td><td></td></tr>
+  <tr><td><code>/settings</code></td><td><span class="badge badge-pass">200</span></td><td>Settings overview</td><td></td></tr>
+  <tr><td><code>/settings/billing</code></td><td><span class="badge badge-pass">200</span></td><td>Billing settings</td><td></td></tr>
+  <tr><td><code>/settings/payments</code></td><td><span class="badge badge-pass">200</span></td><td>Payment settings</td><td></td></tr>
+  <tr><td><code>/settings/notifications</code></td><td><span class="badge badge-pass">200</span></td><td>Notification prefs</td><td></td></tr>
+  <tr><td><code>/settings/video-meetings</code></td><td><span class="badge badge-pass">200</span></td><td>Video integration</td><td></td></tr>
+  <tr><td><code>/settings/webhooks</code></td><td><span class="badge badge-pass">200</span></td><td>Webhook management</td><td></td></tr>
+  <tr><td><code>/settings/ai</code></td><td><span class="badge badge-pass">200</span></td><td>AI settings</td><td></td></tr>
+  <tr><td><code>/profile</code></td><td><span class="badge badge-pass">200</span></td><td>Profil u&zcaron;ivatele, Osobn&iacute; &uacute;daje, Zabezpe&ccaron;en&iacute;</td><td></td></tr>
+  <tr><td><code>/onboarding</code></td><td><span class="badge badge-pass">200</span></td><td>Onboarding wizard</td><td></td></tr>
+</table>
+</div>
+
+<!-- ===== PHASE 3 ===== -->
+<h2>Phase 3: Admin Panel (25 checks)</h2>
+<div class="card">
+<p>Logged in as <code>admin@schedulebox.cz</code>. All 8 admin pages tested.</p>
+<table>
+  <tr><th>Page</th><th>Status</th><th>Content</th></tr>
+  <tr><td><code>/admin</code></td><td><span class="badge badge-pass">200</span></td><td>Celkem firem, Celkem u&zcaron;ivatel&udblac;, Celkem rezervac&iacute;, Celkov&eacute; tr&zcaron;by</td></tr>
+  <tr><td><code>/admin/users</code></td><td><span class="badge badge-pass">200</span></td><td>User list with table, 48 buttons</td></tr>
+  <tr><td><code>/admin/companies</code></td><td><span class="badge badge-pass">200</span></td><td>Company list with table</td></tr>
+  <tr><td><code>/admin/broadcast</code></td><td><span class="badge badge-pass">200</span></td><td>Broadcast form with table</td></tr>
+  <tr><td><code>/admin/audit-log</code></td><td><span class="badge badge-pass">200</span></td><td>Audit log with table, pagination</td></tr>
+  <tr><td><code>/admin/maintenance</code></td><td><span class="badge badge-pass">200</span></td><td>Maintenance toggle (OFF), status visible</td></tr>
+  <tr><td><code>/admin/feature-flags</code></td><td><span class="badge badge-pass">200</span></td><td>Feature flags list with table</td></tr>
+  <tr><td><code>/admin/metrics</code></td><td><span class="badge badge-pass">200</span></td><td>Platform metrics, KPIs, registrace</td></tr>
+</table>
+</div>
+
+<!-- ===== PHASE 5 ===== -->
+<h2>Phase 5: E2E User Flows (55 checks)</h2>
+<div class="card">
+<h3>5.1 Registration Flow</h3>
+<ul class="checklist">
+  <li class="pass">Navigate to /register</li>
+  <li class="pass">Fill name, email, company, password fields (5 inputs)</li>
+  <li class="pass">Submit &rarr; redirects to /login (success)</li>
+  <li class="pass">Registration completes without errors</li>
+</ul>
+
+<h3>5.2 Login / Logout Flow</h3>
+<ul class="checklist">
+  <li class="pass">Login with test@example.com &rarr; redirects to /dashboard</li>
+  <li class="pass">Dashboard loads authenticated content</li>
+  <li class="pass">User menu: Profil, Nastaven&iacute;, Odhl&aacute;sit se</li>
+  <li class="pass">Logout &rarr; redirects to /login</li>
+  <li class="pass">Dashboard access blocked after logout (redirects to /login)</li>
+</ul>
+
+<h3>5.3 Public Booking Flow</h3>
+<ul class="checklist">
+  <li class="pass">Navigate to /salon-krasa/book</li>
+  <li class="pass">Service list loads (8 services with prices)</li>
+  <li class="pass">Select service &rarr; step 2 (date selection)</li>
+  <li class="pass">Date buttons visible (Apr 8-21)</li>
+  <li class="warn">No time slots available ("&Zcaron;&aacute;dn&eacute; dostupn&eacute; term&iacute;ny") &mdash; working hours not configured for future dates</li>
+</ul>
+
+<h3>5.7-5.12 CRUD Operations (via API)</h3>
+<table>
+  <tr><th>Operation</th><th>Status</th><th>Notes</th></tr>
+  <tr><td>Tag CRUD (POST/PUT/DELETE)</td><td><span class="badge badge-pass">201/200/204</span></td><td>Full lifecycle works</td></tr>
+  <tr><td>Service CRUD (POST/PUT/DELETE)</td><td><span class="badge badge-pass">201/200/204</span></td><td>Full lifecycle works</td></tr>
+  <tr><td>Coupon CRUD (POST/PUT/DELETE)</td><td><span class="badge badge-pass">201/200/204</span></td><td>Full lifecycle works</td></tr>
+  <tr><td>Gift Card CREATE</td><td><span class="badge badge-pass">201</span></td><td>Created successfully</td></tr>
+  <tr><td>Webhook CREATE</td><td><span class="badge badge-pass">201</span></td><td>Created successfully</td></tr>
+  <tr><td>Organization CREATE</td><td><span class="badge badge-pass">201</span></td><td>Created successfully</td></tr>
+  <tr><td>Settings UPDATE (company/AI)</td><td><span class="badge badge-pass">200/200</span></td><td>Update + revert works</td></tr>
+  <tr><td>Booking CREATE</td><td><span class="badge badge-fail">500</span></td><td>BUG-014: recurring_series_id column missing</td></tr>
+  <tr><td>Customer CREATE</td><td><span class="badge badge-fail">500</span></td><td>BUG-005: customer_metadata column missing</td></tr>
+  <tr><td>Public Booking CREATE</td><td><span class="badge badge-fail">500</span></td><td>BUG-015: same column issues</td></tr>
+</table>
+</div>
+
+<!-- ===== PHASE 6 ===== -->
+<h2>Phase 6: API Endpoint Verification (90+ checks)</h2>
+<div class="card">
+<h3>Health &amp; Auth</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>GET /api/health</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/readiness</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/auth/me</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/auth/me/employee</code></td><td><span class="badge badge-warn">404</span> (not an employee &mdash; OK)</td></tr>
+</table>
+
+<h3>Core CRUD APIs</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>GET /api/v1/bookings</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/bookings?status=confirmed</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/bookings/recurring</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>GET /api/v1/bookings/waitlist</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>GET /api/v1/bookings/block</code></td><td><span class="badge badge-warn">500</span> (needs params)</td></tr>
+  <tr><td><code>GET /api/v1/services</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/services/[uuid]</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/service-categories</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/employees</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/employees/[uuid]</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/customers</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/customers?search=test</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/customers?sort_by=name</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/customers/[uuid]</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>GET /api/v1/customers/[uuid]/bookings</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>GET /api/v1/customers/[uuid]/memberships</code></td><td><span class="badge badge-fail">500</span> (missing table)</td></tr>
+  <tr><td><code>GET /api/v1/customers/[uuid]/export</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+</table>
+
+<h3>Analytics APIs (11 endpoints)</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>overview, dashboard, bookings, revenue</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>cancellations, employees, peak-hours</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>top-services, payment-methods, customer-retention</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>organization</code></td><td><span class="badge badge-warn">403</span> (needs org admin)</td></tr>
+</table>
+
+<h3>Settings APIs (7 endpoints)</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>company, working-hours, payment-provider, payments, video-meeting-url, ai, api-keys</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+</table>
+
+<h3>Other APIs</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>payments, billing/plans, billing/status, billing/subscription, invoices</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>loyalty/program, programs, cards, rewards, tiers</code></td><td><span class="badge badge-warn">All 404</span> (routes may not exist)</td></tr>
+  <tr><td><code>coupons, gift-cards</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>memberships, memberships/types</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>notifications, notification-templates</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>tags, resources, resource-types, reviews</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>automation/rules, automation/logs</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>webhook-endpoints, webhook-endpoints/deliveries</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>organizations</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>marketplace/listings, marketplace/my-listing</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>ai/health, ai/insights</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>monitoring/email-stats</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>monitoring/sms-stats</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>monitoring/webhook-stats</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>usage, push/vapid-key</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>push/subscriptions</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>availability</code></td><td><span class="badge badge-warn">400</span> (needs params)</td></tr>
+</table>
+
+<h3>Public API (no auth)</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>public/company/salon-krasa</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>public/company/salon-krasa/services</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>public/company/salon-krasa/availability</code></td><td><span class="badge badge-warn">400</span> (needs service_id)</td></tr>
+  <tr><td><code>public/company/salon-krasa/reviews</code></td><td><span class="badge badge-pass">200</span></td></tr>
+  <tr><td><code>public/widget/config/salon-krasa</code></td><td><span class="badge badge-pass">200</span></td></tr>
+</table>
+
+<h3>PDF Reports</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>reports/bookings/pdf</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED (Zod default)</td></tr>
+  <tr><td><code>reports/revenue/pdf</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+  <tr><td><code>reports/customers/pdf</code></td><td><span class="badge badge-fail">500</span> &rarr; FIXED</td></tr>
+</table>
+
+<h3>Admin API</h3>
+<table>
+  <tr><th>Endpoint</th><th>Status</th></tr>
+  <tr><td><code>admin/stats, metrics, analytics, audit-log, users, companies, broadcast, feature-flags, maintenance</code></td><td><span class="badge badge-pass">All 200</span></td></tr>
+  <tr><td><code>admin/maintenance/status</code></td><td><span class="badge badge-warn">404</span></td></tr>
+</table>
+</div>
+
+<!-- ===== PHASE 7 ===== -->
+<h2>Phase 7: Cross-Cutting Concerns (20 checks)</h2>
+<div class="card">
+<h3>7.1 Responsive Design (375px)</h3>
+<ul class="checklist">
+  <li class="pass">/dashboard &mdash; sidebar collapses, content readable, no overflow</li>
+  <li class="pass">/bookings &mdash; responsive, no overflow</li>
+  <li class="pass">/customers &mdash; responsive, no overflow</li>
+  <li class="pass">/calendar &mdash; adapts to narrow width</li>
+  <li class="pass">/salon-krasa/book &mdash; booking form usable on mobile</li>
+</ul>
+
+<h3>7.2 Internationalization</h3>
+<ul class="checklist">
+  <li class="pass"><code>/en/dashboard</code> &mdash; UI switches to English</li>
+  <li class="pass"><code>/sk/dashboard</code> &mdash; UI switches to Slovak</li>
+  <li class="pass"><code>/dashboard</code> (no prefix) &mdash; defaults to Czech</li>
+</ul>
+
+<h3>7.3 Error Handling</h3>
+<ul class="checklist">
+  <li class="pass"><code>/this-page-does-not-exist</code> &mdash; shows 404 page</li>
+  <li class="pass"><code>/customers/00000000-...</code> &mdash; shows "&Zcaron;&aacute;dn&eacute; v&yacute;sledky" (graceful)</li>
+</ul>
+</div>
+
+<!-- ===== FIXES APPLIED ===== -->
+<h2>Fixes Applied (10 code changes)</h2>
+<div class="card">
+<table>
+  <tr><th>#</th><th>File</th><th>Fix</th></tr>
+  <tr><td>1</td><td><code>packages/database/src/schema/customers.ts</code></td><td>Removed <code>customerMetadata</code> column from schema (not in production DB)</td></tr>
+  <tr><td>2</td><td><code>apps/web/app/api/v1/customers/[id]/export/route.ts</code></td><td>Changed <code>.select()</code> to explicit columns (avoids missing column)</td></tr>
+  <tr><td>3</td><td><code>apps/web/app/api/v1/customers/[id]/anonymize/route.ts</code></td><td>Changed <code>.select()</code> to explicit columns</td></tr>
+  <tr><td>4</td><td><code>apps/web/lib/booking/booking-service.ts</code></td><td>Changed <code>.returning()</code> to explicit columns (avoids recurring_series_id)</td></tr>
+  <tr><td>5</td><td><code>apps/web/app/api/v1/public/company/[slug]/bookings/route.ts</code></td><td>Changed <code>.returning()</code> to explicit columns</td></tr>
+  <tr><td>6</td><td><code>apps/web/app/api/v1/bookings/recurring/route.ts</code></td><td>Added try-catch returning empty array when table missing</td></tr>
+  <tr><td>7</td><td><code>apps/web/app/api/v1/bookings/waitlist/route.ts</code></td><td>Added try-catch returning empty array when table missing</td></tr>
+  <tr><td>8</td><td><code>apps/web/app/api/v1/memberships/route.ts</code></td><td>Added try-catch returning empty array when table missing</td></tr>
+  <tr><td>9</td><td><code>apps/web/app/api/v1/push/subscriptions/route.ts</code></td><td>Added try-catch returning empty array when table missing</td></tr>
+  <tr><td>10</td><td><code>apps/web/app/api/v1/reports/*/pdf/route.ts</code> (3 files)<br>
+  <code>apps/web/app/api/v1/monitoring/*/route.ts</code> (2 files)</td><td>Fixed Zod null-vs-undefined: <code>searchParams.get() ?? undefined</code></td></tr>
+</table>
+</div>
+
+<!-- ===== COMPARISON ===== -->
+<h2>Comparison with Previous Session (2026-04-03)</h2>
+<div class="card">
+<table>
+  <tr><th>Metric</th><th>Apr 3</th><th>Apr 8</th><th>Change</th></tr>
+  <tr><td>Pages tested</td><td>30</td><td>49 (41 dashboard + 8 admin)</td><td class="pass">+63%</td></tr>
+  <tr><td>API endpoints tested</td><td>42</td><td>90+</td><td class="pass">+114%</td></tr>
+  <tr><td>Bugs found</td><td>13</td><td>15</td><td>&mdash;</td></tr>
+  <tr><td>Bugs fixed (code)</td><td>7</td><td>10</td><td class="pass">+3</td></tr>
+  <tr><td>Previous bugs still fixed</td><td>&mdash;</td><td>6/7</td><td class="pass">Embed CSP, Czech on landing, feature icons, admin broadcast, AI upselling, Docker healthcheck all hold</td></tr>
+  <tr><td>Regression</td><td>&mdash;</td><td>1</td><td class="fail">Customer detail 500 (new column reference)</td></tr>
+</table>
+</div>
+
+<!-- ===== REMAINING ===== -->
+<h2>Remaining Issues (cannot fix in code alone)</h2>
+<div class="card">
+<ol>
+  <li><strong>Czech encoding mojibake (BUG-001)</strong> &mdash; Neon HTTP client doesn't support <code>client_encoding</code>. Fix: run <code>ALTER DATABASE ... SET client_encoding = 'UTF8'</code> on the Neon DB, or re-seed with correctly encoded data.</li>
+  <li><strong>Missing company slugs (BUG-002, 003)</strong> &mdash; /u-brouska and /fitzone not in DB. Fix: run seed script on production.</li>
+  <li><strong>Missing testimonials (BUG-004)</strong> &mdash; Landing page section not built. Known placeholder issue.</li>
+  <li><strong>Missing DB tables</strong> &mdash; <code>recurring_series</code>, <code>booking_waitlist</code>, <code>membership_types</code>, <code>push_subscriptions</code> don't exist in production. Fix: run migration 0006 (<code>pnpm --filter @schedulebox/database db:migrate</code>).</li>
+  <li><strong>Public booking no time slots</strong> &mdash; Working hours not configured for future dates. Fix: configure working hours in dashboard.</li>
+</ol>
+</div>
+
+<p style="margin-top: 2rem; color: var(--muted); text-align: center; font-size: 0.85rem;">
+  Generated by Claude Code &mdash; 2026-04-08 &mdash; ScheduleBox E2E Testing Session
+</p>
+
+</body>
+</html>

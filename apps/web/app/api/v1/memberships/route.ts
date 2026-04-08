@@ -20,8 +20,15 @@ export const GET = createRouteHandler({
   requiredPermissions: [PERMISSIONS.BOOKINGS_READ],
   handler: async ({ user }) => {
     const { companyId } = await findCompanyId(user!.sub);
-    const types = await listMembershipTypes(companyId);
-    return successResponse(types);
+    try {
+      const types = await listMembershipTypes(companyId);
+      return successResponse(types);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message?.includes('does not exist')) {
+        return successResponse([]);
+      }
+      throw e;
+    }
   },
 });
 

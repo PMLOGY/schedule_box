@@ -98,6 +98,8 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
       date_of_birth: customer.dateOfBirth,
       gender: customer.gender,
       notes: customer.notes,
+      // customer_metadata column not yet in production DB — return null for interface compat
+      customer_metadata: null,
       source: customer.source,
       health_score: customer.healthScore,
       clv_predicted: customer.clvPredicted,

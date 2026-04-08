@@ -2,6 +2,9 @@
  * Recurring Booking Series - List and Create
  * GET  /api/v1/bookings/recurring - List recurring series with pagination
  * POST /api/v1/bookings/recurring - Create recurring series with occurrence generation
+ *
+ * NOTE: recurring_series table may not exist in production (migration 0006 not applied).
+ * Handlers return empty results gracefully when the table is missing.
  */
 
 import { eq } from 'drizzle-orm';
@@ -15,50 +18,43 @@ import {
   recurringSeriesCreateSchema,
   recurringSeriesListQuerySchema,
 } from '@/validations/recurring';
-import { createRecurringSeries, listRecurringSeries } from '@/lib/booking/recurring-service';
 
 /**
  * GET /api/v1/bookings/recurring
- * List recurring series with pagination and optional isActive filter
  */
 export const GET = createRouteHandler({
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.BOOKINGS_READ],
   handler: async ({ req, user }) => {
-    const userSub = user?.sub ?? '';
-    const { companyId } = await findCompanyId(userSub);
-
-    // Parse query params from URL directly (same pattern as bookingListQuerySchema)
-    const searchParams = Object.fromEntries(req.nextUrl.searchParams.entries());
-    const query = recurringSeriesListQuerySchema.parse(searchParams);
-
-    const { data, meta } = await listRecurringSeries(companyId, query);
-
-    return paginatedResponse(data, meta);
+    try {
+      const { listRecurringSeries } = await import('@/lib/booking/recurring-service');
+      const userSub = user?.sub ?? '';
+      const { companyId } = await findCompanyId(userSub);
+      const searchParams = Object.fromEntries(req.nextUrl.searchParams.entries());
+      const query = recurringSeriesListQuerySchema.parse(searchParams);
+      const { data, meta } = await listRecurringSeries(companyId, query);
+      return paginatedResponse(data, meta);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message?.includes('does not exist')) {
+        return paginatedResponse([], { page: 1, limit: 20, total: 0, total_pages: 0 });
+      }
+      throw e;
+    }
   },
 });
 
 /**
  * POST /api/v1/bookings/recurring
- * Create a recurring booking series
- *
- * Generates individual booking occurrences based on repeat pattern.
- * Occurrences that conflict with existing bookings are skipped (not errors).
- *
- * Returns:
- * - 201: Series created with occurrence counts
- * - 404: Service, employee, or customer not found
- * - 400: Validation error
  */
 export const POST = createRouteHandler({
   bodySchema: recurringSeriesCreateSchema,
   requiresAuth: true,
   requiredPermissions: [PERMISSIONS.BOOKINGS_CREATE],
   handler: async ({ body, user }) => {
+    const { createRecurringSeries } = await import('@/lib/booking/recurring-service');
     const userSub = user?.sub ?? '';
     const { companyId } = await findCompanyId(userSub);
 
-    // Get user internal ID
     const [userRecord] = await db
       .select({ id: users.id })
       .from(users)

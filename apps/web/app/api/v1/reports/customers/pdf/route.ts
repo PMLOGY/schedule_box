@@ -23,8 +23,8 @@ export const GET = createRouteHandler({
 
     const searchParams = req.nextUrl.searchParams;
     const { days, locale } = querySchema.parse({
-      days: searchParams.get('days'),
-      locale: searchParams.get('locale'),
+      days: searchParams.get('days') ?? undefined,
+      locale: searchParams.get('locale') ?? undefined,
     });
 
     // Date thresholds for churn analysis

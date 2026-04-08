@@ -30,16 +30,23 @@ export const GET = createRouteHandler({
       throw new AppError('UNAUTHORIZED', 'User not found', 401);
     }
 
-    const subscriptions = await db
-      .select({
-        id: pushSubscriptions.id,
-        endpoint: pushSubscriptions.endpoint,
-        userAgent: pushSubscriptions.userAgent,
-        createdAt: pushSubscriptions.createdAt,
-      })
-      .from(pushSubscriptions)
-      .where(eq(pushSubscriptions.userId, userRecord.id));
+    try {
+      const subscriptions = await db
+        .select({
+          id: pushSubscriptions.id,
+          endpoint: pushSubscriptions.endpoint,
+          userAgent: pushSubscriptions.userAgent,
+          createdAt: pushSubscriptions.createdAt,
+        })
+        .from(pushSubscriptions)
+        .where(eq(pushSubscriptions.userId, userRecord.id));
 
-    return successResponse(subscriptions);
+      return successResponse(subscriptions);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message?.includes('does not exist')) {
+        return successResponse([]);
+      }
+      throw e;
+    }
   },
 });

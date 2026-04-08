@@ -25,9 +25,32 @@ export const GET = createRouteHandler<undefined, CustomerIdParam>({
     // Find user's company ID for tenant isolation
     const { companyId } = await findCompanyId(user!.sub);
 
-    // Find customer by UUID with tenant isolation
+    // Find customer by UUID with tenant isolation — explicit columns to avoid missing DB columns
     const [customer] = await db
-      .select()
+      .select({
+        id: customers.id,
+        uuid: customers.uuid,
+        name: customers.name,
+        email: customers.email,
+        phone: customers.phone,
+        dateOfBirth: customers.dateOfBirth,
+        gender: customers.gender,
+        notes: customers.notes,
+        source: customers.source,
+        healthScore: customers.healthScore,
+        clvPredicted: customers.clvPredicted,
+        noShowCount: customers.noShowCount,
+        totalBookings: customers.totalBookings,
+        totalSpent: customers.totalSpent,
+        lastVisitAt: customers.lastVisitAt,
+        marketingConsent: customers.marketingConsent,
+        preferredContact: customers.preferredContact,
+        preferredReminderMinutes: customers.preferredReminderMinutes,
+        isActive: customers.isActive,
+        deletedAt: customers.deletedAt,
+        createdAt: customers.createdAt,
+        updatedAt: customers.updatedAt,
+      })
       .from(customers)
       .where(
         and(

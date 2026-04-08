@@ -40,9 +40,18 @@ export const DELETE = createRouteHandler<undefined, CustomerIdParam>({
     // Find user's company ID for tenant isolation
     const { companyId } = await findCompanyId(user!.sub);
 
-    // Find customer by UUID with tenant isolation
+    // Find customer by UUID with tenant isolation — explicit columns
     const [customer] = await db
-      .select()
+      .select({
+        id: customers.id,
+        uuid: customers.uuid,
+        companyId: customers.companyId,
+        name: customers.name,
+        email: customers.email,
+        phone: customers.phone,
+        isActive: customers.isActive,
+        deletedAt: customers.deletedAt,
+      })
       .from(customers)
       .where(
         and(

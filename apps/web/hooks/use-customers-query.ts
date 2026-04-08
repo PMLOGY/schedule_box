@@ -25,7 +25,7 @@ export interface CustomerDetail {
   date_of_birth: string | null;
   gender: string | null;
   notes: string | null;
-  customer_metadata: Record<string, unknown> | null;
+  customer_metadata?: Record<string, unknown> | null;
   source: string | null;
   health_score: number | null;
   clv_predicted: string | null;

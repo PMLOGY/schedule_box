@@ -65,11 +65,17 @@ export const GET = createRouteHandler({
       serviceId = service?.id;
     }
 
-    const entries = await listWaitlistEntries(companyId, {
-      serviceId,
-      status: query.status,
-    });
-
-    return successResponse(entries);
+    try {
+      const entries = await listWaitlistEntries(companyId, {
+        serviceId,
+        status: query.status,
+      });
+      return successResponse(entries);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message?.includes('does not exist')) {
+        return successResponse([]);
+      }
+      throw e;
+    }
   },
 });

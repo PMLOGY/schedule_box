@@ -78,7 +78,7 @@ export const bookings = pgTable(
     videoMeetingId: integer('video_meeting_id').references(() => videoMeetings.id, {
       onDelete: 'set null',
     }),
-    // Recurring
+    // Recurring — NOTE: column may not exist in production DB if migration 0006 not applied
     recurringSeriesId: integer('recurring_series_id').references(() => recurringSeries.id, {
       onDelete: 'set null',
     }),

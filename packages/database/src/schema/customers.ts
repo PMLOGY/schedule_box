@@ -19,7 +19,6 @@ import {
   smallint,
   numeric,
   date,
-  jsonb,
   primaryKey,
   index,
   check,
@@ -47,7 +46,8 @@ export const customers = pgTable(
     dateOfBirth: date('date_of_birth'),
     gender: varchar('gender', { length: 10 }),
     notes: text('notes'),
-    customerMetadata: jsonb('customer_metadata'),
+    // customerMetadata removed — column not in production DB (migration 0006 not applied)
+    // customerMetadata: jsonb('customer_metadata'),
     source: varchar('source', { length: 50 }).default('manual'),
     // AI-computed fields
     healthScore: smallint('health_score'),
@@ -64,10 +64,10 @@ export const customers = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-    // PII encryption columns (expand phase — old plaintext columns retained until back-fill verified)
-    emailCiphertext: text('email_ciphertext'),
-    phoneCiphertext: text('phone_ciphertext'),
-    emailHmac: varchar('email_hmac', { length: 64 }),
+    // PII encryption columns removed — not in production DB (migration pending)
+    // emailCiphertext: text('email_ciphertext'),
+    // phoneCiphertext: text('phone_ciphertext'),
+    // emailHmac: varchar('email_hmac', { length: 64 }),
   },
   (table) => ({
     emailCompanyUnique: unique('customers_email_company_id_unique').on(
@@ -95,7 +95,7 @@ export const customers = pgTable(
     phoneIdx: index('idx_customers_phone').on(table.phone),
     userIdx: index('idx_customers_user').on(table.userId),
     healthIdx: index('idx_customers_health').on(table.companyId, table.healthScore),
-    emailHmacIdx: index('idx_customers_email_hmac').on(table.emailHmac),
+    // emailHmacIdx: index('idx_customers_email_hmac').on(table.emailHmac),
   }),
 );
 

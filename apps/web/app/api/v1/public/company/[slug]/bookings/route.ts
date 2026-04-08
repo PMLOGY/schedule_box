@@ -35,7 +35,8 @@ import { checkBookingLimit, incrementBookingCounter } from '@/lib/usage/usage-se
 import { redeemPoints } from '@/lib/loyalty/points-engine';
 import { z } from 'zod';
 import { lt, gt, or, sql } from 'drizzle-orm';
-import { encrypt, hmacIndex } from '@/lib/security/encryption';
+// encrypt/hmacIndex unused until encryption migration is applied
+// import { encrypt, hmacIndex } from '@/lib/security/encryption';
 import { triggerWebhooks } from '@/lib/webhooks/trigger';
 import { logRouteComplete, getRequestId } from '@/lib/logger/route-logger';
 import { bookingMetadataSchema } from '@/lib/industry/industry-fields';
@@ -280,45 +281,19 @@ async function _handlePublicBookingCreate({
   }
 
   // 5. Find or create customer by email + company_id
-  // Prefer HMAC lookup when ENCRYPTION_KEY is set (handles encrypted rows)
-  const encKey = process.env.ENCRYPTION_KEY ?? null;
-  const emailHmac = encKey ? hmacIndex(body.customer_email, encKey) : null;
-
-  // Try HMAC lookup first (encrypted rows), then fall back to plaintext
-  let customer = emailHmac
-    ? await db.query.customers.findFirst({
-        where: and(
-          eq(customers.emailHmac, emailHmac),
-          eq(customers.companyId, companyId),
-          isNull(customers.deletedAt),
-        ),
-        columns: { id: true, uuid: true, name: true, email: true, phone: true },
-      })
-    : null;
+  // Note: HMAC/encryption columns not yet in production DB (migration pending).
+  // Use plaintext lookup only until migration is applied.
+  let customer = await db.query.customers.findFirst({
+    where: and(
+      eq(customers.email, body.customer_email),
+      eq(customers.companyId, companyId),
+      isNull(customers.deletedAt),
+    ),
+    columns: { id: true, uuid: true, name: true, email: true, phone: true },
+  });
 
   if (!customer) {
-    // Fall back to plaintext lookup (rows not yet back-filled or no encryption key)
-    customer = await db.query.customers.findFirst({
-      where: and(
-        eq(customers.email, body.customer_email),
-        eq(customers.companyId, companyId),
-        isNull(customers.deletedAt),
-      ),
-      columns: { id: true, uuid: true, name: true, email: true, phone: true },
-    });
-  }
-
-  if (!customer) {
-    // Create new customer — dual-write: plaintext + ciphertext (expand phase)
-    const encryptedFields =
-      encKey !== null
-        ? {
-            emailCiphertext: encrypt(body.customer_email, encKey),
-            phoneCiphertext: body.customer_phone ? encrypt(body.customer_phone, encKey) : null,
-            emailHmac: hmacIndex(body.customer_email, encKey),
-          }
-        : {};
-
+    // Create new customer (encryption columns pending migration — plaintext only)
     const [newCustomer] = await db
       .insert(customers)
       .values({
@@ -327,7 +302,6 @@ async function _handlePublicBookingCreate({
         email: body.customer_email,
         phone: body.customer_phone || null,
         source: 'online',
-        ...encryptedFields,
       })
       .returning({
         id: customers.id,
@@ -338,23 +312,17 @@ async function _handlePublicBookingCreate({
       });
     customer = newCustomer;
   } else {
-    // Update customer name and phone if changed — dual-write phone ciphertext too
+    // Update customer name and phone if changed
     if (
       customer.name !== body.customer_name ||
       (body.customer_phone && customer.phone !== body.customer_phone)
     ) {
-      const updatedPhoneFields =
-        encKey !== null && body.customer_phone
-          ? { phoneCiphertext: encrypt(body.customer_phone, encKey) }
-          : {};
-
       await db
         .update(customers)
         .set({
           name: body.customer_name,
           ...(body.customer_phone ? { phone: body.customer_phone } : {}),
           updatedAt: new Date(),
-          ...updatedPhoneFields,
         })
         .where(eq(customers.id, customer.id));
     }
@@ -519,7 +487,21 @@ async function _handlePublicBookingCreate({
         discountAmount,
         bookingMetadata: body.metadata ?? null,
       })
-      .returning();
+      .returning({
+        id: bookings.id,
+        uuid: bookings.uuid,
+        companyId: bookings.companyId,
+        customerId: bookings.customerId,
+        serviceId: bookings.serviceId,
+        employeeId: bookings.employeeId,
+        startTime: bookings.startTime,
+        endTime: bookings.endTime,
+        status: bookings.status,
+        source: bookings.source,
+        price: bookings.price,
+        currency: bookings.currency,
+        createdAt: bookings.createdAt,
+      });
 
     return insertedBooking;
   });

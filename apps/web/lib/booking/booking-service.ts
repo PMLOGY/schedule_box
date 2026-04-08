@@ -389,7 +389,23 @@ export async function createBooking(
         couponId: null, // TODO: Implement coupon logic
         giftCardId: null, // TODO: Implement gift card logic
       })
-      .returning();
+      .returning({
+        id: bookings.id,
+        uuid: bookings.uuid,
+        companyId: bookings.companyId,
+        customerId: bookings.customerId,
+        serviceId: bookings.serviceId,
+        employeeId: bookings.employeeId,
+        startTime: bookings.startTime,
+        endTime: bookings.endTime,
+        status: bookings.status,
+        source: bookings.source,
+        notes: bookings.notes,
+        price: bookings.price,
+        currency: bookings.currency,
+        createdAt: bookings.createdAt,
+        updatedAt: bookings.updatedAt,
+      });
 
     // 7. Insert resource associations if provided
     if (input.resource_ids && input.resource_ids.length > 0) {

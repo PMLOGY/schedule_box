@@ -33,7 +33,7 @@ export const GET = createRouteHandler({
     // Parse and clamp window query param
     const searchParams = req.nextUrl.searchParams;
     const { window: windowMinutes } = querySchema.parse({
-      window: searchParams.get('window'),
+      window: searchParams.get('window') ?? undefined,
     });
 
     // Query processed_webhooks table for stats in the given time window

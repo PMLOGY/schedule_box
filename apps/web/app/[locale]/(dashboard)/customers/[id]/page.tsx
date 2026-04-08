@@ -85,7 +85,12 @@ export default function CustomerDetailPage() {
   const industryType = companySettings?.industry_type ?? 'general';
 
   // Data fetching
-  const { data: customerData, isLoading: customerLoading } = useCustomerDetail(uuid);
+  const {
+    data: customerData,
+    isLoading: customerLoading,
+    isError: customerError,
+    refetch: refetchCustomer,
+  } = useCustomerDetail(uuid);
   const { data: bookingsData, isLoading: bookingsLoading } = useCustomerBookings(uuid);
   const { data: tagsData } = useTagsQuery();
 
@@ -226,6 +231,24 @@ export default function CustomerDetailPage() {
           ))}
         </div>
         <Skeleton className="h-[400px] rounded-xl" />
+      </div>
+    );
+  }
+
+  // API error — show retry option instead of silent "no results"
+  if (customerError) {
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={() => router.push('/customers')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {t('backToList')}
+        </Button>
+        <Card variant="glass" className="p-8 text-center space-y-4">
+          <p className="text-muted-foreground">{tCommon('error')}</p>
+          <Button variant="outline" onClick={() => refetchCustomer()}>
+            {tCommon('retry')}
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -512,7 +535,7 @@ export default function CustomerDetailPage() {
         {industryType === 'medical_clinic' && (
           <TabsContent value="medical">
             <MedicalFields
-              metadata={customer.customer_metadata}
+              metadata={customer.customer_metadata ?? null}
               onSave={handleSaveMetadata}
               isLoading={updateMutation.isPending}
             />
@@ -523,7 +546,7 @@ export default function CustomerDetailPage() {
         {industryType === 'auto_service' && (
           <TabsContent value="vehicles">
             <VehicleRecords
-              metadata={customer.customer_metadata}
+              metadata={customer.customer_metadata ?? null}
               onSave={handleSaveMetadata}
               isLoading={updateMutation.isPending}
               customerId={uuid}
