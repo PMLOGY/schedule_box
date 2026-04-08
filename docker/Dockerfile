@@ -59,17 +59,6 @@ ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_SENTRY_DSN
 
-# Run database migrations before build (DATABASE_URL available as build arg)
-# Migrations are idempotent — safe to run on every deploy
-ARG DATABASE_URL
-RUN if [ -n "$DATABASE_URL" ]; then \
-      echo "Running database migrations..." && \
-      pnpm --filter @schedulebox/database db:migrate && \
-      echo "Migrations complete." ; \
-    else \
-      echo "No DATABASE_URL — skipping migrations"; \
-    fi
-
 # Build the Next.js app
 RUN pnpm --filter @schedulebox/web build
 
@@ -98,6 +87,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 # i18n message files loaded at runtime by next-intl
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/messages ./apps/web/messages
+# Database migrations — run at container startup (not build time)
+COPY --from=builder --chown=nextjs:nodejs /app/packages/database/src/migrations ./packages/database/src/migrations
+COPY --chown=nextjs:nodejs docker/migrate-runtime.mjs ./migrate-runtime.mjs
 
 USER nextjs
 
@@ -111,4 +103,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>/dev/null || \
       node -e "fetch('http://localhost:3000/api/health').then(r=>{process.exit(r.ok?0:1)}).catch(()=>process.exit(1))"
 
-CMD ["node", "apps/web/server.js"]
+# Run migrations at startup (runtime — can reach DB on Docker network), then start server
+CMD ["sh", "-c", "node migrate-runtime.mjs && node apps/web/server.js"]
