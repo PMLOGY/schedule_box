@@ -90,6 +90,11 @@ const SQL_FILES: SqlFile[] = [
     path: join(__dirname, 'sql', 'booking-status-expired.sql'),
     description: 'Add expired to bookings_status_check constraint',
   },
+  {
+    name: 'Fix Czech Encoding',
+    path: join(__dirname, 'sql', 'fix-czech-encoding.sql'),
+    description: 'Fix mojibake in company and service names (idempotent)',
+  },
 
   // 4. Composite indexes for query performance
   {

@@ -42,7 +42,12 @@ export const db = new Proxy({} as DrizzleDb, {
     if (!_db) {
       const url = getConnectionUrl();
       if (isNeonUrl()) {
-        const sql = neon(url);
+        // Append client_encoding option for Czech/Slovak diacritics
+        const neonUrl = new URL(url);
+        if (!neonUrl.searchParams.has('options')) {
+          neonUrl.searchParams.set('options', '-c client_encoding=UTF8');
+        }
+        const sql = neon(neonUrl.toString());
         _db = drizzleHttp(sql, { schema }) as unknown as DrizzleDb;
       } else {
         // Local PostgreSQL — use postgres.js (devDependency)
@@ -76,7 +81,11 @@ export const dbTx = new Proxy({} as DrizzleDb, {
     if (!_dbTx) {
       const url = getConnectionUrl();
       if (isNeonUrl()) {
-        const pool = new Pool({ connectionString: url });
+        const pool = new Pool({
+          connectionString: url,
+          // Ensure UTF-8 encoding for Czech/Slovak diacritics
+          options: '-c client_encoding=UTF8',
+        });
         _dbTx = drizzleWs({ client: pool, schema }) as unknown as DrizzleDb;
       } else {
         // Local PostgreSQL — use postgres.js (same driver, transactions work natively)
