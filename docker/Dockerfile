@@ -50,8 +50,8 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_OUTPUT_STANDALONE=1
-# Limit Node.js heap — 3GB needed for build with 60+ pages, monorepo tracing, and drizzle-orm 0.45
-ENV NODE_OPTIONS="--max-old-space-size=3072"
+# Limit Node.js heap — must fit within Coolify server RAM (4GB total)
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 # Skip Sentry source map upload during Docker build
 ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 
