@@ -12,7 +12,7 @@
  * No authentication required.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -120,6 +120,20 @@ function formatPrice(price: number, currency: string, locale: string): string {
 // ============================================================================
 
 export default function PublicBookingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <PublicBookingPageInner />
+    </Suspense>
+  );
+}
+
+function PublicBookingPageInner() {
   const params = useParams<{ locale: string; company_slug: string }>();
   const searchParams = useSearchParams();
   const t = useTranslations('publicBooking');
