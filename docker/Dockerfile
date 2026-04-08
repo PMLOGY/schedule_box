@@ -59,6 +59,17 @@ ENV SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_SENTRY_DSN
 
+# Run database migrations before build (DATABASE_URL available as build arg)
+# Migrations are idempotent — safe to run on every deploy
+ARG DATABASE_URL
+RUN if [ -n "$DATABASE_URL" ]; then \
+      echo "Running database migrations..." && \
+      pnpm --filter @schedulebox/database db:migrate && \
+      echo "Migrations complete." ; \
+    else \
+      echo "No DATABASE_URL — skipping migrations"; \
+    fi
+
 # Build the Next.js app
 RUN pnpm --filter @schedulebox/web build
 
